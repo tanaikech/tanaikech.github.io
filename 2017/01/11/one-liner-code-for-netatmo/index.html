@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.16" />
 
-  <title>Tags &middot; tanaike</title>
+  <title>One Liner Code for Netatmo &middot; tanaike</title>
 
   
   
@@ -36,8 +36,6 @@
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
 
   
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike" href="https://tanaikech.github.io/tags/index.xml" />
   
 
   
@@ -113,10 +111,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://tanaikech.github.io/tags/index.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
-    </li>
     
 
     
@@ -206,83 +200,100 @@
 
 
 <div class="header">
-  <h1>Tags</h1>
+  <h1>One Liner Code for Netatmo</h1>
+  <h2></h2>
 </div>
 <div class="content">
-  <ul>
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>11 Jan 2017, 15:00</time>
+  </div>
+
+  
+
   
   
-    <li>
-      <a href="python">python</a>
-      <span>&#40;3&#41;</span>
-    </li>
   
-    <li>
-      <a href="etc">etc</a>
-      <span>&#40;2&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/etc">etc</a>
+    
+  </div>
   
-    <li>
-      <a href="algorithm">algorithm</a>
-      <span>&#40;1&#41;</span>
-    </li>
   
-    <li>
-      <a href="c&#43;&#43;">c&#43;&#43;</a>
-      <span>&#40;1&#41;</span>
-    </li>
+
   
-    <li>
-      <a href="gas">gas</a>
-      <span>&#40;1&#41;</span>
-    </li>
   
-    <li>
-      <a href="go">go</a>
-      <span>&#40;1&#41;</span>
-    </li>
   
-    <li>
-      <a href="google">google</a>
-      <span>&#40;1&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/netatmo">netatmo</a>
+    
+  </div>
   
-    <li>
-      <a href="java">java</a>
-      <span>&#40;1&#41;</span>
-    </li>
   
-    <li>
-      <a href="library">library</a>
-      <span>&#40;1&#41;</span>
-    </li>
+
+</div>
+
   
-    <li>
-      <a href="netatmo">netatmo</a>
-      <span>&#40;1&#41;</span>
-    </li>
+
+<p>I made One Liner Code to retrieve data using Netatmo API. There are 2 ways. One is for windows dos. Another is for unix bash. Requirement tools are curl and jq.</p>
+
+<h3 id="windows-dos">windows dos</h3>
+
+<pre><code>&gt; setlocal &amp; curl -s -d &quot;grant_type=password&amp;client_id='#####'&amp;client_secret='#####'&amp;username='#####'&amp;password='#####'&amp;scope=read_station&quot; &quot;https://api.netatmo.net/oauth2/token&quot; | for /f &quot;usebackq tokens=*&quot; %a in (`jq -r &quot;.access_token&quot;`) do @set a=&quot;%a&quot; | curl -s -d &quot;access_token=%a&amp;device_id='#####'&quot; &quot;https://api.netatmo.net/api/getstationsdata&quot; &gt; dat.txt &amp; for /f &quot;usebackq tokens=*&quot; %b in (`jq -r &quot;.body.devices[0].dashboard_data.Temperature&quot; dat.txt`) do @set b=&quot;%b&quot; | echo: &amp; set /p nb=Indoor: Temperature %b [degree C],&lt;nul &amp; for /f &quot;usebackq tokens=*&quot; %b in (`jq -r &quot;.body.devices[0].dashboard_data.Humidity&quot; dat.txt`) do @set b=&quot;%b&quot; | set /p nb=Humidity %b [%],&lt;nul &amp; for /f &quot;usebackq tokens=*&quot; %b in (`jq -r &quot;.body.devices[0].dashboard_data.Pressure&quot; dat.txt`) do @set b=&quot;%b&quot; | set /p nb=Pressure %b [hPa]&lt;nul &amp; for /f &quot;usebackq tokens=*&quot; %b in (`jq -r &quot;.body.devices[0].modules[0].dashboard_data.Temperature&quot; dat.txt`) do @set b=&quot;%b&quot; | echo: &amp; set /p nb=Outdoor: Temperature %b [degree C],&lt;nul &amp; for /f &quot;usebackq tokens=*&quot; %b in (`jq -r &quot;.body.devices[0].modules[0].dashboard_data.Humidity&quot; dat.txt`) do @set b=&quot;%b&quot; | set /p nb=Humidity %b [%]&lt;nul &amp; del dat.txt
+
+Indoor: Temperature 12 [degree C],  Humidity 56 [%],  Pressure 1000.2 [hPa]
+Outdoor: Temperature 12.3 [degree C],  Humidity 56 [%]
+</code></pre>
+
+<h3 id="unix-bash">unix bash</h3>
+
+<pre><code>$ curl -s -d &quot;grant_type=password&amp;client_id='#####'&amp;client_secret='#####'&amp;username='#####'&amp;password='#####'&amp;scope=read_station&quot; &quot;https://api.netatmo.net/oauth2/token&quot;|curl -s -d &quot;access_token=`jq -r '.access_token'`&amp;device_id='#####'&quot; &quot;https://api.netatmo.net/api/getstationsdata&quot;|jq -r '&quot;\nIndoor: Temperature &quot;+(.body.devices[0].dashboard_data.Temperature|tostring)+&quot; [degree C], Humidity &quot;+(.body.devices[0].dashboard_data.Humidity|tostring)+&quot; [%], Pressure &quot;+(.body.devices[0].dashboard_data.Pressure|tostring)+&quot; [hPa]\nOutdoor: Temperature &quot;+(.body.devices[0].modules[0].dashboard_data.Temperature|tostring)+&quot; [degree C], Humidity &quot;+(.body.devices[0].modules[0].dashboard_data.Humidity|tostring)+&quot; [%]&quot;'
+
+Indoor: Temperature 12 [degree C], Humidity 56 [%], Pressure 1000.2 [hPa]
+Outdoor: Temperature 12.3 [degree C], Humidity 56 [%]
+</code></pre>
+
+<p>If you want to use these One Liner Codes, you can use following code. Please replace &ldquo;#####&rdquo; to yours.</p>
+
+<p>Also you can see the detailed information at <a href="https://github.com/tanaikech/cui4netatmo">https://github.com/tanaikech/cui4netatmo</a>. You will see 2 scripts except for one-liner code. These scripts retrieve data from netatmo using refresh token.</p>
+
+
   
-    <li>
-      <a href="node.js">node.js</a>
-      <span>&#40;1&#41;</span>
-    </li>
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2016/10/30/library-for-python"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2016/10/30/library-for-python">Library for python</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
+</div>
+
+
+
   
-    <li>
-      <a href="ruby">ruby</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="sample">sample</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="souwapy">souwapy</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-  </ul>
+
 </div>
 
 </div>
@@ -318,4 +329,5 @@
 
 </body>
 </html>
+
 
