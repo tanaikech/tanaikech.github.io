@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.16" />
 
-  <title>One Liner Code for Netatmo &middot; tanaike</title>
+  <title>Retrieving cells without blank cells &middot; tanaike</title>
 
   
   
@@ -200,7 +200,7 @@
 
 
 <div class="header">
-  <h1>One Liner Code for Netatmo</h1>
+  <h1>Retrieving cells without blank cells</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -209,7 +209,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>11 Jan 2017, 15:00</time>
+    <time>03 Feb 2017, 10:14</time>
   </div>
 
   
@@ -232,7 +232,7 @@
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/netatmo">netatmo</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>
     
   </div>
   
@@ -240,42 +240,76 @@
 
 </div>
 
-  
+  <p>This is a sample script for retrieving cells without blank cells. In this sheet, <u>the row 14 has one space.</u> Figure 1 shows the sample spreadsheet.</p>
 
-<p>I made One Liner Code to retrieve data using Netatmo API. There are 2 ways. One is for windows dos. Another is for unix bash. Requirement tools are curl and jq.</p>
+<p><br /></p>
 
-<h3 id="windows-dos">windows dos</h3>
+<table>
+<thead>
+<tr>
+<th align="center"></th>
+</tr>
+</thead>
 
-<pre><code>&gt; setlocal &amp; curl -s -d &quot;grant_type=password&amp;client_id='#####'&amp;client_secret='#####'&amp;username='#####'&amp;password='#####'&amp;scope=read_station&quot; &quot;https://api.netatmo.net/oauth2/token&quot; | for /f &quot;usebackq tokens=*&quot; %a in (`jq -r &quot;.access_token&quot;`) do @set a=&quot;%a&quot; | curl -s -d &quot;access_token=%a&amp;device_id='#####'&quot; &quot;https://api.netatmo.net/api/getstationsdata&quot; &gt; dat.txt &amp; for /f &quot;usebackq tokens=*&quot; %b in (`jq -r &quot;.body.devices[0].dashboard_data.Temperature&quot; dat.txt`) do @set b=&quot;%b&quot; | echo: &amp; set /p nb=Indoor: Temperature %b [degree C],&lt;nul &amp; for /f &quot;usebackq tokens=*&quot; %b in (`jq -r &quot;.body.devices[0].dashboard_data.Humidity&quot; dat.txt`) do @set b=&quot;%b&quot; | set /p nb=Humidity %b [%],&lt;nul &amp; for /f &quot;usebackq tokens=*&quot; %b in (`jq -r &quot;.body.devices[0].dashboard_data.Pressure&quot; dat.txt`) do @set b=&quot;%b&quot; | set /p nb=Pressure %b [hPa]&lt;nul &amp; for /f &quot;usebackq tokens=*&quot; %b in (`jq -r &quot;.body.devices[0].modules[0].dashboard_data.Temperature&quot; dat.txt`) do @set b=&quot;%b&quot; | echo: &amp; set /p nb=Outdoor: Temperature %b [degree C],&lt;nul &amp; for /f &quot;usebackq tokens=*&quot; %b in (`jq -r &quot;.body.devices[0].modules[0].dashboard_data.Humidity&quot; dat.txt`) do @set b=&quot;%b&quot; | set /p nb=Humidity %b [%]&lt;nul &amp; del dat.txt
+<tbody>
+<tr>
+<td align="center"><img src="https://tanaikech.github.io/img/fig170203a.png" alt="" /></td>
+</tr>
 
-Indoor: Temperature 12 [degree C],  Humidity 56 [%],  Pressure 1000.2 [hPa]
-Outdoor: Temperature 12.3 [degree C],  Humidity 56 [%]
+<tr>
+<td align="center">Fig. 1: Sample spreadsheet.</td>
+</tr>
+</tbody>
+</table>
+
+<p><br /></p>
+
+<ol>
+<li>Retrieving cells with spaces and no blank cells.</li>
+</ol>
+
+<pre><code>  var data = SpreadsheetApp
+             .getActiveSpreadsheet()
+             .getActiveSheet()
+             .getRange('a1:a30')
+             .getValues();
+  var Result = [!i ? null : i for each (i in data)]
+               .filter(function(e) {
+                 return (e != null)
+               }).join('');
 </code></pre>
 
-<h3 id="unix-bash">unix bash</h3>
+<p><strong>Result : Hello World</strong></p>
 
-<pre><code>$ curl -s -d &quot;grant_type=password&amp;client_id='#####'&amp;client_secret='#####'&amp;username='#####'&amp;password='#####'&amp;scope=read_station&quot; &quot;https://api.netatmo.net/oauth2/token&quot;|curl -s -d &quot;access_token=`jq -r '.access_token'`&amp;device_id='#####'&quot; &quot;https://api.netatmo.net/api/getstationsdata&quot;|jq -r '&quot;\nIndoor: Temperature &quot;+(.body.devices[0].dashboard_data.Temperature|tostring)+&quot; [degree C], Humidity &quot;+(.body.devices[0].dashboard_data.Humidity|tostring)+&quot; [%], Pressure &quot;+(.body.devices[0].dashboard_data.Pressure|tostring)+&quot; [hPa]\nOutdoor: Temperature &quot;+(.body.devices[0].modules[0].dashboard_data.Temperature|tostring)+&quot; [degree C], Humidity &quot;+(.body.devices[0].modules[0].dashboard_data.Humidity|tostring)+&quot; [%]&quot;'
+<ol>
+<li>Retrieving cells without both spaces and blank cells.</li>
+</ol>
 
-Indoor: Temperature 12 [degree C], Humidity 56 [%], Pressure 1000.2 [hPa]
-Outdoor: Temperature 12.3 [degree C], Humidity 56 [%]
+<pre><code>  var data = SpreadsheetApp
+             .getActiveSpreadsheet()
+             .getActiveSheet()
+             .getRange('a1:a30')
+             .getValues();
+  var Result = [isNaN(i) ? null : i for each (i in data)]
+               .filter(function(e) {
+                 return (e != null)
+               }).join('');
 </code></pre>
 
-<p>If you want to use these One Liner Codes, you can use following code. Please replace &ldquo;#####&rdquo; to yours.</p>
-
-<p>Also you can see the detailed information at <a href="https://github.com/tanaikech/cui4netatmo">https://github.com/tanaikech/cui4netatmo</a>. You will see 2 scripts except for one-liner code. These scripts retrieve data from netatmo using refresh token.</p>
+<p><strong>Result : HelloWorld</strong></p>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2016/10/30/library-for-python"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2017/01/11/one-liner-code-for-netatmo"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2016/10/30/library-for-python">Library for python</a>
+      <a href="https://tanaikech.github.io/2017/01/11/one-liner-code-for-netatmo">One Liner Code for Netatmo</a>
     </nav>
     
   </div>
@@ -284,14 +318,8 @@ Outdoor: Temperature 12.3 [degree C], Humidity 56 [%]
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2017/02/03/retrieving-cells-without-blank-cells">Retrieving cells without blank cells</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2017/02/03/retrieving-cells-without-blank-cells"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
