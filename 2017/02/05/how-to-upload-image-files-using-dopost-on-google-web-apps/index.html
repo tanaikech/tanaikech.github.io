@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.16" />
 
-  <title>Google Apps Script &middot; tanaike</title>
+  <title>How to upload image files using doPost on Google Web Apps &middot; tanaike</title>
 
   
   
@@ -36,8 +36,6 @@
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
 
   
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike" href="https://tanaikech.github.io/tags/google-apps-script/index.xml" />
   
 
   
@@ -113,10 +111,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://tanaikech.github.io/tags/google-apps-script/index.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
-    </li>
     
 
     
@@ -206,16 +200,12 @@
 
 
 <div class="header">
-  <h1>Google Apps Script</h1>
+  <h1>How to upload image files using doPost on Google Web Apps</h1>
+  <h2></h2>
 </div>
-
 <div class="content">
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2017/02/05/how-to-upload-image-files-using-dopost-on-google-web-apps">How to upload image files using doPost on Google Web Apps</a></h2>
 
-    <div class="post-meta">
+  <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
@@ -250,73 +240,143 @@
 
 </div>
 
-  </header>
+  
 
-  <p>
-  File upload using HTML form in GAS project Rule Following scripts have to be made into a project of Google Apps Script. Deploy the GAS project as a web application. Ref After updated the script, it has to be updated as a new version. Form.html : &lt;html&gt; &lt;body&gt; &lt;form&gt; &lt;input type=&quot;file&quot; name=&quot;imageFile&quot;&gt; &lt;input type=&quot;button&quot; value=&quot;ok&quot; onclick=&quot;google.script.run.upload(this.parentNode)&quot;&gt; &lt;/form&gt; &lt;/body&gt; &lt;/html&gt; GAS : function doGet() { return HtmlService.createHtmlOutputFromFile('Form.html'); } function upload(e) { var destination_id = '#####'; // Folder ID of destination folder // Reference : https://developers.google.com/apps-script/reference/base/blob#getAs(String) // You can use 'application/pdf', 'image/bmp', 'image/gif', 'image/jpeg' and 'image/png'.
-  </p>
+<h1 id="file-upload-using-html-form-in-gas-project">File upload using HTML form in GAS project</h1>
+
+<p><strong>Rule</strong></p>
+
+<ol>
+<li><p>Following scripts have to be made into a project of Google Apps Script.</p></li>
+
+<li><p>Deploy the GAS project as a web application. <a href="https://developers.google.com/apps-script/guides/web">Ref</a></p></li>
+
+<li><p>After updated the script, it has to be updated as a new version.</p></li>
+</ol>
+
+<p><strong>Form.html :</strong></p>
+
+<pre><code>&lt;html&gt;
+  &lt;body&gt;
+    &lt;form&gt;
+      &lt;input type=&quot;file&quot; name=&quot;imageFile&quot;&gt;
+      &lt;input type=&quot;button&quot; value=&quot;ok&quot; onclick=&quot;google.script.run.upload(this.parentNode)&quot;&gt;
+    &lt;/form&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p><strong>GAS :</strong></p>
+
+<pre><code>function doGet() {
+  return HtmlService.createHtmlOutputFromFile('Form.html');
+}
+
+function upload(e) {
+  var destination_id = '#####'; // Folder ID of destination folder
+
+  // Reference : https://developers.google.com/apps-script/reference/base/blob#getAs(String)
+  // You can use 'application/pdf', 'image/bmp', 'image/gif', 'image/jpeg' and 'image/png'.
+  var contentType = 'image/jpeg';
+  var img = e.imageFile;
+
+  var destination = DriveApp.getFolderById(destination_id);
+  var img = img.getAs(contentType);
+  destination.createFile(img);
+}
+</code></pre>
+
+<p>When you set &lsquo;image/jpeg&rsquo; as &ldquo;contentType&rdquo; and upload png file, the uploaded image file is converted to jpeg file and saved it to the destination folder.</p>
+
+<h1 id="file-upload-from-local-pc">File upload from local PC</h1>
+
+<p><strong>Rule</strong></p>
+
+<ol>
+<li><p>Following GAS has to be made into a project of Google Apps Script.</p></li>
+
+<li><p>Deploy the GAS project as a web application. <a href="https://developers.google.com/apps-script/guides/web">Ref</a></p></li>
+
+<li><p>After updated the script, it has to be updated as a new version.</p></li>
+</ol>
+
+<p><strong>GAS :</strong></p>
+
+<p>This script is very simple sample. It uploads image files of bmp, gif, jpeg, png and svg. When you want to upload other files, please change following script.</p>
+
+<pre><code>function doGet(e) {
+  return message(&quot;Error: no parameters&quot;);
+}
+
+function doPost(e) {
+  if (!e.parameters.filename || !e.parameters.file || !e.parameters.imageformat) {
+    return message(&quot;Error: Bad parameters&quot;);
+  } else {
+    var imgf = e.parameters.imageformat[0].toUpperCase();
+    var mime =
+        (imgf == 'BMP')  ? MimeType.BMP
+      : (imgf == 'GIF')  ? MimeType.GIF
+      : (imgf == 'JPEG') ? MimeType.JPEG
+      : (imgf == 'PNG')  ? MimeType.PNG
+      : (imgf == 'SVG')  ? MimeType.SVG
+      : false;
+    if (mime) {
+      var data = Utilities.base64Decode(e.parameters.file, Utilities.Charset.UTF_8);
+      var blob = Utilities.newBlob(data, mime, e.parameters.filename);
+      DriveApp.getFolderById('FOLDER ID').createFile(blob);
+      return message(&quot;completed&quot;);
+    } else {
+      return message(&quot;Error: Bad image format&quot;);
+    }
+  }
+}
+
+function message(msg) {
+  return ContentService.createTextOutput(JSON.stringify({result: msg})).setMimeType(ContentService.MimeType.JSON);
+}
+</code></pre>
+
+<p><strong>curl :</strong></p>
+
+<pre><code>curl -L \
+    -F 'filename=[file name on Google Drive]' \
+    -F 'imageformat=[image format (bmp, gif, jpeg, png and svg)]' \
+    -F &quot;file=`base64 [upload file]`&quot; \
+    '[Current web app URL (https://script.google.com/macros/s/fugahoge/exec)]'
+</code></pre>
+
+<p>Using &ldquo;doPost&rdquo; of <a href="https://developers.google.com/apps-script/guides/web">Google Web Apps</a>, files cannot be uploaded from local PC, while text data which isn&rsquo;t a file can be uploaded. So it converted from image data to base64 data, and upload it. By this, it was found that various files can be uploaded using &ldquo;doPost&rdquo; of Google Web Apps. Although the sample on this submission is &ldquo;curl&rdquo; command, using this method, you can upload files using html form.</p>
+
 
   
-  <footer>
-    <a href="https://tanaikech.github.io/2017/02/05/how-to-upload-image-files-using-dopost-on-google-web-apps">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2017/02/03/retrieving-cells-without-blank-using-gas">Retrieving cells without blank using GAS</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>03 Feb 2017, 10:14</time>
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2017/02/05/add-next-row-to-current-row-using-awk"><i class="fa fa-chevron-left"></i></a>
+    
   </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
+  <div class="pure-u-10-24">
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/etc">etc</a>
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2017/02/05/add-next-row-to-current-row-using-awk">Add next row to current row using AWK</a>
+    </nav>
     
   </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
     
   </div>
-  
-  
-
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
 </div>
 
-  </header>
 
-  <p>
-  This is a sample script for retrieving cells without blank cells. Figure 1 shows the sample spreadsheet. In this sheet, the row 14 has one space. Fig. 1: Sample spreadsheet. Data is retrieved as follows. var data = SpreadsheetApp .getActiveSpreadsheet() .getActiveSheet() .getRange('a1:a30') .getValues(); 1. Retrieving cells with spaces and no blank cells. var Result = [i for each (i in data)if (i)].join(''); Result : Hello World 2. Retrieving cells without both spaces and blank cells.
-  </p>
 
   
-  <footer>
-    <a href="https://tanaikech.github.io/2017/02/03/retrieving-cells-without-blank-using-gas">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
-  
-</article>
 
-  
 </div>
 
 </div>
@@ -352,4 +412,5 @@
 
 </body>
 </html>
+
 
