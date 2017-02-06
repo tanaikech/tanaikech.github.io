@@ -344,10 +344,55 @@ function message(msg) {
     -F 'filename=[file name on Google Drive]' \
     -F 'imageformat=[image format (bmp, gif, jpeg, png and svg)]' \
     -F &quot;file=`base64 [upload file]`&quot; \
-    '[Current web app URL (https://script.google.com/macros/s/fugahoge/exec)]'
+    '[Current web app URL (https://script.google.com/macros/s/[Project ID]/exec)]'
 </code></pre>
 
 <p>Using &ldquo;doPost&rdquo; of <a href="https://developers.google.com/apps-script/guides/web">Google Web Apps</a>, files cannot be uploaded from local PC, while text data which isn&rsquo;t a file can be uploaded. So it converted from image data to base64 data, and upload it. By this, it was found that various files can be uploaded using &ldquo;doPost&rdquo; of Google Web Apps. Although the sample on this submission is &ldquo;curl&rdquo; command, using this method, you can upload files using html form.</p>
+
+<p><strong>html form :</strong></p>
+
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;script src=&quot;http://code.jquery.com/jquery-latest.js&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;input type=&quot;file&quot; id=&quot;file&quot;&gt;
+
+    &lt;script type=&quot;text/javascript&quot;&gt;
+        $(function(){
+            var url = 'https://script.google.com/macros/s/[Project ID]/exec';
+            var params = {
+                filename: 'samplefile',
+                imageformat: 'PNG'
+            };
+
+            $('#file').on(&quot;change&quot;, function() {
+                var file = this.files[0];
+                var fr = new FileReader();
+                fr.onload = function(e) {
+                    params.file = e.target.result.replace(/^.*,/, '');
+                    postJump();
+                }
+                fr.readAsDataURL(file);
+            });
+
+            function postJump(){
+                var html = '&lt;form method=&quot;post&quot; action=&quot;'+url+'&quot; id=&quot;postjump&quot; style=&quot;display: none;&quot;&gt;';
+                Object.keys(params).forEach(function (key) {
+                    html += '&lt;input type=&quot;hidden&quot; name=&quot;'+key+'&quot; value=&quot;'+params[key]+'&quot; &gt;';
+                });
+                html += '&lt;/form&gt;';
+                $(&quot;body&quot;).append(html);
+                $('#postjump').submit();
+                $('#postjump').remove();
+            }
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
 
 
   

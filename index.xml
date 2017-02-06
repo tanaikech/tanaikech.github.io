@@ -120,10 +120,55 @@ function message(msg) {
     -F &#39;filename=[file name on Google Drive]&#39; \
     -F &#39;imageformat=[image format (bmp, gif, jpeg, png and svg)]&#39; \
     -F &amp;quot;file=`base64 [upload file]`&amp;quot; \
-    &#39;[Current web app URL (https://script.google.com/macros/s/fugahoge/exec)]&#39;
+    &#39;[Current web app URL (https://script.google.com/macros/s/[Project ID]/exec)]&#39;
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Using &amp;ldquo;doPost&amp;rdquo; of &lt;a href=&#34;https://developers.google.com/apps-script/guides/web&#34;&gt;Google Web Apps&lt;/a&gt;, files cannot be uploaded from local PC, while text data which isn&amp;rsquo;t a file can be uploaded. So it converted from image data to base64 data, and upload it. By this, it was found that various files can be uploaded using &amp;ldquo;doPost&amp;rdquo; of Google Web Apps. Although the sample on this submission is &amp;ldquo;curl&amp;rdquo; command, using this method, you can upload files using html form.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;html form :&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;!DOCTYPE html&amp;gt;
+&amp;lt;html&amp;gt;
+&amp;lt;head&amp;gt;
+    &amp;lt;meta charset=&amp;quot;UTF-8&amp;quot;&amp;gt;
+    &amp;lt;script src=&amp;quot;http://code.jquery.com/jquery-latest.js&amp;quot; type=&amp;quot;text/javascript&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+&amp;lt;/head&amp;gt;
+&amp;lt;body&amp;gt;
+    &amp;lt;input type=&amp;quot;file&amp;quot; id=&amp;quot;file&amp;quot;&amp;gt;
+
+    &amp;lt;script type=&amp;quot;text/javascript&amp;quot;&amp;gt;
+        $(function(){
+            var url = &#39;https://script.google.com/macros/s/[Project ID]/exec&#39;;
+            var params = {
+                filename: &#39;samplefile&#39;,
+                imageformat: &#39;PNG&#39;
+            };
+
+            $(&#39;#file&#39;).on(&amp;quot;change&amp;quot;, function() {
+                var file = this.files[0];
+                var fr = new FileReader();
+                fr.onload = function(e) {
+                    params.file = e.target.result.replace(/^.*,/, &#39;&#39;);
+                    postJump();
+                }
+                fr.readAsDataURL(file);
+            });
+
+            function postJump(){
+                var html = &#39;&amp;lt;form method=&amp;quot;post&amp;quot; action=&amp;quot;&#39;+url+&#39;&amp;quot; id=&amp;quot;postjump&amp;quot; style=&amp;quot;display: none;&amp;quot;&amp;gt;&#39;;
+                Object.keys(params).forEach(function (key) {
+                    html += &#39;&amp;lt;input type=&amp;quot;hidden&amp;quot; name=&amp;quot;&#39;+key+&#39;&amp;quot; value=&amp;quot;&#39;+params[key]+&#39;&amp;quot; &amp;gt;&#39;;
+                });
+                html += &#39;&amp;lt;/form&amp;gt;&#39;;
+                $(&amp;quot;body&amp;quot;).append(html);
+                $(&#39;#postjump&#39;).submit();
+                $(&#39;#postjump&#39;).remove();
+            }
+        });
+    &amp;lt;/script&amp;gt;
+&amp;lt;/body&amp;gt;
+&amp;lt;/html&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>
     
