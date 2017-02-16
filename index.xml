@@ -7,8 +7,89 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Mon, 13 Feb 2017 08:57:58 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 16 Feb 2017 10:31:37 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Download a CSV File from Spreadsheet Using Google HTML Service</title>
+      <link>https://tanaikech.github.io/2017/02/16/download-a-csv-file-from-spreadsheet-using-google-html-service</link>
+      <pubDate>Thu, 16 Feb 2017 10:31:37 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/02/16/download-a-csv-file-from-spreadsheet-using-google-html-service</guid>
+      <description>
+
+&lt;p&gt;Here, I introduce how to download a CSV file from spreadsheet using Google HTML Service.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Using &amp;ldquo;onOpen()&amp;rdquo;, it addes menu for launching a dialog.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/170216a.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;After launching the dialog, &amp;ldquo;getFileUrl()&amp;rdquo; is launched by pushing a button. &amp;ldquo;getFileUrl()&amp;rdquo; exports a CSV file and outputs download URL.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;The CSV file is downloaded by &amp;ldquo;executeDownload()&amp;rdquo;.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;u&gt;Please put both HTML and GAS to a GAS project.&lt;/u&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;html-download-html&#34;&gt;HTML : download.html&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;!DOCTYPE html&amp;gt;
+&amp;lt;html&amp;gt;
+  &amp;lt;body&amp;gt;
+    Download CSV?
+    &amp;lt;form&amp;gt;
+      &amp;lt;input type=&amp;quot;button&amp;quot; value=&amp;quot;ok&amp;quot; onclick=&amp;quot;google.script.run
+                                              .withSuccessHandler(executeDownload)
+                                              .getFileUrl();&amp;quot; /&amp;gt;
+    &amp;lt;/form&amp;gt;
+  &amp;lt;/body&amp;gt;
+  &amp;lt;script&amp;gt;
+    function executeDownload(url) {
+      window.location.href = url;
+    }
+  &amp;lt;/script&amp;gt;
+&amp;lt;/html&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;gas&#34;&gt;GAS :&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;function onOpen() {
+  SpreadsheetApp.getUi()
+                .createMenu(&#39;export&#39;)
+                .addItem(&#39;export csv files&#39;, &#39;dialog&#39;)
+                .addToUi();
+}
+
+function dialog() {
+  var html = HtmlService.createHtmlOutputFromFile(&#39;download&#39;);
+  SpreadsheetApp.getUi().showModalDialog(html, &#39;CSV download dialog&#39;);
+}
+
+function getFileUrl() {
+    var filename = &amp;quot;#####&amp;quot;; // CSV file name
+    var folder = &amp;quot;#####&amp;quot;; // Folder ID
+
+    var csv = &amp;quot;&amp;quot;;
+    var v = SpreadsheetApp // Now spreadsheet is an active sheet.
+            .getActiveSpreadsheet()
+            .getActiveSheet()
+            .getDataRange()
+            .getValues();
+    v.forEach(function(e) {
+      csv += e.join(&amp;quot;,&amp;quot;) + &amp;quot;\n&amp;quot;;
+    });
+    var url = DriveApp.getFolderById(folder)
+              .createFile(filename, csv, MimeType.CSV)
+              .getDownloadUrl()
+              .replace(&amp;quot;?e=download&amp;amp;gd=true&amp;quot;,&amp;quot;&amp;quot;);
+    return url;
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
     
     <item>
       <title>Making charts at spreadsheet</title>
@@ -1092,17 +1173,6 @@ Kanshi TANAIKE
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>1stpost</title>
-      <link>https://tanaikech.github.io/2016/09/18/1stpost</link>
-      <pubDate>Sun, 18 Sep 2016 15:02:15 +0900</pubDate>
-      
-      <guid>https://tanaikech.github.io/2016/09/18/1stpost</guid>
-      <description>&lt;p&gt;This is a first post. Today this blog was launched. I would like to introduce some of my experimental results. I&amp;rsquo;m Japanese. So I&amp;rsquo;ll use both English and Japanese here.
-Thank you.&lt;/p&gt;
 </description>
     </item>
     
