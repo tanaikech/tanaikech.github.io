@@ -7,8 +7,67 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Thu, 16 Feb 2017 11:53:50 +0900</lastBuildDate>
+    <lastBuildDate>Fri, 17 Feb 2017 17:25:29 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/tags/google-apps-script/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Retrieving Access Token for Google Drive API using GAS</title>
+      <link>https://tanaikech.github.io/2017/02/17/retrieving-access-token-for-google-drive-api-using-gas</link>
+      <pubDate>Fri, 17 Feb 2017 17:25:29 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/02/17/retrieving-access-token-for-google-drive-api-using-gas</guid>
+      <description>
+
+&lt;p&gt;These GASs retrieve an access token for using Google Drive API. There are 3 parts. Before you use this, please retrieve client ID, client secret and redirect uri from Google , and choose scopes.&lt;/p&gt;
+
+&lt;h3 id=&#34;1-retrieving-code-from-web&#34;&gt;1. Retrieving code from web&lt;/h3&gt;
+
+&lt;p&gt;This is a script to output URL for retrieving &amp;ldquo;code&amp;rdquo; from web. Please retrieve &amp;ldquo;code&amp;rdquo; by import this URL to your browser. After you run this script, using &amp;ldquo;url&amp;rdquo; got from this script, it retrieves &amp;ldquo;code&amp;rdquo;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;  var url = &#39;https://accounts.google.com/o/oauth2/auth&#39; +
+        &amp;quot;?client_id=&amp;quot; + encodeURIComponent(clientid) +
+        &amp;quot;&amp;amp;redirect_uri=&amp;quot; + encodeURIComponent(redirecturi) +
+        &amp;quot;&amp;amp;scope=&amp;quot; + encodeURIComponent(scopes) +
+        &amp;quot;&amp;amp;response_type=code&amp;amp;access_type=offline&amp;quot;;
+  Logger.log(url);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;2-retrieving-refresh-token&#34;&gt;2. Retrieving refresh token&lt;/h3&gt;
+
+&lt;p&gt;This is a script to retrieve &amp;ldquo;refresh token&amp;rdquo;. Before you run this script, it sets &amp;ldquo;code&amp;rdquo; got at part 1. By this script, you can also retrieve &amp;ldquo;access token&amp;rdquo;. Also this &amp;ldquo;access token&amp;rdquo; can be used. But there is a limit time for it. So you have to retrieve &amp;ldquo;access token&amp;rdquo; again. At that time, &amp;ldquo;refresh token&amp;rdquo; is need to it. According to &amp;ldquo;golang.org/x/oauth2&amp;rdquo;, it uses &amp;ldquo;refresh token&amp;rdquo; every time without using the limit time of access token. So this script can be used to only retrieve &amp;ldquo;refresh token&amp;rdquo;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;  var token = JSON.parse(UrlFetchApp.fetch(&amp;quot;https://accounts.google.com/o/oauth2/token&amp;quot;, {
+    &amp;quot;method&amp;quot; : &amp;quot;POST&amp;quot;,
+    &amp;quot;payload&amp;quot; : {
+      &amp;quot;code&amp;quot; : code,
+      &amp;quot;client_id&amp;quot; : clientid,
+      &amp;quot;client_secret&amp;quot; : clientsecret,
+      &amp;quot;redirect_uri&amp;quot; : redirecturi,
+      &amp;quot;grant_type&amp;quot; : &amp;quot;authorization_code&amp;quot;
+    },
+    &amp;quot;muteHttpExceptions&amp;quot; : true
+  }).getContentText());
+  Logger.log(token.refresh_token);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;3-retrieving-access-token&#34;&gt;3. Retrieving access token&lt;/h3&gt;
+
+&lt;p&gt;This is a script to retrieve &amp;ldquo;access token&amp;rdquo; using &amp;ldquo;refresh token&amp;rdquo;. Before you run this script, it sets &amp;ldquo;refresh token&amp;rdquo; got at part 2. When you use Drive API, the &amp;ldquo;access token&amp;rdquo; can be retrieved by this script. You can continue to use &amp;ldquo;refresh token&amp;rdquo; got at part 2, until it&amp;rsquo;s revoked.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;  var token = JSON.parse(UrlFetchApp.fetch(&amp;quot;https://www.googleapis.com/oauth2/v4/token&amp;quot;, {
+    &amp;quot;method&amp;quot; : &amp;quot;POST&amp;quot;,
+    &amp;quot;payload&amp;quot; : {
+      &amp;quot;client_id&amp;quot; : clientid,
+      &amp;quot;client_secret&amp;quot; : clientsecret,
+      &amp;quot;refresh_token&amp;quot; :refreshtoken,
+      &amp;quot;grant_type&amp;quot; : &amp;quot;refresh_token&amp;quot;
+    },
+    &amp;quot;muteHttpExceptions&amp;quot; : true
+  }).getContentText());
+  Logger.log(token.access_token);
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
     
     <item>
       <title>Send E-mail with Excel file converted from Spreadsheet</title>

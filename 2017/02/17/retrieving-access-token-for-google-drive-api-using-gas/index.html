@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.16" />
 
-  <title>Send E-mail with Excel file converted from Spreadsheet &middot; tanaike</title>
+  <title>Retrieving Access Token for Google Drive API using GAS &middot; tanaike</title>
 
   
   
@@ -200,7 +200,7 @@
 
 
 <div class="header">
-  <h1>Send E-mail with Excel file converted from Spreadsheet</h1>
+  <h1>Retrieving Access Token for Google Drive API using GAS</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -209,7 +209,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>16 Feb 2017, 11:53</time>
+    <time>17 Feb 2017, 17:25</time>
   </div>
 
   
@@ -234,7 +234,9 @@
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/oauth2">OAuth2</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/drive-api">Drive API</a>
     
   </div>
   
@@ -242,42 +244,69 @@
 
 </div>
 
-  <p>This sample script sends an e-mail with an Excel file exported from Spreadsheet as an attachment file.</p>
+  
 
-<pre><code>function excelSender() {
-  var sheetID = [Sheet ID];
-  var xlsxName = [Excel file name];
-  var params = {
-    &quot;headers&quot; : {Authorization: &quot;Bearer [Retrieved AccessToken]&quot;},
-    &quot;muteHttpExceptions&quot; : true
-  };
-  var dUrl = &quot;https://www.googleapis.com/drive/v3/files/&quot; + sheetID + &quot;/export?mimeType=application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&quot;
-  var xlsxlFile = UrlFetchApp.fetch(dUrl, params).getBlob().setName(xlsxName);
-  MailApp.sendEmail({
-    to: [Mail address],
-    subject: &quot;sample subject&quot;,
-    body: &quot;sample body&quot;,
-    attachments: [xlsxlFile]
-  });
-}
+<p>These GASs retrieve an access token for using Google Drive API. There are 3 parts. Before you use this, please retrieve client ID, client secret and redirect uri from Google , and choose scopes.</p>
+
+<h3 id="1-retrieving-code-from-web">1. Retrieving code from web</h3>
+
+<p>This is a script to output URL for retrieving &ldquo;code&rdquo; from web. Please retrieve &ldquo;code&rdquo; by import this URL to your browser. After you run this script, using &ldquo;url&rdquo; got from this script, it retrieves &ldquo;code&rdquo;.</p>
+
+<pre><code>  var url = 'https://accounts.google.com/o/oauth2/auth' +
+        &quot;?client_id=&quot; + encodeURIComponent(clientid) +
+        &quot;&amp;redirect_uri=&quot; + encodeURIComponent(redirecturi) +
+        &quot;&amp;scope=&quot; + encodeURIComponent(scopes) +
+        &quot;&amp;response_type=code&amp;access_type=offline&quot;;
+  Logger.log(url);
 </code></pre>
 
-<p><img src="https://tanaikech.github.io/img/170216b.png" alt="" /></p>
+<h3 id="2-retrieving-refresh-token">2. Retrieving refresh token</h3>
 
-<p>Is <code>ScriptApp.getOAuthToken()</code> unstable? When it creates new GAS project, it can be used. But when the time has elapsed, the script cannot be used. On the other hand, when an access token manually retrieves without <code>getOAuthToken()</code>, it can be used stably. The scopes I used are <code>https://www.googleapis.com/auth/drive</code> and <code>https://www.googleapis.com/auth/drive.file</code>. I don&rsquo;t know about this reason.</p>
+<p>This is a script to retrieve &ldquo;refresh token&rdquo;. Before you run this script, it sets &ldquo;code&rdquo; got at part 1. By this script, you can also retrieve &ldquo;access token&rdquo;. Also this &ldquo;access token&rdquo; can be used. But there is a limit time for it. So you have to retrieve &ldquo;access token&rdquo; again. At that time, &ldquo;refresh token&rdquo; is need to it. According to &ldquo;golang.org/x/oauth2&rdquo;, it uses &ldquo;refresh token&rdquo; every time without using the limit time of access token. So this script can be used to only retrieve &ldquo;refresh token&rdquo;.</p>
+
+<pre><code>  var token = JSON.parse(UrlFetchApp.fetch(&quot;https://accounts.google.com/o/oauth2/token&quot;, {
+    &quot;method&quot; : &quot;POST&quot;,
+    &quot;payload&quot; : {
+      &quot;code&quot; : code,
+      &quot;client_id&quot; : clientid,
+      &quot;client_secret&quot; : clientsecret,
+      &quot;redirect_uri&quot; : redirecturi,
+      &quot;grant_type&quot; : &quot;authorization_code&quot;
+    },
+    &quot;muteHttpExceptions&quot; : true
+  }).getContentText());
+  Logger.log(token.refresh_token);
+</code></pre>
+
+<h3 id="3-retrieving-access-token">3. Retrieving access token</h3>
+
+<p>This is a script to retrieve &ldquo;access token&rdquo; using &ldquo;refresh token&rdquo;. Before you run this script, it sets &ldquo;refresh token&rdquo; got at part 2. When you use Drive API, the &ldquo;access token&rdquo; can be retrieved by this script. You can continue to use &ldquo;refresh token&rdquo; got at part 2, until it&rsquo;s revoked.</p>
+
+<pre><code>  var token = JSON.parse(UrlFetchApp.fetch(&quot;https://www.googleapis.com/oauth2/v4/token&quot;, {
+    &quot;method&quot; : &quot;POST&quot;,
+    &quot;payload&quot; : {
+      &quot;client_id&quot; : clientid,
+      &quot;client_secret&quot; : clientsecret,
+      &quot;refresh_token&quot; :refreshtoken,
+      &quot;grant_type&quot; : &quot;refresh_token&quot;
+    },
+    &quot;muteHttpExceptions&quot; : true
+  }).getContentText());
+  Logger.log(token.access_token);
+</code></pre>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2017/02/16/download-a-csv-file-from-spreadsheet-using-google-html-service"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2017/02/16/send-e-mail-with-excel-file-converted-from-spreadsheet"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2017/02/16/download-a-csv-file-from-spreadsheet-using-google-html-service">Download a CSV File from Spreadsheet Using Google HTML Service</a>
+      <a href="https://tanaikech.github.io/2017/02/16/send-e-mail-with-excel-file-converted-from-spreadsheet">Send E-mail with Excel file converted from Spreadsheet</a>
     </nav>
     
   </div>
@@ -286,14 +315,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2017/02/17/retrieving-access-token-for-google-drive-api-using-gas">Retrieving Access Token for Google Drive API using GAS</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2017/02/17/retrieving-access-token-for-google-drive-api-using-gas"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
