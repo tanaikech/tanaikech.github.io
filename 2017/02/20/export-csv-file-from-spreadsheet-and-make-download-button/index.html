@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.16" />
 
-  <title>Topics &middot; tanaike</title>
+  <title>Export CSV File from Spreadsheet and Make Download Button &middot; tanaike</title>
 
   
   
@@ -36,8 +36,6 @@
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
 
   
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike" href="https://tanaikech.github.io/topics/index.xml" />
   
 
   
@@ -113,10 +111,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://tanaikech.github.io/topics/index.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
-    </li>
     
 
     
@@ -206,23 +200,153 @@
 
 
 <div class="header">
-  <h1>Topics</h1>
+  <h1>Export CSV File from Spreadsheet and Make Download Button</h1>
+  <h2></h2>
 </div>
 <div class="content">
-  <ul>
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>20 Feb 2017, 10:00</time>
+  </div>
+
+  
+
   
   
-    <li>
-      <a href="etc">etc</a>
-      <span>&#40;16&#41;</span>
-    </li>
   
-    <li>
-      <a href="report">report</a>
-      <span>&#40;3&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/etc">etc</a>
+    
+  </div>
   
-  </ul>
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/"></a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/"></a>
+    
+  </div>
+  
+  
+
+</div>
+
+  <p>This is a script to export a CSV file from spreadsheet and make an user download it. When the users download it, they can download by push a button made by this script.</p>
+
+<p>In order to use this script, put both HTML and script in a GAS project.</p>
+
+<p><strong>html :</strong></p>
+
+<p>This file name is &ldquo;download.html&rdquo;.</p>
+
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;body&gt;
+    Download CSV?
+    &lt;form&gt;
+      &lt;input type=&quot;button&quot; value=&quot;ok&quot; onclick=&quot;google.script.run
+                                              .withSuccessHandler(executeDownload)
+                                              .saveAsCSV();&quot; /&gt;
+    &lt;/form&gt;
+  &lt;/body&gt;
+  &lt;script&gt;
+    function executeDownload(url) {
+      window.location.href = url;
+    }
+  &lt;/script&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p><strong>Script :</strong></p>
+
+<pre><code>function onOpen() {
+  SpreadsheetApp.getUi()
+                .createMenu('csv')
+                .addItem('export as csv files', 'dialog')
+                .addToUi();
+}
+
+function dialog() {
+  var html = HtmlService.createHtmlOutputFromFile('download');
+  SpreadsheetApp.getUi().showModalDialog(html, 'CSV download dialog');
+}
+
+function saveAsCSV() {
+    var filename = &quot;#####&quot;; // CSV file name
+    var folder = &quot;#####&quot;; // Folder ID
+
+    var csv = &quot;&quot;;
+    var v = SpreadsheetApp
+            .getActiveSpreadsheet()
+            .getActiveSheet()
+            .getDataRange()
+            .getValues();
+    v.forEach(function(e) {
+      csv += e.join(&quot;,&quot;) + &quot;\n&quot;;
+    });
+    var url = DriveApp.getFolderById(folder)
+              .createFile(filename, csv, MimeType.CSV)
+              .getDownloadUrl()
+              .replace(&quot;?e=download&amp;gd=true&quot;,&quot;&quot;);
+    return url;
+}
+</code></pre>
+
+<p><strong>Process :</strong></p>
+
+<ol>
+<li><p>Using &ldquo;onOpen()&rdquo;, it addes menu for launching a dialog.</p></li>
+
+<li><p>After launching the dialog, &ldquo;saveAsCSV()&rdquo; is launched by pushing a button. &ldquo;saveAsCSV()&rdquo; exports a CSV file and outputs download URL. At current script, all of data on active sheet is retrieved and exported CSV. If you want to retrieve a range you need, please use &ldquo;<a href="https://developers.google.com/apps-script/reference/spreadsheet/sheet#getRange(Integer,Integer)">getRange()</a>&rdquo;.</p></li>
+
+<li><p>The CSV file is downloaded by &ldquo;executeDownload()&rdquo;.</p></li>
+</ol>
+
+<p>You can set csv file-name and output folder by &ldquo;filename&rdquo; and &ldquo;folder&rdquo;, respectively. In this sample, the source sheet is the sheet which opens currently. If you want to other sheet, please change this script.</p>
+
+
+  
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2017/02/20/send-e-mail-with-xlsx-file-converted-from-spreadsheet"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2017/02/20/send-e-mail-with-xlsx-file-converted-from-spreadsheet">Send E-mail with xlsx File Converted from Spreadsheet</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
+</div>
+
+
+
+  
+
 </div>
 
 </div>
@@ -258,4 +382,5 @@
 
 </body>
 </html>
+
 

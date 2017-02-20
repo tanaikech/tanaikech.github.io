@@ -7,8 +7,118 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Fri, 17 Feb 2017 17:25:29 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 20 Feb 2017 10:00:28 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/topics/etc/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Export CSV File from Spreadsheet and Make Download Button</title>
+      <link>https://tanaikech.github.io/2017/02/20/export-csv-file-from-spreadsheet-and-make-download-button</link>
+      <pubDate>Mon, 20 Feb 2017 10:00:28 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/02/20/export-csv-file-from-spreadsheet-and-make-download-button</guid>
+      <description>&lt;p&gt;This is a script to export a CSV file from spreadsheet and make an user download it. When the users download it, they can download by push a button made by this script.&lt;/p&gt;
+
+&lt;p&gt;In order to use this script, put both HTML and script in a GAS project.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;html :&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;This file name is &amp;ldquo;download.html&amp;rdquo;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;!DOCTYPE html&amp;gt;
+&amp;lt;html&amp;gt;
+  &amp;lt;body&amp;gt;
+    Download CSV?
+    &amp;lt;form&amp;gt;
+      &amp;lt;input type=&amp;quot;button&amp;quot; value=&amp;quot;ok&amp;quot; onclick=&amp;quot;google.script.run
+                                              .withSuccessHandler(executeDownload)
+                                              .saveAsCSV();&amp;quot; /&amp;gt;
+    &amp;lt;/form&amp;gt;
+  &amp;lt;/body&amp;gt;
+  &amp;lt;script&amp;gt;
+    function executeDownload(url) {
+      window.location.href = url;
+    }
+  &amp;lt;/script&amp;gt;
+&amp;lt;/html&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;Script :&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;function onOpen() {
+  SpreadsheetApp.getUi()
+                .createMenu(&#39;csv&#39;)
+                .addItem(&#39;export as csv files&#39;, &#39;dialog&#39;)
+                .addToUi();
+}
+
+function dialog() {
+  var html = HtmlService.createHtmlOutputFromFile(&#39;download&#39;);
+  SpreadsheetApp.getUi().showModalDialog(html, &#39;CSV download dialog&#39;);
+}
+
+function saveAsCSV() {
+    var filename = &amp;quot;#####&amp;quot;; // CSV file name
+    var folder = &amp;quot;#####&amp;quot;; // Folder ID
+
+    var csv = &amp;quot;&amp;quot;;
+    var v = SpreadsheetApp
+            .getActiveSpreadsheet()
+            .getActiveSheet()
+            .getDataRange()
+            .getValues();
+    v.forEach(function(e) {
+      csv += e.join(&amp;quot;,&amp;quot;) + &amp;quot;\n&amp;quot;;
+    });
+    var url = DriveApp.getFolderById(folder)
+              .createFile(filename, csv, MimeType.CSV)
+              .getDownloadUrl()
+              .replace(&amp;quot;?e=download&amp;amp;gd=true&amp;quot;,&amp;quot;&amp;quot;);
+    return url;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;Process :&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;Using &amp;ldquo;onOpen()&amp;rdquo;, it addes menu for launching a dialog.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;After launching the dialog, &amp;ldquo;saveAsCSV()&amp;rdquo; is launched by pushing a button. &amp;ldquo;saveAsCSV()&amp;rdquo; exports a CSV file and outputs download URL. At current script, all of data on active sheet is retrieved and exported CSV. If you want to retrieve a range you need, please use &amp;ldquo;&lt;a href=&#34;https://developers.google.com/apps-script/reference/spreadsheet/sheet#getRange(Integer,Integer)&#34;&gt;getRange()&lt;/a&gt;&amp;rdquo;.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;The CSV file is downloaded by &amp;ldquo;executeDownload()&amp;rdquo;.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;You can set csv file-name and output folder by &amp;ldquo;filename&amp;rdquo; and &amp;ldquo;folder&amp;rdquo;, respectively. In this sample, the source sheet is the sheet which opens currently. If you want to other sheet, please change this script.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Send E-mail with xlsx File Converted from Spreadsheet</title>
+      <link>https://tanaikech.github.io/2017/02/20/send-e-mail-with-xlsx-file-converted-from-spreadsheet</link>
+      <pubDate>Mon, 20 Feb 2017 09:56:12 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/02/20/send-e-mail-with-xlsx-file-converted-from-spreadsheet</guid>
+      <description>&lt;p&gt;This is a script to send e-mail with a xlsx file converted from spreadsheet as an attachment file. Access token is necessary to use this script.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;function excelSender() {
+  var accesstoken = &amp;quot;[your accesstoken]&amp;quot;;
+  var sheetID = &amp;quot;[sheet id]&amp;quot;;
+  var xlsxName = &amp;quot;[output xlsx file name]&amp;quot;
+  var params = {
+    &amp;quot;headers&amp;quot; : {Authorization: &amp;quot;Bearer &amp;quot; + accesstoken},
+    &amp;quot;muteHttpExceptions&amp;quot; : true
+  };
+  var dUrl = &amp;quot;https://www.googleapis.com/drive/v3/files/&amp;quot; + sheetID + &amp;quot;/export?mimeType=application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&amp;quot;
+  var xlsxlFile = UrlFetchApp.fetch(dUrl, params).getBlob().setName(xlsxName);
+  MailApp.sendEmail({
+    to: &amp;quot;[your mail address]&amp;quot;,
+    subject: &amp;quot;sample mail&amp;quot;,
+    body: &amp;quot;sample mail with an excel file&amp;quot;,
+    attachments: [xlsxlFile]
+  });
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
     
     <item>
       <title>Retrieving Access Token for Google Drive API using GAS</title>
@@ -190,7 +300,7 @@ function getFileUrl() {
       <guid>https://tanaikech.github.io/2017/02/13/making-charts-at-spreadsheet</guid>
       <description>&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/table.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt; var ss = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+&lt;pre&gt;&lt;code&gt; var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
  var chart = sheet.newChart()
     .setChartType(Charts.ChartType.LINE)
     .asLineChart()
@@ -692,17 +802,6 @@ print(result)
       
       <guid>https://tanaikech.github.io/2016/10/20/coffeescript</guid>
       <description>&lt;p&gt;I may be slow a bit, but I could notice much convenience of CoffeeScript just now. I didn&amp;rsquo;t know that scripts of GAS can be made by CoffeeScript up until now. This will have me work more effectively! :D&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>1stpost</title>
-      <link>https://tanaikech.github.io/2016/09/18/1stpost</link>
-      <pubDate>Sun, 18 Sep 2016 15:02:15 +0900</pubDate>
-      
-      <guid>https://tanaikech.github.io/2016/09/18/1stpost</guid>
-      <description>&lt;p&gt;This is a first post. Today this blog was launched. I would like to introduce some of my experimental results. I&amp;rsquo;m Japanese. So I&amp;rsquo;ll use both English and Japanese here.
-Thank you.&lt;/p&gt;
 </description>
     </item>
     
