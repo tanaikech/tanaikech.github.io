@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.16" />
 
-  <title>tanaike</title>
+  <title>Download Files Except for Google Docs from Google Drive &middot; tanaike</title>
 
   
   
@@ -36,8 +36,6 @@
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
 
   
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike" href="https://tanaikech.github.io/index.xml" />
   
 
   
@@ -113,10 +111,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://tanaikech.github.io/index.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
-    </li>
     
 
     
@@ -206,78 +200,16 @@
 
 
 <div class="header">
-  <h1>tanaike</h1>
-  <h2>The Thinker</h2>
+  <h1>Download Files Except for Google Docs from Google Drive</h1>
+  <h2></h2>
 </div>
-
 <div class="content">
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2016/10/13/improved-algorithms-for-summation-of-array-elements">Improved Algorithms for Summation of Array Elements</a></h2>
 
-    <div class="post-meta">
+  <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>13 Oct 2016, 14:39</time>
-  </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/report">report</a>
-    
-  </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/gas">gas</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google">google</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/algorithm">algorithm</a>
-    
-  </div>
-  
-  
-
-</div>
-
-  </header>
-
-  <p>
-  Kanshi TANAIKE Abstract I considered an efficient algorithm for summation of array elements. All elements in an array are string. When those elements are summed using scripts, a standard method is to add each element in order. If the script is run without any optimize, the process becomes gradually sluggish, because the total amount of active data during the summation process is proportional to the square of the number of array elements.
-  </p>
-
-  
-  <footer>
-    <a href="https://tanaikech.github.io/2016/10/13/improved-algorithms-for-summation-of-array-elements">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2016/09/18/1stpost">1stpost</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>18 Sep 2016, 15:02</time>
+    <time>20 Mar 2017, 14:30</time>
   </div>
 
   
@@ -300,7 +232,9 @@
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/etc">etc</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/python">python</a>
     
   </div>
   
@@ -308,31 +242,117 @@
 
 </div>
 
-  </header>
-
-  <p>
-  This is a first post. Today this blog was launched. I would like to introduce some of my experimental results. I&rsquo;m Japanese. So I&rsquo;ll use both English and Japanese here. Thank you.
-  </p>
-
-  
-</article>
-
   
 
-  
+<h1 id="overview">Overview</h1>
+
+<p>In this article, files except for Google Docs can be downloaded from Google Drive.</p>
+
+<h1 id="description">Description</h1>
+
+<p>When we download files from Google Drive using Drive API, Google Docs which are document, spreadsheet, presentation and so on can be downloaded. But when we download an image, a following error occurs. Recently, I noticed this. So I made this.</p>
+
+<pre><code class="language-json">{
+ &quot;error&quot;: {
+  &quot;errors&quot;: [
+   {
+    &quot;domain&quot;: &quot;global&quot;,
+    &quot;reason&quot;: &quot;fileNotExportable&quot;,
+    &quot;message&quot;: &quot;Export only supports Google Docs.&quot;
+   }
+  ],
+  &quot;code&quot;: 403,
+  &quot;message&quot;: &quot;Export only supports Google Docs.&quot;
+ }
+}
+</code></pre>
+
+<p>We cannot download not only image, but also text, zip, sound and movie which are not Google Docs. We cannot download files except for Google Docs, because of the specification of Google. This article makes it possible to do it to us.</p>
+
+<p>As a sample, I introduce a script for downloading the files using Web Apps.</p>
+
+<p>In this sample, it changes a file to a byte slice and send it as text data. Then, it reconstructs it.</p>
+
+<h1 id="usage">Usage</h1>
+
+<h2 id="1-u-deploy-web-apps-https-developers-google-com-apps-script-guides-web-u">1. <u><a href="https://developers.google.com/apps-script/guides/web">Deploy Web Apps</a></u></h2>
+
+<ol>
+<li>Open the Script Editor.</li>
+<li>On the Script Editor
+
+<ul>
+<li>File -&gt; Manage Versions -&gt; Save New Version</li>
+<li>Publish -&gt; Deploy as Web App</li>
+<li>At Execute the app as, select <strong>&ldquo;your account&rdquo;</strong></li>
+<li>At Who has access to the app, select <strong>&ldquo;Anyone, even anonymous&rdquo;</strong></li>
+<li>Click &ldquo;Deploy&rdquo;</li>
+<li>Copy <strong>&ldquo;Current web app URL&rdquo;</strong></li>
+<li>Click &ldquo;OK&rdquo;</li>
+</ul></li>
+</ol>
+
+<h2 id="2-paste-following-script-on-script-editor">2. Paste following script on Script Editor.</h2>
+
+<pre><code class="language-javascript">function doPost(e) {
+  return (function(id){
+    var file = DriveApp.getFileById(id);
+    return ContentService
+          .createTextOutput(JSON.stringify({
+            result: file.getBlob().getBytes(),
+            name: file.getName(),
+            mimeType: file.getBlob().getContentType()
+          }))
+          .setMimeType(ContentService.MimeType.JSON);
+  })(e.parameters.id);
+}
+</code></pre>
+
+<h2 id="3-at-local-pc-use-following-script">3. At local pc, use following script.</h2>
+
+<pre><code class="language-python">import numpy as np
+import requests
+r = requests.post(
+    &quot;https://script.google.com/macros/s/### Your ID ###/exec&quot;,
+    data={&quot;id&quot;: &quot;### File ID ###&quot;}
+)
+f = open(r.json()[&quot;name&quot;], &quot;bw&quot;)
+f.write(np.array(r.json()[&quot;result&quot;], dtype=np.uint8))
+f.close()
+print(&quot;Filename = {0}, MimeType = {1}&quot;.format(r.json()[&quot;name&quot;], r.json()[&quot;mimeType&quot;]))
+</code></pre>
+
+<p>Files output from this sample have no extension. So please add the extension for each mimeType to the files.</p>
 
 
-<nav class="pagination" role="pagination">
   
-  <a href="https://tanaikech.github.io/page/4/"><i class="fa fa-chevron-left"></i></a>
-  
-  <span>&nbsp;5 / 5&nbsp;</span>
-  
-  <i class="fa fa-chevron-right"></i>
-  
-</nav>
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2017/03/13/output-folder-list-on-google-drive"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2017/03/13/output-folder-list-on-google-drive">Output Folder List on Google Drive</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
+</div>
 
 
+
+  
 
 </div>
 
