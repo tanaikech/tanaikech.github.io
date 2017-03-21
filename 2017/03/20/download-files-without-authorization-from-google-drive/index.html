@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.16" />
 
-  <title>Javascript &middot; tanaike</title>
+  <title>Download Files Without Authorization From Google Drive &middot; tanaike</title>
 
   
   
@@ -36,8 +36,6 @@
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
 
   
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike" href="https://tanaikech.github.io/tags/javascript/index.xml" />
   
 
   
@@ -113,10 +111,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://tanaikech.github.io/tags/javascript/index.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
-    </li>
     
 
     
@@ -206,20 +200,16 @@
 
 
 <div class="header">
-  <h1>Javascript</h1>
+  <h1>Download Files Without Authorization From Google Drive</h1>
+  <h2></h2>
 </div>
-
 <div class="content">
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2017/03/21/transposing-array-from-n-x-m-to-m-x-n">Transposing Array From (n x m) To (m x n)</a></h2>
 
-    <div class="post-meta">
+  <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>21 Mar 2017, 08:55</time>
+    <time>20 Mar 2017, 14:30</time>
   </div>
 
   
@@ -242,7 +232,9 @@
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/javascript">javascript</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/python">python</a>
     
   </div>
   
@@ -250,75 +242,119 @@
 
 </div>
 
-  </header>
+  
 
-  <p>
-  This script transposes from an array with n rows x m columns to the array with m rows x n columns. In this script, you can use array of n != m. array = [ [a1, b1, c1, d1, e1], [a2, b2, c2, d2, e2], [a3, b3, c3, d3, e3], [a4, b4, c4, d4, e4], [a5, b5, c5, d5, e5], [a6, b6, c6, d6, e6], [a7, b7, c7, d7, e7],
-  </p>
+<h1 id="overview">Overview</h1>
+
+<p>In this article, files can be downloaded without authorization.</p>
+
+<h1 id="description">Description</h1>
+
+<p>When we download files from Google Drive, it usually has to use Drive API. In order to use Drive API, access token is required. If you want to make your friends download files from your Google Drive, the authorization process is to take time. Also Web Link for each files can be used. But it has to set for each files. So I proposal this.</p>
+
+<p>As a sample, I introduce a script for downloading the files using Web Apps. In this sample, it changes a file to a byte slice and send it as text data. Then, it reconstructs it. Of course, base64 encode can be used for this. But the data size for using base64 is much larger than that for using the byte slice.</p>
+
+<p>At this method, the project files including GAS script cannot be downloaded. When Google Docs are downloaded using this method, those are downloaded as PDF file. It may be the specification of Google.</p>
+
+<p>By the way, also you can upload files without authorization to Google Drive using this method.</p>
+
+<h1 id="usage">Usage</h1>
+
+<h2 id="1-u-deploy-web-apps-https-developers-google-com-apps-script-guides-web-u">1. <u><a href="https://developers.google.com/apps-script/guides/web">Deploy Web Apps</a></u></h2>
+
+<ol>
+<li>Open the Script Editor.</li>
+<li>On the Script Editor
+
+<ul>
+<li>File -&gt; Manage Versions -&gt; Save New Version</li>
+<li>Publish -&gt; Deploy as Web App</li>
+<li>At Execute the app as, select <strong>&ldquo;your account&rdquo;</strong></li>
+<li>At Who has access to the app, select <strong>&ldquo;Anyone, even anonymous&rdquo;</strong></li>
+<li>Click &ldquo;Deploy&rdquo;</li>
+<li>Copy <strong>&ldquo;Current web app URL&rdquo;</strong></li>
+<li>Click &ldquo;OK&rdquo;</li>
+</ul></li>
+</ol>
+
+<h2 id="2-paste-following-script-on-script-editor">2. Paste following script on Script Editor.</h2>
+
+<pre><code class="language-javascript">function doPost(e) {
+  return (function(id){
+    var file = DriveApp.getFileById(id);
+    return ContentService
+          .createTextOutput(JSON.stringify({
+            result: file.getBlob().getBytes(),
+            name: file.getName(),
+            mimeType: file.getBlob().getContentType()
+          }))
+          .setMimeType(ContentService.MimeType.JSON);
+  })(e.parameters.id);
+}
+</code></pre>
+
+<h2 id="3-at-local-pc-use-following-script">3. At local pc, use following script.</h2>
+
+<pre><code class="language-python">import numpy as np
+import requests
+r = requests.post(
+    &quot;https://script.google.com/macros/s/### Your ID ###/exec&quot;,
+    data={&quot;id&quot;: &quot;### File ID ###&quot;}
+)
+f = open(r.json()[&quot;name&quot;], &quot;bw&quot;)
+f.write(np.array(r.json()[&quot;result&quot;], dtype=np.uint8))
+f.close()
+print(&quot;Filename = {0}, MimeType = {1}&quot;.format(r.json()[&quot;name&quot;], r.json()[&quot;mimeType&quot;]))
+</code></pre>
+
+<p>Files output from this sample have no extension. So please add the extension for each mimeType to the files.</p>
+
+<h1 id="appendix">Appendix</h1>
+
+<p>If you want to download with authorization, there are <a href="https://developers.google.com/drive/v3/web/manage-downloads">3 patterns</a>.</p>
+
+<ol>
+<li><a href="https://developers.google.com/apps-script/import-export">Download script and project including script.</a></li>
+<li><a href="https://developers.google.com/drive/v3/reference/files/export">Download Google Docs (spreadsheet, document, presentation and so on). In this case, Google calls &ldquo;Export&rdquo;.</a></li>
+<li><a href="https://developers.google.com/drive/v3/reference/files/get">Download files except for Google Docs.</a></li>
+</ol>
+
 
   
-  <footer>
-    <a href="https://tanaikech.github.io/2017/03/21/transposing-array-from-n-x-m-to-m-x-n">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2017/02/08/sample-array-script-for-spreadsheet">Sample Array Script for Spreadsheet</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>08 Feb 2017, 08:50</time>
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2017/03/13/output-folder-list-on-google-drive"><i class="fa fa-chevron-left"></i></a>
+    
   </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
+  <div class="pure-u-10-24">
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/etc">etc</a>
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2017/03/13/output-folder-list-on-google-drive">Output Folder List on Google Drive</a>
+    </nav>
     
   </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/javascript">javascript</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>
+    <nav class="next">
+      <a href="https://tanaikech.github.io/2017/03/21/transposing-array-from-n-x-m-to-m-x-n">Transposing Array From (n x m) To (m x n)</a>
+    </nav>
     
   </div>
-  
-  
-
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+    <a href="https://tanaikech.github.io/2017/03/21/transposing-array-from-n-x-m-to-m-x-n"><i class="fa fa-chevron-right"></i></a>
+    
+  </div>
 </div>
 
-  </header>
 
-  <p>
-  This is a Sample Array Script for Spreadsheet. It makes an 2D array filled by strings and number. The strings and number are column strings and row number, respectively. However, because this is a sample, the maximum column number is 26. function sa(row, col){ if (col &gt; 26) return; var ar = new Array(row); for(var i = 0; i &lt; row; i++) ar[i] = new Array(col); for (var i = 0; i &lt; row; i++){ for (var j = 0; j &lt; col; j++){ ar[i][j] = String.fromCharCode(i + 97) + String(j + 1); } } return ar.map(function(x, i){return x.map(function(y, j){return ar[j][i]})}); } When &ldquo;sa(10,10)&rdquo; is given, following array can be output.
-  </p>
 
   
-  <footer>
-    <a href="https://tanaikech.github.io/2017/02/08/sample-array-script-for-spreadsheet">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
-  
-</article>
 
-  
 </div>
 
 </div>
@@ -354,4 +390,5 @@
 
 </body>
 </html>
+
 
