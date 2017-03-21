@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.16" />
 
-  <title>Output Folder List on Google Drive &middot; tanaike</title>
+  <title>Download Files Without Authorization &middot; tanaike</title>
 
   
   
@@ -200,7 +200,7 @@
 
 
 <div class="header">
-  <h1>Output Folder List on Google Drive</h1>
+  <h1>Download Files Without Authorization</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -209,7 +209,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>13 Mar 2017, 13:27</time>
+    <time>20 Mar 2017, 14:30</time>
   </div>
 
   
@@ -232,7 +232,9 @@
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/python">python</a>
     
   </div>
   
@@ -240,47 +242,95 @@
 
 </div>
 
-  <p>This is a sample script for retrieving a list of all folders in Google Drive. For each element, parent folder and sub folder are retrieved.</p>
+  
 
-<p><strong>Script :</strong></p>
+<h1 id="overview">Overview</h1>
 
-<pre><code class="language-javascript">  var results = (function(folder, folderSt, results){
-    var ar = [];
-    var folders = folder.getFolders();
-    while(folders.hasNext()) ar.push(folders.next());
-    folderSt += folder.getName() + &quot;(&quot; + folder.getId() + &quot;)-&quot;;
-    var array_folderSt = folderSt.split(&quot;-&quot;);
-    array_folderSt.pop()
-    results.push(array_folderSt);
-    ar.length == 0 &amp;&amp; (folderSt = &quot;&quot;);
-    for (var i in ar) arguments.callee(ar[i], folderSt, results);
-    return results;
-  })(DriveApp.getRootFolder(),&quot;&quot;,[]);
+<p>In this article, files can be downloaded without authorization.</p>
+
+<h1 id="description">Description</h1>
+
+<p>When we download files from Google Drive, it usually has to use Drive API. In order to use Drive API, access token is required. If you want to make your friends download files from your Google Drive, the authorization process is to take time. Also Web Link for each files can be used. But it has to set for each files. So I proposal this.</p>
+
+<p>As a sample, I introduce a script for downloading the files using Web Apps. In this sample, it changes a file to a byte slice and send it as text data. Then, it reconstructs it. Of course, base64 encode can be used for this. But the data size for using base64 is much larger than that for using the byte slice.</p>
+
+<p>At this method, the project files including GAS script cannot be downloaded. When Google Docs are downloaded using this method, those are downloaded as PDF file. It may be the specification of Google.</p>
+
+<p>By the way, also you can upload files without authorization to Google Drive using this method.</p>
+
+<h1 id="usage">Usage</h1>
+
+<h2 id="1-u-deploy-web-apps-https-developers-google-com-apps-script-guides-web-u">1. <u><a href="https://developers.google.com/apps-script/guides/web">Deploy Web Apps</a></u></h2>
+
+<ol>
+<li>Open the Script Editor.</li>
+<li>On the Script Editor
+
+<ul>
+<li>File -&gt; Manage Versions -&gt; Save New Version</li>
+<li>Publish -&gt; Deploy as Web App</li>
+<li>At Execute the app as, select <strong>&ldquo;your account&rdquo;</strong></li>
+<li>At Who has access to the app, select <strong>&ldquo;Anyone, even anonymous&rdquo;</strong></li>
+<li>Click &ldquo;Deploy&rdquo;</li>
+<li>Copy <strong>&ldquo;Current web app URL&rdquo;</strong></li>
+<li>Click &ldquo;OK&rdquo;</li>
+</ul></li>
+</ol>
+
+<h2 id="2-paste-following-script-on-script-editor">2. Paste following script on Script Editor.</h2>
+
+<pre><code class="language-javascript">function doPost(e) {
+  return (function(id){
+    var file = DriveApp.getFileById(id);
+    return ContentService
+          .createTextOutput(JSON.stringify({
+            result: file.getBlob().getBytes(),
+            name: file.getName(),
+            mimeType: file.getBlob().getContentType()
+          }))
+          .setMimeType(ContentService.MimeType.JSON);
+  })(e.parameters.id);
+}
 </code></pre>
 
-<p><strong>Result :</strong></p>
+<h2 id="3-at-local-pc-use-following-script">3. At local pc, use following script.</h2>
 
-<pre><code class="language-json">[
-    [foldername1(folder1 id)],
-    [foldername1(folder1 id), sub foldername1s(sub folde1s id)],
-    [foldername1(folder2 id)],
-    [foldername2(folder2 id), sub foldername2s1(sub folde2s1 id)],
-    [foldername2(folder2 id), sub foldername2s1(sub folde2s1 id), sub foldername2s2(sub folde2s2 id)]
-]
+<pre><code class="language-python">import numpy as np
+import requests
+r = requests.post(
+    &quot;https://script.google.com/macros/s/### Your ID ###/exec&quot;,
+    data={&quot;id&quot;: &quot;### File ID ###&quot;}
+)
+f = open(r.json()[&quot;name&quot;], &quot;bw&quot;)
+f.write(np.array(r.json()[&quot;result&quot;], dtype=np.uint8))
+f.close()
+print(&quot;Filename = {0}, MimeType = {1}&quot;.format(r.json()[&quot;name&quot;], r.json()[&quot;mimeType&quot;]))
 </code></pre>
+
+<p>Files output from this sample have no extension. So please add the extension for each mimeType to the files.</p>
+
+<h1 id="appendix">Appendix</h1>
+
+<p>If you want to download with authorization, there are <a href="https://developers.google.com/drive/v3/web/manage-downloads">3 patterns</a>.</p>
+
+<ol>
+<li><a href="https://developers.google.com/apps-script/import-export">Download script and project including script.</a></li>
+<li><a href="https://developers.google.com/drive/v3/reference/files/export">Download Google Docs (spreadsheet, document, presentation and so on). In this case, Google calls &ldquo;Export&rdquo;.</a></li>
+<li><a href="https://developers.google.com/drive/v3/reference/files/get">Download files except for Google Docs.</a></li>
+</ol>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2017/02/24/gogauth"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2017/03/13/output-folder-list-on-google-drive"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2017/02/24/gogauth">gogauth</a>
+      <a href="https://tanaikech.github.io/2017/03/13/output-folder-list-on-google-drive">Output Folder List on Google Drive</a>
     </nav>
     
   </div>
@@ -290,13 +340,13 @@
   <div class="pure-u-10-24">
     
     <nav class="next">
-      <a href="https://tanaikech.github.io/2017/03/20/download-files-without-authorization">Download Files Without Authorization</a>
+      <a href="https://tanaikech.github.io/2017/03/21/transposing-array-n-x-m-to-m-x-n">Transposing array (n x m) to (m x n)</a>
     </nav>
     
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
     
-    <a href="https://tanaikech.github.io/2017/03/20/download-files-without-authorization"><i class="fa fa-chevron-right"></i></a>
+    <a href="https://tanaikech.github.io/2017/03/21/transposing-array-n-x-m-to-m-x-n"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
