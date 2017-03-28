@@ -7,8 +7,41 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Thu, 23 Mar 2017 14:24:29 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 29 Mar 2017 07:53:51 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Put a channel to a channel for golang</title>
+      <link>https://tanaikech.github.io/2017/03/29/put-a-channel-to-a-channel-for-golang</link>
+      <pubDate>Wed, 29 Mar 2017 07:53:51 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/03/29/put-a-channel-to-a-channel-for-golang</guid>
+      <description>&lt;p&gt;I have never heard this. I would like to use this from now.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;package main
+
+import &amp;quot;fmt&amp;quot;
+
+type st struct {
+    data1 int
+    data2 int
+}
+
+func main() {
+    c1 := make(chan *st, 1)
+    c2 := make(chan *st, 1)
+    c1 &amp;lt;- &amp;amp;st{1, 2}
+    c2 &amp;lt;- &amp;lt;-c1
+    close(c1)
+    close(c2)
+    res, _ := &amp;lt;-c2
+    fmt.Println(res.data2)
+}
+
+&amp;gt;&amp;gt;&amp;gt; 2
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
     
     <item>
       <title>Retrieving File ID from File Name using GAS</title>
@@ -689,168 +722,6 @@ function getFileUrl() {
 &lt;h2 id=&#34;reference&#34;&gt;Reference&lt;/h2&gt;
 
 &lt;p&gt;You can see the detailed information of sheet events from &lt;a href=&#34;https://developers.google.com/apps-script/guides/triggers/events&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>File upload using doPost on Google Web Apps</title>
-      <link>https://tanaikech.github.io/2017/02/05/file-upload-using-dopost-on-google-web-apps</link>
-      <pubDate>Sun, 05 Feb 2017 11:40:08 +0900</pubDate>
-      
-      <guid>https://tanaikech.github.io/2017/02/05/file-upload-using-dopost-on-google-web-apps</guid>
-      <description>
-
-&lt;h1 id=&#34;file-upload-using-html-form-in-gas-project&#34;&gt;File upload using HTML form in GAS project&lt;/h1&gt;
-
-&lt;p&gt;&lt;strong&gt;Rule&lt;/strong&gt;&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;Following scripts have to be made into a project of Google Apps Script.&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;Deploy the GAS project as a web application. &lt;a href=&#34;https://developers.google.com/apps-script/guides/web&#34;&gt;Ref&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;After updated the script, it has to be updated as a new version.&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;&lt;strong&gt;Form.html :&lt;/strong&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;lt;html&amp;gt;
-  &amp;lt;body&amp;gt;
-    &amp;lt;form&amp;gt;
-      &amp;lt;input type=&amp;quot;file&amp;quot; name=&amp;quot;imageFile&amp;quot;&amp;gt;
-      &amp;lt;input type=&amp;quot;button&amp;quot; value=&amp;quot;ok&amp;quot; onclick=&amp;quot;google.script.run.upload(this.parentNode)&amp;quot;&amp;gt;
-    &amp;lt;/form&amp;gt;
-  &amp;lt;/body&amp;gt;
-&amp;lt;/html&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;strong&gt;GAS :&lt;/strong&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;function doGet() {
-  return HtmlService.createHtmlOutputFromFile(&#39;Form.html&#39;);
-}
-
-function upload(e) {
-  var destination_id = &#39;#####&#39;; // Folder ID of destination folder
-
-  // Reference : https://developers.google.com/apps-script/reference/base/blob#getAs(String)
-  // You can use &#39;application/pdf&#39;, &#39;image/bmp&#39;, &#39;image/gif&#39;, &#39;image/jpeg&#39; and &#39;image/png&#39;.
-  var contentType = &#39;image/jpeg&#39;;
-  var img = e.imageFile;
-
-  var destination = DriveApp.getFolderById(destination_id);
-  var img = img.getAs(contentType);
-  destination.createFile(img);
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;When you set &amp;lsquo;image/jpeg&amp;rsquo; as &amp;ldquo;contentType&amp;rdquo; and upload png file, the uploaded image file is converted to jpeg file and saved it to the destination folder.&lt;/p&gt;
-
-&lt;h1 id=&#34;file-upload-from-local-pc&#34;&gt;File upload from local PC&lt;/h1&gt;
-
-&lt;p&gt;For the Web API of Google HTML service, cannot &amp;ldquo;multipart/form-data&amp;rdquo; be used from local HTML form? Although I investigated it and tried various methods of file upload using &amp;ldquo;multipart/form-data&amp;rdquo;, all of them didn&amp;rsquo;t work. So I thought other method which is file upload without &amp;ldquo;multipart/form-data&amp;rdquo;. Of course, if you use Drive API, file upload can be easily done. But I wanted to achieve the file upload using Web API of Google HTML service. I think that this is self-satisfaction.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Rule&lt;/strong&gt;&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;Following GAS has to be made into a project of Google Apps Script.&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;Deploy the GAS project as a web application. &lt;a href=&#34;https://developers.google.com/apps-script/guides/web&#34;&gt;Ref&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;After updated the script, it has to be updated as a new version.&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;&lt;strong&gt;GAS :&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;This script is very simple sample. It uploads image files of bmp, gif, jpeg, png and svg. When you want to upload other files, please change following script.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;function doGet(e) {
-  return message(&amp;quot;Error: no parameters&amp;quot;);
-}
-
-function doPost(e) {
-  if (!e.parameters.filename || !e.parameters.file || !e.parameters.imageformat) {
-    return message(&amp;quot;Error: Bad parameters&amp;quot;);
-  } else {
-    var imgf = e.parameters.imageformat[0].toUpperCase();
-    var mime =
-        (imgf == &#39;BMP&#39;)  ? MimeType.BMP
-      : (imgf == &#39;GIF&#39;)  ? MimeType.GIF
-      : (imgf == &#39;JPEG&#39;) ? MimeType.JPEG
-      : (imgf == &#39;PNG&#39;)  ? MimeType.PNG
-      : (imgf == &#39;SVG&#39;)  ? MimeType.SVG
-      : false;
-    if (mime) {
-      var data = Utilities.base64Decode(e.parameters.file, Utilities.Charset.UTF_8);
-      var blob = Utilities.newBlob(data, mime, e.parameters.filename);
-      DriveApp.getFolderById(&#39;FOLDER ID&#39;).createFile(blob);
-      return message(&amp;quot;completed&amp;quot;);
-    } else {
-      return message(&amp;quot;Error: Bad image format&amp;quot;);
-    }
-  }
-}
-
-function message(msg) {
-  return ContentService.createTextOutput(JSON.stringify({result: msg})).setMimeType(ContentService.MimeType.JSON);
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;strong&gt;curl :&lt;/strong&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;curl -L \
-    -F &#39;filename=[file name on Google Drive]&#39; \
-    -F &#39;imageformat=[image format (bmp, gif, jpeg, png and svg)]&#39; \
-    -F &amp;quot;file=`base64 [upload file]`&amp;quot; \
-    &#39;[Current web app URL (https://script.google.com/macros/s/[Project ID]/exec)]&#39;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Using &amp;ldquo;doPost&amp;rdquo; of &lt;a href=&#34;https://developers.google.com/apps-script/guides/web&#34;&gt;Google Web Apps&lt;/a&gt;, files cannot be uploaded from local PC, while text data which isn&amp;rsquo;t a file can be uploaded. So I thought that it converted from image data to base64 data, and upload it. By this, it was found that various files can be uploaded from local HTML form using &amp;ldquo;doPost&amp;rdquo; of Google Web Apps.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;html form :&lt;/strong&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;lt;!DOCTYPE html&amp;gt;
-&amp;lt;html&amp;gt;
-&amp;lt;head&amp;gt;
-    &amp;lt;meta charset=&amp;quot;UTF-8&amp;quot;&amp;gt;
-    &amp;lt;script src=&amp;quot;http://code.jquery.com/jquery-latest.js&amp;quot; type=&amp;quot;text/javascript&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
-&amp;lt;/head&amp;gt;
-&amp;lt;body&amp;gt;
-    &amp;lt;input type=&amp;quot;file&amp;quot; id=&amp;quot;file&amp;quot;&amp;gt;
-
-    &amp;lt;script type=&amp;quot;text/javascript&amp;quot;&amp;gt;
-        $(function(){
-            var url = &#39;https://script.google.com/macros/s/[Project ID]/exec&#39;;
-            var params = {
-                filename: &#39;samplefile&#39;,
-                imageformat: &#39;PNG&#39;
-            };
-
-            $(&#39;#file&#39;).on(&amp;quot;change&amp;quot;, function() {
-                var file = this.files[0];
-                var fr = new FileReader();
-                fr.onload = function(e) {
-                    params.file = e.target.result.replace(/^.*,/, &#39;&#39;);
-                    postJump();
-                }
-                fr.readAsDataURL(file);
-            });
-
-            function postJump(){
-                var html = &#39;&amp;lt;form method=&amp;quot;post&amp;quot; action=&amp;quot;&#39;+url+&#39;&amp;quot; id=&amp;quot;postjump&amp;quot; style=&amp;quot;display: none;&amp;quot;&amp;gt;&#39;;
-                Object.keys(params).forEach(function (key) {
-                    html += &#39;&amp;lt;input type=&amp;quot;hidden&amp;quot; name=&amp;quot;&#39;+key+&#39;&amp;quot; value=&amp;quot;&#39;+params[key]+&#39;&amp;quot; &amp;gt;&#39;;
-                });
-                html += &#39;&amp;lt;/form&amp;gt;&#39;;
-                $(&amp;quot;body&amp;quot;).append(html);
-                $(&#39;#postjump&#39;).submit();
-                $(&#39;#postjump&#39;).remove();
-            }
-        });
-    &amp;lt;/script&amp;gt;
-&amp;lt;/body&amp;gt;
-&amp;lt;/html&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>
     
