@@ -7,8 +7,67 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Wed, 29 Mar 2017 07:53:51 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 29 Mar 2017 16:00:06 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Retrieve old revision file from Google Drive</title>
+      <link>https://tanaikech.github.io/2017/03/29/retrieve-old-revision-file-from-google-drive</link>
+      <pubDate>Wed, 29 Mar 2017 16:00:06 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/03/29/retrieve-old-revision-file-from-google-drive</guid>
+      <description>
+
+&lt;h3 id=&#34;1-file-id&#34;&gt;1. File ID&lt;/h3&gt;
+
+&lt;p&gt;Retrieve file id from file name.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;curl -X GET -sSL \
+    -H &#39;Authorization: Bearer ### Access token ###&#39; \
+    &#39;https://www.googleapis.com/drive/v3/files?q=name=&amp;quot;### FileName ###&amp;quot;&amp;amp;fields=files(id,name)&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;wget -q --header=&#39;Authorization: Bearer ### Access token ###&#39; \
+    &#39;https://www.googleapis.com/drive/v3/files?q=name=&amp;quot;### FileName ###&amp;quot;&amp;amp;fields=files(id,name)&#39; \
+    -O out.txt
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Reference : &lt;a href=&#34;https://developers.google.com/drive/v3/reference/files/list&#34;&gt;https://developers.google.com/drive/v3/reference/files/list&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;2-revision-id&#34;&gt;2. Revision ID&lt;/h3&gt;
+
+&lt;p&gt;Retrieve revision id from file id.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;curl -X GET -sSL \
+    -H &#39;Authorization: Bearer ### Access token ###&#39; \
+    &#39;https://www.googleapis.com/drive/v3/files/### FileID ###/revisions?fields=revisions(id%2CmodifiedTime)&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;wget -q --header=&#39;Authorization: Bearer ### Access token ###&#39; \
+    &#39;https://www.googleapis.com/drive/v3/files/### FileID ###/revisions?fields=revisions(id%2CmodifiedTime)&#39; \
+    -O out.txt
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Reference : &lt;a href=&#34;https://developers.google.com/drive/v3/reference/revisions/list&#34;&gt;https://developers.google.com/drive/v3/reference/revisions/list&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;3-file-for-revision-id&#34;&gt;3. File for Revision ID&lt;/h3&gt;
+
+&lt;p&gt;Retrieve a file from revision id.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;curl -X GET -sSL \
+    -H &#39;Authorization: Bearer ### Access token ###&#39; \
+    &amp;quot;https://www.googleapis.com/drive/v3/files/### FileID ###/revisions/### RevisionID ###?alt=media&amp;quot; \
+    -o outputfilename
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;wget -q --header=&#39;Authorization: Bearer ### Access token ###&#39; \
+    &amp;quot;https://www.googleapis.com/drive/v3/files/### FileID ###/revisions/### RevisionID ###?alt=media&amp;quot; \
+    -O outputfilename
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Reference : &lt;a href=&#34;https://developers.google.com/drive/v3/reference/revisions/get&#34;&gt;https://developers.google.com/drive/v3/reference/revisions/get&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Put a channel to a channel for golang</title>
@@ -684,44 +743,6 @@ function getFileUrl() {
     [a10, b10, c10, d10, e10, f10, g10, h10, i10, j10]
 ]
 &lt;/code&gt;&lt;/pre&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Event of onEdit() for Google spreadsheet</title>
-      <link>https://tanaikech.github.io/2017/02/07/event-of-onedit-for-google-spreadsheet</link>
-      <pubDate>Tue, 07 Feb 2017 11:03:56 +0900</pubDate>
-      
-      <guid>https://tanaikech.github.io/2017/02/07/event-of-onedit-for-google-spreadsheet</guid>
-      <description>
-
-&lt;h1 id=&#34;about-event-objects&#34;&gt;About Event Objects&lt;/h1&gt;
-
-&lt;p&gt;For example, it thinks the situation of input text of &amp;lsquo;test&amp;rsquo; to &amp;lsquo;A1&amp;rsquo; on a sheet.&lt;/p&gt;
-
-&lt;p&gt;When you use only &amp;lsquo;onEdit(e)&amp;rsquo; without an installing trigger, &amp;lsquo;e&amp;rsquo; has following parameters.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{authMode=LIMITED, range=Range, source=Spreadsheet, user=, value=test}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;In this case, the event cannot send an e-mail because of &amp;lsquo;authMode=LIMITED&amp;rsquo;.&lt;/p&gt;
-
-&lt;p&gt;When you use &amp;ldquo;onEdit(e)&amp;rdquo; with an installing trigger of &amp;ldquo;Edit&amp;rdquo;, &amp;lsquo;e&amp;rsquo; has following parameters.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{authMode=FULL, range=Range, source=Spreadsheet, value=test, triggerUid=#####}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;In this case, the event can send an e-mail because of &amp;lsquo;authMode=FULL&amp;rsquo;.&lt;/p&gt;
-
-&lt;p&gt;&amp;lsquo;range&amp;rsquo; and &amp;lsquo;source&amp;rsquo; are the coordinate and spreadsheet of the edited cell, respectively. They can confirm using &amp;lsquo;e.range.getA1Notation()&amp;rsquo; and &amp;lsquo;getId()&amp;rsquo;, respectively.&lt;/p&gt;
-
-&lt;h2 id=&#34;about-ljava-lang-object&#34;&gt;About [Ljava.lang.Object;&lt;/h2&gt;
-
-&lt;p&gt;About &amp;ldquo;Form submit event&amp;rdquo; of GAS with spreadsheet, e.values and e.namedValues have &amp;ldquo;[Ljava.lang.Object;&amp;ldquo;. Using &amp;ldquo;JSON.Stringify()&amp;rdquo; like &amp;ldquo;JSON.stringify(e.values)&amp;rdquo;, &amp;ldquo;JSON.stringify(e.namedValues)&amp;rdquo;, values from &amp;ldquo;[Ljava.lang.Object;&amp;rdquo; can be retrieved.&lt;/p&gt;
-
-&lt;h2 id=&#34;reference&#34;&gt;Reference&lt;/h2&gt;
-
-&lt;p&gt;You can see the detailed information of sheet events from &lt;a href=&#34;https://developers.google.com/apps-script/guides/triggers/events&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
 </description>
     </item>
     
