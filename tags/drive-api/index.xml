@@ -7,8 +7,106 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Fri, 17 Feb 2017 17:25:29 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 30 Mar 2017 08:53:21 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/tags/drive-api/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>How to use &#34;fields&#34; of Drive APIs</title>
+      <link>https://tanaikech.github.io/2017/03/30/how-to-use-fields-of-drive-apis</link>
+      <pubDate>Thu, 30 Mar 2017 08:53:21 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/03/30/how-to-use-fields-of-drive-apis</guid>
+      <description>
+
+&lt;p&gt;There are a lot of APIs on Google. When we use Google Drive APIs, they usually have &amp;ldquo;fields&amp;rdquo; as a resource. The parameter &amp;ldquo;fields&amp;rdquo; gives various information which is selected to us. This is one of important parameters. And this can be used at Google Apps Script (GAS) although that version is v2. About how to use it, there are &lt;a href=&#34;https://developers.google.com/drive/v2/reference/&#34;&gt;some documents&lt;/a&gt;. But it is difficult to find how to use it at GAS. So I would like to write down here as a memorandum. Most parameters for APIs have to be expressed as JSON. However, the expressions are different for each API. I would like to introduce this using some samples. &lt;strong&gt;This is for GAS.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;1-drive-files-list&#34;&gt;1. Drive.Files.list&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;var params = {
+    q:      &amp;quot;title=&#39;sample&#39; and trashed=false&amp;quot;,
+    fields: &amp;quot;items(id, title, mimeType), kind&amp;quot;
+};
+var res = Drive.Files.list(params)
+Logger.log(JSON.stringify(res))
+
+{
+  &amp;quot;kind&amp;quot;: &amp;quot;drive#fileList&amp;quot;,
+  &amp;quot;items&amp;quot;: [
+    {
+      &amp;quot;id&amp;quot;: &amp;quot;FILE ID&amp;quot;,
+      &amp;quot;mimeType&amp;quot;: &amp;quot;mimeType&amp;quot;,
+      &amp;quot;title&amp;quot;: &amp;quot;FILE NAME&amp;quot;
+    }
+  ]
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;q&lt;/code&gt; is used at &amp;ldquo;Search for Files&amp;rdquo;. At this sample, it searches file name of &amp;ldquo;sample&amp;rdquo; outside trash box.&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;fields&lt;/code&gt; is expressed as above. &lt;code&gt;title&lt;/code&gt;, &lt;code&gt;id&lt;/code&gt; and &amp;ldquo;mimeType&amp;rdquo; are file name, file id and mime type of the file, respectively. &lt;code&gt;kind&lt;/code&gt; is &amp;ldquo;This is always drive#fileList.&amp;rdquo; from document.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;References :
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://developers.google.com/drive/v2/reference/files/list&#34;&gt;https://developers.google.com/drive/v2/reference/files/list&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://developers.google.com/drive/v2/web/search-parameters&#34;&gt;https://developers.google.com/drive/v2/web/search-parameters&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;2-drive-files-get&#34;&gt;2. Drive.Files.get&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;var params = {
+    fields: &amp;quot;id, title, mimeType&amp;quot;
+};
+var dat = Drive.Files.get(&amp;quot;FILE ID&amp;quot;, params);
+Logger.log(JSON.stringify(dat))
+
+{
+  &amp;quot;id&amp;quot;: &amp;quot;FILE ID&amp;quot;,
+  &amp;quot;mimeType&amp;quot;: &amp;quot;mimeType&amp;quot;,
+  &amp;quot;title&amp;quot;: &amp;quot;FILE NAME&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;For example, &lt;code&gt;title&lt;/code&gt;, &lt;code&gt;id&lt;/code&gt; and &lt;code&gt;mimeType&lt;/code&gt; are file name, file id and mime type of the file, respectively.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Reference :
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://developers.google.com/drive/v2/reference/files/get&#34;&gt;https://developers.google.com/drive/v2/reference/files/get&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;3-drive-files-insert&#34;&gt;3. Drive.Files.insert&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;var data = {
+    title:    &amp;quot;sample&amp;quot;,
+    mimeType: &amp;quot;application/vnd.google-apps.spreadsheet&amp;quot;,
+    parents:  [{&amp;quot;id&amp;quot;: &amp;quot;FOLDER ID&amp;quot;}]
+};
+var res = Drive.Files.insert(data);
+Logger.log(&amp;quot;{id: %s, title: %s, mimeType: %s}&amp;quot;, res.id, res.title, res.mimeType)
+
+{
+  &amp;quot;id&amp;quot;: &amp;quot;FILE ID&amp;quot;,
+  &amp;quot;title&amp;quot;: &amp;quot;sample&amp;quot;,
+  &amp;quot;mimeType&amp;quot;: &amp;quot;application/vnd.google-apps.spreadsheet&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;By this, a new spreadsheet is created under the FOLDER ID. In this case, &amp;ldquo;fields&amp;rdquo; is retrieved from the results of execution.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Reference :
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://developers.google.com/drive/v2/reference/files/insert&#34;&gt;https://developers.google.com/drive/v2/reference/files/insert&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
     
     <item>
       <title>Retrieving Access Token for Google Drive API using GAS</title>
