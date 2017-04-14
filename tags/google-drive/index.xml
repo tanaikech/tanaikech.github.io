@@ -7,8 +7,46 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Thu, 30 Mar 2017 08:53:21 +0900</lastBuildDate>
+    <lastBuildDate>Fri, 14 Apr 2017 18:03:32 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/tags/google-drive/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Creating Downloaded Excel file as Spreadsheet</title>
+      <link>https://tanaikech.github.io/2017/04/14/creating-downloaded-excel-file-as-spreadsheet</link>
+      <pubDate>Fri, 14 Apr 2017 18:03:32 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/04/14/creating-downloaded-excel-file-as-spreadsheet</guid>
+      <description>&lt;p&gt;This is a sample GAS script to create an Excel file, which was downloaded from web, as Spreadsheet. By using Drive API, it can be achieved without access token.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Script :&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function downloadFile(fileURL, folder) {
+  var filename = fileURL.match(&amp;quot;.+/(.+?)([\?#;].*)?$&amp;quot;)[1];
+  var response = UrlFetchApp.fetch(fileURL);
+  var rc = response.getResponseCode();
+  var blob = response.getBlob();
+  var resource = {
+    &amp;quot;mimeType&amp;quot;: &amp;quot;application/vnd.google-apps.spreadsheet&amp;quot;,
+    &amp;quot;parents&amp;quot;: [{id: folder}],
+    &amp;quot;title&amp;quot;: filename
+  };
+  var res = Drive.Files.insert(resource, blob);
+  var fileInfo = [rc, res.title, blob.getBytes().length, res.id];
+  return fileInfo;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;Result :&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;[
+    200,
+    sample.xlsx,
+    10000.0,
+    ## file id ##
+]
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
     
     <item>
       <title>How to use &#34;fields&#34; of Drive APIs</title>
