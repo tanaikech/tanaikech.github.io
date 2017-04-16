@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.16" />
 
-  <title>tanaike</title>
+  <title>Comprehension of GAS &middot; tanaike</title>
 
   
   
@@ -36,8 +36,6 @@
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
 
   
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike" href="https://tanaikech.github.io/index.xml" />
   
 
   
@@ -113,10 +111,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://tanaikech.github.io/index.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
-    </li>
     
 
     
@@ -206,78 +200,16 @@
 
 
 <div class="header">
-  <h1>tanaike</h1>
-  <h2>The Thinker</h2>
+  <h1>Comprehension of GAS</h1>
+  <h2></h2>
 </div>
-
 <div class="content">
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2016/10/13/improved-algorithms-for-summation-of-array-elements">Improved Algorithms for Summation of Array Elements</a></h2>
 
-    <div class="post-meta">
+  <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>13 Oct 2016, 14:39</time>
-  </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/report">report</a>
-    
-  </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/gas">gas</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google">google</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/algorithm">algorithm</a>
-    
-  </div>
-  
-  
-
-</div>
-
-  </header>
-
-  <p>
-  Kanshi TANAIKE Abstract I considered an efficient algorithm for summation of array elements. All elements in an array are string. When those elements are summed using scripts, a standard method is to add each element in order. If the script is run without any optimize, the process becomes gradually sluggish, because the total amount of active data during the summation process is proportional to the square of the number of array elements.
-  </p>
-
-  
-  <footer>
-    <a href="https://tanaikech.github.io/2016/10/13/improved-algorithms-for-summation-of-array-elements">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2016/09/18/1stpost">1stpost</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>18 Sep 2016, 15:02</time>
+    <time>17 Apr 2017, 08:16</time>
   </div>
 
   
@@ -300,7 +232,7 @@
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/etc">etc</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>
     
   </div>
   
@@ -308,31 +240,96 @@
 
 </div>
 
-  </header>
-
-  <p>
-  This is a first post. Today this blog was launched. I would like to introduce some of my experimental results. I&rsquo;m Japanese. So I&rsquo;ll use both English and Japanese here. Thank you.
-  </p>
-
-  
-</article>
-
   
 
-  
+<p>Here, I would like to introduce a comprehension of GAS.</p>
+
+<pre><code>var data = [[[0], [1], [2], [3]], [[4], [5], [6], [7]]];
+</code></pre>
+
+<h3 id="pattern-1">Pattern 1</h3>
+
+<pre><code>var a = [];
+for (var i=0; i&lt;data.length; i++) {
+  var temp = [];
+  for (var j=0; j&lt;data[i].length; j++) {
+    if (data[i][j][0] % 2 == 0) temp.push(j);
+  }
+  a.push(temp);
+}
+Logger.log(a)
+</code></pre>
+
+<p><strong>Result :</strong></p>
+
+<pre><code>[[0.0, 2.0], [0.0, 2.0]]
+</code></pre>
+
+<h3 id="pattern-2">Pattern 2</h3>
+
+<pre><code>var b = [];
+data.forEach(function(e1){
+  var temp = [];
+  e1.forEach(function(e2, i2){
+    if (e2[0] % 2 == 0) temp.push(parseInt(i2, 10));
+  });
+  b.push(temp);
+});
+Logger.log(b)
+</code></pre>
+
+<p><strong>Result :</strong></p>
+
+<pre><code>[[0.0, 2.0], [0.0, 2.0]]
+</code></pre>
+
+<h3 id="pattern-3">Pattern 3</h3>
+
+<pre><code>var c = [[parseInt(i, 10) for (i in e) if (e[i][0] % 2 == 0)] for each (e in data)];
+Logger.log(c)
+</code></pre>
+
+<p><strong>Result :</strong></p>
+
+<pre><code>[[0.0, 2.0], [0.0, 2.0]]
+</code></pre>
+
+<p>GAS can use JavaScript 1.7. So it can write as above.</p>
+
+<ul>
+<li>In the case of <code>[i for (i in array)]</code>, <code>i</code> is index. But it&rsquo;s string.</li>
+<li>In the case of <code>[i for each (i in array)]</code>, <code>i</code> is element.</li>
+</ul>
 
 
-<nav class="pagination" role="pagination">
   
-  <a href="https://tanaikech.github.io/page/6/"><i class="fa fa-chevron-left"></i></a>
-  
-  <span>&nbsp;7 / 7&nbsp;</span>
-  
-  <i class="fa fa-chevron-right"></i>
-  
-</nav>
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2017/04/15/creating-spreadsheet-from-excel-file"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2017/04/15/creating-spreadsheet-from-excel-file">Creating Spreadsheet from Excel file</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
+</div>
 
 
+
+  
 
 </div>
 

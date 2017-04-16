@@ -7,8 +7,77 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Sat, 15 Apr 2017 10:39:05 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 17 Apr 2017 08:16:36 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/tags/google-apps-script/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Comprehension of GAS</title>
+      <link>https://tanaikech.github.io/2017/04/17/comprehension-of-gas</link>
+      <pubDate>Mon, 17 Apr 2017 08:16:36 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/04/17/comprehension-of-gas</guid>
+      <description>
+
+&lt;p&gt;Here, I would like to introduce a comprehension of GAS.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var data = [[[0], [1], [2], [3]], [[4], [5], [6], [7]]];
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;pattern-1&#34;&gt;Pattern 1&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;var a = [];
+for (var i=0; i&amp;lt;data.length; i++) {
+  var temp = [];
+  for (var j=0; j&amp;lt;data[i].length; j++) {
+    if (data[i][j][0] % 2 == 0) temp.push(j);
+  }
+  a.push(temp);
+}
+Logger.log(a)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;Result :&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[[0.0, 2.0], [0.0, 2.0]]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;pattern-2&#34;&gt;Pattern 2&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;var b = [];
+data.forEach(function(e1){
+  var temp = [];
+  e1.forEach(function(e2, i2){
+    if (e2[0] % 2 == 0) temp.push(parseInt(i2, 10));
+  });
+  b.push(temp);
+});
+Logger.log(b)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;Result :&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[[0.0, 2.0], [0.0, 2.0]]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;pattern-3&#34;&gt;Pattern 3&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;var c = [[parseInt(i, 10) for (i in e) if (e[i][0] % 2 == 0)] for each (e in data)];
+Logger.log(c)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;Result :&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[[0.0, 2.0], [0.0, 2.0]]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;GAS can use JavaScript 1.7. So it can write as above.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;In the case of &lt;code&gt;[i for (i in array)]&lt;/code&gt;, &lt;code&gt;i&lt;/code&gt; is index. But it&amp;rsquo;s string.&lt;/li&gt;
+&lt;li&gt;In the case of &lt;code&gt;[i for each (i in array)]&lt;/code&gt;, &lt;code&gt;i&lt;/code&gt; is element.&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
     
     <item>
       <title>Creating Spreadsheet from Excel file</title>
@@ -918,63 +987,6 @@ function message(msg) {
 &amp;lt;/body&amp;gt;
 &amp;lt;/html&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Retrieving cells without blank using GAS</title>
-      <link>https://tanaikech.github.io/2017/02/03/retrieving-cells-without-blank-using-gas</link>
-      <pubDate>Fri, 03 Feb 2017 10:14:25 +0900</pubDate>
-      
-      <guid>https://tanaikech.github.io/2017/02/03/retrieving-cells-without-blank-using-gas</guid>
-      <description>
-
-&lt;p&gt;This is a sample script for retrieving cells without blank cells. Figure 1 shows the sample spreadsheet. In this sheet, &lt;u&gt;the row 14 has one space.&lt;/u&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th align=&#34;center&#34;&gt;&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td align=&#34;center&#34;&gt;&lt;img src=&#34;https://tanaikech.github.io/img/fig170203a.png&#34; alt=&#34;&#34; /&gt;&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;center&#34;&gt;Fig. 1: Sample spreadsheet.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;Data is retrieved as follows.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;  var data = SpreadsheetApp
-             .getActiveSpreadsheet()
-             .getActiveSheet()
-             .getRange(&#39;a1:a30&#39;)
-             .getValues();
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;1-retrieving-cells-with-spaces-and-no-blank-cells&#34;&gt;1. Retrieving cells with spaces and no blank cells.&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;  var Result = [i for each (i in data)if (i)].join(&#39;&#39;);
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;strong&gt;Result : Hello World&lt;/strong&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;2-retrieving-cells-without-both-spaces-and-blank-cells&#34;&gt;2. Retrieving cells without both spaces and blank cells.&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;  var Result = [i for each (i in data)if (isNaN(i))].join(&#39;&#39;);
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;strong&gt;Result : HelloWorld&lt;/strong&gt;&lt;/p&gt;
 </description>
     </item>
     
