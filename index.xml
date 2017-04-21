@@ -7,8 +7,45 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Thu, 20 Apr 2017 07:56:36 +0900</lastBuildDate>
+    <lastBuildDate>Fri, 21 Apr 2017 13:13:00 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Overwriting Spreadsheet to Existing Excel File</title>
+      <link>https://tanaikech.github.io/2017/04/21/overwriting-spreadsheet-to-existing-excel-file</link>
+      <pubDate>Fri, 21 Apr 2017 13:13:00 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/04/21/overwriting-spreadsheet-to-existing-excel-file</guid>
+      <description>&lt;p&gt;This sample script converts a spreadsheet to excel file, and overwrites the excel file to the existing excel file. When you use this script, at first, &lt;u&gt;please confirm whether Drive API is enabled at Google API console.&lt;/u&gt; Because the existing excel file is overwritten, the file name and file ID are not changed.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function overWrite(src_spreadsheetId, dst_excelfileId) {
+  var accesstoken = ScriptApp.getOAuthToken();
+  return UrlFetchApp.fetch(
+    &amp;quot;https://www.googleapis.com/upload/drive/v3/files/&amp;quot; +
+    dst_excelfileId +
+    &amp;quot;?uploadType=multipart&amp;quot;,
+    {
+      method: &amp;quot;PATCH&amp;quot;,
+      headers: {Authorization: &amp;quot;Bearer &amp;quot; + accesstoken},
+      contentType: &amp;quot;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&amp;quot;,
+      payload: function(a, s) {
+        return UrlFetchApp.fetch(
+          &amp;quot;https://www.googleapis.com/drive/v3/files/&amp;quot; +
+          s +
+          &amp;quot;/export?mimeType=application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&amp;quot;,
+          {
+            method: &amp;quot;GET&amp;quot;,
+            headers: {Authorization: &amp;quot;Bearer &amp;quot; + a},
+            muteHttpExceptions: true
+          }
+        ).getBlob().getBytes();
+      }(accesstoken, src_spreadsheetId)
+    }
+  ).getContentText();
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
     
     <item>
       <title>Converting Spreadsheet to PDF</title>
@@ -633,55 +670,6 @@ print(&amp;quot;Filename = {0}, MimeType = {1}&amp;quot;.format(r.json()[&amp;qu
 &lt;li&gt;&lt;a href=&#34;https://developers.google.com/drive/v3/reference/files/export&#34;&gt;Download Google Docs (spreadsheet, document, presentation and so on). In this case, Google calls &amp;ldquo;Export&amp;rdquo;.&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;https://developers.google.com/drive/v3/reference/files/get&#34;&gt;Download files except for Google Docs.&lt;/a&gt;&lt;/li&gt;
 &lt;/ol&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Create Folder Tree on Google Drive</title>
-      <link>https://tanaikech.github.io/2017/03/13/create-folder-tree-on-google-drive</link>
-      <pubDate>Mon, 13 Mar 2017 13:27:57 +0900</pubDate>
-      
-      <guid>https://tanaikech.github.io/2017/03/13/create-folder-tree-on-google-drive</guid>
-      <description>&lt;p&gt;This is a sample script for creating a folder tree including all folders in Google Drive. For each element, parent folder and sub folder are retrieved.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Script :&lt;/strong&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;  var results = (function(folder, folderSt, results){
-    var ar = [];
-    var folders = folder.getFolders();
-    while(folders.hasNext()) ar.push(folders.next());
-    folderSt += folder.getName() + &amp;quot;(&amp;quot; + folder.getId() + &amp;quot;)#_aabbccddee_#&amp;quot;;
-    var array_folderSt = folderSt.split(&amp;quot;#_aabbccddee_#&amp;quot;);
-    array_folderSt.pop()
-    results.push(array_folderSt);
-    ar.length == 0 &amp;amp;&amp;amp; (folderSt = &amp;quot;&amp;quot;);
-    for (var i in ar) arguments.callee(ar[i], folderSt, results);
-    return results;
-  })(DriveApp.getRootFolder(),&amp;quot;&amp;quot;,[]);
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;strong&gt;Result :&lt;/strong&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;[
-    [foldername1(folder1 id)],
-    [foldername1(folder1 id), sub foldername1s(sub folde1s id)],
-    [foldername1(folder2 id)],
-    [foldername2(folder2 id), sub foldername2s1(sub folde2s1 id)],
-    [foldername2(folder2 id), sub foldername2s1(sub folde2s1 id), sub foldername2s2(sub folde2s2 id)]
-]
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;strong&gt;By the way :&lt;/strong&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;ar.length == 0 &amp;amp;&amp;amp; (folderSt = &amp;quot;&amp;quot;);
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;if (ar.length == 0) {
-  folderSt = &amp;quot;&amp;quot;;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Both scripts are the same meaning.&lt;/p&gt;
 </description>
     </item>
     

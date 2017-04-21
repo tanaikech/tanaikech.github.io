@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.16" />
 
-  <title>Topics &middot; tanaike</title>
+  <title>Overwriting Spreadsheet to Existing Excel File &middot; tanaike</title>
 
   
   
@@ -36,8 +36,6 @@
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
 
   
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike" href="https://tanaikech.github.io/topics/index.xml" />
   
 
   
@@ -113,10 +111,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://tanaikech.github.io/topics/index.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
-    </li>
     
 
     
@@ -206,23 +200,105 @@
 
 
 <div class="header">
-  <h1>Topics</h1>
+  <h1>Overwriting Spreadsheet to Existing Excel File</h1>
+  <h2></h2>
 </div>
 <div class="content">
-  <ul>
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>21 Apr 2017, 13:13</time>
+  </div>
+
+  
+
   
   
-    <li>
-      <a href="etc">etc</a>
-      <span>&#40;33&#41;</span>
-    </li>
   
-    <li>
-      <a href="report">report</a>
-      <span>&#40;3&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/etc">etc</a>
+    
+  </div>
   
-  </ul>
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  <p>This sample script converts a spreadsheet to excel file, and overwrites the excel file to the existing excel file. When you use this script, at first, <u>please confirm whether Drive API is enabled at Google API console.</u> Because the existing excel file is overwritten, the file name and file ID are not changed.</p>
+
+<pre><code class="language-javascript">function overWrite(src_spreadsheetId, dst_excelfileId) {
+  var accesstoken = ScriptApp.getOAuthToken();
+  return UrlFetchApp.fetch(
+    &quot;https://www.googleapis.com/upload/drive/v3/files/&quot; +
+    dst_excelfileId +
+    &quot;?uploadType=multipart&quot;,
+    {
+      method: &quot;PATCH&quot;,
+      headers: {Authorization: &quot;Bearer &quot; + accesstoken},
+      contentType: &quot;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&quot;,
+      payload: function(a, s) {
+        return UrlFetchApp.fetch(
+          &quot;https://www.googleapis.com/drive/v3/files/&quot; +
+          s +
+          &quot;/export?mimeType=application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&quot;,
+          {
+            method: &quot;GET&quot;,
+            headers: {Authorization: &quot;Bearer &quot; + a},
+            muteHttpExceptions: true
+          }
+        ).getBlob().getBytes();
+      }(accesstoken, src_spreadsheetId)
+    }
+  ).getContentText();
+}
+</code></pre>
+
+
+  
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2017/04/20/converting-spreadsheet-to-pdf"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2017/04/20/converting-spreadsheet-to-pdf">Converting Spreadsheet to PDF</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
+</div>
+
+
+
+  
+
 </div>
 
 </div>
@@ -258,4 +334,5 @@
 
 </body>
 </html>
+
 
