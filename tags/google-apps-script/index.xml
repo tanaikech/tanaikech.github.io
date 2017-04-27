@@ -7,8 +7,142 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Mon, 24 Apr 2017 15:07:11 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 27 Apr 2017 14:34:22 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/tags/google-apps-script/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Retrieving User Information with Shared Spreadsheet</title>
+      <link>https://tanaikech.github.io/2017/04/27/retrieving-user-information-with-shared-spreadsheet</link>
+      <pubDate>Thu, 27 Apr 2017 14:34:22 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/04/27/retrieving-user-information-with-shared-spreadsheet</guid>
+      <description>&lt;p&gt;This sample script retrieves the user information which is editing the shared spreadsheet.&lt;/p&gt;
+
+&lt;p&gt;It was found as follows.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;User information retrieving by Class Session is the owner and users which installed triggers by themselves.&lt;/li&gt;
+&lt;li&gt;When each user installs a trigger, user information retrieving by Class Session losts the accuracy. So user information has to be retrieved using a temporally installed trigger.&lt;/li&gt;
+&lt;li&gt;Using &lt;code&gt;onOpen()&lt;/code&gt;, it cannot directly install triggers and authorize.&lt;/li&gt;
+&lt;li&gt;Using menu bar, it can install triggers and authorize Google Services using API.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Here, I thought 2 problems.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;The confirmation whether the authorization was done.
+
+&lt;ul&gt;
+&lt;li&gt;At &lt;code&gt;onOpen()&lt;/code&gt;, although many methods using Google API can be executed without the authorization, there are also some methods which cannot be executed without the authorization. Furthermore, there are some methods which cannot execute even if the authorization was done. It&amp;rsquo;s &lt;code&gt;trigger&lt;/code&gt;. On the other hand, &lt;code&gt;DriveApp&lt;/code&gt; requires the authorization for only the first time, but it can use without the authorization after 2nd times.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;I thought that users can find easily by displaying information in a dialog box when spreadsheet is launched. So I adopted displaying information using the dialog box. But, there is a big limitation for the dialog box.
+
+&lt;ul&gt;
+&lt;li&gt;Using a click of button on a dialog box, it can install triggers. However it cannot authorize Google Services using API.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Using above information, I thought a flow to retrieve user information.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;When user opens the spreadsheet for the first time, it displays &amp;lsquo;Please authorize at &amp;ldquo;Authorization&amp;rdquo; of menu bar.&amp;rsquo; using a dialog box, and creates a menu bar &amp;ldquo;Authorization&amp;rdquo;.&lt;/li&gt;
+&lt;li&gt;The user clicks &amp;ldquo;OK&amp;rdquo; button on the dialog box and run &amp;ldquo;Authorization&amp;rdquo; at the menu bar. By running &amp;ldquo;Authorization&amp;rdquo;, the user information is retrieved by a temporally installed trigger.&lt;/li&gt;
+&lt;li&gt;When the user opens the spreadsheet after the 2nd time, the authorization is checked by &lt;code&gt;DriveApp&lt;/code&gt;. A dialog box with &amp;lsquo;Push OK button.&amp;rsquo; is displayed. By clicking &amp;ldquo;OK&amp;rdquo;, the user information is retrieved by a temporally installed trigger.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;By this flow, the user information which is editing the shared spreadsheet can be retrieved. Although I think that there may be also other solutions, I proposal this as one of solutions.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Script :&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function getUser(){
+  var triggerId = ScriptApp.newTrigger(&#39;getUser&#39;)
+    .forSpreadsheet(SpreadsheetApp.getActive())
+    .onEdit()
+    .create()
+    .getUniqueId();
+  var userInf = Session.getEffectiveUser();
+  var userName = userInf.getUsername();
+  var userMail = userInf.getEmail();
+  var triggers = ScriptApp.getProjectTriggers();
+  [ScriptApp.deleteTrigger(i) for each (i in triggers) if (i.getUniqueId() == triggerId)];
+  CacheService.getUserCache().putAll({
+    &amp;quot;username&amp;quot;: userName,
+    &amp;quot;usermail&amp;quot;: userMail
+  }, 3600);
+}
+
+function dialogForGetUser(){
+  SpreadsheetApp.getActiveSpreadsheet().show(
+    HtmlService
+    .createHtmlOutput(&#39;&amp;lt;input type=&amp;quot;button&amp;quot;\
+      value=&amp;quot;OK&amp;quot;\
+      onclick=&amp;quot;google.script.run.withSuccessHandler(function(){google.script.host.close()})\
+      .getUser()&amp;quot;&amp;gt;&#39;
+    )
+    .setTitle(&#39;Push OK button.&#39;)
+    .setWidth(400)
+    .setHeight(100)
+  );
+}
+
+function dialogForAuth(){
+  SpreadsheetApp.getActiveSpreadsheet().show(
+    HtmlService
+    .createHtmlOutput(&#39;&amp;lt;input type=&amp;quot;button&amp;quot;\
+      value=&amp;quot;OK&amp;quot;\
+      onclick=&amp;quot;google.script.host.close()&amp;quot;&amp;gt;&#39;
+    )
+    .setTitle(&#39;Please authorize at &amp;quot;Authorization&amp;quot; of menu bar.&#39;)
+    .setWidth(400)
+    .setHeight(100)
+  );
+}
+
+function getAuth() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  ss.removeMenu(&amp;quot;Authorization&amp;quot;);
+  getUser();
+  ss.toast(&amp;quot;Done.&amp;quot;, &amp;quot;Authorization&amp;quot;, 3);
+}
+
+function onOpen(){
+  try {
+    var temp = DriveApp.getFileById(SpreadsheetApp.getActiveSpreadsheet().getId())
+    dialogForGetUser();
+  } catch(e) {
+    dialogForAuth();
+    SpreadsheetApp.getActiveSpreadsheet().addMenu(
+      &amp;quot;Authorization&amp;quot;,
+      [{
+        functionName:&amp;quot;getAuth&amp;quot;,
+        name:&amp;quot;Run this only when the first time&amp;quot;
+      }]
+    );
+  }
+}
+
+function onEdit(e){
+  var cache = CacheService.getUserCache();
+  var user = cache.getAll([&amp;quot;username&amp;quot;, &amp;quot;usermail&amp;quot;]);
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ol&gt;
+&lt;li&gt;When the spreadsheet is opened, at first, &lt;code&gt;onOpen()&lt;/code&gt; is executed. It is checked whether the user has already authorized. The dialog box is as follows.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170427-1st.gif&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;If the user has never authorized yet, &lt;code&gt;dialogForAuth()&lt;/code&gt; is executed. If the user has already authorized. &lt;code&gt;dialogForGetUser()&lt;/code&gt; is executed. The dialog box is as follows.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170427-2nd.gif&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;For example, you can retrieve user name by &lt;code&gt;user.username&lt;/code&gt; at &lt;code&gt;onEdit()&lt;/code&gt;.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>CLI Tool - ggsrun</title>
@@ -688,38 +822,6 @@ function saveAsCSV() {
   }).getContentText());
   Logger.log(token.access_token);
 &lt;/code&gt;&lt;/pre&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Send E-mail with Excel file converted from Spreadsheet</title>
-      <link>https://tanaikech.github.io/2017/02/16/send-e-mail-with-excel-file-converted-from-spreadsheet</link>
-      <pubDate>Thu, 16 Feb 2017 11:53:50 +0900</pubDate>
-      
-      <guid>https://tanaikech.github.io/2017/02/16/send-e-mail-with-excel-file-converted-from-spreadsheet</guid>
-      <description>&lt;p&gt;This sample script sends an e-mail with an Excel file exported from Spreadsheet as an attachment file.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;function excelSender() {
-  var sheetID = [Sheet ID];
-  var xlsxName = [Excel file name];
-  var params = {
-    &amp;quot;headers&amp;quot; : {Authorization: &amp;quot;Bearer [Retrieved AccessToken]&amp;quot;},
-    &amp;quot;muteHttpExceptions&amp;quot; : true
-  };
-  var dUrl = &amp;quot;https://www.googleapis.com/drive/v3/files/&amp;quot; + sheetID + &amp;quot;/export?mimeType=application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&amp;quot;
-  var xlsxlFile = UrlFetchApp.fetch(dUrl, params).getBlob().setName(xlsxName);
-  MailApp.sendEmail({
-    to: [Mail address],
-    subject: &amp;quot;sample subject&amp;quot;,
-    body: &amp;quot;sample body&amp;quot;,
-    attachments: [xlsxlFile]
-  });
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/170216b.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Is &lt;code&gt;ScriptApp.getOAuthToken()&lt;/code&gt; unstable? When it creates new GAS project, it can be used. But when the time has elapsed, the script cannot be used. On the other hand, when an access token manually retrieves without &lt;code&gt;getOAuthToken()&lt;/code&gt;, it can be used stably. The scopes I used are &lt;code&gt;https://www.googleapis.com/auth/drive&lt;/code&gt; and &lt;code&gt;https://www.googleapis.com/auth/drive.file&lt;/code&gt;. I don&amp;rsquo;t know about this reason.&lt;/p&gt;
 </description>
     </item>
     
