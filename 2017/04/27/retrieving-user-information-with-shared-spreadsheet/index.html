@@ -280,47 +280,45 @@
 
 <p><strong>Script :</strong></p>
 
-<pre><code class="language-javascript">function getUser(){
+<pre><code class="language-javascript">function showDialog(html, title){
+  SpreadsheetApp.getActiveSpreadsheet().show(
+    HtmlService
+    .createHtmlOutput(html)
+    .setTitle(title)
+    .setWidth(400)
+    .setHeight(100)
+  );
+}
+
+function getUser(){
   var triggerId = ScriptApp.newTrigger('getUser')
     .forSpreadsheet(SpreadsheetApp.getActive())
     .onEdit()
     .create()
     .getUniqueId();
   var userInf = Session.getEffectiveUser();
-  var userName = userInf.getUsername();
-  var userMail = userInf.getEmail();
+  CacheService.getUserCache().putAll({
+    &quot;username&quot;: userInf.getUsername(),
+    &quot;usermail&quot;: userInf.getEmail()
+  }, 7200);
   var triggers = ScriptApp.getProjectTriggers();
   [ScriptApp.deleteTrigger(i) for each (i in triggers) if (i.getUniqueId() == triggerId)];
-  CacheService.getUserCache().putAll({
-    &quot;username&quot;: userName,
-    &quot;usermail&quot;: userMail
-  }, 3600);
 }
 
 function dialogForGetUser(){
-  SpreadsheetApp.getActiveSpreadsheet().show(
-    HtmlService
-    .createHtmlOutput('&lt;input type=&quot;button&quot;\
+  showDialog('&lt;input type=&quot;button&quot;\
       value=&quot;OK&quot;\
       onclick=&quot;google.script.run.withSuccessHandler(function(){google.script.host.close()})\
-      .getUser()&quot;&gt;'
-    )
-    .setTitle('Push OK button.')
-    .setWidth(400)
-    .setHeight(100)
+      .getUser()&quot;&gt;',
+      'Push OK button.'
   );
 }
 
 function dialogForAuth(){
-  SpreadsheetApp.getActiveSpreadsheet().show(
-    HtmlService
-    .createHtmlOutput('&lt;input type=&quot;button&quot;\
+  showDialog('&lt;input type=&quot;button&quot;\
       value=&quot;OK&quot;\
-      onclick=&quot;google.script.host.close()&quot;&gt;'
-    )
-    .setTitle('Please authorize at &quot;Authorization&quot; of menu bar.')
-    .setWidth(400)
-    .setHeight(100)
+      onclick=&quot;google.script.host.close()&quot;&gt;',
+      'Please authorize at &quot;Authorization&quot; of menu bar.'
   );
 }
 
@@ -346,12 +344,6 @@ function onOpen(){
     );
   }
 }
-
-function onEdit(e){
-  var cache = CacheService.getUserCache();
-  var user = cache.getAll([&quot;username&quot;, &quot;usermail&quot;]);
-
-}
 </code></pre>
 
 <ol>
@@ -366,7 +358,10 @@ function onEdit(e){
 
 <p><img src="https://tanaikech.github.io/img/20170427-2nd.png" alt="" /></p>
 
-<p>For example, you can retrieve user name by <code>user.username</code> at <code>onEdit()</code>.</p>
+<p>The user information is retrieved as follows. You can use this by <code>onEdit()</code> and trigger.</p>
+
+<pre><code class="language-javascript">var user = CacheService.getUserCache().getAll([&quot;username&quot;, &quot;usermail&quot;]);
+</code></pre>
 
 
   
