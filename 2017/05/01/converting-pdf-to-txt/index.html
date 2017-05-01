@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.16" />
 
-  <title>Updated ggsrun to v110 &middot; tanaike</title>
+  <title>Converting PDF to TXT &middot; tanaike</title>
 
   
   
@@ -200,7 +200,7 @@
 
 
 <div class="header">
-  <h1>Updated ggsrun to v110</h1>
+  <h1>Converting PDF to TXT</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -209,7 +209,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>30 Apr 2017, 11:49</time>
+    <time>01 May 2017, 15:04</time>
   </div>
 
   
@@ -232,11 +232,11 @@
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/ggsrun">ggsrun</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/python">python</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/cli">CLI</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google">Google</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/drive-api">drive-api</a>
     
   </div>
   
@@ -244,26 +244,95 @@
 
 </div>
 
-  
+  <p>This is a sample script for converting a PDF file to a TXT file. 2 steps are required for this.</p>
 
-<h2 id="updated-ggsrun-to-v-1-1-0">Updated ggsrun to v.1.1.0</h2>
+<ol>
+<li>Upload a PDF file as a Google Document</li>
+<li>Download a Google Document as a TXT file</li>
+</ol>
 
-<p>Added a command for updating existing project on Google Drive. One of scripts in the project can be also updated.</p>
+<p>In this sample, Python Quickstart is used. The detail information is <a href="https://developers.google.com/drive/v3/web/quickstart/python">https://developers.google.com/drive/v3/web/quickstart/python</a>. Please read &ldquo;Step 1: Turn on the Drive API&rdquo; and &ldquo;Step 2: Install the Google Client Library&rdquo;.</p>
 
-<p><a href="https://github.com/tanaikech/ggsrun">https://github.com/tanaikech/ggsrun</a></p>
+<pre><code class="language-python">from __future__ import print_function
+import httplib2
+import os
+import io
+
+from apiclient import discovery
+from oauth2client import client
+from oauth2client import tools
+from oauth2client.file import Storage
+from apiclient.http import MediaFileUpload, MediaIoBaseDownload
+
+try:
+    import argparse
+    flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
+except ImportError:
+    flags = None
+
+SCOPES = 'https://www.googleapis.com/auth/drive'
+CLIENT_SECRET_FILE = 'client_secret.json'
+APPLICATION_NAME = 'Drive API Python Quickstart'
+
+
+def get_credentials():
+    credential_path = os.path.join(&quot;./&quot;, 'drive-python-quickstart.json')
+    store = Storage(credential_path)
+    credentials = store.get()
+    if not credentials or credentials.invalid:
+        flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
+        flow.user_agent = APPLICATION_NAME
+        if flags:
+            credentials = tools.run_flow(flow, store, flags)
+        else:  # Needed only for compatibility with Python 2.6
+            credentials = tools.run(flow, store)
+        print('Storing credentials to ' + credential_path)
+    return credentials
+
+
+def main():
+    credentials = get_credentials()
+    http = credentials.authorize(httplib2.Http())
+    service = discovery.build('drive', 'v3', http=http)
+
+    pdffile = 'sample.pdf'
+    txtfile = 'sample.txt'
+
+    mime = 'application/vnd.google-apps.document'
+    res = service.files().create(
+        body={
+            'name': pdffile,
+            'mimeType': mime
+        },
+        media_body=MediaFileUpload(pdffile, mimetype=mime, resumable=True)
+    ).execute()
+
+    dl = MediaIoBaseDownload(
+        io.FileIO(txtfile, 'wb'),
+        service.files().export_media(fileId=res['id'], mimeType=&quot;text/plain&quot;)
+    )
+    done = False
+    while done is False:
+        status, done = dl.next_chunk()
+    print(&quot;Done.&quot;)
+
+
+if __name__ == '__main__':
+    main()
+</code></pre>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2017/04/27/retrieving-user-information-with-shared-spreadsheet"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2017/04/30/updated-ggsrun-to-v110"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2017/04/27/retrieving-user-information-with-shared-spreadsheet">Retrieving User Information with Shared Spreadsheet</a>
+      <a href="https://tanaikech.github.io/2017/04/30/updated-ggsrun-to-v110">Updated ggsrun to v110</a>
     </nav>
     
   </div>
@@ -272,14 +341,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2017/05/01/converting-pdf-to-txt">Converting PDF to TXT</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2017/05/01/converting-pdf-to-txt"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
