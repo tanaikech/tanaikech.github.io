@@ -7,8 +7,100 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Mon, 01 May 2017 15:04:30 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 02 May 2017 14:21:55 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>OCR using Google Drive API</title>
+      <link>https://tanaikech.github.io/2017/05/02/ocr-using-google-drive-api</link>
+      <pubDate>Tue, 02 May 2017 14:21:55 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/05/02/ocr-using-google-drive-api</guid>
+      <description>&lt;p&gt;This is a sample script for OCR using Google Drive API. A text file which converted by OCR can be retrieved by inputting an image file.&lt;/p&gt;
+
+&lt;p&gt;In this sample, Python Quickstart is used. The detail information is &lt;a href=&#34;https://developers.google.com/drive/v3/web/quickstart/python&#34;&gt;https://developers.google.com/drive/v3/web/quickstart/python&lt;/a&gt;. Please read “Step 1: Turn on the Drive API” and “Step 2: Install the Google Client Library”.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;from __future__ import print_function
+import httplib2
+import os
+import io
+
+from apiclient import discovery
+from oauth2client import client
+from oauth2client import tools
+from oauth2client.file import Storage
+from apiclient.http import MediaFileUpload, MediaIoBaseDownload
+
+try:
+    import argparse
+    flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
+except ImportError:
+    flags = None
+
+# If modifying these scopes, delete your previously saved credentials
+# at ~/.credentials/drive-python-quickstart.json
+SCOPES = &#39;https://www.googleapis.com/auth/drive&#39;
+CLIENT_SECRET_FILE = &#39;client_secret.json&#39;
+APPLICATION_NAME = &#39;Drive API Python Quickstart&#39;
+
+
+def get_credentials():
+    &amp;quot;&amp;quot;&amp;quot;Gets valid user credentials from storage.
+
+    If nothing has been stored, or if the stored credentials are invalid,
+    the OAuth2 flow is completed to obtain the new credentials.
+
+    Returns:
+        Credentials, the obtained credential.
+    &amp;quot;&amp;quot;&amp;quot;
+    credential_path = os.path.join(&amp;quot;./&amp;quot;, &#39;drive-python-quickstart.json&#39;)
+    store = Storage(credential_path)
+    credentials = store.get()
+    if not credentials or credentials.invalid:
+        flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
+        flow.user_agent = APPLICATION_NAME
+        if flags:
+            credentials = tools.run_flow(flow, store, flags)
+        else:  # Needed only for compatibility with Python 2.6
+            credentials = tools.run(flow, store)
+        print(&#39;Storing credentials to &#39; + credential_path)
+    return credentials
+
+
+def main():
+    credentials = get_credentials()
+    http = credentials.authorize(httplib2.Http())
+    service = discovery.build(&#39;drive&#39;, &#39;v3&#39;, http=http)
+
+    imgfile = &#39;sample.png&#39;  # Image with texts (png, jpg, bmp, gif, pdf)
+    txtfile = &#39;output.txt&#39;  # Text file outputted by OCR
+
+    mime = &#39;application/vnd.google-apps.document&#39;
+    res = service.files().create(
+        body={
+            &#39;name&#39;: imgfile,
+            &#39;mimeType&#39;: mime
+        },
+        media_body=MediaFileUpload(imgfile, mimetype=mime, resumable=True)
+    ).execute()
+
+    downloader = MediaIoBaseDownload(
+        io.FileIO(txtfile, &#39;wb&#39;),
+        service.files().export_media(fileId=res[&#39;id&#39;], mimeType=&amp;quot;text/plain&amp;quot;)
+    )
+    done = False
+    while done is False:
+        status, done = downloader.next_chunk()
+
+    service.files().delete(fileId=res[&#39;id&#39;]).execute()
+    print(&amp;quot;Done.&amp;quot;)
+
+
+if __name__ == &#39;__main__&#39;:
+    main()
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
     
     <item>
       <title>Converting PDF to TXT</title>
@@ -613,104 +705,6 @@ console.log flatten [1, [2, 3, [4, 5]], 6, [7, [8, [9], 10] ,11 , 12], 13]
 
 &amp;gt;&amp;gt;&amp;gt; [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 ]
 &lt;/code&gt;&lt;/pre&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>How to use &#34;fields&#34; of Drive APIs</title>
-      <link>https://tanaikech.github.io/2017/03/30/how-to-use-fields-of-drive-apis</link>
-      <pubDate>Thu, 30 Mar 2017 08:53:21 +0900</pubDate>
-      
-      <guid>https://tanaikech.github.io/2017/03/30/how-to-use-fields-of-drive-apis</guid>
-      <description>
-
-&lt;p&gt;There are a lot of APIs on Google. When we use Google Drive APIs, they usually have &amp;ldquo;fields&amp;rdquo; as a resource. The parameter &amp;ldquo;fields&amp;rdquo; gives various information which is selected to us. This is one of important parameters. And this can be used at Google Apps Script (GAS) although that version is v2. About how to use it, there are &lt;a href=&#34;https://developers.google.com/drive/v2/reference/&#34;&gt;some documents&lt;/a&gt;. But it is difficult to find how to use it at GAS. So I would like to write down here as a memorandum. Most parameters for APIs have to be expressed as JSON. However, the expressions are different for each API. I would like to introduce this using some samples. &lt;strong&gt;This is for GAS.&lt;/strong&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;1-drive-files-list&#34;&gt;1. Drive.Files.list&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;var params = {
-    q:      &amp;quot;title=&#39;sample&#39; and trashed=false&amp;quot;,
-    fields: &amp;quot;items(id, title, mimeType), kind&amp;quot;
-};
-var res = Drive.Files.list(params)
-Logger.log(JSON.stringify(res))
-
-{
-  &amp;quot;kind&amp;quot;: &amp;quot;drive#fileList&amp;quot;,
-  &amp;quot;items&amp;quot;: [
-    {
-      &amp;quot;id&amp;quot;: &amp;quot;FILE ID&amp;quot;,
-      &amp;quot;mimeType&amp;quot;: &amp;quot;mimeType&amp;quot;,
-      &amp;quot;title&amp;quot;: &amp;quot;FILE NAME&amp;quot;
-    }
-  ]
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;code&gt;q&lt;/code&gt; is used at &amp;ldquo;Search for Files&amp;rdquo;. At this sample, it searches file name of &amp;ldquo;sample&amp;rdquo; outside trash box.&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;fields&lt;/code&gt; is expressed as above. &lt;code&gt;title&lt;/code&gt;, &lt;code&gt;id&lt;/code&gt; and &amp;ldquo;mimeType&amp;rdquo; are file name, file id and mime type of the file, respectively. &lt;code&gt;kind&lt;/code&gt; is &amp;ldquo;This is always drive#fileList.&amp;rdquo; from document.&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;References :
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://developers.google.com/drive/v2/reference/files/list&#34;&gt;https://developers.google.com/drive/v2/reference/files/list&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://developers.google.com/drive/v2/web/search-parameters&#34;&gt;https://developers.google.com/drive/v2/web/search-parameters&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;2-drive-files-get&#34;&gt;2. Drive.Files.get&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;var params = {
-    fields: &amp;quot;id, title, mimeType&amp;quot;
-};
-var dat = Drive.Files.get(&amp;quot;FILE ID&amp;quot;, params);
-Logger.log(JSON.stringify(dat))
-
-{
-  &amp;quot;id&amp;quot;: &amp;quot;FILE ID&amp;quot;,
-  &amp;quot;mimeType&amp;quot;: &amp;quot;mimeType&amp;quot;,
-  &amp;quot;title&amp;quot;: &amp;quot;FILE NAME&amp;quot;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;For example, &lt;code&gt;title&lt;/code&gt;, &lt;code&gt;id&lt;/code&gt; and &lt;code&gt;mimeType&lt;/code&gt; are file name, file id and mime type of the file, respectively.&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Reference :
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://developers.google.com/drive/v2/reference/files/get&#34;&gt;https://developers.google.com/drive/v2/reference/files/get&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;3-drive-files-insert&#34;&gt;3. Drive.Files.insert&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;var data = {
-    title:    &amp;quot;sample&amp;quot;,
-    mimeType: &amp;quot;application/vnd.google-apps.spreadsheet&amp;quot;,
-    parents:  [{&amp;quot;id&amp;quot;: &amp;quot;FOLDER ID&amp;quot;}]
-};
-var res = Drive.Files.insert(data);
-Logger.log(&amp;quot;{id: %s, title: %s, mimeType: %s}&amp;quot;, res.id, res.title, res.mimeType)
-
-{
-  &amp;quot;id&amp;quot;: &amp;quot;FILE ID&amp;quot;,
-  &amp;quot;title&amp;quot;: &amp;quot;sample&amp;quot;,
-  &amp;quot;mimeType&amp;quot;: &amp;quot;application/vnd.google-apps.spreadsheet&amp;quot;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;By this, a new spreadsheet is created under the FOLDER ID. In this case, &amp;ldquo;fields&amp;rdquo; is retrieved from the results of execution.&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Reference :
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://developers.google.com/drive/v2/reference/files/insert&#34;&gt;https://developers.google.com/drive/v2/reference/files/insert&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
 </description>
     </item>
     
