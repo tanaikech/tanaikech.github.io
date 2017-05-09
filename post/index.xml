@@ -7,8 +7,46 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Tue, 09 May 2017 09:36:43 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 09 May 2017 10:58:37 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Change Slack Status using Google Apps Script</title>
+      <link>https://tanaikech.github.io/2017/05/09/change-slack-status-using-google-apps-script</link>
+      <pubDate>Tue, 09 May 2017 10:58:37 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/05/09/change-slack-status-using-google-apps-script</guid>
+      <description>&lt;p&gt;This script changes slack status using GAS. If you want to change it on time you decided, it can be achieved by installing this method as a trigger.&lt;/p&gt;
+
+&lt;p&gt;In order to use this, the required scope is &lt;strong&gt;&lt;code&gt;users.profile:write&lt;/code&gt;&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function setSlackStatus(token, user, status_text, status_emoji) {
+  return UrlFetchApp.fetch(
+    &#39;https://slack.com/api/users.profile.set&#39;,
+    {
+      method: &#39;post&#39;,
+      payload: {
+        token: token,
+        user: user,
+        profile: JSON.stringify({status_text: status_text, status_emoji: status_emoji})
+      },
+      muteHttpExceptions: true
+    }
+  ).getContentText();
+}
+
+function main() {
+  var res = setSlackStatus(
+    &#39;### Your access token ###&#39;,
+    &#39;### User ID ###&#39;,
+    &#39;sample&#39;,
+    &#39;:coffee:&#39;
+  );
+  Logger.log(res)
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
     
     <item>
       <title>Delete Line Feed Code by DOS and Bash</title>
@@ -667,44 +705,6 @@ var res = Drive.Files.insert({
 &lt;p&gt;For example, when you want to retrieve created file ID, you can retrieve it by&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;res.id
-&lt;/code&gt;&lt;/pre&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Creating Downloaded Excel file as Spreadsheet</title>
-      <link>https://tanaikech.github.io/2017/04/14/creating-downloaded-excel-file-as-spreadsheet</link>
-      <pubDate>Fri, 14 Apr 2017 18:03:32 +0900</pubDate>
-      
-      <guid>https://tanaikech.github.io/2017/04/14/creating-downloaded-excel-file-as-spreadsheet</guid>
-      <description>&lt;p&gt;This is a sample GAS script to create an Excel file, which was downloaded from web, as Spreadsheet. By using Drive API, it can be achieved without access token.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Script :&lt;/strong&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function downloadFile(fileURL, folder) {
-  var filename = fileURL.match(&amp;quot;.+/(.+?)([\?#;].*)?$&amp;quot;)[1];
-  var response = UrlFetchApp.fetch(fileURL);
-  var rc = response.getResponseCode();
-  var blob = response.getBlob();
-  var resource = {
-    &amp;quot;mimeType&amp;quot;: &amp;quot;application/vnd.google-apps.spreadsheet&amp;quot;,
-    &amp;quot;parents&amp;quot;: [{id: folder}],
-    &amp;quot;title&amp;quot;: filename
-  };
-  var res = Drive.Files.insert(resource, blob);
-  var fileInfo = [rc, res.title, blob.getBytes().length, res.id];
-  return fileInfo;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;strong&gt;Result :&lt;/strong&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;[
-    200,
-    sample.xlsx,
-    10000.0,
-    ## file id ##
-]
 &lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>
