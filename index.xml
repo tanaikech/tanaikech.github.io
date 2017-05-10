@@ -7,8 +7,179 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Tue, 09 May 2017 15:58:08 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 10 May 2017 13:28:28 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>File Transfer for Google Drive Without Authorization</title>
+      <link>https://tanaikech.github.io/2017/05/10/file-transfer-for-google-drive-without-authorization</link>
+      <pubDate>Wed, 10 May 2017 13:28:28 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/05/10/file-transfer-for-google-drive-without-authorization</guid>
+      <description>
+
+&lt;h1 id=&#34;overview&#34;&gt;Overview&lt;/h1&gt;
+
+&lt;p&gt;In this article, I would like to introduce how to transfer files for Google Drive under no authorization.&lt;/p&gt;
+
+&lt;h1 id=&#34;description&#34;&gt;Description&lt;/h1&gt;
+
+&lt;p&gt;When we download and upload files for Google Drive, it usually has to use Drive API. In order to use Drive API, access token is required. If you want to make your friends download and upload files for your Google Drive, the authorization process is to take time. So I proposal this.&lt;/p&gt;
+
+&lt;p&gt;As a sample, I introduce a script for downloading and uploading files using Web Apps. In this sample, it changes a file to a byte slice and send it as text data. Then, it reconstructs it. Of course, base64 encode can be used for this. But the data size for using base64 is much larger than that for using the byte slice.&lt;/p&gt;
+
+&lt;p&gt;At this method, the project files including GAS script cannot be downloaded. When a script file is uploaded, it is converted to text file which is not a project file of Google. When Google Docs can be downloaded using this method, those are downloaded as PDF file. docx, pptx and xlsx can be uploaded.&lt;/p&gt;
+
+&lt;p&gt;They say taht the limitation size of an uploading file is 24 MBytes. &lt;a href=&#34;http://stackoverflow.com/questions/38315816/max-size-for-post-request-sent-to-webapps&#34;&gt;Ref.&lt;/a&gt;&lt;/p&gt;
+
+&lt;h1 id=&#34;usage&#34;&gt;Usage&lt;/h1&gt;
+
+&lt;h2 id=&#34;1-u-deploy-web-apps-https-developers-google-com-apps-script-guides-web-u&#34;&gt;1. &lt;u&gt;&lt;a href=&#34;https://developers.google.com/apps-script/guides/web&#34;&gt;Deploy Web Apps&lt;/a&gt;&lt;/u&gt;&lt;/h2&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Open the Script Editor.&lt;/li&gt;
+&lt;li&gt;On the Script Editor
+
+&lt;ul&gt;
+&lt;li&gt;File -&amp;gt; Manage Versions -&amp;gt; Save New Version&lt;/li&gt;
+&lt;li&gt;Publish -&amp;gt; Deploy as Web App&lt;/li&gt;
+&lt;li&gt;At Execute the app as, select &lt;strong&gt;&amp;ldquo;your account&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;At Who has access to the app, select &lt;strong&gt;&amp;ldquo;Anyone, even anonymous&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;Click &amp;ldquo;Deploy&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;Copy &lt;strong&gt;&amp;ldquo;Current web app URL&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;Click &amp;ldquo;OK&amp;rdquo;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;2-paste-following-script-on-script-editor&#34;&gt;2. Paste following script on Script Editor.&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function doPost(e) {
+  if (e.parameters.method == &amp;quot;download&amp;quot;) {
+    try {
+      return (function(id){
+        var file = DriveApp.getFileById(id);
+        return ContentService
+              .createTextOutput(JSON.stringify({
+                size: file.getBlob().getBytes(),
+                name: file.getName(),
+                result: file.getName() + &amp;quot; (&amp;quot; + file.getBlob().getContentType() + &amp;quot;)&amp;quot;
+              }))
+              .setMimeType(ContentService.MimeType.JSON);
+      })(e.parameters.id);
+    } catch(err) {
+      return ContentService.createTextOutput(JSON.stringify({
+                result: err.message
+              }))
+              .setMimeType(ContentService.MimeType.JSON);
+    }
+  }
+
+  if (e.parameters.method == &amp;quot;upload&amp;quot;) {
+    try {
+      return ContentService
+              .createTextOutput(JSON.stringify({
+                result: (function(p){
+                  return DriveApp
+                    .createFile(
+                      Utilities.newBlob(
+                        [parseInt(i, 10) for each (i in p.file)],
+                        p.mime,
+                        p.name
+                      )
+                    )
+                    .getId();
+                })(e.parameters)
+              }))
+              .setMimeType(ContentService.MimeType.JSON);
+    } catch(err) {
+      return ContentService.createTextOutput(JSON.stringify({
+                result: err.message
+              }))
+              .setMimeType(ContentService.MimeType.JSON);
+    }
+  }
+
+  if (e.parameters.method == &amp;quot;delete&amp;quot;) {
+    try {
+      DriveApp.getFileById(e.parameters.id).setTrashed(true);
+      return ContentService.createTextOutput(JSON.stringify({
+                result: e.parameters.id + &amp;quot; was deleted.&amp;quot;
+              }))
+              .setMimeType(ContentService.MimeType.JSON);
+    } catch(err) {
+      return ContentService.createTextOutput(JSON.stringify({
+                result: err.message
+              }))
+              .setMimeType(ContentService.MimeType.JSON);
+    }
+  }
+
+  return ContentService.createTextOutput(&amp;quot;Did nothing.&amp;quot;);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;3-at-local-pc-use-following-script&#34;&gt;3. At local pc, use following script.&lt;/h2&gt;
+
+&lt;p&gt;There are 3 methods of &lt;code&gt;download()&lt;/code&gt;, &lt;code&gt;upload()&lt;/code&gt; and &lt;code&gt;delete()&lt;/code&gt;. When you use those, please give a value of file ID to&lt;code&gt;download()&lt;/code&gt; and &lt;code&gt;delete()&lt;/code&gt;. Then please give file name to &lt;code&gt;upload()&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import mimetypes
+import numpy as np
+import requests
+
+# Please paste &amp;quot;Current web app URL&amp;quot; here.
+url = &amp;quot;https://script.google.com/macros/s/#####/exec&amp;quot;
+
+
+def download(fileid):
+    r = requests.post(
+        url,
+        data={&amp;quot;method&amp;quot;: &amp;quot;download&amp;quot;, &amp;quot;id&amp;quot;: fileid}
+    )
+    if len(r.json()[&amp;quot;name&amp;quot;]) &amp;gt; 0:
+        with open(r.json()[&amp;quot;name&amp;quot;], &amp;quot;bw&amp;quot;) as f:
+            f.write(np.array(r.json()[&amp;quot;size&amp;quot;], dtype=np.uint8))
+    return r.json()[&amp;quot;result&amp;quot;]
+
+
+def upload(filename):
+    with open(filename, &amp;quot;rb&amp;quot;) as f:
+        d = f.read()
+    r = requests.post(
+        url,
+        data={
+            &amp;quot;method&amp;quot;: &amp;quot;upload&amp;quot;,
+            &amp;quot;file&amp;quot;: [(-(i &amp;amp; 0b10000000) | (i &amp;amp; 0b01111111)) for i in d],
+            &amp;quot;name&amp;quot;: filename,
+            &amp;quot;mime&amp;quot;: mimetypes.guess_type(filename)[0]
+        }
+    )
+    return r.json()[&amp;quot;result&amp;quot;]
+
+
+def delete(fileid):
+    r = requests.post(
+        url,
+        data={&amp;quot;method&amp;quot;: &amp;quot;delete&amp;quot;, &amp;quot;id&amp;quot;: fileid}
+    )
+    return r.json()[&amp;quot;result&amp;quot;]
+
+def main():
+    fileid = &amp;quot;#####&amp;quot;
+    print(download(fileid))
+
+    filename = &amp;quot;#####&amp;quot;
+    print(upload(filename))
+
+    fileid = &amp;quot;#####&amp;quot;
+    print(delete(fileid))
+
+if __name__ == &#39;__main__&#39;:
+    main()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Download files have no extension. So please add the extension for each mimeType to the files.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Dynamical Nested JSON Objects by Golang</title>
@@ -640,67 +811,6 @@ DriveApp.getFolderById(folderId)
 &lt;p&gt;You can see the detail information at &lt;a href=&#34;https://github.com/tanaikech/CreateImg&#34;&gt;https://github.com/tanaikech/CreateImg&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;There is a part where I would like to improve in this library. That&amp;rsquo;s &lt;code&gt;convByteSlice()&lt;/code&gt;. I think that there is the method to be faster about the part. If you know much about the logical operation using GAS, if you teach me about the improvements. I&amp;rsquo;m so glad.&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Comprehension of GAS</title>
-      <link>https://tanaikech.github.io/2017/04/17/comprehension-of-gas</link>
-      <pubDate>Mon, 17 Apr 2017 08:16:36 +0900</pubDate>
-      
-      <guid>https://tanaikech.github.io/2017/04/17/comprehension-of-gas</guid>
-      <description>
-
-&lt;p&gt;Here, I would like to introduce a comprehension of GAS.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Input :&lt;/strong&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;var data = [[[0], [1], [2], [3]], [[4], [5], [6], [7]]];
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;strong&gt;Output :&lt;/strong&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;[[0.0, 2.0], [0.0, 2.0]]
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;pattern-1&#34;&gt;Pattern 1&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;var a = [];
-for (var i=0; i&amp;lt;data.length; i++) {
-  var temp = [];
-  for (var j=0; j&amp;lt;data[i].length; j++) {
-    if (data[i][j][0] % 2 == 0) temp.push(j);
-  }
-  a.push(temp);
-}
-Logger.log(a)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;pattern-2&#34;&gt;Pattern 2&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;var b = [];
-data.forEach(function(e1){
-  var temp = [];
-  e1.forEach(function(e2, i2){
-    if (e2[0] % 2 == 0) temp.push(parseInt(i2, 10));
-  });
-  b.push(temp);
-});
-Logger.log(b)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;pattern-3&#34;&gt;Pattern 3&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;var c = [[parseInt(i, 10) for (i in e) if (e[i][0] % 2 == 0)] for each (e in data)];
-Logger.log(c)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;GAS can use JavaScript 1.7. So it can write as above.&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;In the case of &lt;code&gt;[i for (i in array)]&lt;/code&gt;, &lt;code&gt;i&lt;/code&gt; is index. But it&amp;rsquo;s string.&lt;/li&gt;
-&lt;li&gt;In the case of &lt;code&gt;[i for each (i in array)]&lt;/code&gt;, &lt;code&gt;i&lt;/code&gt; is element.&lt;/li&gt;
-&lt;/ul&gt;
 </description>
     </item>
     
