@@ -7,8 +7,34 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Wed, 10 May 2017 13:28:28 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 14 May 2017 17:43:52 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/tags/google-apps-script/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Sending E-mail When Spreadsheet was Edited from Outside by Sheet API</title>
+      <link>https://tanaikech.github.io/2017/05/14/sending-e-mail-when-spreadsheet-was-edited-from-outside-by-sheet-api</link>
+      <pubDate>Sun, 14 May 2017 17:43:52 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/05/14/sending-e-mail-when-spreadsheet-was-edited-from-outside-by-sheet-api</guid>
+      <description>&lt;p&gt;This sample script sends an e-mail, when spreadsheet was edited from outside by Sheet API v4. When you use this sample, please create a container bound script with spreadsheet which is edited by Sheet API. And please input your e-mail and run firstly a method of &lt;code&gt;createTrigger()&lt;/code&gt;. By this, a trigger is installed as &lt;code&gt;onChange()&lt;/code&gt;. After this, edit spreadsheet from outside by Sheet API v4.&lt;/p&gt;
+
+&lt;p&gt;When when spreadsheet was edited from outside by Sheet API v4, I used &lt;code&gt;sendEmail()&lt;/code&gt; as a sample, because script editor is closed.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Sample script :&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function createTrigger(){
+  ScriptApp.newTrigger(&#39;sendMail&#39;)
+      .forSpreadsheet(SpreadsheetApp.getActive())
+      .onChange()
+      .create();
+}
+
+function sendMail() {
+  MailApp.sendEmail(&amp;quot;### Your e-mail address ###&amp;quot;, &amp;quot;test mail&amp;quot;, &amp;quot;Spreadsheet was edited.&amp;quot;);
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
     
     <item>
       <title>File Transfer for Google Drive Without Authorization</title>
@@ -859,87 +885,6 @@ print(&amp;quot;Filename = {0}, MimeType = {1}&amp;quot;.format(r.json()[&amp;qu
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Both scripts are the same meaning.&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Export CSV File from Spreadsheet and Make Download Button</title>
-      <link>https://tanaikech.github.io/2017/02/20/export-csv-file-from-spreadsheet-and-make-download-button</link>
-      <pubDate>Mon, 20 Feb 2017 10:00:28 +0900</pubDate>
-      
-      <guid>https://tanaikech.github.io/2017/02/20/export-csv-file-from-spreadsheet-and-make-download-button</guid>
-      <description>&lt;p&gt;This is a script to export a CSV file from spreadsheet and make an user download it. When the users download it, they can download by push a button made by this script.&lt;/p&gt;
-
-&lt;p&gt;In order to use this script, put both HTML and script in a GAS project.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;html :&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;This file name is &amp;ldquo;download.html&amp;rdquo;.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;lt;!DOCTYPE html&amp;gt;
-&amp;lt;html&amp;gt;
-  &amp;lt;body&amp;gt;
-    Download CSV?
-    &amp;lt;form&amp;gt;
-      &amp;lt;input type=&amp;quot;button&amp;quot; value=&amp;quot;ok&amp;quot; onclick=&amp;quot;google.script.run
-                                              .withSuccessHandler(executeDownload)
-                                              .saveAsCSV();&amp;quot; /&amp;gt;
-    &amp;lt;/form&amp;gt;
-  &amp;lt;/body&amp;gt;
-  &amp;lt;script&amp;gt;
-    function executeDownload(url) {
-      window.location.href = url;
-    }
-  &amp;lt;/script&amp;gt;
-&amp;lt;/html&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;strong&gt;Script :&lt;/strong&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;function onOpen() {
-  SpreadsheetApp.getUi()
-                .createMenu(&#39;csv&#39;)
-                .addItem(&#39;export as csv files&#39;, &#39;dialog&#39;)
-                .addToUi();
-}
-
-function dialog() {
-  var html = HtmlService.createHtmlOutputFromFile(&#39;download&#39;);
-  SpreadsheetApp.getUi().showModalDialog(html, &#39;CSV download dialog&#39;);
-}
-
-function saveAsCSV() {
-    var filename = &amp;quot;#####&amp;quot;; // CSV file name
-    var folder = &amp;quot;#####&amp;quot;; // Folder ID
-
-    var csv = &amp;quot;&amp;quot;;
-    var v = SpreadsheetApp
-            .getActiveSpreadsheet()
-            .getActiveSheet()
-            .getDataRange()
-            .getValues();
-    v.forEach(function(e) {
-      csv += e.join(&amp;quot;,&amp;quot;) + &amp;quot;\n&amp;quot;;
-    });
-    var url = DriveApp.getFolderById(folder)
-              .createFile(filename, csv, MimeType.CSV)
-              .getDownloadUrl()
-              .replace(&amp;quot;?e=download&amp;amp;gd=true&amp;quot;,&amp;quot;&amp;quot;);
-    return url;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;strong&gt;Process :&lt;/strong&gt;&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;Using &amp;ldquo;onOpen()&amp;rdquo;, it addes menu for launching a dialog.&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;After launching the dialog, &amp;ldquo;saveAsCSV()&amp;rdquo; is launched by pushing a button. &amp;ldquo;saveAsCSV()&amp;rdquo; exports a CSV file and outputs download URL. At current script, all of data on active sheet is retrieved and exported CSV. If you want to retrieve a range you need, please use &amp;ldquo;&lt;a href=&#34;https://developers.google.com/apps-script/reference/spreadsheet/sheet#getRange(Integer,Integer)&#34;&gt;getRange()&lt;/a&gt;&amp;rdquo;.&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;The CSV file is downloaded by &amp;ldquo;executeDownload()&amp;rdquo;.&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;You can set csv file-name and output folder by &amp;ldquo;filename&amp;rdquo; and &amp;ldquo;folder&amp;rdquo;, respectively. In this sample, the source sheet is the sheet which opens currently. If you want to other sheet, please change this script.&lt;/p&gt;
 </description>
     </item>
     
