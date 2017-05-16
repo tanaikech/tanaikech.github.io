@@ -1,0 +1,805 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Gastips on tanaike</title>
+    <link>https://tanaikech.github.io/topics/gastips/</link>
+    <description>Recent content in Gastips on tanaike</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <copyright>&amp;copy; 2016. All rights reserved.</copyright>
+    <lastBuildDate>Sun, 14 May 2017 17:43:52 +0900</lastBuildDate>
+    <atom:link href="https://tanaikech.github.io/topics/gastips/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Sending E-mail When Spreadsheet was Edited from Outside by Sheet API</title>
+      <link>https://tanaikech.github.io/2017/05/14/sending-e-mail-when-spreadsheet-was-edited-from-outside-by-sheet-api</link>
+      <pubDate>Sun, 14 May 2017 17:43:52 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/05/14/sending-e-mail-when-spreadsheet-was-edited-from-outside-by-sheet-api</guid>
+      <description>&lt;p&gt;This sample script sends an e-mail, when spreadsheet was edited from outside by Sheet API v4. When you use this sample, please create a container bound script with spreadsheet which is edited by Sheet API. And please input your e-mail and run firstly a method of &lt;code&gt;createTrigger()&lt;/code&gt;. By this, a trigger is installed as &lt;code&gt;onChange()&lt;/code&gt;. After this, edit spreadsheet from outside by Sheet API v4.&lt;/p&gt;
+
+&lt;p&gt;When when spreadsheet was edited from outside by Sheet API v4, I used &lt;code&gt;sendEmail()&lt;/code&gt; as a sample, because script editor is closed.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Sample script :&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function createTrigger(){
+  ScriptApp.newTrigger(&#39;sendMail&#39;)
+      .forSpreadsheet(SpreadsheetApp.getActive())
+      .onChange()
+      .create();
+}
+
+function sendMail() {
+  MailApp.sendEmail(&amp;quot;### Your e-mail address ###&amp;quot;, &amp;quot;test mail&amp;quot;, &amp;quot;Spreadsheet was edited.&amp;quot;);
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Changing Slack Status using Google Apps Script</title>
+      <link>https://tanaikech.github.io/2017/05/09/changing-slack-status-using-google-apps-script</link>
+      <pubDate>Tue, 09 May 2017 10:58:37 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/05/09/changing-slack-status-using-google-apps-script</guid>
+      <description>&lt;p&gt;This script changes slack status using GAS. If you want to change it on time you decided, it can be achieved by installing this method as a trigger.&lt;/p&gt;
+
+&lt;p&gt;In order to use this, the required scope is &lt;strong&gt;&lt;code&gt;users.profile:write&lt;/code&gt;&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function setSlackStatus(token, user, status_text, status_emoji) {
+  return UrlFetchApp.fetch(
+    &#39;https://slack.com/api/users.profile.set&#39;,
+    {
+      method: &#39;post&#39;,
+      payload: {
+        token: token,
+        user: user,
+        profile: JSON.stringify({status_text: status_text, status_emoji: status_emoji})
+      },
+      muteHttpExceptions: true
+    }
+  ).getContentText();
+}
+
+function main() {
+  var res = setSlackStatus(
+    &#39;### Your access token ###&#39;,
+    &#39;### User ID ###&#39;,
+    &#39;sample&#39;,
+    &#39;:coffee:&#39;
+  );
+  Logger.log(res)
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Retrieving User Information with Shared Spreadsheet</title>
+      <link>https://tanaikech.github.io/2017/04/27/retrieving-user-information-with-shared-spreadsheet</link>
+      <pubDate>Thu, 27 Apr 2017 14:34:22 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/04/27/retrieving-user-information-with-shared-spreadsheet</guid>
+      <description>&lt;p&gt;This sample script retrieves the user information which is editing the shared spreadsheet.&lt;/p&gt;
+
+&lt;p&gt;It was found as follows.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;User information retrieving by Class Session is the owner and users which installed triggers by themselves.&lt;/li&gt;
+&lt;li&gt;When each user installs a trigger, user information retrieving by Class Session losts the accuracy. So user information has to be retrieved using a temporally installed trigger.&lt;/li&gt;
+&lt;li&gt;Using &lt;code&gt;onOpen()&lt;/code&gt;, it cannot directly install triggers and authorize.&lt;/li&gt;
+&lt;li&gt;Using menu bar, it can install triggers and authorize Google Services using API.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Here, I thought 2 problems.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;The confirmation whether the authorization was done.
+
+&lt;ul&gt;
+&lt;li&gt;At &lt;code&gt;onOpen()&lt;/code&gt;, although many methods using Google API can be executed without the authorization, there are also some methods which cannot be executed without the authorization. Furthermore, there are some methods which cannot execute even if the authorization was done. It&amp;rsquo;s &lt;code&gt;trigger&lt;/code&gt;. On the other hand, &lt;code&gt;DriveApp&lt;/code&gt; requires the authorization for only the first time, but it can use without the authorization after 2nd times.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;I thought that users can find easily by displaying information in a dialog box when spreadsheet is launched. So I adopted displaying information using the dialog box. But, there is a big limitation for the dialog box.
+
+&lt;ul&gt;
+&lt;li&gt;Using a click of button on a dialog box, it can install triggers. However it cannot authorize Google Services using API.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Using above information, I thought a flow to retrieve user information.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;When user opens the spreadsheet for the first time, it displays &amp;lsquo;Please authorize at &amp;ldquo;Authorization&amp;rdquo; of menu bar.&amp;rsquo; using a dialog box, and creates a menu bar &amp;ldquo;Authorization&amp;rdquo;.&lt;/li&gt;
+&lt;li&gt;The user clicks &amp;ldquo;OK&amp;rdquo; button on the dialog box and run &amp;ldquo;Authorization&amp;rdquo; at the menu bar. By running &amp;ldquo;Authorization&amp;rdquo;, the user information is retrieved by a temporally installed trigger.&lt;/li&gt;
+&lt;li&gt;When the user opens the spreadsheet after the 2nd time, the authorization is checked by &lt;code&gt;DriveApp&lt;/code&gt;. A dialog box with &amp;lsquo;Push OK button.&amp;rsquo; is displayed. By clicking &amp;ldquo;OK&amp;rdquo;, the user information is retrieved by a temporally installed trigger.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;By this flow, the user information which is editing the shared spreadsheet can be retrieved. Although I think that there may be also other solutions, I proposal this as one of solutions.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Script :&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function showDialog(html, title){
+  SpreadsheetApp.getActiveSpreadsheet().show(
+    HtmlService
+    .createHtmlOutput(html)
+    .setTitle(title)
+    .setWidth(400)
+    .setHeight(100)
+  );
+}
+
+function getUser(){
+  var triggerId = ScriptApp.newTrigger(&#39;getUser&#39;)
+    .forSpreadsheet(SpreadsheetApp.getActive())
+    .onEdit()
+    .create()
+    .getUniqueId();
+  var userInf = Session.getEffectiveUser();
+  CacheService.getUserCache().putAll({
+    &amp;quot;username&amp;quot;: userInf.getUsername(),
+    &amp;quot;usermail&amp;quot;: userInf.getEmail()
+  }, 7200);
+  var triggers = ScriptApp.getProjectTriggers();
+  [ScriptApp.deleteTrigger(i) for each (i in triggers) if (i.getUniqueId() == triggerId)];
+}
+
+function dialogForGetUser(){
+  showDialog(&#39;&amp;lt;input type=&amp;quot;button&amp;quot;\
+      value=&amp;quot;OK&amp;quot;\
+      onclick=&amp;quot;google.script.run.withSuccessHandler(function(){google.script.host.close()})\
+      .getUser()&amp;quot;&amp;gt;&#39;,
+      &#39;Push OK button.&#39;
+  );
+}
+
+function dialogForAuth(){
+  showDialog(&#39;&amp;lt;input type=&amp;quot;button&amp;quot;\
+      value=&amp;quot;OK&amp;quot;\
+      onclick=&amp;quot;google.script.host.close()&amp;quot;&amp;gt;&#39;,
+      &#39;Please authorize at &amp;quot;Authorization&amp;quot; of menu bar.&#39;
+  );
+}
+
+function getAuth() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  ss.removeMenu(&amp;quot;Authorization&amp;quot;);
+  getUser();
+  ss.toast(&amp;quot;Done.&amp;quot;, &amp;quot;Authorization&amp;quot;, 3);
+}
+
+function onOpen(){
+  try {
+    var temp = DriveApp.getFileById(SpreadsheetApp.getActiveSpreadsheet().getId())
+    dialogForGetUser();
+  } catch(e) {
+    dialogForAuth();
+    SpreadsheetApp.getActiveSpreadsheet().addMenu(
+      &amp;quot;Authorization&amp;quot;,
+      [{
+        functionName:&amp;quot;getAuth&amp;quot;,
+        name:&amp;quot;Run this only when the first time&amp;quot;
+      }]
+    );
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ol&gt;
+&lt;li&gt;When the spreadsheet is opened, at first, &lt;code&gt;onOpen()&lt;/code&gt; is executed. It is checked whether the user has already authorized. The dialog box is as follows.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170427-1st.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;If the user has never authorized yet, &lt;code&gt;dialogForAuth()&lt;/code&gt; is executed. If the user has already authorized. &lt;code&gt;dialogForGetUser()&lt;/code&gt; is executed. The dialog box is as follows.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170427-2nd.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The user information is retrieved as follows. You can use this by &lt;code&gt;onEdit()&lt;/code&gt; and trigger.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;var user = CacheService.getUserCache().getAll([&amp;quot;username&amp;quot;, &amp;quot;usermail&amp;quot;]);
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Overwriting Spreadsheet to Existing Excel File</title>
+      <link>https://tanaikech.github.io/2017/04/21/overwriting-spreadsheet-to-existing-excel-file</link>
+      <pubDate>Fri, 21 Apr 2017 13:13:00 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/04/21/overwriting-spreadsheet-to-existing-excel-file</guid>
+      <description>&lt;p&gt;This sample script converts a spreadsheet to excel file, and overwrites the excel file to the existing excel file. When you use this script, at first, &lt;u&gt;please confirm whether Drive API is enabled at Google API console.&lt;/u&gt; Because the existing excel file is overwritten, the file name and file ID are not changed.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function overWrite(src_spreadsheetId, dst_excelfileId) {
+  var accesstoken = ScriptApp.getOAuthToken();
+  return UrlFetchApp.fetch(
+    &amp;quot;https://www.googleapis.com/upload/drive/v3/files/&amp;quot; +
+    dst_excelfileId +
+    &amp;quot;?uploadType=multipart&amp;quot;,
+    {
+      method: &amp;quot;PATCH&amp;quot;,
+      headers: {Authorization: &amp;quot;Bearer &amp;quot; + accesstoken},
+      contentType: &amp;quot;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&amp;quot;,
+      payload: function(a, s) {
+        return UrlFetchApp.fetch(
+          &amp;quot;https://www.googleapis.com/drive/v3/files/&amp;quot; +
+          s +
+          &amp;quot;/export?mimeType=application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&amp;quot;,
+          {
+            method: &amp;quot;GET&amp;quot;,
+            headers: {Authorization: &amp;quot;Bearer &amp;quot; + a},
+            muteHttpExceptions: true
+          }
+        ).getBlob().getBytes();
+      }(accesstoken, src_spreadsheetId)
+    }
+  ).getContentText();
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Converting Spreadsheet to PDF</title>
+      <link>https://tanaikech.github.io/2017/04/20/converting-spreadsheet-to-pdf</link>
+      <pubDate>Thu, 20 Apr 2017 07:56:36 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/04/20/converting-spreadsheet-to-pdf</guid>
+      <description>&lt;p&gt;Converting Spreadsheet to PDF&lt;/p&gt;
+
+&lt;p&gt;This sample script converts from a spreadsheet to a PDF file which has all sheets in the spreadsheet. When you use this, please enable Drive API at Google API console.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var spreadsheetId = &amp;quot;#####&amp;quot;;
+var folderId = &amp;quot;#####&amp;quot;;
+var outputFilename = &amp;quot;#####&amp;quot;;
+
+DriveApp.getFolderById(folderId)
+    .createFile(UrlFetchApp.fetch(
+      &amp;quot;https://www.googleapis.com/drive/v3/files/&amp;quot; +
+        spreadsheetId +
+        &amp;quot;/export?mimeType=application/pdf&amp;quot;,
+      {
+        method: &amp;quot;GET&amp;quot;,
+        headers: {Authorization: &amp;quot;Bearer &amp;quot; + ScriptApp.getOAuthToken()},
+        muteHttpExceptions: true
+      })
+    .getBlob())
+    .setName(outputFilename);
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GAS Library - CreateImg</title>
+      <link>https://tanaikech.github.io/2017/04/17/gas-library---createimg</link>
+      <pubDate>Mon, 17 Apr 2017 15:29:15 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/04/17/gas-library---createimg</guid>
+      <description>&lt;p&gt;Recently, I had been looking for creating an image from coordinate data. Unfortunately I have never found them. So I made this. This Google Apps Script (GAS) library creates an image file from coordinate data.&lt;/p&gt;
+
+&lt;p&gt;You can see the detail information at &lt;a href=&#34;https://github.com/tanaikech/CreateImg&#34;&gt;https://github.com/tanaikech/CreateImg&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;There is a part where I would like to improve in this library. That&amp;rsquo;s &lt;code&gt;convByteSlice()&lt;/code&gt;. I think that there is the method to be faster about the part. If you know much about the logical operation using GAS, if you teach me about the improvements. I&amp;rsquo;m so glad.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Comprehension of GAS</title>
+      <link>https://tanaikech.github.io/2017/04/17/comprehension-of-gas</link>
+      <pubDate>Mon, 17 Apr 2017 08:16:36 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/04/17/comprehension-of-gas</guid>
+      <description>
+
+&lt;p&gt;Here, I would like to introduce a comprehension of GAS.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Input :&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var data = [[[0], [1], [2], [3]], [[4], [5], [6], [7]]];
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;Output :&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[[0.0, 2.0], [0.0, 2.0]]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;pattern-1&#34;&gt;Pattern 1&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;var a = [];
+for (var i=0; i&amp;lt;data.length; i++) {
+  var temp = [];
+  for (var j=0; j&amp;lt;data[i].length; j++) {
+    if (data[i][j][0] % 2 == 0) temp.push(j);
+  }
+  a.push(temp);
+}
+Logger.log(a)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;pattern-2&#34;&gt;Pattern 2&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;var b = [];
+data.forEach(function(e1){
+  var temp = [];
+  e1.forEach(function(e2, i2){
+    if (e2[0] % 2 == 0) temp.push(parseInt(i2, 10));
+  });
+  b.push(temp);
+});
+Logger.log(b)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;pattern-3&#34;&gt;Pattern 3&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;var c = [[parseInt(i, 10) for (i in e) if (e[i][0] % 2 == 0)] for each (e in data)];
+Logger.log(c)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;GAS can use JavaScript 1.7. So it can write as above.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;In the case of &lt;code&gt;[i for (i in array)]&lt;/code&gt;, &lt;code&gt;i&lt;/code&gt; is index. But it&amp;rsquo;s string.&lt;/li&gt;
+&lt;li&gt;In the case of &lt;code&gt;[i for each (i in array)]&lt;/code&gt;, &lt;code&gt;i&lt;/code&gt; is element.&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Creating Spreadsheet from Excel file</title>
+      <link>https://tanaikech.github.io/2017/04/15/creating-spreadsheet-from-excel-file</link>
+      <pubDate>Sat, 15 Apr 2017 10:39:05 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/04/15/creating-spreadsheet-from-excel-file</guid>
+      <description>
+
+&lt;p&gt;These scripts can be executed on Script Editor. But, in order to use these, you have to enable Drive API of Advanced Google services and of Google API Console. &amp;ldquo;Drive API v2&amp;rdquo; can be used at Google Apps Script by enabling Drive API of Advanced Google services and of Google API Console.&lt;/p&gt;
+
+&lt;p&gt;How to use it is as follows.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;In the script editor, select Resources &amp;gt; Advanced Google services&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;In the dialog that appears, click the on/off switch for &lt;a href=&#34;https://developers.google.com/drive/v2/reference/&#34;&gt;Drive API v2&lt;/a&gt;.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;At the bottom of the dialog, click the link for the Google API Console.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;In the console, click into the filter box and type part of the name of the API &amp;ldquo;Drive API&amp;rdquo;, then click the name once you see it.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;On the next screen, click Enable API.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Close the Developers Console and return to the script editor. Click OK in the dialog. The advanced service you enabled is now available in autocomplete.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;The detail information is &lt;a href=&#34;https://developers.google.com/apps-script/guides/services/advanced&#34;&gt;https://developers.google.com/apps-script/guides/services/advanced&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&#34;1-creating-spreadsheet-from-excel-file-on-google-drive&#34;&gt;1. Creating Spreadsheet from Excel file on Google Drive&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;var fileID = &amp;quot;#####&amp;quot;;
+var folderID = &amp;quot;#####&amp;quot;;
+var filename = &amp;quot;filename&amp;quot;;
+
+var res = Drive.Files.insert({
+  &amp;quot;mimeType&amp;quot;: &amp;quot;application/vnd.google-apps.spreadsheet&amp;quot;,
+  &amp;quot;parents&amp;quot;: [{id: folderID}],
+  &amp;quot;title&amp;quot;: filename
+}, DriveApp.getFileById(fileID).getBlob());
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;2-creating-spreadsheet-from-excel-file-on-web-site&#34;&gt;2. Creating Spreadsheet from Excel file on Web Site&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;var fileURL = &amp;quot;https://#####/sample.xlsx&amp;quot;;
+var folderID = &amp;quot;#####&amp;quot;;
+var filename = &amp;quot;filename&amp;quot;;
+
+var res = Drive.Files.insert({
+  &amp;quot;mimeType&amp;quot;: &amp;quot;application/vnd.google-apps.spreadsheet&amp;quot;,
+  &amp;quot;parents&amp;quot;: [{id: folderID}],
+  &amp;quot;title&amp;quot;: filename
+}, UrlFetchApp.fetch(fileURL).getBlob());
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;For example, when you want to retrieve created file ID, you can retrieve it by&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;res.id
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Creating Downloaded Excel file as Spreadsheet</title>
+      <link>https://tanaikech.github.io/2017/04/14/creating-downloaded-excel-file-as-spreadsheet</link>
+      <pubDate>Fri, 14 Apr 2017 18:03:32 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/04/14/creating-downloaded-excel-file-as-spreadsheet</guid>
+      <description>&lt;p&gt;This is a sample GAS script to create an Excel file, which was downloaded from web, as Spreadsheet. By using Drive API, it can be achieved without access token.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Script :&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function downloadFile(fileURL, folder) {
+  var filename = fileURL.match(&amp;quot;.+/(.+?)([\?#;].*)?$&amp;quot;)[1];
+  var response = UrlFetchApp.fetch(fileURL);
+  var rc = response.getResponseCode();
+  var blob = response.getBlob();
+  var resource = {
+    &amp;quot;mimeType&amp;quot;: &amp;quot;application/vnd.google-apps.spreadsheet&amp;quot;,
+    &amp;quot;parents&amp;quot;: [{id: folder}],
+    &amp;quot;title&amp;quot;: filename
+  };
+  var res = Drive.Files.insert(resource, blob);
+  var fileInfo = [rc, res.title, blob.getBytes().length, res.id];
+  return fileInfo;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;Result :&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;[
+    200,
+    sample.xlsx,
+    10000.0,
+    ## file id ##
+]
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>How to use &#34;fields&#34; of Drive APIs</title>
+      <link>https://tanaikech.github.io/2017/03/30/how-to-use-fields-of-drive-apis</link>
+      <pubDate>Thu, 30 Mar 2017 08:53:21 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/03/30/how-to-use-fields-of-drive-apis</guid>
+      <description>
+
+&lt;p&gt;There are a lot of APIs on Google. When we use Google Drive APIs, they usually have &amp;ldquo;fields&amp;rdquo; as a resource. The parameter &amp;ldquo;fields&amp;rdquo; gives various information which is selected to us. This is one of important parameters. And this can be used at Google Apps Script (GAS) although that version is v2. About how to use it, there are &lt;a href=&#34;https://developers.google.com/drive/v2/reference/&#34;&gt;some documents&lt;/a&gt;. But it is difficult to find how to use it at GAS. So I would like to write down here as a memorandum. Most parameters for APIs have to be expressed as JSON. However, the expressions are different for each API. I would like to introduce this using some samples. &lt;strong&gt;This is for GAS.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;1-drive-files-list&#34;&gt;1. Drive.Files.list&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;var params = {
+    q:      &amp;quot;title=&#39;sample&#39; and trashed=false&amp;quot;,
+    fields: &amp;quot;items(id, title, mimeType), kind&amp;quot;
+};
+var res = Drive.Files.list(params)
+Logger.log(JSON.stringify(res))
+
+{
+  &amp;quot;kind&amp;quot;: &amp;quot;drive#fileList&amp;quot;,
+  &amp;quot;items&amp;quot;: [
+    {
+      &amp;quot;id&amp;quot;: &amp;quot;FILE ID&amp;quot;,
+      &amp;quot;mimeType&amp;quot;: &amp;quot;mimeType&amp;quot;,
+      &amp;quot;title&amp;quot;: &amp;quot;FILE NAME&amp;quot;
+    }
+  ]
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;q&lt;/code&gt; is used at &amp;ldquo;Search for Files&amp;rdquo;. At this sample, it searches file name of &amp;ldquo;sample&amp;rdquo; outside trash box.&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;fields&lt;/code&gt; is expressed as above. &lt;code&gt;title&lt;/code&gt;, &lt;code&gt;id&lt;/code&gt; and &amp;ldquo;mimeType&amp;rdquo; are file name, file id and mime type of the file, respectively. &lt;code&gt;kind&lt;/code&gt; is &amp;ldquo;This is always drive#fileList.&amp;rdquo; from document.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;References :
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://developers.google.com/drive/v2/reference/files/list&#34;&gt;https://developers.google.com/drive/v2/reference/files/list&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://developers.google.com/drive/v2/web/search-parameters&#34;&gt;https://developers.google.com/drive/v2/web/search-parameters&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;2-drive-files-get&#34;&gt;2. Drive.Files.get&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;var params = {
+    fields: &amp;quot;id, title, mimeType&amp;quot;
+};
+var dat = Drive.Files.get(&amp;quot;FILE ID&amp;quot;, params);
+Logger.log(JSON.stringify(dat))
+
+{
+  &amp;quot;id&amp;quot;: &amp;quot;FILE ID&amp;quot;,
+  &amp;quot;mimeType&amp;quot;: &amp;quot;mimeType&amp;quot;,
+  &amp;quot;title&amp;quot;: &amp;quot;FILE NAME&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;For example, &lt;code&gt;title&lt;/code&gt;, &lt;code&gt;id&lt;/code&gt; and &lt;code&gt;mimeType&lt;/code&gt; are file name, file id and mime type of the file, respectively.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Reference :
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://developers.google.com/drive/v2/reference/files/get&#34;&gt;https://developers.google.com/drive/v2/reference/files/get&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;3-drive-files-insert&#34;&gt;3. Drive.Files.insert&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;var data = {
+    title:    &amp;quot;sample&amp;quot;,
+    mimeType: &amp;quot;application/vnd.google-apps.spreadsheet&amp;quot;,
+    parents:  [{&amp;quot;id&amp;quot;: &amp;quot;FOLDER ID&amp;quot;}]
+};
+var res = Drive.Files.insert(data);
+Logger.log(&amp;quot;{id: %s, title: %s, mimeType: %s}&amp;quot;, res.id, res.title, res.mimeType)
+
+{
+  &amp;quot;id&amp;quot;: &amp;quot;FILE ID&amp;quot;,
+  &amp;quot;title&amp;quot;: &amp;quot;sample&amp;quot;,
+  &amp;quot;mimeType&amp;quot;: &amp;quot;application/vnd.google-apps.spreadsheet&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;By this, a new spreadsheet is created under the FOLDER ID. In this case, &amp;ldquo;fields&amp;rdquo; is retrieved from the results of execution.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Reference :
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://developers.google.com/drive/v2/reference/files/insert&#34;&gt;https://developers.google.com/drive/v2/reference/files/insert&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Retrieving File ID from File Name using GAS</title>
+      <link>https://tanaikech.github.io/2017/03/23/retrieving-file-id-from-file-name-using-gas</link>
+      <pubDate>Thu, 23 Mar 2017 14:24:29 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/03/23/retrieving-file-id-from-file-name-using-gas</guid>
+      <description>&lt;p&gt;This is a sample script of GAS for converting file name to file id on Google Drive. Drive API is used for this. So please enable Drive API at Advanced Drive Services and Google API Console.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function nameToId(filename){
+  return [i.id for each (i in Drive.Files.list({q: &amp;quot;title=&#39;&amp;quot; + filename + &amp;quot;&#39; and trashed=false&amp;quot;}).items)];
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Download Files Without Authorization From Google Drive</title>
+      <link>https://tanaikech.github.io/2017/03/20/download-files-without-authorization-from-google-drive</link>
+      <pubDate>Mon, 20 Mar 2017 14:30:15 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/03/20/download-files-without-authorization-from-google-drive</guid>
+      <description>
+
+&lt;h1 id=&#34;overview&#34;&gt;Overview&lt;/h1&gt;
+
+&lt;p&gt;In this article, files can be downloaded without authorization.&lt;/p&gt;
+
+&lt;h1 id=&#34;description&#34;&gt;Description&lt;/h1&gt;
+
+&lt;p&gt;When we download files from Google Drive, it usually has to use Drive API. In order to use Drive API, access token is required. If you want to make your friends download files from your Google Drive, the authorization process is to take time. Also Web Link for each files can be used. But it has to set for each files. So I proposal this.&lt;/p&gt;
+
+&lt;p&gt;As a sample, I introduce a script for downloading the files using Web Apps. In this sample, it changes a file to a byte slice and send it as text data. Then, it reconstructs it. Of course, base64 encode can be used for this. But the data size for using base64 is much larger than that for using the byte slice.&lt;/p&gt;
+
+&lt;p&gt;At this method, the project files including GAS script cannot be downloaded. When Google Docs are downloaded using this method, those are downloaded as PDF file. It may be the specification of Google.&lt;/p&gt;
+
+&lt;p&gt;By the way, also you can upload files without authorization to Google Drive using this method.&lt;/p&gt;
+
+&lt;h1 id=&#34;usage&#34;&gt;Usage&lt;/h1&gt;
+
+&lt;h2 id=&#34;1-u-deploy-web-apps-https-developers-google-com-apps-script-guides-web-u&#34;&gt;1. &lt;u&gt;&lt;a href=&#34;https://developers.google.com/apps-script/guides/web&#34;&gt;Deploy Web Apps&lt;/a&gt;&lt;/u&gt;&lt;/h2&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Open the Script Editor.&lt;/li&gt;
+&lt;li&gt;On the Script Editor
+
+&lt;ul&gt;
+&lt;li&gt;File -&amp;gt; Manage Versions -&amp;gt; Save New Version&lt;/li&gt;
+&lt;li&gt;Publish -&amp;gt; Deploy as Web App&lt;/li&gt;
+&lt;li&gt;At Execute the app as, select &lt;strong&gt;&amp;ldquo;your account&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;At Who has access to the app, select &lt;strong&gt;&amp;ldquo;Anyone, even anonymous&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;Click &amp;ldquo;Deploy&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;Copy &lt;strong&gt;&amp;ldquo;Current web app URL&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;Click &amp;ldquo;OK&amp;rdquo;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;2-paste-following-script-on-script-editor&#34;&gt;2. Paste following script on Script Editor.&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function doPost(e) {
+  return (function(id){
+    var file = DriveApp.getFileById(id);
+    return ContentService
+          .createTextOutput(JSON.stringify({
+            result: file.getBlob().getBytes(),
+            name: file.getName(),
+            mimeType: file.getBlob().getContentType()
+          }))
+          .setMimeType(ContentService.MimeType.JSON);
+  })(e.parameters.id);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;3-at-local-pc-use-following-script&#34;&gt;3. At local pc, use following script.&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import numpy as np
+import requests
+r = requests.post(
+    &amp;quot;https://script.google.com/macros/s/### Your ID ###/exec&amp;quot;,
+    data={&amp;quot;id&amp;quot;: &amp;quot;### File ID ###&amp;quot;}
+)
+f = open(r.json()[&amp;quot;name&amp;quot;], &amp;quot;bw&amp;quot;)
+f.write(np.array(r.json()[&amp;quot;result&amp;quot;], dtype=np.uint8))
+f.close()
+print(&amp;quot;Filename = {0}, MimeType = {1}&amp;quot;.format(r.json()[&amp;quot;name&amp;quot;], r.json()[&amp;quot;mimeType&amp;quot;]))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Files output from this sample have no extension. So please add the extension for each mimeType to the files.&lt;/p&gt;
+
+&lt;h1 id=&#34;appendix&#34;&gt;Appendix&lt;/h1&gt;
+
+&lt;p&gt;If you want to download with authorization, there are &lt;a href=&#34;https://developers.google.com/drive/v3/web/manage-downloads&#34;&gt;3 patterns&lt;/a&gt;.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;a href=&#34;https://developers.google.com/apps-script/import-export&#34;&gt;Download script and project including script.&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://developers.google.com/drive/v3/reference/files/export&#34;&gt;Download Google Docs (spreadsheet, document, presentation and so on). In this case, Google calls &amp;ldquo;Export&amp;rdquo;.&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://developers.google.com/drive/v3/reference/files/get&#34;&gt;Download files except for Google Docs.&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Create Folder Tree on Google Drive</title>
+      <link>https://tanaikech.github.io/2017/03/13/create-folder-tree-on-google-drive</link>
+      <pubDate>Mon, 13 Mar 2017 13:27:57 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/03/13/create-folder-tree-on-google-drive</guid>
+      <description>&lt;p&gt;This is a sample script for creating a folder tree including all folders in Google Drive. For each element, parent folder and sub folder are retrieved.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Script :&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;  var results = (function(folder, folderSt, results){
+    var ar = [];
+    var folders = folder.getFolders();
+    while(folders.hasNext()) ar.push(folders.next());
+    folderSt += folder.getName() + &amp;quot;(&amp;quot; + folder.getId() + &amp;quot;)#_aabbccddee_#&amp;quot;;
+    var array_folderSt = folderSt.split(&amp;quot;#_aabbccddee_#&amp;quot;);
+    array_folderSt.pop()
+    results.push(array_folderSt);
+    ar.length == 0 &amp;amp;&amp;amp; (folderSt = &amp;quot;&amp;quot;);
+    for (var i in ar) arguments.callee(ar[i], folderSt, results);
+    return results;
+  })(DriveApp.getRootFolder(),&amp;quot;&amp;quot;,[]);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;Result :&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;[
+    [foldername1(folder1 id)],
+    [foldername1(folder1 id), sub foldername1s(sub folde1s id)],
+    [foldername1(folder2 id)],
+    [foldername2(folder2 id), sub foldername2s1(sub folde2s1 id)],
+    [foldername2(folder2 id), sub foldername2s1(sub folde2s1 id), sub foldername2s2(sub folde2s2 id)]
+]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;By the way :&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;ar.length == 0 &amp;amp;&amp;amp; (folderSt = &amp;quot;&amp;quot;);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;if (ar.length == 0) {
+  folderSt = &amp;quot;&amp;quot;;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Both scripts are the same meaning.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Export CSV File from Spreadsheet and Make Download Button</title>
+      <link>https://tanaikech.github.io/2017/02/20/export-csv-file-from-spreadsheet-and-make-download-button</link>
+      <pubDate>Mon, 20 Feb 2017 10:00:28 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/02/20/export-csv-file-from-spreadsheet-and-make-download-button</guid>
+      <description>&lt;p&gt;This is a script to export a CSV file from spreadsheet and make an user download it. When the users download it, they can download by push a button made by this script.&lt;/p&gt;
+
+&lt;p&gt;In order to use this script, put both HTML and script in a GAS project.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;html :&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;This file name is &amp;ldquo;download.html&amp;rdquo;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;!DOCTYPE html&amp;gt;
+&amp;lt;html&amp;gt;
+  &amp;lt;body&amp;gt;
+    Download CSV?
+    &amp;lt;form&amp;gt;
+      &amp;lt;input type=&amp;quot;button&amp;quot; value=&amp;quot;ok&amp;quot; onclick=&amp;quot;google.script.run
+                                              .withSuccessHandler(executeDownload)
+                                              .saveAsCSV();&amp;quot; /&amp;gt;
+    &amp;lt;/form&amp;gt;
+  &amp;lt;/body&amp;gt;
+  &amp;lt;script&amp;gt;
+    function executeDownload(url) {
+      window.location.href = url;
+    }
+  &amp;lt;/script&amp;gt;
+&amp;lt;/html&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;Script :&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;function onOpen() {
+  SpreadsheetApp.getUi()
+                .createMenu(&#39;csv&#39;)
+                .addItem(&#39;export as csv files&#39;, &#39;dialog&#39;)
+                .addToUi();
+}
+
+function dialog() {
+  var html = HtmlService.createHtmlOutputFromFile(&#39;download&#39;);
+  SpreadsheetApp.getUi().showModalDialog(html, &#39;CSV download dialog&#39;);
+}
+
+function saveAsCSV() {
+    var filename = &amp;quot;#####&amp;quot;; // CSV file name
+    var folder = &amp;quot;#####&amp;quot;; // Folder ID
+
+    var csv = &amp;quot;&amp;quot;;
+    var v = SpreadsheetApp
+            .getActiveSpreadsheet()
+            .getActiveSheet()
+            .getDataRange()
+            .getValues();
+    v.forEach(function(e) {
+      csv += e.join(&amp;quot;,&amp;quot;) + &amp;quot;\n&amp;quot;;
+    });
+    var url = DriveApp.getFolderById(folder)
+              .createFile(filename, csv, MimeType.CSV)
+              .getDownloadUrl()
+              .replace(&amp;quot;?e=download&amp;amp;gd=true&amp;quot;,&amp;quot;&amp;quot;);
+    return url;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;Process :&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;Using &amp;ldquo;onOpen()&amp;rdquo;, it addes menu for launching a dialog.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;After launching the dialog, &amp;ldquo;saveAsCSV()&amp;rdquo; is launched by pushing a button. &amp;ldquo;saveAsCSV()&amp;rdquo; exports a CSV file and outputs download URL. At current script, all of data on active sheet is retrieved and exported CSV. If you want to retrieve a range you need, please use &amp;ldquo;&lt;a href=&#34;https://developers.google.com/apps-script/reference/spreadsheet/sheet#getRange(Integer,Integer)&#34;&gt;getRange()&lt;/a&gt;&amp;rdquo;.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;The CSV file is downloaded by &amp;ldquo;executeDownload()&amp;rdquo;.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;You can set csv file-name and output folder by &amp;ldquo;filename&amp;rdquo; and &amp;ldquo;folder&amp;rdquo;, respectively. In this sample, the source sheet is the sheet which opens currently. If you want to other sheet, please change this script.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Send E-mail with xlsx File Converted from Spreadsheet</title>
+      <link>https://tanaikech.github.io/2017/02/20/send-e-mail-with-xlsx-file-converted-from-spreadsheet</link>
+      <pubDate>Mon, 20 Feb 2017 09:56:12 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/02/20/send-e-mail-with-xlsx-file-converted-from-spreadsheet</guid>
+      <description>&lt;p&gt;This is a script to send e-mail with a xlsx file converted from spreadsheet as an attachment file. Access token is necessary to use this script.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;function excelSender() {
+  var accesstoken = &amp;quot;[your accesstoken]&amp;quot;;
+  var sheetID = &amp;quot;[sheet id]&amp;quot;;
+  var xlsxName = &amp;quot;[output xlsx file name]&amp;quot;
+  var params = {
+    &amp;quot;headers&amp;quot; : {Authorization: &amp;quot;Bearer &amp;quot; + accesstoken},
+    &amp;quot;muteHttpExceptions&amp;quot; : true
+  };
+  var dUrl = &amp;quot;https://www.googleapis.com/drive/v3/files/&amp;quot; + sheetID + &amp;quot;/export?mimeType=application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&amp;quot;
+  var xlsxlFile = UrlFetchApp.fetch(dUrl, params).getBlob().setName(xlsxName);
+  MailApp.sendEmail({
+    to: &amp;quot;[your mail address]&amp;quot;,
+    subject: &amp;quot;sample mail&amp;quot;,
+    body: &amp;quot;sample mail with an excel file&amp;quot;,
+    attachments: [xlsxlFile]
+  });
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
