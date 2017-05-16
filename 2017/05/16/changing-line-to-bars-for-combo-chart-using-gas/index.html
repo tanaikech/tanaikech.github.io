@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.16" />
 
-  <title>Sending E-mail When Spreadsheet was Edited from Outside by Sheet API &middot; tanaike</title>
+  <title>Changing Line to Bars for Combo Chart using GAS &middot; tanaike</title>
 
   
   
@@ -200,7 +200,7 @@
 
 
 <div class="header">
-  <h1>Sending E-mail When Spreadsheet was Edited from Outside by Sheet API</h1>
+  <h1>Changing Line to Bars for Combo Chart using GAS</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -209,7 +209,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>14 May 2017, 17:43</time>
+    <time>16 May 2017, 11:42</time>
   </div>
 
   
@@ -220,7 +220,9 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/googlecharttips">GoogleChartTips</a>
     
   </div>
   
@@ -236,7 +238,7 @@
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/trigger">trigger</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/chart">chart</a>
     
   </div>
   
@@ -244,36 +246,143 @@
 
 </div>
 
-  <p>This sample script sends an e-mail, when spreadsheet was edited from outside by Sheet API v4. When you use this sample, please create a container bound script with spreadsheet which is edited by Sheet API. And please input your e-mail and run firstly a method of <code>createTrigger()</code>. By this, a trigger is installed as <code>onChange()</code>. After this, edit spreadsheet from outside by Sheet API v4.</p>
+  
 
-<p>When when spreadsheet was edited from outside by Sheet API v4, I used <code>sendEmail()</code> as a sample, because script editor is closed.</p>
+<h2 id="sample-data">Sample data</h2>
 
-<p><strong>Sample script :</strong></p>
+<p>This is a sample data for this sample script. The column B was created by the normal distribution formula, and the column C was created by multiplying random number for column B.</p>
 
-<pre><code class="language-javascript">function createTrigger(){
-  ScriptApp.newTrigger('sendMail')
-      .forSpreadsheet(SpreadsheetApp.getActive())
-      .onChange()
-      .create();
-}
+<pre><code class="language-csv">A, B, C
+1.0, 0.0001, 0.0000
+1.5, 0.0009, 0.0006
+2.0, 0.0044, 0.0037
+2.5, 0.0175, 0.0133
+3.0, 0.0540, 0.0236
+3.5, 0.1296, 0.0533
+4.0, 0.2420, 0.0073
+4.5, 0.3522, 0.2468
+5.0, 0.3990, 0.0843
+5.5, 0.3522, 0.3352
+6.0, 0.2420, 0.2201
+6.5, 0.1296, 0.0607
+7.0, 0.0540, 0.0256
+7.5, 0.0175, 0.0006
+8.0, 0.0044, 0.0030
+8.5, 0.0009, 0.0005
+9.0, 0.0001, 0.0001
+</code></pre>
 
-function sendMail() {
-  MailApp.sendEmail(&quot;### Your e-mail address ###&quot;, &quot;test mail&quot;, &quot;Spreadsheet was edited.&quot;);
+<h2 id="create-chart">Create chart</h2>
+
+<p><code>createChart()</code> creates a chart from data. A chart with 2 lines is created by this method.</p>
+
+<pre><code class="language-javascript">function createChart(){
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var chart = sheet.newChart()
+    .setChartType(Charts.ChartType.COMBO)
+    .addRange(sheet.getRange('a1:a18'))
+    .addRange(sheet.getRange('b1:b18'))
+    .addRange(sheet.getRange('c1:c18'))
+    .setPosition(5, 5, 0, 0)
+    .setOption('series', {
+      0:{type: 'line', color: 'red', curveType: 'function'},
+      1:{type: 'line', color: 'blue', curveType: 'function'},
+    })
+    .setOption('useFirstColumnAsDomain', true)
+    .setOption('height', 280)
+    .setOption('width', 480)
+    .setOption('title', 'Sample chart')
+    .setOption('vAxis', {
+      minValue: 0,
+      maxValue: 0.4,
+      gridlines: {
+        count: 10
+      }
+    })
+    .build();
+  sheet.insertChart(chart);
 }
 </code></pre>
+
+<h3 id="created-chart">Created chart</h3>
+
+<p><img src="https://tanaikech.github.io/img/20170516_fig1.png" alt="" /></p>
+
+<h3 id="note">note</h3>
+
+<ul>
+<li><code>.setChartType(Charts.ChartType.COMBO)</code> defines COMBO chart.</li>
+<li><code>.setOption('series', {})</code> defines each type for range <code>'b1:b18'</code> and <code>'c1:c18'</code>.</li>
+<li><code>0:{}</code> and <code>1:{}</code> of <code>.setOption('series', {})</code> mean range <code>'b1:b18'</code> and <code>'c1:c18'</code>, respectively.</li>
+</ul>
+
+<h2 id="modify-chart">Modify chart</h2>
+
+<p><code>modifyChart()</code> modifies the chart with 2 lines. It modifies from red line to red bars.</p>
+
+<pre><code class="language-javascript">function modifyChart(){
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var chart = sheet.getCharts()[0];
+  chart = chart.modify()
+    .setChartType(Charts.ChartType.COMBO)
+    .addRange(sheet.getRange('a1:a18'))
+    .addRange(sheet.getRange('b1:b18'))
+    .addRange(sheet.getRange('c1:c18'))
+    .setPosition(5, 5, 0, 0)
+    .setOption('series', {
+      0:{type: 'bars', color: 'red'},
+      1:{type: 'line', color: 'blue', curveType: 'function'},
+    })
+    .setOption('useFirstColumnAsDomain', true)
+    .setOption('height', 280)
+    .setOption('width', 480)
+    .setOption('title', 'Sample chart')
+    .setOption('vAxis', {
+      minValue: 0,
+      maxValue: 0.4,
+      gridlines: {
+        count: 10
+      }
+    })
+    .build();
+  sheet.updateChart(chart);
+}
+</code></pre>
+
+<h3 id="modified-chart">Modified chart</h3>
+
+<p><img src="https://tanaikech.github.io/img/20170516_fig2.png" alt="" /></p>
+
+<h3 id="note-1">note</h3>
+
+<ul>
+<li><code>0:{type: 'bars', color: 'red'}</code> was modified.</li>
+</ul>
+
+<h2 id="reference">Reference</h2>
+
+<p>Reference pages are <a href="https://developers.google.com/apps-script/reference/spreadsheet/embedded-line-chart-builder">here</a> and <a href="https://developers.google.com/chart/interactive/docs/gallery/areachart#configuration-options">here</a>.</p>
+
+<h2 id="commission">Commission</h2>
+
+<p>This was accepted as a commission.</p>
+
+<ul>
+<li>May 13, 2017, Dr. Mehmet TEKDAL (Çukurova University)</li>
+</ul>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2017/05/10/file-transfer-for-google-drive-without-authorization"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2017/05/14/sending-e-mail-when-spreadsheet-was-edited-from-outside-by-sheet-api"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2017/05/10/file-transfer-for-google-drive-without-authorization">File Transfer for Google Drive Without Authorization</a>
+      <a href="https://tanaikech.github.io/2017/05/14/sending-e-mail-when-spreadsheet-was-edited-from-outside-by-sheet-api">Sending E-mail When Spreadsheet was Edited from Outside by Sheet API</a>
     </nav>
     
   </div>
@@ -282,14 +391,8 @@ function sendMail() {
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2017/05/16/changing-line-to-bars-for-combo-chart-using-gas">Changing Line to Bars for Combo Chart using GAS</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2017/05/16/changing-line-to-bars-for-combo-chart-using-gas"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
