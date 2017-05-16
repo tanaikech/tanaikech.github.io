@@ -7,8 +7,141 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Sun, 14 May 2017 17:43:52 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 16 May 2017 11:42:56 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Changing Line to Bars for Chart using GAS</title>
+      <link>https://tanaikech.github.io/2017/05/16/changing-line-to-bars-for-chart-using-gas</link>
+      <pubDate>Tue, 16 May 2017 11:42:56 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/05/16/changing-line-to-bars-for-chart-using-gas</guid>
+      <description>
+
+&lt;h2 id=&#34;sample-data&#34;&gt;Sample data&lt;/h2&gt;
+
+&lt;p&gt;This is a sample data for this sample script. The column B was created by the normal distribution formula, and the column C was created by multiplying random number for column B.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-csv&#34;&gt;A, B, C
+1.0, 0.0001, 0.0000
+1.5, 0.0009, 0.0006
+2.0, 0.0044, 0.0037
+2.5, 0.0175, 0.0133
+3.0, 0.0540, 0.0236
+3.5, 0.1296, 0.0533
+4.0, 0.2420, 0.0073
+4.5, 0.3522, 0.2468
+5.0, 0.3990, 0.0843
+5.5, 0.3522, 0.3352
+6.0, 0.2420, 0.2201
+6.5, 0.1296, 0.0607
+7.0, 0.0540, 0.0256
+7.5, 0.0175, 0.0006
+8.0, 0.0044, 0.0030
+8.5, 0.0009, 0.0005
+9.0, 0.0001, 0.0001
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;create-chart&#34;&gt;Create chart&lt;/h2&gt;
+
+&lt;p&gt;&lt;code&gt;createChart()&lt;/code&gt; creates a chart from data. A chart with 2 lines is created by this method.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function createChart(){
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var chart = sheet.newChart()
+    .setChartType(Charts.ChartType.COMBO)
+    .addRange(sheet.getRange(&#39;a1:a18&#39;))
+    .addRange(sheet.getRange(&#39;b1:b18&#39;))
+    .addRange(sheet.getRange(&#39;c1:c18&#39;))
+    .setPosition(5, 5, 0, 0)
+    .setOption(&#39;series&#39;, {
+      0:{type: &#39;line&#39;, color: &#39;red&#39;, curveType: &#39;function&#39;},
+      1:{type: &#39;line&#39;, color: &#39;blue&#39;, curveType: &#39;function&#39;},
+    })
+    .setOption(&#39;useFirstColumnAsDomain&#39;, true)
+    .setOption(&#39;height&#39;, 280)
+    .setOption(&#39;width&#39;, 480)
+    .setOption(&#39;title&#39;, &#39;Sample chart&#39;)
+    .setOption(&#39;vAxis&#39;, {
+      minValue: 0,
+      maxValue: 0.4,
+      gridlines: {
+        count: 10
+      }
+    })
+    .build();
+  sheet.insertChart(chart);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;created-chart&#34;&gt;Created chart&lt;/h3&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170516_fig1.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;note&#34;&gt;note&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;.setChartType(Charts.ChartType.COMBO)&lt;/code&gt; defines COMBO chart.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;.setOption(&#39;series&#39;, {})&lt;/code&gt; defines each type for range &lt;code&gt;&#39;b1:b18&#39;&lt;/code&gt; and &lt;code&gt;&#39;c1:c18&#39;&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;0:{}&lt;/code&gt; and &lt;code&gt;1:{}&lt;/code&gt; of &lt;code&gt;.setOption(&#39;series&#39;, {})&lt;/code&gt; mean range &lt;code&gt;&#39;b1:b18&#39;&lt;/code&gt; and &lt;code&gt;&#39;c1:c18&#39;&lt;/code&gt;, respectively.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;modify-chart&#34;&gt;Modify chart&lt;/h2&gt;
+
+&lt;p&gt;&lt;code&gt;modifyChart()&lt;/code&gt; modifies the chart with 2 lines. It modifies from red line to red bars.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function modifyChart(){
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var chart = sheet.getCharts()[0];
+  chart = chart.modify()
+    .setChartType(Charts.ChartType.COMBO)
+    .addRange(sheet.getRange(&#39;a1:a18&#39;))
+    .addRange(sheet.getRange(&#39;b1:b18&#39;))
+    .addRange(sheet.getRange(&#39;c1:c18&#39;))
+    .setPosition(5, 5, 0, 0)
+    .setOption(&#39;series&#39;, {
+      0:{type: &#39;bars&#39;, color: &#39;red&#39;},
+      1:{type: &#39;line&#39;, color: &#39;blue&#39;, curveType: &#39;function&#39;},
+    })
+    .setOption(&#39;useFirstColumnAsDomain&#39;, true)
+    .setOption(&#39;height&#39;, 280)
+    .setOption(&#39;width&#39;, 480)
+    .setOption(&#39;title&#39;, &#39;Sample chart&#39;)
+    .setOption(&#39;vAxis&#39;, {
+      minValue: 0,
+      maxValue: 0.4,
+      gridlines: {
+        count: 10
+      }
+    })
+    .build();
+  sheet.updateChart(chart);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;modified-chart&#34;&gt;Modified chart&lt;/h3&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170516_fig2.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;note-1&#34;&gt;note&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;0:{type: &#39;bars&#39;, color: &#39;red&#39;}&lt;/code&gt; was modified.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;reference&#34;&gt;Reference&lt;/h2&gt;
+
+&lt;p&gt;Reference pages are &lt;a href=&#34;https://developers.google.com/apps-script/reference/spreadsheet/embedded-line-chart-builder&#34;&gt;here&lt;/a&gt; and &lt;a href=&#34;https://developers.google.com/chart/interactive/docs/gallery/areachart#configuration-options&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;commission&#34;&gt;Commission&lt;/h2&gt;
+
+&lt;p&gt;This was accepted as a commission.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;May 13, 2017, Dr. Mehmet TEKDAL (Çukurova University)&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
     
     <item>
       <title>Sending E-mail When Spreadsheet was Edited from Outside by Sheet API</title>
@@ -811,20 +944,6 @@ DriveApp.getFolderById(folderId)
     .getBlob())
     .setName(outputFilename);
 &lt;/code&gt;&lt;/pre&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Updated: CLI Tool - gogauth</title>
-      <link>https://tanaikech.github.io/2017/04/19/updated-cli-tool---gogauth</link>
-      <pubDate>Wed, 19 Apr 2017 13:34:36 +0900</pubDate>
-      
-      <guid>https://tanaikech.github.io/2017/04/19/updated-cli-tool---gogauth</guid>
-      <description>&lt;p&gt;gogauth is a CLI tool to retrieve easily access token for using APIs on Google.&lt;/p&gt;
-
-&lt;p&gt;Today, it was updated with big changes. Please check it out.&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/tanaikech/gogauth&#34;&gt;https://github.com/tanaikech/gogauth&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
