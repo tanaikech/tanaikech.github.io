@@ -7,8 +7,27 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Tue, 16 May 2017 11:42:56 +0900</lastBuildDate>
+    <lastBuildDate>Fri, 19 May 2017 08:49:06 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/tags/google-apps-script/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Updated ggsrun to v.1.2.0</title>
+      <link>https://tanaikech.github.io/2017/05/19/updated-ggsrun-to-v.1.2.0</link>
+      <pubDate>Fri, 19 May 2017 08:49:06 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/05/19/updated-ggsrun-to-v.1.2.0</guid>
+      <description>
+
+&lt;h1 id=&#34;ggsrun-was-updated-to-v-1-2-0&#34;&gt;ggsrun was updated to v.1.2.0&lt;/h1&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Added a command for retrieving revision files on Google Drive.&lt;/li&gt;
+&lt;li&gt;Some modifications.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;You can check this at &lt;a href=&#34;https://github.com/tanaikech/ggsrun&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Changing Line to Bars for Combo Chart using GAS</title>
@@ -884,91 +903,6 @@ Logger.log(&amp;quot;{id: %s, title: %s, mimeType: %s}&amp;quot;, res.id, res.ti
   return [i.id for each (i in Drive.Files.list({q: &amp;quot;title=&#39;&amp;quot; + filename + &amp;quot;&#39; and trashed=false&amp;quot;}).items)];
 }
 &lt;/code&gt;&lt;/pre&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Download Files Without Authorization From Google Drive</title>
-      <link>https://tanaikech.github.io/2017/03/20/download-files-without-authorization-from-google-drive</link>
-      <pubDate>Mon, 20 Mar 2017 14:30:15 +0900</pubDate>
-      
-      <guid>https://tanaikech.github.io/2017/03/20/download-files-without-authorization-from-google-drive</guid>
-      <description>
-
-&lt;h1 id=&#34;overview&#34;&gt;Overview&lt;/h1&gt;
-
-&lt;p&gt;In this article, files can be downloaded without authorization.&lt;/p&gt;
-
-&lt;h1 id=&#34;description&#34;&gt;Description&lt;/h1&gt;
-
-&lt;p&gt;When we download files from Google Drive, it usually has to use Drive API. In order to use Drive API, access token is required. If you want to make your friends download files from your Google Drive, the authorization process is to take time. Also Web Link for each files can be used. But it has to set for each files. So I proposal this.&lt;/p&gt;
-
-&lt;p&gt;As a sample, I introduce a script for downloading the files using Web Apps. In this sample, it changes a file to a byte slice and send it as text data. Then, it reconstructs it. Of course, base64 encode can be used for this. But the data size for using base64 is much larger than that for using the byte slice.&lt;/p&gt;
-
-&lt;p&gt;At this method, the project files including GAS script cannot be downloaded. When Google Docs are downloaded using this method, those are downloaded as PDF file. It may be the specification of Google.&lt;/p&gt;
-
-&lt;p&gt;By the way, also you can upload files without authorization to Google Drive using this method.&lt;/p&gt;
-
-&lt;h1 id=&#34;usage&#34;&gt;Usage&lt;/h1&gt;
-
-&lt;h2 id=&#34;1-u-deploy-web-apps-https-developers-google-com-apps-script-guides-web-u&#34;&gt;1. &lt;u&gt;&lt;a href=&#34;https://developers.google.com/apps-script/guides/web&#34;&gt;Deploy Web Apps&lt;/a&gt;&lt;/u&gt;&lt;/h2&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Open the Script Editor.&lt;/li&gt;
-&lt;li&gt;On the Script Editor
-
-&lt;ul&gt;
-&lt;li&gt;File -&amp;gt; Manage Versions -&amp;gt; Save New Version&lt;/li&gt;
-&lt;li&gt;Publish -&amp;gt; Deploy as Web App&lt;/li&gt;
-&lt;li&gt;At Execute the app as, select &lt;strong&gt;&amp;ldquo;your account&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;At Who has access to the app, select &lt;strong&gt;&amp;ldquo;Anyone, even anonymous&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;Click &amp;ldquo;Deploy&amp;rdquo;&lt;/li&gt;
-&lt;li&gt;Copy &lt;strong&gt;&amp;ldquo;Current web app URL&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;Click &amp;ldquo;OK&amp;rdquo;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2 id=&#34;2-paste-following-script-on-script-editor&#34;&gt;2. Paste following script on Script Editor.&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function doPost(e) {
-  return (function(id){
-    var file = DriveApp.getFileById(id);
-    return ContentService
-          .createTextOutput(JSON.stringify({
-            result: file.getBlob().getBytes(),
-            name: file.getName(),
-            mimeType: file.getBlob().getContentType()
-          }))
-          .setMimeType(ContentService.MimeType.JSON);
-  })(e.parameters.id);
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;3-at-local-pc-use-following-script&#34;&gt;3. At local pc, use following script.&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import numpy as np
-import requests
-r = requests.post(
-    &amp;quot;https://script.google.com/macros/s/### Your ID ###/exec&amp;quot;,
-    data={&amp;quot;id&amp;quot;: &amp;quot;### File ID ###&amp;quot;}
-)
-f = open(r.json()[&amp;quot;name&amp;quot;], &amp;quot;bw&amp;quot;)
-f.write(np.array(r.json()[&amp;quot;result&amp;quot;], dtype=np.uint8))
-f.close()
-print(&amp;quot;Filename = {0}, MimeType = {1}&amp;quot;.format(r.json()[&amp;quot;name&amp;quot;], r.json()[&amp;quot;mimeType&amp;quot;]))
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Files output from this sample have no extension. So please add the extension for each mimeType to the files.&lt;/p&gt;
-
-&lt;h1 id=&#34;appendix&#34;&gt;Appendix&lt;/h1&gt;
-
-&lt;p&gt;If you want to download with authorization, there are &lt;a href=&#34;https://developers.google.com/drive/v3/web/manage-downloads&#34;&gt;3 patterns&lt;/a&gt;.&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;&lt;a href=&#34;https://developers.google.com/apps-script/import-export&#34;&gt;Download script and project including script.&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://developers.google.com/drive/v3/reference/files/export&#34;&gt;Download Google Docs (spreadsheet, document, presentation and so on). In this case, Google calls &amp;ldquo;Export&amp;rdquo;.&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://developers.google.com/drive/v3/reference/files/get&#34;&gt;Download files except for Google Docs.&lt;/a&gt;&lt;/li&gt;
-&lt;/ol&gt;
 </description>
     </item>
     
