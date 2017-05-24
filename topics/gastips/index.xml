@@ -7,8 +7,82 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Tue, 16 May 2017 11:42:56 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 24 May 2017 09:08:58 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/topics/gastips/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Retrieving HTML File ID from Microsoft Docx File on Google Drive</title>
+      <link>https://tanaikech.github.io/2017/05/24/retrieving-html-file-id-from-microsoft-docx-file-on-google-drive</link>
+      <pubDate>Wed, 24 May 2017 09:08:58 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/05/24/retrieving-html-file-id-from-microsoft-docx-file-on-google-drive</guid>
+      <description>
+
+&lt;p&gt;This sample script converts from Microsoft Docx File on Google Drive to Google Spreadsheet, and converts to HTML file.&lt;/p&gt;
+
+&lt;p&gt;Drive APIs v2 and v3 are used for this. Please set as follows.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://developers.google.com/drive/v2/reference/&#34;&gt;Drive API v2&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://developers.google.com/drive/v3/reference/&#34;&gt;Drive API v3&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&amp;ldquo;Drive API v2&amp;rdquo; can be used at Google Apps Script by enabling Drive API of Advanced Google services and of Google API Console.&lt;/p&gt;
+
+&lt;p&gt;How to use it is as follows.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;In the script editor, select Resources &amp;gt; Advanced Google services&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;In the dialog that appears, click the on/off switch for Drive API v2.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;At the bottom of the dialog, click the link for the Google API Console.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;In the console, click into the filter box and type part of the name of the API &amp;ldquo;Drive API&amp;rdquo;, then click the name once you see it.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;On the next screen, click Enable API. By this, Drive APIs v2 and v3 can be used.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Close the Developers Console and return to the script editor. Click OK in the dialog. The advanced service you enabled is now available in autocomplete.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;The detail information is &lt;a href=&#34;https://developers.google.com/apps-script/guides/services/advanced&#34;&gt;https://developers.google.com/apps-script/guides/services/advanced&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;script&#34;&gt;Script&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function doGet(e){
+  var folderId = &amp;quot;### Folder ID ###&amp;quot;;
+
+  var file = DriveApp.getFileById(e.parameters.id);
+  var docfileId = Drive.Files.insert(
+    {
+      &amp;quot;title&amp;quot;: file.getName(),
+      &amp;quot;mimeType&amp;quot;: &amp;quot;application/vnd.google-apps.document&amp;quot;,
+      &amp;quot;parents&amp;quot;:  [{&amp;quot;id&amp;quot;: folderId}]
+    },
+    file.getBlob()
+  ).id;
+  var htmlId = DriveApp.getFolderById(folderId).createFile(
+    UrlFetchApp.fetch(
+      &amp;quot;https://www.googleapis.com/drive/v3/files/&amp;quot; + docfileId + &amp;quot;/export?mimeType=text/html&amp;quot;,
+      {
+        headers : {Authorization: &amp;quot;Bearer &amp;quot; + ScriptApp.getOAuthToken()},
+        muteHttpExceptions : true
+      }
+    ).getBlob()
+  ).setName(file.getName() + &amp;quot;.html&amp;quot;).getId();
+  Drive.Files.remove(docfileId);
+  return ContentService.createTextOutput(htmlId);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;check-script&#34;&gt;Check Script&lt;/h2&gt;
+
+&lt;p&gt;In order to check above script, you can do it using curl as follows. When Docx File ID is sent to doGet() on Google, you can retrieve HTML file ID from Google.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;curl -L https://script.google.com/macros/s/#####/exec?id=### Docx File ID ###
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
     
     <item>
       <title>Changing Line to Bars for Combo Chart using GAS</title>
@@ -821,87 +895,6 @@ print(&amp;quot;Filename = {0}, MimeType = {1}&amp;quot;.format(r.json()[&amp;qu
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Both scripts are the same meaning.&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Export CSV File from Spreadsheet and Make Download Button</title>
-      <link>https://tanaikech.github.io/2017/02/20/export-csv-file-from-spreadsheet-and-make-download-button</link>
-      <pubDate>Mon, 20 Feb 2017 10:00:28 +0900</pubDate>
-      
-      <guid>https://tanaikech.github.io/2017/02/20/export-csv-file-from-spreadsheet-and-make-download-button</guid>
-      <description>&lt;p&gt;This is a script to export a CSV file from spreadsheet and make an user download it. When the users download it, they can download by push a button made by this script.&lt;/p&gt;
-
-&lt;p&gt;In order to use this script, put both HTML and script in a GAS project.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;html :&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;This file name is &amp;ldquo;download.html&amp;rdquo;.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;lt;!DOCTYPE html&amp;gt;
-&amp;lt;html&amp;gt;
-  &amp;lt;body&amp;gt;
-    Download CSV?
-    &amp;lt;form&amp;gt;
-      &amp;lt;input type=&amp;quot;button&amp;quot; value=&amp;quot;ok&amp;quot; onclick=&amp;quot;google.script.run
-                                              .withSuccessHandler(executeDownload)
-                                              .saveAsCSV();&amp;quot; /&amp;gt;
-    &amp;lt;/form&amp;gt;
-  &amp;lt;/body&amp;gt;
-  &amp;lt;script&amp;gt;
-    function executeDownload(url) {
-      window.location.href = url;
-    }
-  &amp;lt;/script&amp;gt;
-&amp;lt;/html&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;strong&gt;Script :&lt;/strong&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;function onOpen() {
-  SpreadsheetApp.getUi()
-                .createMenu(&#39;csv&#39;)
-                .addItem(&#39;export as csv files&#39;, &#39;dialog&#39;)
-                .addToUi();
-}
-
-function dialog() {
-  var html = HtmlService.createHtmlOutputFromFile(&#39;download&#39;);
-  SpreadsheetApp.getUi().showModalDialog(html, &#39;CSV download dialog&#39;);
-}
-
-function saveAsCSV() {
-    var filename = &amp;quot;#####&amp;quot;; // CSV file name
-    var folder = &amp;quot;#####&amp;quot;; // Folder ID
-
-    var csv = &amp;quot;&amp;quot;;
-    var v = SpreadsheetApp
-            .getActiveSpreadsheet()
-            .getActiveSheet()
-            .getDataRange()
-            .getValues();
-    v.forEach(function(e) {
-      csv += e.join(&amp;quot;,&amp;quot;) + &amp;quot;\n&amp;quot;;
-    });
-    var url = DriveApp.getFolderById(folder)
-              .createFile(filename, csv, MimeType.CSV)
-              .getDownloadUrl()
-              .replace(&amp;quot;?e=download&amp;amp;gd=true&amp;quot;,&amp;quot;&amp;quot;);
-    return url;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;strong&gt;Process :&lt;/strong&gt;&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;Using &amp;ldquo;onOpen()&amp;rdquo;, it addes menu for launching a dialog.&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;After launching the dialog, &amp;ldquo;saveAsCSV()&amp;rdquo; is launched by pushing a button. &amp;ldquo;saveAsCSV()&amp;rdquo; exports a CSV file and outputs download URL. At current script, all of data on active sheet is retrieved and exported CSV. If you want to retrieve a range you need, please use &amp;ldquo;&lt;a href=&#34;https://developers.google.com/apps-script/reference/spreadsheet/sheet#getRange(Integer,Integer)&#34;&gt;getRange()&lt;/a&gt;&amp;rdquo;.&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;The CSV file is downloaded by &amp;ldquo;executeDownload()&amp;rdquo;.&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;You can set csv file-name and output folder by &amp;ldquo;filename&amp;rdquo; and &amp;ldquo;folder&amp;rdquo;, respectively. In this sample, the source sheet is the sheet which opens currently. If you want to other sheet, please change this script.&lt;/p&gt;
 </description>
     </item>
     

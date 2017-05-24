@@ -7,8 +7,82 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Sat, 15 Apr 2017 10:39:05 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 24 May 2017 09:08:58 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/tags/google-drive/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Retrieving HTML File ID from Microsoft Docx File on Google Drive</title>
+      <link>https://tanaikech.github.io/2017/05/24/retrieving-html-file-id-from-microsoft-docx-file-on-google-drive</link>
+      <pubDate>Wed, 24 May 2017 09:08:58 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/05/24/retrieving-html-file-id-from-microsoft-docx-file-on-google-drive</guid>
+      <description>
+
+&lt;p&gt;This sample script converts from Microsoft Docx File on Google Drive to Google Spreadsheet, and converts to HTML file.&lt;/p&gt;
+
+&lt;p&gt;Drive APIs v2 and v3 are used for this. Please set as follows.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://developers.google.com/drive/v2/reference/&#34;&gt;Drive API v2&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://developers.google.com/drive/v3/reference/&#34;&gt;Drive API v3&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&amp;ldquo;Drive API v2&amp;rdquo; can be used at Google Apps Script by enabling Drive API of Advanced Google services and of Google API Console.&lt;/p&gt;
+
+&lt;p&gt;How to use it is as follows.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;In the script editor, select Resources &amp;gt; Advanced Google services&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;In the dialog that appears, click the on/off switch for Drive API v2.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;At the bottom of the dialog, click the link for the Google API Console.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;In the console, click into the filter box and type part of the name of the API &amp;ldquo;Drive API&amp;rdquo;, then click the name once you see it.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;On the next screen, click Enable API. By this, Drive APIs v2 and v3 can be used.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Close the Developers Console and return to the script editor. Click OK in the dialog. The advanced service you enabled is now available in autocomplete.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;The detail information is &lt;a href=&#34;https://developers.google.com/apps-script/guides/services/advanced&#34;&gt;https://developers.google.com/apps-script/guides/services/advanced&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;script&#34;&gt;Script&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function doGet(e){
+  var folderId = &amp;quot;### Folder ID ###&amp;quot;;
+
+  var file = DriveApp.getFileById(e.parameters.id);
+  var docfileId = Drive.Files.insert(
+    {
+      &amp;quot;title&amp;quot;: file.getName(),
+      &amp;quot;mimeType&amp;quot;: &amp;quot;application/vnd.google-apps.document&amp;quot;,
+      &amp;quot;parents&amp;quot;:  [{&amp;quot;id&amp;quot;: folderId}]
+    },
+    file.getBlob()
+  ).id;
+  var htmlId = DriveApp.getFolderById(folderId).createFile(
+    UrlFetchApp.fetch(
+      &amp;quot;https://www.googleapis.com/drive/v3/files/&amp;quot; + docfileId + &amp;quot;/export?mimeType=text/html&amp;quot;,
+      {
+        headers : {Authorization: &amp;quot;Bearer &amp;quot; + ScriptApp.getOAuthToken()},
+        muteHttpExceptions : true
+      }
+    ).getBlob()
+  ).setName(file.getName() + &amp;quot;.html&amp;quot;).getId();
+  Drive.Files.remove(docfileId);
+  return ContentService.createTextOutput(htmlId);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;check-script&#34;&gt;Check Script&lt;/h2&gt;
+
+&lt;p&gt;In order to check above script, you can do it using curl as follows. When Docx File ID is sent to doGet() on Google, you can retrieve HTML file ID from Google.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;curl -L https://script.google.com/macros/s/#####/exec?id=### Docx File ID ###
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
     
     <item>
       <title>Creating Spreadsheet from Excel file</title>
