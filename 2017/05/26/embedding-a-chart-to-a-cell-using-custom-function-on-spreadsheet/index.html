@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.16" />
 
-  <title>Chart &middot; tanaike</title>
+  <title>Embedding a Chart to a Cell using Custom Function on Spreadsheet &middot; tanaike</title>
 
   
   
@@ -36,8 +36,6 @@
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
 
   
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike" href="https://tanaikech.github.io/tags/chart/index.xml" />
   
 
   
@@ -113,10 +111,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://tanaikech.github.io/tags/chart/index.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
-    </li>
     
 
     
@@ -206,16 +200,12 @@
 
 
 <div class="header">
-  <h1>Chart</h1>
+  <h1>Embedding a Chart to a Cell using Custom Function on Spreadsheet</h1>
+  <h2></h2>
 </div>
-
 <div class="content">
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2017/05/26/embedding-a-chart-to-a-cell-using-custom-function-on-spreadsheet">Embedding a Chart to a Cell using Custom Function on Spreadsheet</a></h2>
 
-    <div class="post-meta">
+  <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
@@ -256,134 +246,143 @@
 
 </div>
 
-  </header>
+  
 
-  <p>
-  This sample script embeds a chart to a cell using custom function on Spreadsheet. I think that this method is one of various ideas. Problem When you want to create a chart and embed it to a cell using custom functions, you notice that insertChart() cannot be used. There are some limitations for using custom functions. But insertChart() creates floating charts. So in order to embed a chart to a cell, the function =IMAGE() is suitable for this situation.
-  </p>
+<p>This sample script embeds a chart to a cell using custom function on Spreadsheet.</p>
+
+<p>I think that this method is one of various ideas.</p>
+
+<h2 id="problem">Problem</h2>
+
+<p>When you want to create a chart and embed it to a cell using custom functions, you notice that <code>insertChart()</code> cannot be used. There are some limitations for using custom functions. But <code>insertChart()</code> creates floating charts. So in order to embed a chart to a cell, the function <code>=IMAGE()</code> is suitable for this situation. Here, <code>setFormula()</code> for setting <code>=IMAGE()</code> and <code>DriveApp.createFile()</code> for creating images from charts also cannot be used for custom functions.</p>
+
+<h2 id="solution">Solution</h2>
+
+<p>In order to avoid these limitations, I used <a href="https://developers.google.com/apps-script/guides/web">Web Apps</a>. From previous research, it has been found that Web Apps can avoid various limitations. Also in the case of this situation, Web Apps could avoid the above limitations.</p>
+
+<p>To use this sample script, please deploy Web Apps as follows.</p>
+
+<p>On the Script Editor,</p>
+
+<ul>
+<li>File
+
+<ul>
+<li>-&gt; Manage Versions</li>
+<li>-&gt; Save New Version</li>
+</ul></li>
+<li>Publish
+
+<ul>
+<li>-&gt; Deploy as Web App</li>
+<li>-&gt; At Execute the app as, select <strong>&ldquo;your account&rdquo;</strong></li>
+<li>-&gt; At Who has access to the app, select <strong>&ldquo;Anyone, even anonymous&rdquo;</strong></li>
+<li>-&gt; Click <strong>&ldquo;Deploy&rdquo;</strong></li>
+<li>-&gt; Copy <strong>&ldquo;Current web app URL&rdquo;</strong></li>
+<li>-&gt; Click <strong>&ldquo;OK&rdquo;</strong></li>
+</ul></li>
+</ul>
+
+<p>When it deploys Web Apps, the approval required authorization can be done, simultaneously.</p>
+
+<h2 id="sample-script">Sample Script :</h2>
+
+<p>Please copy and paste this script to a bound script of spreadsheet.</p>
+
+<pre><code class="language-javascript">var folderId = &quot;### Folder ID ###&quot;;
+var webappsurl = &quot;https://script.google.com/macros/s/######/exec&quot;;
+
+function embedChart(range) {
+  var ac = SpreadsheetApp.getActiveSheet().getActiveCell();
+  var q1 = &quot;?datarange=&quot; + range;
+  var q2 = &quot;&amp;row=&quot; + ac.getRow();
+  var q3 = &quot;&amp;col=&quot; + ac.getColumn();
+  var url = webappsurl + q1 + q2 + q3;
+  UrlFetchApp.fetch(url);
+}
+
+function doGet(e) {
+  var sheet = SpreadsheetApp.getActiveSheet();
+  var chart = sheet.newChart()
+    .setChartType(Charts.ChartType.PIE)
+    .addRange(sheet.getRange(e.parameters.datarange))
+    .setOption('height', 280)
+    .setOption('width', 480)
+    .setOption('title', 'Sample chart')
+    .build();
+  var file = DriveApp.getFolderById(folderId).createFile(
+    chart.getAs('image/png').setName(&quot;chart_image.png&quot;)
+  );
+  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  sheet.getRange(e.parameters.row, e.parameters.col).setFormula(
+    '=IMAGE(&quot;' + &quot;http://drive.google.com/uc?id=&quot; + file.getId() + '&quot;)'
+  );
+}
+</code></pre>
+
+<h3 id="flow-of-script">Flow of Script :</h3>
+
+<p><strong>embedChart()</strong></p>
+
+<ol>
+<li>Input <code>=embedChart(&quot;a2:a6&quot;)</code> in cell <code>B7</code>.</li>
+<li>Using <code>fetch()</code>, sends data of <code>a2:a6</code> and the inputted coordinate to <code>doGet()</code>.</li>
+</ol>
+
+<p><strong>doGet()</strong></p>
+
+<ol>
+<li>Using <code>doGet()</code>, get the data.</li>
+<li>Creates a chart using inputted range <code>a2:a6</code>. (in this case, creates a pie chart)</li>
+<li>Saves a chart as an image.  (in this case, saves as PNG)</li>
+<li>Updates a permission of the image file to use for <code>=IMAGE()</code>.</li>
+<li>Embeds the image using <code>=IMAGE()</code> which was imported by <code>setFormula()</code>.</li>
+</ol>
+
+<h2 id="result">Result :</h2>
+
+<p>By inputting <code>=embedChart(&quot;a2:a6&quot;)</code> in cell <code>B7</code> as a custom function, following result can be obtained.</p>
+
+<p><img src="https://tanaikech.github.io/img/20170526a.png" alt="" /></p>
+
+<h2 id="note">Note :</h2>
+
+<ol>
+<li>When the custom function <code>embedChart()</code> is used, loading time is about 40 seconds. (I don&rsquo;t know whether this occurs only my environment.)</li>
+<li>Permissions of the created image are <a href="https://developers.google.com/apps-script/reference/drive/access">ANYONE_WITH_LINK</a>, <a href="https://developers.google.com/apps-script/reference/drive/permission">VIEW</a>.</li>
+<li><code>embedChart()</code> is overwritten by <code>=IMAGE()</code>. So when the spreadsheet is reopened, the response of <code>=IMAGE()</code> is much faster than that of <code>embedChart()</code>.</li>
+</ol>
+
 
   
-  <footer>
-    <a href="https://tanaikech.github.io/2017/05/26/embedding-a-chart-to-a-cell-using-custom-function-on-spreadsheet">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2017/05/16/changing-line-to-bars-for-combo-chart-using-gas">Changing Line to Bars for Combo Chart using GAS</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>16 May 2017, 11:42</time>
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2017/05/24/retrieving-html-file-id-from-microsoft-docx-file-on-google-drive"><i class="fa fa-chevron-left"></i></a>
+    
   </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
+  <div class="pure-u-10-24">
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/googlecharttips">GoogleChartTips</a>
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2017/05/24/retrieving-html-file-id-from-microsoft-docx-file-on-google-drive">Retrieving HTML File ID from Microsoft Docx File on Google Drive</a>
+    </nav>
     
   </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/chart">chart</a>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
     
   </div>
-  
-  
-
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
 </div>
 
-  </header>
 
-  <p>
-  Sample data This is a sample data for this sample script. The column B was created by the normal distribution formula, and the column C was created by multiplying random number for column B. A, B, C 1.0, 0.0001, 0.0000 1.5, 0.0009, 0.0006 2.0, 0.0044, 0.0037 2.5, 0.0175, 0.0133 3.0, 0.0540, 0.0236 3.5, 0.1296, 0.0533 4.0, 0.2420, 0.0073 4.5, 0.3522, 0.2468 5.0, 0.3990, 0.0843 5.5, 0.3522, 0.3352 6.0, 0.2420, 0.2201 6.5, 0.1296, 0.0607 7.0, 0.0540, 0.0256 7.5, 0.0175, 0.0006 8.0, 0.0044, 0.0030 8.5, 0.0009, 0.0005 9.0, 0.0001, 0.0001 Create chart createChart() creates a chart from data.
-  </p>
-
-  
-  <footer>
-    <a href="https://tanaikech.github.io/2017/05/16/changing-line-to-bars-for-combo-chart-using-gas">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2017/02/13/making-charts-at-spreadsheet">Making charts at spreadsheet</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>13 Feb 2017, 08:57</time>
-  </div>
 
   
 
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/googlecharttips">GoogleChartTips</a>
-    
-  </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/chart">chart</a>
-    
-  </div>
-  
-  
-
-</div>
-
-  </header>
-
-  <p>
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet(); var chart = sheet.newChart() .setChartType(Charts.ChartType.LINE) .asLineChart() .addRange(sheet.getRange('a1:a21')) .addRange(sheet.getRange('b1:b21')) .addRange(sheet.getRange('c1:c21')) .setColors([&quot;green&quot;, &quot;red&quot;]) .setBackgroundColor(&quot;black&quot;) .setPosition(5, 5, 0, 0) .setPointStyle(Charts.PointStyle.MEDIUM) .setOption('useFirstColumnAsDomain', true) .setOption('height', 280) .setOption('width', 480) .setOption('title', 'Sample chart') .setOption('hAxis', { title: 'x axis', minValue: 0, maxValue: 20, titleTextStyle: { color: '#c0c0c0', fontSize: 20, italic: false, bold: false }, textStyle: { color: '#c0c0c0', fontSize: 12, bold: false, italic: false }, baselineColor: '#c0c0c0', gridlines: { color: '#c0c0c0', count: 4 } }) .setOption('vAxis', {title: 'y axis', minValue: 0, maxValue: 800, titleTextStyle: { color: '#c0c0c0', fontSize: 20, italic: false, bold: false }, textStyle: { color: '#c0c0c0', fontSize: 12, bold: false, italic: false }, baselineColor: '#c0c0c0', gridlines: { color: '#c0c0c0', count: 4 } }) .setOption('legend', { position: 'right', textStyle: { color: 'yellow', fontSize: 16 } }) .build(); sheet.insertChart(chart); Reference pages are here and here.
-  </p>
-
-  
-</article>
-
-  
 </div>
 
 </div>
@@ -419,4 +418,5 @@
 
 </body>
 </html>
+
 

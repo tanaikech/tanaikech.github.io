@@ -7,8 +7,123 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Tue, 16 May 2017 11:42:56 +0900</lastBuildDate>
+    <lastBuildDate>Fri, 26 May 2017 11:59:06 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/tags/spreadsheet/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Embedding a Chart to a Cell using Custom Function on Spreadsheet</title>
+      <link>https://tanaikech.github.io/2017/05/26/embedding-a-chart-to-a-cell-using-custom-function-on-spreadsheet</link>
+      <pubDate>Fri, 26 May 2017 11:59:06 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/05/26/embedding-a-chart-to-a-cell-using-custom-function-on-spreadsheet</guid>
+      <description>
+
+&lt;p&gt;This sample script embeds a chart to a cell using custom function on Spreadsheet.&lt;/p&gt;
+
+&lt;p&gt;I think that this method is one of various ideas.&lt;/p&gt;
+
+&lt;h2 id=&#34;problem&#34;&gt;Problem&lt;/h2&gt;
+
+&lt;p&gt;When you want to create a chart and embed it to a cell using custom functions, you notice that &lt;code&gt;insertChart()&lt;/code&gt; cannot be used. There are some limitations for using custom functions. But &lt;code&gt;insertChart()&lt;/code&gt; creates floating charts. So in order to embed a chart to a cell, the function &lt;code&gt;=IMAGE()&lt;/code&gt; is suitable for this situation. Here, &lt;code&gt;setFormula()&lt;/code&gt; for setting &lt;code&gt;=IMAGE()&lt;/code&gt; and &lt;code&gt;DriveApp.createFile()&lt;/code&gt; for creating images from charts also cannot be used for custom functions.&lt;/p&gt;
+
+&lt;h2 id=&#34;solution&#34;&gt;Solution&lt;/h2&gt;
+
+&lt;p&gt;In order to avoid these limitations, I used &lt;a href=&#34;https://developers.google.com/apps-script/guides/web&#34;&gt;Web Apps&lt;/a&gt;. From previous research, it has been found that Web Apps can avoid various limitations. Also in the case of this situation, Web Apps could avoid the above limitations.&lt;/p&gt;
+
+&lt;p&gt;To use this sample script, please deploy Web Apps as follows.&lt;/p&gt;
+
+&lt;p&gt;On the Script Editor,&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;File
+
+&lt;ul&gt;
+&lt;li&gt;-&amp;gt; Manage Versions&lt;/li&gt;
+&lt;li&gt;-&amp;gt; Save New Version&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Publish
+
+&lt;ul&gt;
+&lt;li&gt;-&amp;gt; Deploy as Web App&lt;/li&gt;
+&lt;li&gt;-&amp;gt; At Execute the app as, select &lt;strong&gt;&amp;ldquo;your account&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;-&amp;gt; At Who has access to the app, select &lt;strong&gt;&amp;ldquo;Anyone, even anonymous&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;-&amp;gt; Click &lt;strong&gt;&amp;ldquo;Deploy&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;-&amp;gt; Copy &lt;strong&gt;&amp;ldquo;Current web app URL&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;-&amp;gt; Click &lt;strong&gt;&amp;ldquo;OK&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;When it deploys Web Apps, the approval required authorization can be done, simultaneously.&lt;/p&gt;
+
+&lt;h2 id=&#34;sample-script&#34;&gt;Sample Script :&lt;/h2&gt;
+
+&lt;p&gt;Please copy and paste this script to a bound script of spreadsheet.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;var folderId = &amp;quot;### Folder ID ###&amp;quot;;
+var webappsurl = &amp;quot;https://script.google.com/macros/s/######/exec&amp;quot;;
+
+function embedChart(range) {
+  var ac = SpreadsheetApp.getActiveSheet().getActiveCell();
+  var q1 = &amp;quot;?datarange=&amp;quot; + range;
+  var q2 = &amp;quot;&amp;amp;row=&amp;quot; + ac.getRow();
+  var q3 = &amp;quot;&amp;amp;col=&amp;quot; + ac.getColumn();
+  var url = webappsurl + q1 + q2 + q3;
+  UrlFetchApp.fetch(url);
+}
+
+function doGet(e) {
+  var sheet = SpreadsheetApp.getActiveSheet();
+  var chart = sheet.newChart()
+    .setChartType(Charts.ChartType.PIE)
+    .addRange(sheet.getRange(e.parameters.datarange))
+    .setOption(&#39;height&#39;, 280)
+    .setOption(&#39;width&#39;, 480)
+    .setOption(&#39;title&#39;, &#39;Sample chart&#39;)
+    .build();
+  var file = DriveApp.getFolderById(folderId).createFile(
+    chart.getAs(&#39;image/png&#39;).setName(&amp;quot;chart_image.png&amp;quot;)
+  );
+  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  sheet.getRange(e.parameters.row, e.parameters.col).setFormula(
+    &#39;=IMAGE(&amp;quot;&#39; + &amp;quot;http://drive.google.com/uc?id=&amp;quot; + file.getId() + &#39;&amp;quot;)&#39;
+  );
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;flow-of-script&#34;&gt;Flow of Script :&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;embedChart()&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Input &lt;code&gt;=embedChart(&amp;quot;a2:a6&amp;quot;)&lt;/code&gt; in cell &lt;code&gt;B7&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Using &lt;code&gt;fetch()&lt;/code&gt;, sends data of &lt;code&gt;a2:a6&lt;/code&gt; and the inputted coordinate to &lt;code&gt;doGet()&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;strong&gt;doGet()&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Using &lt;code&gt;doGet()&lt;/code&gt;, get the data.&lt;/li&gt;
+&lt;li&gt;Creates a chart using inputted range &lt;code&gt;a2:a6&lt;/code&gt;. (in this case, creates a pie chart)&lt;/li&gt;
+&lt;li&gt;Saves a chart as an image.  (in this case, saves as PNG)&lt;/li&gt;
+&lt;li&gt;Updates a permission of the image file to use for &lt;code&gt;=IMAGE()&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Embeds the image using &lt;code&gt;=IMAGE()&lt;/code&gt; which was imported by &lt;code&gt;setFormula()&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;result&#34;&gt;Result :&lt;/h2&gt;
+
+&lt;p&gt;By inputting &lt;code&gt;=embedChart(&amp;quot;a2:a6&amp;quot;)&lt;/code&gt; in cell &lt;code&gt;B7&lt;/code&gt; as a custom function, following result can be obtained.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170526a.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;note&#34;&gt;Note :&lt;/h2&gt;
+
+&lt;ol&gt;
+&lt;li&gt;When the custom function &lt;code&gt;embedChart()&lt;/code&gt; is used, loading time is about 40 seconds. (I don&amp;rsquo;t know whether this occurs only my environment.)&lt;/li&gt;
+&lt;li&gt;Permissions of the created image are &lt;a href=&#34;https://developers.google.com/apps-script/reference/drive/access&#34;&gt;ANYONE_WITH_LINK&lt;/a&gt;, &lt;a href=&#34;https://developers.google.com/apps-script/reference/drive/permission&#34;&gt;VIEW&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;embedChart()&lt;/code&gt; is overwritten by &lt;code&gt;=IMAGE()&lt;/code&gt;. So when the spreadsheet is reopened, the response of &lt;code&gt;=IMAGE()&lt;/code&gt; is much faster than that of &lt;code&gt;embedChart()&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
     
     <item>
       <title>Changing Line to Bars for Combo Chart using GAS</title>
