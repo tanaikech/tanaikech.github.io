@@ -7,8 +7,52 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Fri, 02 Jun 2017 11:56:30 +0900</lastBuildDate>
+    <lastBuildDate>Fri, 02 Jun 2017 17:22:13 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Changing from &#39;float64&#39; to &#39;int&#39; for Values did Unmarshal using &#39;map[string]interface{}&#39;</title>
+      <link>https://tanaikech.github.io/2017/06/02/changing-from-float64-to-int-for-values-did-unmarshal-using-mapstringinterface</link>
+      <pubDate>Fri, 02 Jun 2017 17:22:13 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/06/02/changing-from-float64-to-int-for-values-did-unmarshal-using-mapstringinterface</guid>
+      <description>&lt;p&gt;This sample is for changing from &amp;ldquo;float64&amp;rdquo; to &amp;ldquo;int&amp;rdquo; for values did unmarshal using &lt;code&gt;map[string]interface{}&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;When it did unmarshal using map[string]interface{}, a number with &amp;ldquo;int&amp;rdquo; was changed to &amp;ldquo;float64&amp;rdquo;. And it shows an error as follows.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Error :&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;panic: interface conversion: interface {} is float64, not int
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;Sample Script :&lt;/strong&gt;
+It solves using following script.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;package main
+
+import (
+    &amp;quot;encoding/json&amp;quot;
+    &amp;quot;fmt&amp;quot;
+    &amp;quot;reflect&amp;quot;
+)
+
+func main() {
+    data := `{&amp;quot;key&amp;quot;: 10}`
+    var i map[string]interface{}
+    json.Unmarshal([]byte(data), &amp;amp;i)
+
+    val1 := i[&amp;quot;key&amp;quot;]
+    fmt.Printf(&amp;quot;%v, %v\n&amp;quot;, val1, reflect.TypeOf(val1)) // 10, float64
+
+    i[&amp;quot;key&amp;quot;] = int(i[&amp;quot;key&amp;quot;].(float64))
+    val2 := i[&amp;quot;key&amp;quot;]
+    fmt.Printf(&amp;quot;%v, %v\n&amp;quot;, val2, reflect.TypeOf(val2)) // 10, int
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://play.golang.org/p/kHroZ1rHVQ&#34;&gt;Go Playground&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Replacing JSON Key by Golang</title>
@@ -804,44 +848,6 @@ for i := 1; i &amp;lt;= 5; i++ {
       &amp;quot;C_key&amp;quot;: &amp;quot;value&amp;quot;
     }
   }
-}
-&lt;/code&gt;&lt;/pre&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Changing Slack Status using Google Apps Script</title>
-      <link>https://tanaikech.github.io/2017/05/09/changing-slack-status-using-google-apps-script</link>
-      <pubDate>Tue, 09 May 2017 10:58:37 +0900</pubDate>
-      
-      <guid>https://tanaikech.github.io/2017/05/09/changing-slack-status-using-google-apps-script</guid>
-      <description>&lt;p&gt;This script changes slack status using GAS. If you want to change it on time you decided, it can be achieved by installing this method as a trigger.&lt;/p&gt;
-
-&lt;p&gt;In order to use this, the required scope is &lt;strong&gt;&lt;code&gt;users.profile:write&lt;/code&gt;&lt;/strong&gt;.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function setSlackStatus(token, user, status_text, status_emoji) {
-  return UrlFetchApp.fetch(
-    &#39;https://slack.com/api/users.profile.set&#39;,
-    {
-      method: &#39;post&#39;,
-      payload: {
-        token: token,
-        user: user,
-        profile: JSON.stringify({status_text: status_text, status_emoji: status_emoji})
-      },
-      muteHttpExceptions: true
-    }
-  ).getContentText();
-}
-
-function main() {
-  var res = setSlackStatus(
-    &#39;### Your access token ###&#39;,
-    &#39;### User ID ###&#39;,
-    &#39;sample&#39;,
-    &#39;:coffee:&#39;
-  );
-  Logger.log(res)
 }
 &lt;/code&gt;&lt;/pre&gt;
 </description>
