@@ -7,8 +7,69 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Sun, 21 May 2017 11:55:34 +0900</lastBuildDate>
+    <lastBuildDate>Fri, 02 Jun 2017 10:59:31 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/topics/gotips/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Splitting Command-Line Arguments by Golang</title>
+      <link>https://tanaikech.github.io/2017/06/02/splitting-command-line-arguments-by-golang</link>
+      <pubDate>Fri, 02 Jun 2017 10:59:31 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/06/02/splitting-command-line-arguments-by-golang</guid>
+      <description>
+
+&lt;p&gt;This sample script is for splitting command-line arguments by golang. There are 2 types. One is the regular expression is used. Another is that &lt;code&gt;Split()&lt;/code&gt; and &lt;code&gt;TrimSpace()&lt;/code&gt; are used.&lt;/p&gt;
+
+&lt;p&gt;Here, each process speed was compared.&lt;/p&gt;
+
+&lt;h2 id=&#34;script&#34;&gt;Script :&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;package main
+
+import (
+    &amp;quot;regexp&amp;quot;
+    &amp;quot;strings&amp;quot;
+    &amp;quot;testing&amp;quot;
+)
+
+func BenchmarkB1(b *testing.B) {
+    str := &amp;quot;test1.txt, test2.txt&amp;quot;
+    b.ResetTimer()
+    for i := 0; i &amp;lt; b.N; i++ {
+        ar := regexp.MustCompile(`\s*,\s*`).Split(str, -1)
+        var result []string
+        for _, x := range ar {
+            result = append(result, x) // --&amp;gt; &#39;test.js&#39;, &#39;test2.py&#39;
+        }
+        _ = result
+    }
+}
+
+func BenchmarkB2(b *testing.B) {
+    str := &amp;quot;test1.txt, test2.txt&amp;quot;
+    b.ResetTimer()
+    for i := 0; i &amp;lt; b.N; i++ {
+        ar := strings.Split(str, &amp;quot;,&amp;quot;)
+        var result []string
+        for _, x := range ar {
+            result = append(result, strings.TrimSpace(x)) // --&amp;gt; &#39;test.js&#39;, &#39;test2.py&#39;
+        }
+        _ = result
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;result&#34;&gt;Result :&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$ go test -bench .
+BenchmarkB1-4             100000             13048 ns/op
+BenchmarkB2-4            3000000               399 ns/op
+PASS
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Just as expected, the regular expression was slow. And it&amp;rsquo;s much slower than that of &lt;code&gt;Split()&lt;/code&gt; and &lt;code&gt;TrimSpace()&lt;/code&gt;.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Decoding JSON by Golang</title>

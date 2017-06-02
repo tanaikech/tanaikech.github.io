@@ -7,8 +7,69 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Sun, 28 May 2017 14:20:08 +0900</lastBuildDate>
+    <lastBuildDate>Fri, 02 Jun 2017 10:59:31 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Splitting Command-Line Arguments by Golang</title>
+      <link>https://tanaikech.github.io/2017/06/02/splitting-command-line-arguments-by-golang</link>
+      <pubDate>Fri, 02 Jun 2017 10:59:31 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/06/02/splitting-command-line-arguments-by-golang</guid>
+      <description>
+
+&lt;p&gt;This sample script is for splitting command-line arguments by golang. There are 2 types. One is the regular expression is used. Another is that &lt;code&gt;Split()&lt;/code&gt; and &lt;code&gt;TrimSpace()&lt;/code&gt; are used.&lt;/p&gt;
+
+&lt;p&gt;Here, each process speed was compared.&lt;/p&gt;
+
+&lt;h2 id=&#34;script&#34;&gt;Script :&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;package main
+
+import (
+    &amp;quot;regexp&amp;quot;
+    &amp;quot;strings&amp;quot;
+    &amp;quot;testing&amp;quot;
+)
+
+func BenchmarkB1(b *testing.B) {
+    str := &amp;quot;test1.txt, test2.txt&amp;quot;
+    b.ResetTimer()
+    for i := 0; i &amp;lt; b.N; i++ {
+        ar := regexp.MustCompile(`\s*,\s*`).Split(str, -1)
+        var result []string
+        for _, x := range ar {
+            result = append(result, x) // --&amp;gt; &#39;test.js&#39;, &#39;test2.py&#39;
+        }
+        _ = result
+    }
+}
+
+func BenchmarkB2(b *testing.B) {
+    str := &amp;quot;test1.txt, test2.txt&amp;quot;
+    b.ResetTimer()
+    for i := 0; i &amp;lt; b.N; i++ {
+        ar := strings.Split(str, &amp;quot;,&amp;quot;)
+        var result []string
+        for _, x := range ar {
+            result = append(result, strings.TrimSpace(x)) // --&amp;gt; &#39;test.js&#39;, &#39;test2.py&#39;
+        }
+        _ = result
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;result&#34;&gt;Result :&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$ go test -bench .
+BenchmarkB1-4             100000             13048 ns/op
+BenchmarkB2-4            3000000               399 ns/op
+PASS
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Just as expected, the regular expression was slow. And it&amp;rsquo;s much slower than that of &lt;code&gt;Split()&lt;/code&gt; and &lt;code&gt;TrimSpace()&lt;/code&gt;.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Updated ggsrun to v121</title>
@@ -804,66 +865,6 @@ function main() {
   );
   Logger.log(res)
 }
-&lt;/code&gt;&lt;/pre&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Delete Line Feed Code by DOS and Bash</title>
-      <link>https://tanaikech.github.io/2017/05/09/delete-line-feed-code-by-dos-and-bash</link>
-      <pubDate>Tue, 09 May 2017 09:36:43 +0900</pubDate>
-      
-      <guid>https://tanaikech.github.io/2017/05/09/delete-line-feed-code-by-dos-and-bash</guid>
-      <description>
-
-&lt;h3 id=&#34;input-json&#34;&gt;Input JSON&lt;/h3&gt;
-
-&lt;p&gt;&lt;strong&gt;text.txt :&lt;/strong&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;{
-  &amp;quot;values&amp;quot;: [
-    [
-      &amp;quot;a1&amp;quot;,
-      &amp;quot;b1&amp;quot;,
-      &amp;quot;c1&amp;quot;
-    ],
-    [
-      &amp;quot;a2&amp;quot;,
-      &amp;quot;b2&amp;quot;,
-      &amp;quot;c2&amp;quot;
-    ],
-    [
-      &amp;quot;a3&amp;quot;,
-      &amp;quot;b3&amp;quot;,
-      &amp;quot;c3&amp;quot;
-    ],
-    [
-      &amp;quot;a4&amp;quot;,
-      &amp;quot;b4&amp;quot;,
-      &amp;quot;c4&amp;quot;
-    ],
-    [
-      &amp;quot;a5&amp;quot;,
-      &amp;quot;b5&amp;quot;,
-      &amp;quot;c5&amp;quot;
-    ]
-  ]
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;windows-dos&#34;&gt;Windows DOS&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;type text.txt | jq -c &amp;quot;.&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;linux-bash&#34;&gt;Linux Bash&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$ cat text.txt | jq -c &#39;.&#39;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;output-json&#34;&gt;Output JSON&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;{&amp;quot;values&amp;quot;:[[&amp;quot;a1&amp;quot;,&amp;quot;b1&amp;quot;,&amp;quot;c1&amp;quot;],[&amp;quot;a2&amp;quot;,&amp;quot;b2&amp;quot;,&amp;quot;c2&amp;quot;],[&amp;quot;a3&amp;quot;,&amp;quot;b3&amp;quot;,&amp;quot;c3&amp;quot;],[&amp;quot;a4&amp;quot;,&amp;quot;b4&amp;quot;,&amp;quot;c4&amp;quot;],[&amp;quot;a5&amp;quot;,&amp;quot;b5&amp;quot;,&amp;quot;c5&amp;quot;]]}
 &lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>
