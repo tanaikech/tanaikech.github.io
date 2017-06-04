@@ -7,8 +7,84 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Sun, 04 Jun 2017 12:02:28 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 04 Jun 2017 18:15:37 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/tags/google-apps-script/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Retirving All files in Folder with Spreadsheet</title>
+      <link>https://tanaikech.github.io/2017/06/04/retirving-all-files-in-folder-with-spreadsheet</link>
+      <pubDate>Sun, 04 Jun 2017 18:15:37 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/06/04/retirving-all-files-in-folder-with-spreadsheet</guid>
+      <description>
+
+&lt;p&gt;This sample retrieves all files in a folder with spreadsheet. When there are some folders in the folder with spreadsheet, this script can retrieve all files in all folders. This script has to be a container-bound script for spreadsheet.&lt;/p&gt;
+
+&lt;h2 id=&#34;script&#34;&gt;Script :&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function getFileList(){
+  var folderlist = (function(folder, folderSt, results){
+    var ar = [];
+    var folders = folder.getFolders();
+    while(folders.hasNext()) ar.push(folders.next());
+    folderSt += folder.getId() + &amp;quot;#_aabbccddee_#&amp;quot;;
+    var array_folderSt = folderSt.split(&amp;quot;#_aabbccddee_#&amp;quot;);
+    array_folderSt.pop()
+    results.push(array_folderSt);
+    ar.length == 0 &amp;amp;&amp;amp; (folderSt = &amp;quot;&amp;quot;);
+    for (var i in ar) arguments.callee(ar[i], folderSt, results);
+    return results;
+  })(DriveApp.getFolderById(
+    DriveApp.getFileById(
+      SpreadsheetApp.getActiveSpreadsheet().getId()
+    ).getParents().next().getId()
+  ),&amp;quot;&amp;quot;,[]);
+  var filelist = {};
+  for (var i in folderlist){
+    var folderid = folderlist[i][folderlist[i].length - 1];
+    var temp = [];
+    var files = DriveApp.getFolderById(folderid).getFiles();
+    while(files.hasNext()){
+      var file = files.next();
+      temp.push({
+        &amp;quot;file_name&amp;quot;: file.getName(),
+        &amp;quot;file_id&amp;quot;: file.getId()
+      });
+    }
+    filelist[folderid] = temp;
+  }
+  return filelist;
+}
+
+function main(){
+  var filelist = getFileList();
+  Logger.log(JSON.stringify(filelist))
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;result&#34;&gt;Result :&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;{
+  &amp;quot;### ID for foldername1 ###&amp;quot;: [
+    {
+      &amp;quot;file_name&amp;quot;: &amp;quot;### filename1 ###&amp;quot;,
+      &amp;quot;file_id&amp;quot;: &amp;quot;### ID for filename1 ###&amp;quot;
+    },
+    {
+      &amp;quot;file_name&amp;quot;: &amp;quot;### filename2 ###&amp;quot;,
+      &amp;quot;file_id&amp;quot;: &amp;quot;### ID for filename2 ###&amp;quot;
+    }
+  ],
+  &amp;quot;### ID for foldername2 ###&amp;quot;: [
+    {
+      &amp;quot;file_name&amp;quot;: &amp;quot;### filename3 ###&amp;quot;,
+      &amp;quot;file_id&amp;quot;: &amp;quot;### ID for filename3 ###&amp;quot;
+    }
+  ]
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
     
     <item>
       <title>Embedding a Map to a Cell using Custom Function on Spreadsheet</title>
@@ -967,67 +1043,6 @@ DriveApp.getFolderById(folderId)
 &lt;p&gt;You can see the detail information at &lt;a href=&#34;https://github.com/tanaikech/CreateImg&#34;&gt;https://github.com/tanaikech/CreateImg&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;There is a part where I would like to improve in this library. That&amp;rsquo;s &lt;code&gt;convByteSlice()&lt;/code&gt;. I think that there is the method to be faster about the part. If you know much about the logical operation using GAS, if you teach me about the improvements. I&amp;rsquo;m so glad.&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Comprehension of GAS</title>
-      <link>https://tanaikech.github.io/2017/04/17/comprehension-of-gas</link>
-      <pubDate>Mon, 17 Apr 2017 08:16:36 +0900</pubDate>
-      
-      <guid>https://tanaikech.github.io/2017/04/17/comprehension-of-gas</guid>
-      <description>
-
-&lt;p&gt;Here, I would like to introduce a comprehension of GAS.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Input :&lt;/strong&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;var data = [[[0], [1], [2], [3]], [[4], [5], [6], [7]]];
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;strong&gt;Output :&lt;/strong&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;[[0.0, 2.0], [0.0, 2.0]]
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;pattern-1&#34;&gt;Pattern 1&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;var a = [];
-for (var i=0; i&amp;lt;data.length; i++) {
-  var temp = [];
-  for (var j=0; j&amp;lt;data[i].length; j++) {
-    if (data[i][j][0] % 2 == 0) temp.push(j);
-  }
-  a.push(temp);
-}
-Logger.log(a)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;pattern-2&#34;&gt;Pattern 2&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;var b = [];
-data.forEach(function(e1){
-  var temp = [];
-  e1.forEach(function(e2, i2){
-    if (e2[0] % 2 == 0) temp.push(parseInt(i2, 10));
-  });
-  b.push(temp);
-});
-Logger.log(b)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;pattern-3&#34;&gt;Pattern 3&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;var c = [[parseInt(i, 10) for (i in e) if (e[i][0] % 2 == 0)] for each (e in data)];
-Logger.log(c)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;GAS can use JavaScript 1.7. So it can write as above.&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;In the case of &lt;code&gt;[i for (i in array)]&lt;/code&gt;, &lt;code&gt;i&lt;/code&gt; is index. But it&amp;rsquo;s string.&lt;/li&gt;
-&lt;li&gt;In the case of &lt;code&gt;[i for each (i in array)]&lt;/code&gt;, &lt;code&gt;i&lt;/code&gt; is element.&lt;/li&gt;
-&lt;/ul&gt;
 </description>
     </item>
     

@@ -7,8 +7,84 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Sun, 04 Jun 2017 12:02:28 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 04 Jun 2017 18:15:37 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Retirving All files in Folder with Spreadsheet</title>
+      <link>https://tanaikech.github.io/2017/06/04/retirving-all-files-in-folder-with-spreadsheet</link>
+      <pubDate>Sun, 04 Jun 2017 18:15:37 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/06/04/retirving-all-files-in-folder-with-spreadsheet</guid>
+      <description>
+
+&lt;p&gt;This sample retrieves all files in a folder with spreadsheet. When there are some folders in the folder with spreadsheet, this script can retrieve all files in all folders. This script has to be a container-bound script for spreadsheet.&lt;/p&gt;
+
+&lt;h2 id=&#34;script&#34;&gt;Script :&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function getFileList(){
+  var folderlist = (function(folder, folderSt, results){
+    var ar = [];
+    var folders = folder.getFolders();
+    while(folders.hasNext()) ar.push(folders.next());
+    folderSt += folder.getId() + &amp;quot;#_aabbccddee_#&amp;quot;;
+    var array_folderSt = folderSt.split(&amp;quot;#_aabbccddee_#&amp;quot;);
+    array_folderSt.pop()
+    results.push(array_folderSt);
+    ar.length == 0 &amp;amp;&amp;amp; (folderSt = &amp;quot;&amp;quot;);
+    for (var i in ar) arguments.callee(ar[i], folderSt, results);
+    return results;
+  })(DriveApp.getFolderById(
+    DriveApp.getFileById(
+      SpreadsheetApp.getActiveSpreadsheet().getId()
+    ).getParents().next().getId()
+  ),&amp;quot;&amp;quot;,[]);
+  var filelist = {};
+  for (var i in folderlist){
+    var folderid = folderlist[i][folderlist[i].length - 1];
+    var temp = [];
+    var files = DriveApp.getFolderById(folderid).getFiles();
+    while(files.hasNext()){
+      var file = files.next();
+      temp.push({
+        &amp;quot;file_name&amp;quot;: file.getName(),
+        &amp;quot;file_id&amp;quot;: file.getId()
+      });
+    }
+    filelist[folderid] = temp;
+  }
+  return filelist;
+}
+
+function main(){
+  var filelist = getFileList();
+  Logger.log(JSON.stringify(filelist))
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;result&#34;&gt;Result :&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;{
+  &amp;quot;### ID for foldername1 ###&amp;quot;: [
+    {
+      &amp;quot;file_name&amp;quot;: &amp;quot;### filename1 ###&amp;quot;,
+      &amp;quot;file_id&amp;quot;: &amp;quot;### ID for filename1 ###&amp;quot;
+    },
+    {
+      &amp;quot;file_name&amp;quot;: &amp;quot;### filename2 ###&amp;quot;,
+      &amp;quot;file_id&amp;quot;: &amp;quot;### ID for filename2 ###&amp;quot;
+    }
+  ],
+  &amp;quot;### ID for foldername2 ###&amp;quot;: [
+    {
+      &amp;quot;file_name&amp;quot;: &amp;quot;### filename3 ###&amp;quot;,
+      &amp;quot;file_id&amp;quot;: &amp;quot;### ID for filename3 ###&amp;quot;
+    }
+  ]
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
     
     <item>
       <title>Embedding a Map to a Cell using Custom Function on Spreadsheet</title>
@@ -751,179 +827,6 @@ function sendMail() {
   MailApp.sendEmail(&amp;quot;### Your e-mail address ###&amp;quot;, &amp;quot;test mail&amp;quot;, &amp;quot;Spreadsheet was edited.&amp;quot;);
 }
 &lt;/code&gt;&lt;/pre&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>File Transfer for Google Drive Without Authorization</title>
-      <link>https://tanaikech.github.io/2017/05/10/file-transfer-for-google-drive-without-authorization</link>
-      <pubDate>Wed, 10 May 2017 13:28:28 +0900</pubDate>
-      
-      <guid>https://tanaikech.github.io/2017/05/10/file-transfer-for-google-drive-without-authorization</guid>
-      <description>
-
-&lt;h1 id=&#34;overview&#34;&gt;Overview&lt;/h1&gt;
-
-&lt;p&gt;In this article, I would like to introduce how to transfer files for Google Drive under no authorization.&lt;/p&gt;
-
-&lt;p&gt;This has also been published here. &lt;a href=&#34;https://github.com/tanaikech/FileTransfer&#34;&gt;https://github.com/tanaikech/FileTransfer&lt;/a&gt;&lt;/p&gt;
-
-&lt;h1 id=&#34;description&#34;&gt;Description&lt;/h1&gt;
-
-&lt;p&gt;When we download and upload files for Google Drive, it usually has to use Drive API. In order to use Drive API, access token is required. If you want to make your friends download and upload files for your Google Drive, the authorization process is to take time. So I proposal this.&lt;/p&gt;
-
-&lt;p&gt;As a sample, I introduce a script for downloading and uploading files using Web Apps. In this sample, it changes a file to a byte slice and send it as text data. Then, it reconstructs it. Of course, base64 encode can be used for this. But the data size for using base64 is much larger than that for using the byte slice.&lt;/p&gt;
-
-&lt;p&gt;At this method, the project files including GAS script cannot be downloaded. When a script file is uploaded, it is converted to text file which is not a project file of Google. When Google Docs can be downloaded using this method, those are downloaded as PDF file. docx, pptx and xlsx can be uploaded.&lt;/p&gt;
-
-&lt;p&gt;They say taht the limitation size of an uploading file is 24 MBytes. &lt;a href=&#34;http://stackoverflow.com/questions/38315816/max-size-for-post-request-sent-to-webapps&#34;&gt;Ref.&lt;/a&gt;&lt;/p&gt;
-
-&lt;h1 id=&#34;usage&#34;&gt;Usage&lt;/h1&gt;
-
-&lt;h2 id=&#34;1-u-deploy-web-apps-https-developers-google-com-apps-script-guides-web-u&#34;&gt;1. &lt;u&gt;&lt;a href=&#34;https://developers.google.com/apps-script/guides/web&#34;&gt;Deploy Web Apps&lt;/a&gt;&lt;/u&gt;&lt;/h2&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Open the Script Editor.&lt;/li&gt;
-&lt;li&gt;On the Script Editor
-
-&lt;ul&gt;
-&lt;li&gt;File -&amp;gt; Manage Versions -&amp;gt; Save New Version&lt;/li&gt;
-&lt;li&gt;Publish -&amp;gt; Deploy as Web App&lt;/li&gt;
-&lt;li&gt;At Execute the app as, select &lt;strong&gt;&amp;ldquo;your account&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;At Who has access to the app, select &lt;strong&gt;&amp;ldquo;Anyone, even anonymous&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;Click &amp;ldquo;Deploy&amp;rdquo;&lt;/li&gt;
-&lt;li&gt;Copy &lt;strong&gt;&amp;ldquo;Current web app URL&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;Click &amp;ldquo;OK&amp;rdquo;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2 id=&#34;2-paste-following-script-on-script-editor&#34;&gt;2. Paste following script on Script Editor.&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function doPost(e) {
-  if (e.parameters.method == &amp;quot;download&amp;quot;) {
-    try {
-      return (function(id){
-        var file = DriveApp.getFileById(id);
-        return ContentService
-              .createTextOutput(JSON.stringify({
-                size: file.getBlob().getBytes(),
-                name: file.getName(),
-                result: file.getName() + &amp;quot; (&amp;quot; + file.getBlob().getContentType() + &amp;quot;)&amp;quot;
-              }))
-              .setMimeType(ContentService.MimeType.JSON);
-      })(e.parameters.id);
-    } catch(err) {
-      return ContentService.createTextOutput(JSON.stringify({
-                result: err.message
-              }))
-              .setMimeType(ContentService.MimeType.JSON);
-    }
-  }
-
-  if (e.parameters.method == &amp;quot;upload&amp;quot;) {
-    try {
-      return ContentService
-              .createTextOutput(JSON.stringify({
-                result: (function(p){
-                  return DriveApp
-                    .createFile(
-                      Utilities.newBlob(
-                        [parseInt(i, 10) for each (i in p.file)],
-                        p.mime,
-                        p.name
-                      )
-                    )
-                    .getId();
-                })(e.parameters)
-              }))
-              .setMimeType(ContentService.MimeType.JSON);
-    } catch(err) {
-      return ContentService.createTextOutput(JSON.stringify({
-                result: err.message
-              }))
-              .setMimeType(ContentService.MimeType.JSON);
-    }
-  }
-
-  if (e.parameters.method == &amp;quot;delete&amp;quot;) {
-    try {
-      DriveApp.getFileById(e.parameters.id).setTrashed(true);
-      return ContentService.createTextOutput(JSON.stringify({
-                result: e.parameters.id + &amp;quot; was deleted.&amp;quot;
-              }))
-              .setMimeType(ContentService.MimeType.JSON);
-    } catch(err) {
-      return ContentService.createTextOutput(JSON.stringify({
-                result: err.message
-              }))
-              .setMimeType(ContentService.MimeType.JSON);
-    }
-  }
-
-  return ContentService.createTextOutput(&amp;quot;Did nothing.&amp;quot;);
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;3-at-local-pc-use-following-script&#34;&gt;3. At local pc, use following script.&lt;/h2&gt;
-
-&lt;p&gt;There are 3 methods of &lt;code&gt;download()&lt;/code&gt;, &lt;code&gt;upload()&lt;/code&gt; and &lt;code&gt;delete()&lt;/code&gt;. When you use those, please give a value of file ID to&lt;code&gt;download()&lt;/code&gt; and &lt;code&gt;delete()&lt;/code&gt;. Then please give file name to &lt;code&gt;upload()&lt;/code&gt;.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import mimetypes
-import numpy as np
-import requests
-
-# Please paste &amp;quot;Current web app URL&amp;quot; here.
-url = &amp;quot;https://script.google.com/macros/s/#####/exec&amp;quot;
-
-
-def download(fileid):
-    r = requests.post(
-        url,
-        data={&amp;quot;method&amp;quot;: &amp;quot;download&amp;quot;, &amp;quot;id&amp;quot;: fileid}
-    )
-    if len(r.json()[&amp;quot;name&amp;quot;]) &amp;gt; 0:
-        with open(r.json()[&amp;quot;name&amp;quot;], &amp;quot;bw&amp;quot;) as f:
-            f.write(np.array(r.json()[&amp;quot;size&amp;quot;], dtype=np.uint8))
-    return r.json()[&amp;quot;result&amp;quot;]
-
-
-def upload(filename):
-    with open(filename, &amp;quot;rb&amp;quot;) as f:
-        d = f.read()
-    r = requests.post(
-        url,
-        data={
-            &amp;quot;method&amp;quot;: &amp;quot;upload&amp;quot;,
-            &amp;quot;file&amp;quot;: [(-(i &amp;amp; 0b10000000) | (i &amp;amp; 0b01111111)) for i in d],
-            &amp;quot;name&amp;quot;: filename,
-            &amp;quot;mime&amp;quot;: mimetypes.guess_type(filename)[0]
-        }
-    )
-    return r.json()[&amp;quot;result&amp;quot;]
-
-
-def delete(fileid):
-    r = requests.post(
-        url,
-        data={&amp;quot;method&amp;quot;: &amp;quot;delete&amp;quot;, &amp;quot;id&amp;quot;: fileid}
-    )
-    return r.json()[&amp;quot;result&amp;quot;]
-
-def main():
-    fileid = &amp;quot;#####&amp;quot;
-    print(download(fileid))
-
-    filename = &amp;quot;#####&amp;quot;
-    print(upload(filename))
-
-    fileid = &amp;quot;#####&amp;quot;
-    print(delete(fileid))
-
-if __name__ == &#39;__main__&#39;:
-    main()
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Download files have no extension. So please add the extension for each mimeType to the files.&lt;/p&gt;
 </description>
     </item>
     

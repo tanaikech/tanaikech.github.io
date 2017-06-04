@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>File on tanaike</title>
+    <link>https://tanaikech.github.io/tags/file/</link>
+    <description>Recent content in File on tanaike</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <copyright>&amp;copy; 2016. All rights reserved.</copyright>
+    <lastBuildDate>Sun, 04 Jun 2017 18:15:37 +0900</lastBuildDate>
+    <atom:link href="https://tanaikech.github.io/tags/file/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Retirving All files in Folder with Spreadsheet</title>
+      <link>https://tanaikech.github.io/2017/06/04/retirving-all-files-in-folder-with-spreadsheet</link>
+      <pubDate>Sun, 04 Jun 2017 18:15:37 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/06/04/retirving-all-files-in-folder-with-spreadsheet</guid>
+      <description>
+
+&lt;p&gt;This sample retrieves all files in a folder with spreadsheet. When there are some folders in the folder with spreadsheet, this script can retrieve all files in all folders. This script has to be a container-bound script for spreadsheet.&lt;/p&gt;
+
+&lt;h2 id=&#34;script&#34;&gt;Script :&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function getFileList(){
+  var folderlist = (function(folder, folderSt, results){
+    var ar = [];
+    var folders = folder.getFolders();
+    while(folders.hasNext()) ar.push(folders.next());
+    folderSt += folder.getId() + &amp;quot;#_aabbccddee_#&amp;quot;;
+    var array_folderSt = folderSt.split(&amp;quot;#_aabbccddee_#&amp;quot;);
+    array_folderSt.pop()
+    results.push(array_folderSt);
+    ar.length == 0 &amp;amp;&amp;amp; (folderSt = &amp;quot;&amp;quot;);
+    for (var i in ar) arguments.callee(ar[i], folderSt, results);
+    return results;
+  })(DriveApp.getFolderById(
+    DriveApp.getFileById(
+      SpreadsheetApp.getActiveSpreadsheet().getId()
+    ).getParents().next().getId()
+  ),&amp;quot;&amp;quot;,[]);
+  var filelist = {};
+  for (var i in folderlist){
+    var folderid = folderlist[i][folderlist[i].length - 1];
+    var temp = [];
+    var files = DriveApp.getFolderById(folderid).getFiles();
+    while(files.hasNext()){
+      var file = files.next();
+      temp.push({
+        &amp;quot;file_name&amp;quot;: file.getName(),
+        &amp;quot;file_id&amp;quot;: file.getId()
+      });
+    }
+    filelist[folderid] = temp;
+  }
+  return filelist;
+}
+
+function main(){
+  var filelist = getFileList();
+  Logger.log(JSON.stringify(filelist))
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;result&#34;&gt;Result :&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;{
+  &amp;quot;### ID for foldername1 ###&amp;quot;: [
+    {
+      &amp;quot;file_name&amp;quot;: &amp;quot;### filename1 ###&amp;quot;,
+      &amp;quot;file_id&amp;quot;: &amp;quot;### ID for filename1 ###&amp;quot;
+    },
+    {
+      &amp;quot;file_name&amp;quot;: &amp;quot;### filename2 ###&amp;quot;,
+      &amp;quot;file_id&amp;quot;: &amp;quot;### ID for filename2 ###&amp;quot;
+    }
+  ],
+  &amp;quot;### ID for foldername2 ###&amp;quot;: [
+    {
+      &amp;quot;file_name&amp;quot;: &amp;quot;### filename3 ###&amp;quot;,
+      &amp;quot;file_id&amp;quot;: &amp;quot;### ID for filename3 ###&amp;quot;
+    }
+  ]
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
