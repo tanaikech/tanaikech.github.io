@@ -7,8 +7,156 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Mon, 05 Jun 2017 10:09:49 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 06 Jun 2017 07:53:57 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>OCR using Custom Function on Spreadsheet</title>
+      <link>https://tanaikech.github.io/2017/06/06/ocr-using-custom-function-on-spreadsheet</link>
+      <pubDate>Tue, 06 Jun 2017 07:53:57 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/06/06/ocr-using-custom-function-on-spreadsheet</guid>
+      <description>
+
+&lt;p&gt;This sample script performs OCR and imports resultant text to a cell using custom function on Spreadsheet.&lt;/p&gt;
+
+&lt;p&gt;Drive API has a function to do OCR. It was used for this sample.&lt;/p&gt;
+
+&lt;p&gt;I think that this method is one of various ideas.&lt;/p&gt;
+
+&lt;h2 id=&#34;problem&#34;&gt;Problem&lt;/h2&gt;
+
+&lt;p&gt;When OCR is performed and imported the result to a cell on spreadsheet, there are some limetations. &lt;code&gt;DriveApp&lt;/code&gt;, &lt;code&gt;UrlFetchApp&lt;/code&gt;, &lt;code&gt;setFormula()&lt;/code&gt; cannot be used for custom functions.&lt;/p&gt;
+
+&lt;h2 id=&#34;solution&#34;&gt;Solution&lt;/h2&gt;
+
+&lt;p&gt;In order to avoid these limitations, I used &lt;a href=&#34;https://developers.google.com/apps-script/guides/web&#34;&gt;Web Apps&lt;/a&gt;. From previous research, it has been found that Web Apps can avoid various limitations. Also in the case of this situation, Web Apps could avoid the above limitations.&lt;/p&gt;
+
+&lt;p&gt;To use this sample script, please deploy Web Apps as follows.&lt;/p&gt;
+
+&lt;p&gt;On the Script Editor,&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;File
+
+&lt;ul&gt;
+&lt;li&gt;-&amp;gt; Manage Versions&lt;/li&gt;
+&lt;li&gt;-&amp;gt; Save New Version&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Publish
+
+&lt;ul&gt;
+&lt;li&gt;-&amp;gt; Deploy as Web App&lt;/li&gt;
+&lt;li&gt;-&amp;gt; At Execute the app as, select &lt;strong&gt;&amp;ldquo;your account&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;-&amp;gt; At Who has access to the app, select &lt;strong&gt;&amp;ldquo;Anyone, even anonymous&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;-&amp;gt; Click &lt;strong&gt;&amp;ldquo;Deploy&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;-&amp;gt; Copy &lt;strong&gt;&amp;ldquo;Current web app URL&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;-&amp;gt; Click &lt;strong&gt;&amp;ldquo;OK&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;When it deploys Web Apps, the approval required authorization can be done, simultaneously.&lt;/p&gt;
+
+&lt;h2 id=&#34;sample-script&#34;&gt;Sample Script :&lt;/h2&gt;
+
+&lt;p&gt;Please copy and paste this script to a bound script of spreadsheet.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;var folderId = &amp;quot;### Folder ID ###&amp;quot;;
+
+function OCR(filename) {
+  var ac = SpreadsheetApp.getActiveSheet().getActiveCell();
+  var q1 = &amp;quot;?file=&amp;quot; + filename;
+  var q2 = &amp;quot;&amp;amp;row=&amp;quot; + ac.getRow();
+  var q3 = &amp;quot;&amp;amp;col=&amp;quot; + ac.getColumn();
+  var url = ScriptApp.getService().getUrl() + q1 + q2 + q3;
+  UrlFetchApp.fetch(url);
+}
+
+function doGet(e) {
+  var res = doOCR(e.parameters.file);
+  SpreadsheetApp
+  .getActiveSheet()
+  .getRange(e.parameters.row, e.parameters.col, 1, 2)
+  .setFormulas([[
+    &#39;=T(&amp;quot;&#39; + e.parameters.file + &#39;&amp;quot;)&#39;,
+    &#39;=T(&amp;quot;&#39; + res + &#39;&amp;quot;)&#39;
+  ]]);
+}
+
+function doOCR(src) {
+  var srcfile = DriveApp.getFilesByName(src).next();
+  var fileid = Drive.Files.insert(
+    {
+      title: srcfile.getName(),
+      mimeType: Drive.Files.get(srcfile.getId(), {fields: &amp;quot;mimeType&amp;quot;}).mimeType,
+      parents:  [{&amp;quot;id&amp;quot;: srcfile.getParents().next().getId()}]
+    },
+    srcfile.getBlob(),
+    {
+      ocr: true,
+      ocrLanguage: &#39;en&#39;
+    }
+  ).getId();
+  var textdata = UrlFetchApp.fetch(
+    &amp;quot;https://www.googleapis.com/drive/v3/files/&amp;quot; +
+    fileid +
+    &amp;quot;/export?mimeType=text/plain&amp;quot;,
+    {
+      headers : {Authorization: &amp;quot;Bearer &amp;quot; + ScriptApp.getOAuthToken()},
+      muteHttpExceptions : true
+    }
+  ).getContentText();
+  Drive.Files.remove(fileid);
+  return textdata.replace(&amp;quot;________________&amp;quot;, &amp;quot;&amp;quot;);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The text data obtained by OCR is included a text &lt;code&gt;&amp;quot;________________&amp;quot;&lt;/code&gt;. I don&amp;rsquo;t know the reason. But this can be remove using &lt;code&gt;replace()&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h3 id=&#34;flow-of-script&#34;&gt;Flow of Script :&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;OCR()&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Input &lt;code&gt;=OCR(&amp;quot;sample.png&amp;quot;)&lt;/code&gt; in cell &lt;code&gt;A1&lt;/code&gt;. &lt;code&gt;&amp;quot;sample.png&amp;quot;&lt;/code&gt; is a source image file. Also PDF files can be used for a source file. &lt;code&gt;&amp;quot;sample.png&amp;quot;&lt;/code&gt; is as follows.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170606a_sample.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Using &lt;code&gt;fetch()&lt;/code&gt;, sends data of &lt;code&gt;&amp;quot;sample.png&amp;quot;&lt;/code&gt; and the inputted coordinate to &lt;code&gt;doGet()&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;strong&gt;doGet()&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Using &lt;code&gt;doGet()&lt;/code&gt;, get the data.&lt;/li&gt;
+&lt;li&gt;The source file is converted to a Google Document using &lt;code&gt;Drive API&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;The created Document is converted to text data using &lt;code&gt;Drive API&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Imports the text data by &lt;code&gt;setFormula()&lt;/code&gt;. &lt;code&gt;setFormula()&lt;/code&gt; is used for overwriting &lt;code&gt;=OCR(&amp;quot;sample.png&amp;quot;)&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;result&#34;&gt;Result :&lt;/h2&gt;
+
+&lt;p&gt;By inputting &lt;code&gt;=OCR(&amp;quot;sample.png&amp;quot;)&lt;/code&gt; in cell &lt;code&gt;A1&lt;/code&gt; as a custom function, following result can be obtained.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170606b.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;note&#34;&gt;Note :&lt;/h2&gt;
+
+&lt;ol&gt;
+&lt;li&gt;When the custom function &lt;code&gt;OCR()&lt;/code&gt; is used, loading time is about 40 seconds. (I don&amp;rsquo;t know whether this occurs only my environment.)&lt;/li&gt;
+&lt;li&gt;Permissions of the created image are &lt;a href=&#34;https://developers.google.com/apps-script/reference/drive/access&#34;&gt;ANYONE_WITH_LINK&lt;/a&gt;, &lt;a href=&#34;https://developers.google.com/apps-script/reference/drive/permission&#34;&gt;VIEW&lt;/a&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;related-tips&#34;&gt;Related Tips&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://tanaikech.github.io/2017/05/26/embedding-a-chart-to-a-cell-using-custom-function-on-spreadsheet/&#34;&gt;Embedding a Chart to a Cell using Custom Function on Spreadsheet&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://tanaikech.github.io/2017/06/04/embedding-a-map-to-a-cell-using-custom-function-on-spreadsheet/&#34;&gt;Embedding a Map to a Cell using Custom Function on Spreadsheet&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
     
     <item>
       <title>Changing File Name and Reopening Renamed File by Sublime Text</title>
@@ -690,139 +838,6 @@ contentLength := res.Header.Get(&amp;quot;Content-Length&amp;quot;)
 &lt;p&gt;Today, it was updated to v1.0.1. Please check it out. &lt;a href=&#34;https://github.com/tanaikech/goris&#34;&gt;https://github.com/tanaikech/goris&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;When number of retrieved URLs is smaller than number of default output, an error had occurred. This was fixed.&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Changing Line to Bars for Combo Chart using GAS</title>
-      <link>https://tanaikech.github.io/2017/05/16/changing-line-to-bars-for-combo-chart-using-gas</link>
-      <pubDate>Tue, 16 May 2017 11:42:56 +0900</pubDate>
-      
-      <guid>https://tanaikech.github.io/2017/05/16/changing-line-to-bars-for-combo-chart-using-gas</guid>
-      <description>
-
-&lt;h2 id=&#34;sample-data&#34;&gt;Sample data&lt;/h2&gt;
-
-&lt;p&gt;This is a sample data for this sample script. The column B was created by the normal distribution formula, and the column C was created by multiplying random number for column B.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-csv&#34;&gt;A, B, C
-1.0, 0.0001, 0.0000
-1.5, 0.0009, 0.0006
-2.0, 0.0044, 0.0037
-2.5, 0.0175, 0.0133
-3.0, 0.0540, 0.0236
-3.5, 0.1296, 0.0533
-4.0, 0.2420, 0.0073
-4.5, 0.3522, 0.2468
-5.0, 0.3990, 0.0843
-5.5, 0.3522, 0.3352
-6.0, 0.2420, 0.2201
-6.5, 0.1296, 0.0607
-7.0, 0.0540, 0.0256
-7.5, 0.0175, 0.0006
-8.0, 0.0044, 0.0030
-8.5, 0.0009, 0.0005
-9.0, 0.0001, 0.0001
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;create-chart&#34;&gt;Create chart&lt;/h2&gt;
-
-&lt;p&gt;&lt;code&gt;createChart()&lt;/code&gt; creates a chart from data. A chart with 2 lines is created by this method.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function createChart(){
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var chart = sheet.newChart()
-    .setChartType(Charts.ChartType.COMBO)
-    .addRange(sheet.getRange(&#39;a1:a18&#39;))
-    .addRange(sheet.getRange(&#39;b1:b18&#39;))
-    .addRange(sheet.getRange(&#39;c1:c18&#39;))
-    .setPosition(5, 5, 0, 0)
-    .setOption(&#39;series&#39;, {
-      0:{type: &#39;line&#39;, color: &#39;red&#39;, curveType: &#39;function&#39;},
-      1:{type: &#39;line&#39;, color: &#39;blue&#39;, curveType: &#39;function&#39;},
-    })
-    .setOption(&#39;useFirstColumnAsDomain&#39;, true)
-    .setOption(&#39;height&#39;, 280)
-    .setOption(&#39;width&#39;, 480)
-    .setOption(&#39;title&#39;, &#39;Sample chart&#39;)
-    .setOption(&#39;vAxis&#39;, {
-      minValue: 0,
-      maxValue: 0.4,
-      gridlines: {
-        count: 10
-      }
-    })
-    .build();
-  sheet.insertChart(chart);
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;created-chart&#34;&gt;Created chart&lt;/h3&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170516_fig1.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;h3 id=&#34;note&#34;&gt;note&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;.setChartType(Charts.ChartType.COMBO)&lt;/code&gt; defines COMBO chart.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;.setOption(&#39;series&#39;, {})&lt;/code&gt; defines each type for range &lt;code&gt;&#39;b1:b18&#39;&lt;/code&gt; and &lt;code&gt;&#39;c1:c18&#39;&lt;/code&gt;.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;0:{}&lt;/code&gt; and &lt;code&gt;1:{}&lt;/code&gt; of &lt;code&gt;.setOption(&#39;series&#39;, {})&lt;/code&gt; mean range &lt;code&gt;&#39;b1:b18&#39;&lt;/code&gt; and &lt;code&gt;&#39;c1:c18&#39;&lt;/code&gt;, respectively.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;modify-chart&#34;&gt;Modify chart&lt;/h2&gt;
-
-&lt;p&gt;&lt;code&gt;modifyChart()&lt;/code&gt; modifies the chart with 2 lines. It modifies from red line to red bars.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function modifyChart(){
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var chart = sheet.getCharts()[0];
-  chart = chart.modify()
-    .setChartType(Charts.ChartType.COMBO)
-    .addRange(sheet.getRange(&#39;a1:a18&#39;))
-    .addRange(sheet.getRange(&#39;b1:b18&#39;))
-    .addRange(sheet.getRange(&#39;c1:c18&#39;))
-    .setPosition(5, 5, 0, 0)
-    .setOption(&#39;series&#39;, {
-      0:{type: &#39;bars&#39;, color: &#39;red&#39;},
-      1:{type: &#39;line&#39;, color: &#39;blue&#39;, curveType: &#39;function&#39;},
-    })
-    .setOption(&#39;useFirstColumnAsDomain&#39;, true)
-    .setOption(&#39;height&#39;, 280)
-    .setOption(&#39;width&#39;, 480)
-    .setOption(&#39;title&#39;, &#39;Sample chart&#39;)
-    .setOption(&#39;vAxis&#39;, {
-      minValue: 0,
-      maxValue: 0.4,
-      gridlines: {
-        count: 10
-      }
-    })
-    .build();
-  sheet.updateChart(chart);
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;modified-chart&#34;&gt;Modified chart&lt;/h3&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170516_fig2.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;h3 id=&#34;note-1&#34;&gt;note&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;0:{type: &#39;bars&#39;, color: &#39;red&#39;}&lt;/code&gt; was modified.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;reference&#34;&gt;Reference&lt;/h2&gt;
-
-&lt;p&gt;Reference pages are &lt;a href=&#34;https://developers.google.com/apps-script/reference/spreadsheet/embedded-line-chart-builder&#34;&gt;here&lt;/a&gt; and &lt;a href=&#34;https://developers.google.com/chart/interactive/docs/gallery/areachart#configuration-options&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
-
-&lt;h2 id=&#34;commission&#34;&gt;Commission&lt;/h2&gt;
-
-&lt;p&gt;This was accepted as a commission.&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;May 13, 2017, Dr. Mehmet TEKDAL (Çukurova University)&lt;/li&gt;
-&lt;/ul&gt;
 </description>
     </item>
     

@@ -7,8 +7,156 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Sun, 04 Jun 2017 12:02:28 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 06 Jun 2017 07:53:57 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/tags/spreadsheet/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>OCR using Custom Function on Spreadsheet</title>
+      <link>https://tanaikech.github.io/2017/06/06/ocr-using-custom-function-on-spreadsheet</link>
+      <pubDate>Tue, 06 Jun 2017 07:53:57 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/06/06/ocr-using-custom-function-on-spreadsheet</guid>
+      <description>
+
+&lt;p&gt;This sample script performs OCR and imports resultant text to a cell using custom function on Spreadsheet.&lt;/p&gt;
+
+&lt;p&gt;Drive API has a function to do OCR. It was used for this sample.&lt;/p&gt;
+
+&lt;p&gt;I think that this method is one of various ideas.&lt;/p&gt;
+
+&lt;h2 id=&#34;problem&#34;&gt;Problem&lt;/h2&gt;
+
+&lt;p&gt;When OCR is performed and imported the result to a cell on spreadsheet, there are some limetations. &lt;code&gt;DriveApp&lt;/code&gt;, &lt;code&gt;UrlFetchApp&lt;/code&gt;, &lt;code&gt;setFormula()&lt;/code&gt; cannot be used for custom functions.&lt;/p&gt;
+
+&lt;h2 id=&#34;solution&#34;&gt;Solution&lt;/h2&gt;
+
+&lt;p&gt;In order to avoid these limitations, I used &lt;a href=&#34;https://developers.google.com/apps-script/guides/web&#34;&gt;Web Apps&lt;/a&gt;. From previous research, it has been found that Web Apps can avoid various limitations. Also in the case of this situation, Web Apps could avoid the above limitations.&lt;/p&gt;
+
+&lt;p&gt;To use this sample script, please deploy Web Apps as follows.&lt;/p&gt;
+
+&lt;p&gt;On the Script Editor,&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;File
+
+&lt;ul&gt;
+&lt;li&gt;-&amp;gt; Manage Versions&lt;/li&gt;
+&lt;li&gt;-&amp;gt; Save New Version&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Publish
+
+&lt;ul&gt;
+&lt;li&gt;-&amp;gt; Deploy as Web App&lt;/li&gt;
+&lt;li&gt;-&amp;gt; At Execute the app as, select &lt;strong&gt;&amp;ldquo;your account&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;-&amp;gt; At Who has access to the app, select &lt;strong&gt;&amp;ldquo;Anyone, even anonymous&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;-&amp;gt; Click &lt;strong&gt;&amp;ldquo;Deploy&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;-&amp;gt; Copy &lt;strong&gt;&amp;ldquo;Current web app URL&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;-&amp;gt; Click &lt;strong&gt;&amp;ldquo;OK&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;When it deploys Web Apps, the approval required authorization can be done, simultaneously.&lt;/p&gt;
+
+&lt;h2 id=&#34;sample-script&#34;&gt;Sample Script :&lt;/h2&gt;
+
+&lt;p&gt;Please copy and paste this script to a bound script of spreadsheet.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;var folderId = &amp;quot;### Folder ID ###&amp;quot;;
+
+function OCR(filename) {
+  var ac = SpreadsheetApp.getActiveSheet().getActiveCell();
+  var q1 = &amp;quot;?file=&amp;quot; + filename;
+  var q2 = &amp;quot;&amp;amp;row=&amp;quot; + ac.getRow();
+  var q3 = &amp;quot;&amp;amp;col=&amp;quot; + ac.getColumn();
+  var url = ScriptApp.getService().getUrl() + q1 + q2 + q3;
+  UrlFetchApp.fetch(url);
+}
+
+function doGet(e) {
+  var res = doOCR(e.parameters.file);
+  SpreadsheetApp
+  .getActiveSheet()
+  .getRange(e.parameters.row, e.parameters.col, 1, 2)
+  .setFormulas([[
+    &#39;=T(&amp;quot;&#39; + e.parameters.file + &#39;&amp;quot;)&#39;,
+    &#39;=T(&amp;quot;&#39; + res + &#39;&amp;quot;)&#39;
+  ]]);
+}
+
+function doOCR(src) {
+  var srcfile = DriveApp.getFilesByName(src).next();
+  var fileid = Drive.Files.insert(
+    {
+      title: srcfile.getName(),
+      mimeType: Drive.Files.get(srcfile.getId(), {fields: &amp;quot;mimeType&amp;quot;}).mimeType,
+      parents:  [{&amp;quot;id&amp;quot;: srcfile.getParents().next().getId()}]
+    },
+    srcfile.getBlob(),
+    {
+      ocr: true,
+      ocrLanguage: &#39;en&#39;
+    }
+  ).getId();
+  var textdata = UrlFetchApp.fetch(
+    &amp;quot;https://www.googleapis.com/drive/v3/files/&amp;quot; +
+    fileid +
+    &amp;quot;/export?mimeType=text/plain&amp;quot;,
+    {
+      headers : {Authorization: &amp;quot;Bearer &amp;quot; + ScriptApp.getOAuthToken()},
+      muteHttpExceptions : true
+    }
+  ).getContentText();
+  Drive.Files.remove(fileid);
+  return textdata.replace(&amp;quot;________________&amp;quot;, &amp;quot;&amp;quot;);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The text data obtained by OCR is included a text &lt;code&gt;&amp;quot;________________&amp;quot;&lt;/code&gt;. I don&amp;rsquo;t know the reason. But this can be remove using &lt;code&gt;replace()&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h3 id=&#34;flow-of-script&#34;&gt;Flow of Script :&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;OCR()&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Input &lt;code&gt;=OCR(&amp;quot;sample.png&amp;quot;)&lt;/code&gt; in cell &lt;code&gt;A1&lt;/code&gt;. &lt;code&gt;&amp;quot;sample.png&amp;quot;&lt;/code&gt; is a source image file. Also PDF files can be used for a source file. &lt;code&gt;&amp;quot;sample.png&amp;quot;&lt;/code&gt; is as follows.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170606a_sample.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Using &lt;code&gt;fetch()&lt;/code&gt;, sends data of &lt;code&gt;&amp;quot;sample.png&amp;quot;&lt;/code&gt; and the inputted coordinate to &lt;code&gt;doGet()&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;strong&gt;doGet()&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Using &lt;code&gt;doGet()&lt;/code&gt;, get the data.&lt;/li&gt;
+&lt;li&gt;The source file is converted to a Google Document using &lt;code&gt;Drive API&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;The created Document is converted to text data using &lt;code&gt;Drive API&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Imports the text data by &lt;code&gt;setFormula()&lt;/code&gt;. &lt;code&gt;setFormula()&lt;/code&gt; is used for overwriting &lt;code&gt;=OCR(&amp;quot;sample.png&amp;quot;)&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;result&#34;&gt;Result :&lt;/h2&gt;
+
+&lt;p&gt;By inputting &lt;code&gt;=OCR(&amp;quot;sample.png&amp;quot;)&lt;/code&gt; in cell &lt;code&gt;A1&lt;/code&gt; as a custom function, following result can be obtained.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170606b.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;note&#34;&gt;Note :&lt;/h2&gt;
+
+&lt;ol&gt;
+&lt;li&gt;When the custom function &lt;code&gt;OCR()&lt;/code&gt; is used, loading time is about 40 seconds. (I don&amp;rsquo;t know whether this occurs only my environment.)&lt;/li&gt;
+&lt;li&gt;Permissions of the created image are &lt;a href=&#34;https://developers.google.com/apps-script/reference/drive/access&#34;&gt;ANYONE_WITH_LINK&lt;/a&gt;, &lt;a href=&#34;https://developers.google.com/apps-script/reference/drive/permission&#34;&gt;VIEW&lt;/a&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;related-tips&#34;&gt;Related Tips&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://tanaikech.github.io/2017/05/26/embedding-a-chart-to-a-cell-using-custom-function-on-spreadsheet/&#34;&gt;Embedding a Chart to a Cell using Custom Function on Spreadsheet&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://tanaikech.github.io/2017/06/04/embedding-a-map-to-a-cell-using-custom-function-on-spreadsheet/&#34;&gt;Embedding a Map to a Cell using Custom Function on Spreadsheet&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
     
     <item>
       <title>Embedding a Map to a Cell using Custom Function on Spreadsheet</title>
