@@ -187,50 +187,34 @@ function doOCR(src) {
       SpreadsheetApp.getActiveSpreadsheet().getId()
     ).getParents().next().getId()
   ),&amp;quot;&amp;quot;,[]);
-  var filelist = {};
+  var filelist = [];
   for (var i in folderlist){
     var folderid = folderlist[i][folderlist[i].length - 1];
     var temp = [];
-    var files = DriveApp.getFolderById(folderid).getFiles();
+    var folder = DriveApp.getFolderById(folderid);
+    var files = folder.getFiles();
+    var foldername = folder.getName();
     while(files.hasNext()){
       var file = files.next();
-      temp.push({
-        &amp;quot;file_name&amp;quot;: file.getName(),
-        &amp;quot;file_id&amp;quot;: file.getId()
-      });
+      temp.push([foldername, file.getName()]);
     }
-    filelist[folderid] = temp;
+    filelist.push(temp);
   }
-  return filelist;
+  return Array.prototype.concat.apply([], filelist);
 }
 
-function main(){
-  var filelist = getFileList();
-  Logger.log(JSON.stringify(filelist))
+function main() {
+  var data = getFileList();
+  var ss = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  ss.getRange(1,1,data.length,data[0].length).setValues(data);
 }
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;result&#34;&gt;Result :&lt;/h2&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;{
-  &amp;quot;### ID for foldername1 ###&amp;quot;: [
-    {
-      &amp;quot;file_name&amp;quot;: &amp;quot;### filename1 ###&amp;quot;,
-      &amp;quot;file_id&amp;quot;: &amp;quot;### ID for filename1 ###&amp;quot;
-    },
-    {
-      &amp;quot;file_name&amp;quot;: &amp;quot;### filename2 ###&amp;quot;,
-      &amp;quot;file_id&amp;quot;: &amp;quot;### ID for filename2 ###&amp;quot;
-    }
-  ],
-  &amp;quot;### ID for foldername2 ###&amp;quot;: [
-    {
-      &amp;quot;file_name&amp;quot;: &amp;quot;### filename3 ###&amp;quot;,
-      &amp;quot;file_id&amp;quot;: &amp;quot;### ID for filename3 ###&amp;quot;
-    }
-  ]
-}
-&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170604b.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;~~~&lt;/p&gt;
 </description>
     </item>
     

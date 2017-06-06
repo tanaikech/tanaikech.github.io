@@ -267,50 +267,34 @@
       SpreadsheetApp.getActiveSpreadsheet().getId()
     ).getParents().next().getId()
   ),&quot;&quot;,[]);
-  var filelist = {};
+  var filelist = [];
   for (var i in folderlist){
     var folderid = folderlist[i][folderlist[i].length - 1];
     var temp = [];
-    var files = DriveApp.getFolderById(folderid).getFiles();
+    var folder = DriveApp.getFolderById(folderid);
+    var files = folder.getFiles();
+    var foldername = folder.getName();
     while(files.hasNext()){
       var file = files.next();
-      temp.push({
-        &quot;file_name&quot;: file.getName(),
-        &quot;file_id&quot;: file.getId()
-      });
+      temp.push([foldername, file.getName()]);
     }
-    filelist[folderid] = temp;
+    filelist.push(temp);
   }
-  return filelist;
+  return Array.prototype.concat.apply([], filelist);
 }
 
-function main(){
-  var filelist = getFileList();
-  Logger.log(JSON.stringify(filelist))
+function main() {
+  var data = getFileList();
+  var ss = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  ss.getRange(1,1,data.length,data[0].length).setValues(data);
 }
 </code></pre>
 
 <h2 id="result">Result :</h2>
 
-<pre><code class="language-json">{
-  &quot;### ID for foldername1 ###&quot;: [
-    {
-      &quot;file_name&quot;: &quot;### filename1 ###&quot;,
-      &quot;file_id&quot;: &quot;### ID for filename1 ###&quot;
-    },
-    {
-      &quot;file_name&quot;: &quot;### filename2 ###&quot;,
-      &quot;file_id&quot;: &quot;### ID for filename2 ###&quot;
-    }
-  ],
-  &quot;### ID for foldername2 ###&quot;: [
-    {
-      &quot;file_name&quot;: &quot;### filename3 ###&quot;,
-      &quot;file_id&quot;: &quot;### ID for filename3 ###&quot;
-    }
-  ]
-}
-</code></pre>
+<p><img src="https://tanaikech.github.io/img/20170604b.png" alt="" /></p>
+
+<p>~~~</p>
 
 
   
