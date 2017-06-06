@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.16" />
 
-  <title>OCR using Custom Function on Spreadsheet &middot; tanaike</title>
+  <title>Embedding Animation GIF in A Cell on Spreadsheet &middot; tanaike</title>
 
   
   
@@ -200,7 +200,7 @@
 
 
 <div class="header">
-  <h1>OCR using Custom Function on Spreadsheet</h1>
+  <h1>Embedding Animation GIF in A Cell on Spreadsheet</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -209,7 +209,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>06 Jun 2017, 07:53</time>
+    <time>06 Jun 2017, 16:47</time>
   </div>
 
   
@@ -244,19 +244,28 @@
 
   
 
-<p>This sample script performs OCR and imports resultant text to a cell using custom function on Spreadsheet.</p>
-
-<p>Drive API has a function to do OCR. It was used for this sample.</p>
+<p>This sample script is for embedding animation GIF in a cell using custom function on Spreadsheet.</p>
 
 <p>I think that this method is one of various ideas.</p>
 
 <h2 id="problem">Problem</h2>
 
-<p>When OCR is performed and imported the result to a cell on spreadsheet, there are some limitations. <code>DriveApp</code>, <code>UrlFetchApp</code>, <code>setFormula()</code> cannot be used for custom functions.</p>
+<p>There are some limitations.</p>
+
+<ol>
+<li>Images of jpeg and png can be embedded in a cell using <code>=IMAGE()</code>. But when animation GIF is embedded using it, GIF is not played.</li>
+<li><code>insertImage()</code> can insert the animation GIF to sheet. But it is not imported to one cell. It floats on several cells.</li>
+<li>In order to float the animation GIF on one cell, the size of GIF has to be retrieved. But the size of image cannot be retrieved at spreadsheet APIs.</li>
+<li><code>=IMAGE()</code> and <code>insertImage()</code> cannot be used by custom functions.</li>
+</ol>
 
 <h2 id="solution">Solution</h2>
 
-<p>In order to avoid these limitations, I used <a href="https://developers.google.com/apps-script/guides/web">Web Apps</a>. From previous research, it has been found that Web Apps can avoid various limitations. Also in the case of this situation, Web Apps could avoid the above limitations.</p>
+<p>I thought a method to floating an animation GIF on one cell using <code>insertImage()</code>. By this, I thought that it will be easy to use as a sheet with GIF images.</p>
+
+<p>In order to retrieve the size of image, it uses Google Document APIs. Class InlineImage of Document APIs has <code>getHeight()</code> and <code>getWidth()</code>. By this, the image size can be retrieved, and the size of cell can be changed using this. Although I have tried to resize image using <code>setHeight()</code> and <code>setWidth()</code>, when the image resized using them is retrieved, the size was original one.</p>
+
+<p><code>insertImage()</code> can be used by Web Apps <a href="https://developers.google.com/apps-script/guides/web">Web Apps</a>. From previous research, it has been found that Web Apps can avoid various limitations. Also in the case of this situation, Web Apps could avoid the above limitations.</p>
 
 <p>To use this sample script, please deploy Web Apps as follows.</p>
 
@@ -287,9 +296,7 @@
 
 <p>Please copy and paste this script to a bound script of spreadsheet.</p>
 
-<pre><code class="language-javascript">var folderId = &quot;### Folder ID ###&quot;;
-
-function OCR(filename) {
+<pre><code class="language-javascript">function gif(filename) {
   var ac = SpreadsheetApp.getActiveSheet().getActiveCell();
   var q1 = &quot;?file=&quot; + filename;
   var q2 = &quot;&amp;row=&quot; + ac.getRow();
@@ -299,85 +306,70 @@ function OCR(filename) {
 }
 
 function doGet(e) {
-  var res = doOCR(e.parameters.file);
-  SpreadsheetApp
-  .getActiveSheet()
-  .getRange(e.parameters.row, e.parameters.col, 1, 2)
-  .setFormulas([[
-    '=T(&quot;' + e.parameters.file + '&quot;)',
-    '=T(&quot;' + res + '&quot;)'
-  ]]);
-}
-
-function doOCR(src) {
-  var srcfile = DriveApp.getFilesByName(src).next();
-  var fileid = Drive.Files.insert(
-    {
-      title: srcfile.getName(),
-      mimeType: Drive.Files.get(srcfile.getId(), {fields: &quot;mimeType&quot;}).mimeType,
+  var srcfile = DriveApp.getFilesByName(e.parameters.file).next();
+  srcfile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  var fileid = Drive.Files.insert({
+      title: &quot;temp&quot;,
+      mimeType: &quot;application/vnd.google-apps.document&quot;,
       parents:  [{&quot;id&quot;: srcfile.getParents().next().getId()}]
-    },
-    srcfile.getBlob(),
-    {
-      ocr: true,
-      ocrLanguage: 'en'
-    }
-  ).getId();
-  var textdata = UrlFetchApp.fetch(
-    &quot;https://www.googleapis.com/drive/v3/files/&quot; +
-    fileid +
-    &quot;/export?mimeType=text/plain&quot;,
-    {
-      headers : {Authorization: &quot;Bearer &quot; + ScriptApp.getOAuthToken()},
-      muteHttpExceptions : true
-    }
-  ).getContentText();
+  }).getId();
+  var img = DocumentApp.openById(fileid)
+            .insertImage(
+              0,
+              UrlFetchApp.fetch(Drive.Files.get(srcfile.getId())
+              .webContentLink)
+              .getBlob()
+            );
+  var sheet = SpreadsheetApp.getActiveSheet();
+  sheet.setRowHeight(e.parameters.row, img.getHeight() + 4);
+  sheet.setColumnWidth(e.parameters.col, img.getWidth() + 3);
+  sheet.getRange(e.parameters.row, e.parameters.col).setFormula(&quot;&quot;);
+  sheet.insertImage(Drive.Files.get(srcfile.getId()).webContentLink, e.parameters.row, e.parameters.col);
+  Utilities.sleep(1000);
   Drive.Files.remove(fileid);
-  return textdata.replace(&quot;________________&quot;, &quot;&quot;);
 }
 </code></pre>
 
-<p>The text data obtained by OCR is included a text <code>&quot;________________&quot;</code>. I don&rsquo;t know the reason. But this can be remove using <code>replace()</code>.</p>
-
 <h3 id="flow-of-script">Flow of Script :</h3>
 
-<p><strong>OCR()</strong></p>
+<p><strong>gif()</strong></p>
 
 <ol>
-<li>Input <code>=OCR(&quot;sample.png&quot;)</code> in cell <code>A1</code>. <code>&quot;sample.png&quot;</code> is a source image file. Also PDF files can be used for a source file. <code>&quot;sample.png&quot;</code> is as follows.</li>
-</ol>
-
-<p><img src="https://tanaikech.github.io/img/20170606a_sample.png" alt="" /></p>
-
-<ol>
-<li>Using <code>fetch()</code>, sends data of <code>&quot;sample.png&quot;</code> and the inputted coordinate to <code>doGet()</code>.</li>
+<li>Input <code>=gif(&quot;sample.gif&quot;)</code> in cell <code>B2</code>. <code>&quot;sample.gif&quot;</code> is an animation GIF.</li>
+<li>Using <code>fetch()</code>, sends data of <code>&quot;sample.gif&quot;</code> and the inputted coordinate to <code>doGet()</code>.</li>
 </ol>
 
 <p><strong>doGet()</strong></p>
 
 <ol>
 <li>Using <code>doGet()</code>, get the data.</li>
-<li>The source file is converted to a Google Document using <code>Drive API</code>.</li>
-<li>The created Document is converted to text data using <code>Drive API</code>.</li>
-<li>Imports the text data by <code>setFormula()</code>. <code>setFormula()</code> is used for overwriting <code>=OCR(&quot;sample.png&quot;)</code>.</li>
+<li>Update the permission of GIF.</li>
+<li>Create Document file as new file.</li>
+<li>Import GIF to the Document and retrieve the image size of GIF.</li>
+<li>Using the size, change the size of cell for importing GIF.</li>
+<li>Import GIF to the cell.</li>
+<li>Delete Document file.</li>
 </ol>
 
 <h2 id="result">Result :</h2>
 
-<p>By inputting <code>=OCR(&quot;sample.png&quot;)</code> in cell <code>A1</code> as a custom function, following result can be obtained.</p>
+<p>By inputting <code>=gif(&quot;sample.png&quot;)</code> in cell <code>B2</code> as a custom function, following result can be obtained.</p>
 
-<p><img src="https://tanaikech.github.io/img/20170606b.png" alt="" /></p>
+<p><strong>Although this demo movie seems short loading time, this loading time is edited. Actual loading time is about 40 seconds.</strong></p>
+
+<p><img src="https://tanaikech.github.io/img/20170606c_demo.gif" alt="" /></p>
 
 <h2 id="note">Note :</h2>
 
 <ol>
-<li>When the custom function <code>OCR()</code> is used, loading time is about 40 seconds. (I don&rsquo;t know whether this occurs only my environment.)</li>
-<li>Permissions of the created image are <a href="https://developers.google.com/apps-script/reference/drive/access">ANYONE_WITH_LINK</a>, <a href="https://developers.google.com/apps-script/reference/drive/permission">VIEW</a>.</li>
+<li>When the custom function <code>gif()</code> is used, loading time is about 40 seconds. (I don&rsquo;t know whether this occurs only my environment.)</li>
+<li>Permissions of GIF are <a href="https://developers.google.com/apps-script/reference/drive/access">ANYONE_WITH_LINK</a>, <a href="https://developers.google.com/apps-script/reference/drive/permission">VIEW</a>.</li>
 </ol>
 
 <h2 id="related-tips">Related Tips</h2>
 
 <ul>
+<li><a href="https://tanaikech.github.io/2017/06/06/ocr-using-custom-function-on-spreadsheet/">OCR using Custom Function on Spreadsheet</a></li>
 <li><a href="https://tanaikech.github.io/2017/05/26/embedding-a-chart-to-a-cell-using-custom-function-on-spreadsheet/">Embedding a Chart to a Cell using Custom Function on Spreadsheet</a></li>
 <li><a href="https://tanaikech.github.io/2017/06/04/embedding-a-map-to-a-cell-using-custom-function-on-spreadsheet/">Embedding a Map to a Cell using Custom Function on Spreadsheet</a></li>
 </ul>
@@ -387,13 +379,13 @@ function doOCR(src) {
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2017/06/05/changing-file-name-and-reopening-renamed-file-by-sublime-text"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2017/06/06/ocr-using-custom-function-on-spreadsheet"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2017/06/05/changing-file-name-and-reopening-renamed-file-by-sublime-text">Changing File Name and Reopening Renamed File by Sublime Text</a>
+      <a href="https://tanaikech.github.io/2017/06/06/ocr-using-custom-function-on-spreadsheet">OCR using Custom Function on Spreadsheet</a>
     </nav>
     
   </div>
@@ -402,14 +394,8 @@ function doOCR(src) {
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2017/06/06/embedding-animation-gif-in-a-cell-on-spreadsheet">Embedding Animation GIF in A Cell on Spreadsheet</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2017/06/06/embedding-animation-gif-in-a-cell-on-spreadsheet"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
