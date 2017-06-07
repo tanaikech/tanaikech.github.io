@@ -7,8 +7,118 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Tue, 06 Jun 2017 16:47:41 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 07 Jun 2017 09:21:54 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/topics/gastips/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Effect of Comprehension for GAS</title>
+      <link>https://tanaikech.github.io/2017/06/07/effect-of-comprehension-for-gas</link>
+      <pubDate>Wed, 07 Jun 2017 09:21:54 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/06/07/effect-of-comprehension-for-gas</guid>
+      <description>
+
+&lt;h1 id=&#34;description&#34;&gt;Description&lt;/h1&gt;
+
+&lt;p&gt;There are a limit executing time for Google Apps Script (GAS). It&amp;rsquo;s 6 minutes. So users have to pay attention to the process cost of the script. GAS can use JavaScript 1.7. This means to be able to be used comprehension for GAS.&lt;/p&gt;
+
+&lt;p&gt;In this report, the process cost for the comprehension has been investigated. The normal for loop was used as the competitor. As a result, it was found that the comprehension can be used one of methods for reducing the process cost. For 1 dimensional array, the process cost of comprehension is about &lt;strong&gt;60% lower&lt;/strong&gt; than that of the normal one. For 2 dimensional array, the process cost of comprehension is about &lt;strong&gt;50% lower&lt;/strong&gt; than that of the normal one. Each data is the average for 10 times measurements.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170607a_1d.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170607a_2d.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h1 id=&#34;sample-script&#34;&gt;Sample Script&lt;/h1&gt;
+
+&lt;p&gt;As a sample, 1 dimensional array and 2 dimensional array were used. The continuous number was imported to 1 dimensional array. For 2 dimensional array, the number of 1 to 100 was imported each element. As the calculation for measuring the process cost, when the element was multiples of 5, it was retrieved. These samples are GAS.&lt;/p&gt;
+
+&lt;h2 id=&#34;for-1d&#34;&gt;For 1D&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function make1dAr(row){
+  var ar = [];
+  for (var i=0; i&amp;lt;row; i++) {
+    ar[i] = i + 1;
+  }
+  return ar;
+}
+
+function comprehension1d(ar){
+  return [i for each (i in ar) if(i % 5 == 0)];
+}
+
+function normal1d(ar){
+  var result = [];
+  for (var i=0; i&amp;lt;ar.length; i++) {
+    if (ar[i] % 5 == 0) {
+      result.push(ar[i]);
+    }
+  }
+  return result;
+}
+
+function main1d() {
+  var data = make1dAr(1000000);
+
+  var start_P_time1 = Date.now();
+  var res = normal1d(data);
+  var end_P_time1 = Date.now();
+  Logger.log((end_P_time1 - start_P_time1)/1000 + &#39; [s]&#39;)
+
+  var start_P_time1 = Date.now();
+  var res = comprehension1d(data);
+  var end_P_time1 = Date.now();
+  Logger.log((end_P_time1 - start_P_time1)/1000 + &#39; [s]&#39;)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;for-2d&#34;&gt;For 2D&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function make2dAr(row){
+  var ar1 = [];
+  for (var i=0; i&amp;lt;row; i++) {
+    var ar2 = [];
+    for (var j=0; j&amp;lt;100; j++) {
+      ar2[j] = j + 1;
+    }
+    ar1[i] = ar2;
+  }
+  return ar1;
+}
+
+function comprehension2d(ar){
+  return [[j for each (j in i) if(j % 5 == 0)] for each (i in ar)];
+}
+
+function normal2d(ar){
+  var ar1 = [];
+  for (var i=0; i&amp;lt;ar.length; i++) {
+    var ar2 = [];
+    for (var j=0; j&amp;lt;ar[i].length; j++) {
+      if (ar[i][j] % 5 == 0) {
+        ar2.push(ar[i][j]);
+      }
+    }
+    ar1.push(ar2)
+  }
+  return ar1;
+}
+
+function main2d() {
+  var data = make2dAr(10000);
+
+  var start_P_time1 = Date.now();
+  var res = normal2d(data);
+  var end_P_time1 = Date.now();
+  Logger.log((end_P_time1 - start_P_time1)/1000 + &#39; [s]&#39;)
+
+  var start_P_time1 = Date.now();
+  var res = comprehension2d(data);
+  var end_P_time1 = Date.now();
+  Logger.log((end_P_time1 - start_P_time1)/1000 + &#39; [s]&#39;)
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
     
     <item>
       <title>Embedding Animation GIF in A Cell on Spreadsheet</title>
@@ -1143,67 +1253,6 @@ Logger.log(c)
 &lt;li&gt;In the case of &lt;code&gt;[i for (i in array)]&lt;/code&gt;, &lt;code&gt;i&lt;/code&gt; is index. But it&amp;rsquo;s string.&lt;/li&gt;
 &lt;li&gt;In the case of &lt;code&gt;[i for each (i in array)]&lt;/code&gt;, &lt;code&gt;i&lt;/code&gt; is element.&lt;/li&gt;
 &lt;/ul&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Creating Spreadsheet from Excel file</title>
-      <link>https://tanaikech.github.io/2017/04/15/creating-spreadsheet-from-excel-file</link>
-      <pubDate>Sat, 15 Apr 2017 10:39:05 +0900</pubDate>
-      
-      <guid>https://tanaikech.github.io/2017/04/15/creating-spreadsheet-from-excel-file</guid>
-      <description>
-
-&lt;p&gt;These scripts can be executed on Script Editor. But, in order to use these, you have to enable Drive API of Advanced Google services and of Google API Console. &amp;ldquo;Drive API v2&amp;rdquo; can be used at Google Apps Script by enabling Drive API of Advanced Google services and of Google API Console.&lt;/p&gt;
-
-&lt;p&gt;How to use it is as follows.&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;In the script editor, select Resources &amp;gt; Advanced Google services&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;In the dialog that appears, click the on/off switch for &lt;a href=&#34;https://developers.google.com/drive/v2/reference/&#34;&gt;Drive API v2&lt;/a&gt;.&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;At the bottom of the dialog, click the link for the Google API Console.&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;In the console, click into the filter box and type part of the name of the API &amp;ldquo;Drive API&amp;rdquo;, then click the name once you see it.&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;On the next screen, click Enable API.&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;Close the Developers Console and return to the script editor. Click OK in the dialog. The advanced service you enabled is now available in autocomplete.&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;The detail information is &lt;a href=&#34;https://developers.google.com/apps-script/guides/services/advanced&#34;&gt;https://developers.google.com/apps-script/guides/services/advanced&lt;/a&gt;.&lt;/p&gt;
-
-&lt;h3 id=&#34;1-creating-spreadsheet-from-excel-file-on-google-drive&#34;&gt;1. Creating Spreadsheet from Excel file on Google Drive&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;var fileID = &amp;quot;#####&amp;quot;;
-var folderID = &amp;quot;#####&amp;quot;;
-var filename = &amp;quot;filename&amp;quot;;
-
-var res = Drive.Files.insert({
-  &amp;quot;mimeType&amp;quot;: &amp;quot;application/vnd.google-apps.spreadsheet&amp;quot;,
-  &amp;quot;parents&amp;quot;: [{id: folderID}],
-  &amp;quot;title&amp;quot;: filename
-}, DriveApp.getFileById(fileID).getBlob());
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;2-creating-spreadsheet-from-excel-file-on-web-site&#34;&gt;2. Creating Spreadsheet from Excel file on Web Site&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;var fileURL = &amp;quot;https://#####/sample.xlsx&amp;quot;;
-var folderID = &amp;quot;#####&amp;quot;;
-var filename = &amp;quot;filename&amp;quot;;
-
-var res = Drive.Files.insert({
-  &amp;quot;mimeType&amp;quot;: &amp;quot;application/vnd.google-apps.spreadsheet&amp;quot;,
-  &amp;quot;parents&amp;quot;: [{id: folderID}],
-  &amp;quot;title&amp;quot;: filename
-}, UrlFetchApp.fetch(fileURL).getBlob());
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;For example, when you want to retrieve created file ID, you can retrieve it by&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;res.id
-&lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>
     

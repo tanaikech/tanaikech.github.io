@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.16" />
 
-  <title>Topics &middot; tanaike</title>
+  <title>Effect of Comprehension for GAS &middot; tanaike</title>
 
   
   
@@ -36,8 +36,6 @@
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
 
   
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike" href="https://tanaikech.github.io/topics/index.xml" />
   
 
   
@@ -113,10 +111,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://tanaikech.github.io/topics/index.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
-    </li>
     
 
     
@@ -206,93 +200,180 @@
 
 
 <div class="header">
-  <h1>Topics</h1>
+  <h1>Effect of Comprehension for GAS</h1>
+  <h2></h2>
 </div>
 <div class="content">
-  <ul>
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>07 Jun 2017, 09:21</time>
+  </div>
+
+  
+
   
   
-    <li>
-      <a href="gastips">gastips</a>
-      <span>&#40;30&#41;</span>
-    </li>
   
-    <li>
-      <a href="clitool">clitool</a>
-      <span>&#40;9&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/report">report</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    
+  </div>
   
-    <li>
-      <a href="googleapitips">googleapitips</a>
-      <span>&#40;8&#41;</span>
-    </li>
   
-    <li>
-      <a href="gotips">gotips</a>
-      <span>&#40;8&#41;</span>
-    </li>
+
   
-    <li>
-      <a href="report">report</a>
-      <span>&#40;4&#41;</span>
-    </li>
   
-    <li>
-      <a href="googlecharttips">googlecharttips</a>
-      <span>&#40;3&#41;</span>
-    </li>
   
-    <li>
-      <a href="jstips">jstips</a>
-      <span>&#40;3&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>
+    
+  </div>
   
-    <li>
-      <a href="library">library</a>
-      <span>&#40;3&#41;</span>
-    </li>
   
-    <li>
-      <a href="shtips">shtips</a>
-      <span>&#40;3&#41;</span>
-    </li>
+
+</div>
+
   
-    <li>
-      <a href="etc">etc</a>
-      <span>&#40;2&#41;</span>
-    </li>
+
+<h1 id="description">Description</h1>
+
+<p>There are a limit executing time for Google Apps Script (GAS). It&rsquo;s 6 minutes. So users have to pay attention to the process cost of the script. GAS can use JavaScript 1.7. This means to be able to be used comprehension for GAS.</p>
+
+<p>In this report, the process cost for the comprehension has been investigated. The normal for loop was used as the competitor. As a result, it was found that the comprehension can be used one of methods for reducing the process cost. For 1 dimensional array, the process cost of comprehension is about <strong>60% lower</strong> than that of the normal one. For 2 dimensional array, the process cost of comprehension is about <strong>50% lower</strong> than that of the normal one. Each data is the average for 10 times measurements.</p>
+
+<p><img src="https://tanaikech.github.io/img/20170607a_1d.png" alt="" /></p>
+
+<p><img src="https://tanaikech.github.io/img/20170607a_2d.png" alt="" /></p>
+
+<h1 id="sample-script">Sample Script</h1>
+
+<p>As a sample, 1 dimensional array and 2 dimensional array were used. The continuous number was imported to 1 dimensional array. For 2 dimensional array, the number of 1 to 100 was imported each element. As the calculation for measuring the process cost, when the element was multiples of 5, it was retrieved. These samples are GAS.</p>
+
+<h2 id="for-1d">For 1D</h2>
+
+<pre><code class="language-javascript">function make1dAr(row){
+  var ar = [];
+  for (var i=0; i&lt;row; i++) {
+    ar[i] = i + 1;
+  }
+  return ar;
+}
+
+function comprehension1d(ar){
+  return [i for each (i in ar) if(i % 5 == 0)];
+}
+
+function normal1d(ar){
+  var result = [];
+  for (var i=0; i&lt;ar.length; i++) {
+    if (ar[i] % 5 == 0) {
+      result.push(ar[i]);
+    }
+  }
+  return result;
+}
+
+function main1d() {
+  var data = make1dAr(1000000);
+
+  var start_P_time1 = Date.now();
+  var res = normal1d(data);
+  var end_P_time1 = Date.now();
+  Logger.log((end_P_time1 - start_P_time1)/1000 + ' [s]')
+
+  var start_P_time1 = Date.now();
+  var res = comprehension1d(data);
+  var end_P_time1 = Date.now();
+  Logger.log((end_P_time1 - start_P_time1)/1000 + ' [s]')
+}
+</code></pre>
+
+<h2 id="for-2d">For 2D</h2>
+
+<pre><code class="language-javascript">function make2dAr(row){
+  var ar1 = [];
+  for (var i=0; i&lt;row; i++) {
+    var ar2 = [];
+    for (var j=0; j&lt;100; j++) {
+      ar2[j] = j + 1;
+    }
+    ar1[i] = ar2;
+  }
+  return ar1;
+}
+
+function comprehension2d(ar){
+  return [[j for each (j in i) if(j % 5 == 0)] for each (i in ar)];
+}
+
+function normal2d(ar){
+  var ar1 = [];
+  for (var i=0; i&lt;ar.length; i++) {
+    var ar2 = [];
+    for (var j=0; j&lt;ar[i].length; j++) {
+      if (ar[i][j] % 5 == 0) {
+        ar2.push(ar[i][j]);
+      }
+    }
+    ar1.push(ar2)
+  }
+  return ar1;
+}
+
+function main2d() {
+  var data = make2dAr(10000);
+
+  var start_P_time1 = Date.now();
+  var res = normal2d(data);
+  var end_P_time1 = Date.now();
+  Logger.log((end_P_time1 - start_P_time1)/1000 + ' [s]')
+
+  var start_P_time1 = Date.now();
+  var res = comprehension2d(data);
+  var end_P_time1 = Date.now();
+  Logger.log((end_P_time1 - start_P_time1)/1000 + ' [s]')
+}
+</code></pre>
+
+
   
-    <li>
-      <a href="pythontips">pythontips</a>
-      <span>&#40;2&#41;</span>
-    </li>
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2017/06/06/embedding-animation-gif-in-a-cell-on-spreadsheet"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2017/06/06/embedding-animation-gif-in-a-cell-on-spreadsheet">Embedding Animation GIF in A Cell on Spreadsheet</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
+</div>
+
+
+
   
-    <li>
-      <a href="coffeescripttips">coffeescripttips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="driveapitips">driveapitips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="netatmotips">netatmotips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="slacktips">slacktips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="sublimetips">sublimetips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-  </ul>
+
 </div>
 
 </div>
@@ -328,4 +409,5 @@
 
 </body>
 </html>
+
 
