@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.16" />
 
-  <title>Updated ggsrun to v121 &middot; tanaike</title>
+  <title>Benchmark: Splitting Command-Line Arguments by Golang &middot; tanaike</title>
 
   
   
@@ -200,7 +200,7 @@
 
 
 <div class="header">
-  <h1>Updated ggsrun to v121</h1>
+  <h1>Benchmark: Splitting Command-Line Arguments by Golang</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -209,7 +209,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>28 May 2017, 14:20</time>
+    <time>02 Jun 2017, 10:59</time>
   </div>
 
   
@@ -220,7 +220,7 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/clitool">CLITool</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gotips">GoTips</a>
     
   </div>
   
@@ -232,13 +232,7 @@
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/ggsrun">ggsrun</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/cli">CLI</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>
     
   </div>
   
@@ -248,26 +242,69 @@
 
   
 
-<h1 id="ggsrun-was-updated-to-v-1-2-1">ggsrun was updated to v.1.2.1</h1>
+<p>This sample script is for splitting command-line arguments by golang. There are 2 types. One is the regular expression is used. Another is that <code>Split()</code> and <code>TrimSpace()</code> are used.</p>
 
-<ol>
-<li>Configuration file (<code>ggsrun.cfg</code>) became to be able to be read using the environment variable.</li>
-</ol>
+<p>Here, each process speed was compared.</p>
 
-<p>You can check this at <a href="https://github.com/tanaikech/ggsrun">here</a>.</p>
+<h2 id="script">Script :</h2>
+
+<pre><code>package main
+
+import (
+    &quot;regexp&quot;
+    &quot;strings&quot;
+    &quot;testing&quot;
+)
+
+func BenchmarkB1(b *testing.B) {
+    str := &quot;test1.txt, test2.txt&quot;
+    b.ResetTimer()
+    for i := 0; i &lt; b.N; i++ {
+        ar := regexp.MustCompile(`\s*,\s*`).Split(str, -1)
+        var result []string
+        for _, x := range ar {
+            result = append(result, x) // --&gt; 'test.js', 'test2.py'
+        }
+        _ = result
+    }
+}
+
+func BenchmarkB2(b *testing.B) {
+    str := &quot;test1.txt, test2.txt&quot;
+    b.ResetTimer()
+    for i := 0; i &lt; b.N; i++ {
+        ar := strings.Split(str, &quot;,&quot;)
+        var result []string
+        for _, x := range ar {
+            result = append(result, strings.TrimSpace(x)) // --&gt; 'test.js', 'test2.py'
+        }
+        _ = result
+    }
+}
+</code></pre>
+
+<h2 id="result">Result :</h2>
+
+<pre><code class="language-bash">$ go test -bench .
+BenchmarkB1-4             100000             13048 ns/op
+BenchmarkB2-4            3000000               399 ns/op
+PASS
+</code></pre>
+
+<p>Just as expected, the regular expression was slow. And it&rsquo;s much slower than that of <code>Split()</code> and <code>TrimSpace()</code>.</p>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2017/05/26/embedding-a-chart-to-a-cell-using-custom-function-on-spreadsheet"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2017/05/28/updated-ggsrun-to-v121"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2017/05/26/embedding-a-chart-to-a-cell-using-custom-function-on-spreadsheet">Embedding a Chart to a Cell using Custom Function on Spreadsheet</a>
+      <a href="https://tanaikech.github.io/2017/05/28/updated-ggsrun-to-v121">Updated ggsrun to v121</a>
     </nav>
     
   </div>
@@ -277,13 +314,13 @@
   <div class="pure-u-10-24">
     
     <nav class="next">
-      <a href="https://tanaikech.github.io/2017/06/02/benchmark-splitting-command-line-arguments-by-golang">Benchmark: Splitting Command-Line Arguments by Golang</a>
+      <a href="https://tanaikech.github.io/2017/06/02/replacing-json-key-by-golang">Replacing JSON Key by Golang</a>
     </nav>
     
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
     
-    <a href="https://tanaikech.github.io/2017/06/02/benchmark-splitting-command-line-arguments-by-golang"><i class="fa fa-chevron-right"></i></a>
+    <a href="https://tanaikech.github.io/2017/06/02/replacing-json-key-by-golang"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
