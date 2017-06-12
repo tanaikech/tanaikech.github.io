@@ -7,8 +7,74 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Wed, 07 Jun 2017 09:21:54 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 12 Jun 2017 11:11:06 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/topics/gastips/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Giving and Retrieving Parameters for Chart at GAS</title>
+      <link>https://tanaikech.github.io/2017/06/12/giving-and-retrieving-parameters-for-chart-at-gas</link>
+      <pubDate>Mon, 12 Jun 2017 11:11:06 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/06/12/giving-and-retrieving-parameters-for-chart-at-gas</guid>
+      <description>
+
+&lt;p&gt;This sample script is for retrieving parameters from a chart. The chart created by both Google Apps Script and manually operation can be used.&lt;/p&gt;
+
+&lt;h2 id=&#34;creates-chart&#34;&gt;Creates Chart&lt;/h2&gt;
+
+&lt;p&gt;When a chart is created, it supposes following parameters.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;var parameters = {
+  &amp;quot;title&amp;quot;: &amp;quot;x axis&amp;quot;,
+  &amp;quot;fontName&amp;quot;: &amp;quot;Arial&amp;quot;,
+  &amp;quot;minValue&amp;quot;: 0,
+  &amp;quot;maxValue&amp;quot;: 100,
+  &amp;quot;titleTextStyle&amp;quot;: {
+    &amp;quot;color&amp;quot;: &amp;quot;#c0c0c0&amp;quot;,
+    &amp;quot;fontSize&amp;quot;: 10,
+    &amp;quot;fontName&amp;quot;: &amp;quot;Roboto&amp;quot;,
+    &amp;quot;italic&amp;quot;: true,
+    &amp;quot;bold&amp;quot;: false
+  }
+};
+
+.setOption(&#39;hAxis&#39;, parameters)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;retrieve-parameters-from-chart&#34;&gt;Retrieve Parameters From Chart&lt;/h2&gt;
+
+&lt;p&gt;For the chart created by above parameters, in order to retrieve the parameters, it uses following script.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;var hAxis_title = chart.getOptions().get(&#39;hAxis.title&#39;)
+var hAxis_fontName = chart.getOptions().get(&#39;hAxis.fontName&#39;)
+var hAxis_minValue = chart.getOptions().get(&#39;hAxis.minValue&#39;)
+var hAxis_maxValue = chart.getOptions().get(&#39;hAxis.maxValue&#39;)
+var hAxis_titleTextStyle_color = chart.getOptions().get(&#39;hAxis.titleTextStyle.color&#39;)
+var hAxis_titleTextStyle_fontSize = chart.getOptions().get(&#39;hAxis.titleTextStyle.fontSize&#39;)
+var hAxis_titleTextStyle_fontName = chart.getOptions().get(&#39;hAxis.titleTextStyle.fontName&#39;)
+var hAxis_titleTextStyle_italic = chart.getOptions().get(&#39;hAxis.titleTextStyle.italic&#39;)
+var hAxis_titleTextStyle_bold = chart.getOptions().get(&#39;hAxis.titleTextStyle.bold&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;Result :&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;x axis
+Arial
+0.0
+100.0
+#c0c0c0
+10.0
+Roboto
+true
+false
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;At Google chart, the parameters is constructed by JSON data. So when the chart is created, JSON data is used.
+In the same way, when the parameters is retrieved from the chart, it retrieves from the JSON data.&lt;/p&gt;
+
+&lt;p&gt;By using this method, it is possible to create a Google Apps Script from the charts which was manually created.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Effect of Comprehension for GAS</title>
@@ -1192,67 +1258,6 @@ DriveApp.getFolderById(folderId)
 &lt;p&gt;You can see the detail information at &lt;a href=&#34;https://github.com/tanaikech/CreateImg&#34;&gt;https://github.com/tanaikech/CreateImg&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;There is a part where I would like to improve in this library. That&amp;rsquo;s &lt;code&gt;convByteSlice()&lt;/code&gt;. I think that there is the method to be faster about the part. If you know much about the logical operation using GAS, if you teach me about the improvements. I&amp;rsquo;m so glad.&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Comprehension of GAS</title>
-      <link>https://tanaikech.github.io/2017/04/17/comprehension-of-gas</link>
-      <pubDate>Mon, 17 Apr 2017 08:16:36 +0900</pubDate>
-      
-      <guid>https://tanaikech.github.io/2017/04/17/comprehension-of-gas</guid>
-      <description>
-
-&lt;p&gt;Here, I would like to introduce a comprehension of GAS.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Input :&lt;/strong&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;var data = [[[0], [1], [2], [3]], [[4], [5], [6], [7]]];
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;strong&gt;Output :&lt;/strong&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;[[0.0, 2.0], [0.0, 2.0]]
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;pattern-1&#34;&gt;Pattern 1&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;var a = [];
-for (var i=0; i&amp;lt;data.length; i++) {
-  var temp = [];
-  for (var j=0; j&amp;lt;data[i].length; j++) {
-    if (data[i][j][0] % 2 == 0) temp.push(j);
-  }
-  a.push(temp);
-}
-Logger.log(a)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;pattern-2&#34;&gt;Pattern 2&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;var b = [];
-data.forEach(function(e1){
-  var temp = [];
-  e1.forEach(function(e2, i2){
-    if (e2[0] % 2 == 0) temp.push(parseInt(i2, 10));
-  });
-  b.push(temp);
-});
-Logger.log(b)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;pattern-3&#34;&gt;Pattern 3&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;var c = [[parseInt(i, 10) for (i in e) if (e[i][0] % 2 == 0)] for each (e in data)];
-Logger.log(c)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;GAS can use JavaScript 1.7. So it can write as above.&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;In the case of &lt;code&gt;[i for (i in array)]&lt;/code&gt;, &lt;code&gt;i&lt;/code&gt; is index. But it&amp;rsquo;s string.&lt;/li&gt;
-&lt;li&gt;In the case of &lt;code&gt;[i for each (i in array)]&lt;/code&gt;, &lt;code&gt;i&lt;/code&gt; is element.&lt;/li&gt;
-&lt;/ul&gt;
 </description>
     </item>
     
