@@ -7,8 +7,188 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Mon, 12 Jun 2017 11:11:06 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 14 Jun 2017 17:35:47 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/tags/spreadsheet/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Search Route and Embedding Map using Custom Function on Spreadsheet</title>
+      <link>https://tanaikech.github.io/2017/06/14/search-route-and-embedding-map-using-custom-function-on-spreadsheet</link>
+      <pubDate>Wed, 14 Jun 2017 17:35:47 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/06/14/search-route-and-embedding-map-using-custom-function-on-spreadsheet</guid>
+      <description>
+
+&lt;p&gt;This sample script is for searching route between place A and B and embedding a map by custom function on Spreadsheet.&lt;/p&gt;
+
+&lt;p&gt;I think that this method is one of various ideas.&lt;/p&gt;
+
+&lt;h2 id=&#34;problem&#34;&gt;Problem&lt;/h2&gt;
+
+&lt;p&gt;When the map is embedded to a cell on spreadsheet as an image, the function &lt;code&gt;=IMAGE()&lt;/code&gt; is suitable for this situation. However, &lt;code&gt;Class Maps&lt;/code&gt;, &lt;code&gt;setFormula()&lt;/code&gt; for importing &lt;code&gt;=IMAGE()&lt;/code&gt; and &lt;code&gt;DriveApp.createFile()&lt;/code&gt; for creating images from maps also cannot be used for custom functions.&lt;/p&gt;
+
+&lt;h2 id=&#34;solution&#34;&gt;Solution&lt;/h2&gt;
+
+&lt;p&gt;In order to avoid these limitations, I used &lt;a href=&#34;https://developers.google.com/apps-script/guides/web&#34;&gt;Web Apps&lt;/a&gt;. From previous research, it has been found that Web Apps can avoid various limitations. Also in the case of this situation, Web Apps could avoid the above limitations.&lt;/p&gt;
+
+&lt;p&gt;To use this sample script, please deploy Web Apps as follows.&lt;/p&gt;
+
+&lt;p&gt;On the Script Editor,&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;File
+
+&lt;ul&gt;
+&lt;li&gt;-&amp;gt; Manage Versions&lt;/li&gt;
+&lt;li&gt;-&amp;gt; Save New Version&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Publish
+
+&lt;ul&gt;
+&lt;li&gt;-&amp;gt; Deploy as Web App&lt;/li&gt;
+&lt;li&gt;-&amp;gt; At Execute the app as, select &lt;strong&gt;&amp;ldquo;your account&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;-&amp;gt; At Who has access to the app, select &lt;strong&gt;&amp;ldquo;Anyone, even anonymous&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;-&amp;gt; Click &lt;strong&gt;&amp;ldquo;Deploy&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;-&amp;gt; Copy &lt;strong&gt;&amp;ldquo;Current web app URL&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;-&amp;gt; Click &lt;strong&gt;&amp;ldquo;OK&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;When it deploys Web Apps, the approval required authorization can be done, simultaneously.&lt;/p&gt;
+
+&lt;h2 id=&#34;sample-script&#34;&gt;Sample Script :&lt;/h2&gt;
+
+&lt;p&gt;Please copy and paste this script to a bound script of spreadsheet. This sample uses &lt;code&gt;UrlShortener API&lt;/code&gt;. So before use this, please enable UrlShortener API at Advanced Google Services and console API.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;var folderId = &#39;### Folder ID ###&#39;; // Please input this.
+
+function getroute(pos1, pos2, mode) {
+  var ac = SpreadsheetApp.getActiveSheet().getActiveCell();
+  var q1 = &#39;?pos1=&#39; + pos1;
+  var q2 = &#39;&amp;amp;pos2=&#39; + pos2;
+  var q3 = &#39;&amp;amp;mode=&#39; + mode;
+  var q4 = &#39;&amp;amp;row=&#39; + ac.getRow();
+  var q5 = &#39;&amp;amp;col=&#39; + ac.getColumn();
+  UrlFetchApp.fetch(ScriptApp.getService().getUrl() + q1 + q2 + q3 + q4 + q5);
+}
+
+function doGet(e) {
+  var data = createMap(e.parameters.pos1, e.parameters.pos2, e.parameters.mode);
+  if (data) {
+    try {
+      var blob = UrlFetchApp.fetch(data[0]).getBlob().setName(e.parameters.pos1 + &#39;_&#39; + e.parameters.pos2);
+      var file = DriveApp.getFolderById(folderId).createFile(blob);
+      file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+      SpreadsheetApp
+      .getActiveSheet()
+      .getRange(e.parameters.row, e.parameters.col, 1, 4)
+      .setFormulas([[
+        &#39;=T(&amp;quot;&#39; + data[1].duration.value + &#39;&amp;quot;)&#39;,
+        &#39;=T(&amp;quot;&#39; + data[1].distance.value + &#39;&amp;quot;)&#39;,
+        &#39;=T(&amp;quot;&#39; + data[0] + &#39;&amp;quot;)&#39;,
+        &#39;=IMAGE(&amp;quot;&#39; + &#39;http://drive.google.com/uc?id=&#39; + file.getId() + &#39;&amp;quot;)&#39;,
+      ]]);
+    } catch(m) {
+      err(e.parameters.row, e.parameters.col);
+    }
+  } else {
+    err(e.parameters.row, e.parameters.col);
+  }
+}
+
+function createMap(pos1s, pos2s, mode) {
+  var geo = Maps.newGeocoder();
+  var pos1 = geo.geocode(pos1s).results[0];
+  var pos2 = geo.geocode(pos2s).results[0];
+  var map = Maps.newStaticMap().setSize(1000, 1000).setLanguage(&#39;en&#39;);
+  var directions = Maps.newDirectionFinder()
+  .setOrigin(pos1.geometry.location.lat, pos1.geometry.location.lng)
+  .setDestination(pos2.geometry.location.lat, pos2.geometry.location.lng)
+  .setMode(function(mode) {
+    switch (mode) {
+      case &#39;transit&#39;: return Maps.DirectionFinder.Mode.TRANSIT; break;
+      case &#39;driving&#39;: return Maps.DirectionFinder.Mode.DRIVING; break;
+      case &#39;walking&#39;: return Maps.DirectionFinder.Mode.WALKING; break;
+      case &#39;bicycling&#39;: return Maps.DirectionFinder.Mode.BICYCLING; break;
+      default : return Maps.DirectionFinder.Mode.DRIVING; break;
+    }
+  }(mode))
+  .setDepart(new Date())
+  .getDirections();
+  map.setPathStyle(5, Maps.StaticMap.Color.GREEN, null);
+  map.beginPath();
+  directions.routes.forEach(function(e1) {
+    e1.legs.forEach(function(e2) {
+      e2.steps.forEach(function(e3) {
+        map.addPath(Maps.decodePolyline(e3.polyline.points));
+      });
+    });
+  });
+  map.endPath();
+  map.setMarkerStyle(Maps.StaticMap.MarkerSize.MID, Maps.StaticMap.Color.RED, &#39;A&#39;).addMarker(pos1s);
+  map.setMarkerStyle(Maps.StaticMap.MarkerSize.MID, Maps.StaticMap.Color.BLUE, &#39;B&#39;).addMarker(pos2s);
+  try {
+    return [UrlShortener.Url.insert({longUrl: map.getMapUrl()}).id, directions.routes[0].legs[0]];
+  } catch(e) {
+    return null;
+  }
+}
+
+function err(row, col) {
+  SpreadsheetApp
+    .getActiveSheet()
+    .getRange(row, col, 1, 2)
+    .setFormulas([[
+      &#39;=T(&amp;quot;Route was not found.&amp;quot;)&#39;,
+      &#39;=T(&amp;quot;Route was not found.&amp;quot;)&#39;,
+  ]]);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;flow-of-script&#34;&gt;Flow of Script :&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;getroute()&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Input &lt;code&gt;=getroute(A2, B2, C2)&lt;/code&gt; in cell &lt;code&gt;D2&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Using &lt;code&gt;fetch()&lt;/code&gt;, sends data of &lt;code&gt;&amp;quot;Tokyo station&amp;quot;, &amp;quot;Ginza station&amp;quot;, &amp;quot;transit&amp;quot;&lt;/code&gt; and the inputted coordinate to &lt;code&gt;doGet()&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;strong&gt;doGet()&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Using &lt;code&gt;doGet()&lt;/code&gt;, get the data.&lt;/li&gt;
+&lt;li&gt;Searches the route from &amp;ldquo;Tokyo station&amp;rdquo; to &amp;ldquo;Ginza station&amp;rdquo;.&lt;/li&gt;
+&lt;li&gt;Creates the map with the route.&lt;/li&gt;
+&lt;li&gt;Saves a map as an image. (in this case, saves as PNG)&lt;/li&gt;
+&lt;li&gt;Updates a permission of the image file to use for &lt;code&gt;=IMAGE()&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Embeds the text data and image using &lt;code&gt;=T()&lt;/code&gt; and &lt;code&gt;=IMAGE()&lt;/code&gt; which was imported by &lt;code&gt;setFormula()&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;result&#34;&gt;Result :&lt;/h2&gt;
+
+&lt;p&gt;By inputting &lt;code&gt;=getroute(A2, B2, C2)&lt;/code&gt; in cell &lt;code&gt;D2&lt;/code&gt; as a custom function, following result can be obtained.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Although this demo movie seems short loading time, this loading time is edited. Actual loading time is about 40 seconds.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170614_demo.gif&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;note&#34;&gt;Note :&lt;/h2&gt;
+
+&lt;ol&gt;
+&lt;li&gt;When the custom function &lt;code&gt;getroute()&lt;/code&gt; is used, loading time is about 40 seconds. (I don&amp;rsquo;t know whether this occurs only my environment.)&lt;/li&gt;
+&lt;li&gt;Permissions of the created image are &lt;a href=&#34;https://developers.google.com/apps-script/reference/drive/access&#34;&gt;ANYONE_WITH_LINK&lt;/a&gt;, &lt;a href=&#34;https://developers.google.com/apps-script/reference/drive/permission&#34;&gt;VIEW&lt;/a&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;related-tips&#34;&gt;Related Tips&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://tanaikech.github.io/2017/06/06/embedding-animation-gif-in-a-cell-on-spreadsheet/&#34;&gt;Embedding Animation GIF in A Cell on Spreadsheet&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://tanaikech.github.io/2017/06/06/ocr-using-custom-function-on-spreadsheet/&#34;&gt;OCR using Custom Function on Spreadsheet&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://tanaikech.github.io/2017/06/04/embedding-a-map-to-a-cell-using-custom-function-on-spreadsheet/&#34;&gt;Embedding a Map to a Cell using Custom Function on Spreadsheet&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://tanaikech.github.io/2017/05/26/embedding-a-chart-to-a-cell-using-custom-function-on-spreadsheet/&#34;&gt;Embedding a Chart to a Cell using Custom Function on Spreadsheet&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
     
     <item>
       <title>Giving and Retrieving Parameters for Chart at GAS</title>
