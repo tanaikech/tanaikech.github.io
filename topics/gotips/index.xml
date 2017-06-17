@@ -7,8 +7,82 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Fri, 09 Jun 2017 09:16:56 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 17 Jun 2017 10:06:24 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/topics/gotips/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Benchmark: Retrieving Values from Deep Nested JSON at Golang</title>
+      <link>https://tanaikech.github.io/2017/06/17/benchmark-retrieving-values-from-deep-nested-json-at-golang</link>
+      <pubDate>Sat, 17 Jun 2017 10:06:24 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/06/17/benchmark-retrieving-values-from-deep-nested-json-at-golang</guid>
+      <description>
+
+&lt;p&gt;This sample script is for retrieving values from a deep nested JSON. There are 2 patterns. So for these, the benchmark were measured.&lt;/p&gt;
+
+&lt;h2 id=&#34;script&#34;&gt;Script :&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;package main
+
+import (
+    &amp;quot;encoding/json&amp;quot;
+    &amp;quot;testing&amp;quot;
+)
+
+const (
+    data = `{
+      &amp;quot;A_key1&amp;quot;: {
+        &amp;quot;B_key1&amp;quot;: {
+          &amp;quot;C_key&amp;quot;: &amp;quot;value&amp;quot;
+        }
+      }
+    }`
+)
+
+func BenchmarkB1(b *testing.B) {
+    b.ResetTimer()
+    for i := 0; i &amp;lt; b.N; i++ {
+        var p map[string]interface{}
+        json.Unmarshal([]byte(data), &amp;amp;p)
+        a1 := p[&amp;quot;A_key1&amp;quot;]
+        a2 := p[&amp;quot;A_key1&amp;quot;].(map[string]interface{})[&amp;quot;B_key1&amp;quot;]
+        a3 := p[&amp;quot;A_key1&amp;quot;].(map[string]interface{})[&amp;quot;B_key1&amp;quot;].(map[string]interface{})[&amp;quot;C_key&amp;quot;]
+        _ = a1 // --&amp;gt; map[B_key1:map[C_key:value]]
+        _ = a2 // --&amp;gt; map[C_key:value]
+        _ = a3 // --&amp;gt; value
+    }
+}
+
+func BenchmarkB2(b *testing.B) {
+    b.ResetTimer()
+    for i := 0; i &amp;lt; b.N; i++ {
+        var p map[string]interface{}
+        json.Unmarshal([]byte(data), &amp;amp;p)
+        b1 := p[&amp;quot;A_key1&amp;quot;]
+        temp, _ := json.Marshal(b1)
+        json.Unmarshal(temp, &amp;amp;p)
+        b2 := p[&amp;quot;B_key1&amp;quot;]
+        temp, _ = json.Marshal(b2)
+        json.Unmarshal(temp, &amp;amp;p)
+        b3 := p[&amp;quot;C_key&amp;quot;]
+        _ = b1 // --&amp;gt; map[B_key1:map[C_key:value]]
+        _ = b2 // --&amp;gt; map[C_key:value]
+        _ = b3 // --&amp;gt; value
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;result&#34;&gt;Result :&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$ go test -bench .
+BenchmarkB1-4             300000              4177 ns/op
+BenchmarkB2-4             100000             13619 ns/op
+PASS
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;It was found that the process cost of &lt;code&gt;json.Unmarshal()&lt;/code&gt; was high. &lt;code&gt;json.Unmarshal()&lt;/code&gt; for test 2 is 3 times larger than that for test 1.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Slice Created by Split at Golang</title>

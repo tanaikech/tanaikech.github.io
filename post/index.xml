@@ -7,8 +7,82 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Thu, 15 Jun 2017 09:52:19 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 17 Jun 2017 10:06:24 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Benchmark: Retrieving Values from Deep Nested JSON at Golang</title>
+      <link>https://tanaikech.github.io/2017/06/17/benchmark-retrieving-values-from-deep-nested-json-at-golang</link>
+      <pubDate>Sat, 17 Jun 2017 10:06:24 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/06/17/benchmark-retrieving-values-from-deep-nested-json-at-golang</guid>
+      <description>
+
+&lt;p&gt;This sample script is for retrieving values from a deep nested JSON. There are 2 patterns. So for these, the benchmark were measured.&lt;/p&gt;
+
+&lt;h2 id=&#34;script&#34;&gt;Script :&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;package main
+
+import (
+    &amp;quot;encoding/json&amp;quot;
+    &amp;quot;testing&amp;quot;
+)
+
+const (
+    data = `{
+      &amp;quot;A_key1&amp;quot;: {
+        &amp;quot;B_key1&amp;quot;: {
+          &amp;quot;C_key&amp;quot;: &amp;quot;value&amp;quot;
+        }
+      }
+    }`
+)
+
+func BenchmarkB1(b *testing.B) {
+    b.ResetTimer()
+    for i := 0; i &amp;lt; b.N; i++ {
+        var p map[string]interface{}
+        json.Unmarshal([]byte(data), &amp;amp;p)
+        a1 := p[&amp;quot;A_key1&amp;quot;]
+        a2 := p[&amp;quot;A_key1&amp;quot;].(map[string]interface{})[&amp;quot;B_key1&amp;quot;]
+        a3 := p[&amp;quot;A_key1&amp;quot;].(map[string]interface{})[&amp;quot;B_key1&amp;quot;].(map[string]interface{})[&amp;quot;C_key&amp;quot;]
+        _ = a1 // --&amp;gt; map[B_key1:map[C_key:value]]
+        _ = a2 // --&amp;gt; map[C_key:value]
+        _ = a3 // --&amp;gt; value
+    }
+}
+
+func BenchmarkB2(b *testing.B) {
+    b.ResetTimer()
+    for i := 0; i &amp;lt; b.N; i++ {
+        var p map[string]interface{}
+        json.Unmarshal([]byte(data), &amp;amp;p)
+        b1 := p[&amp;quot;A_key1&amp;quot;]
+        temp, _ := json.Marshal(b1)
+        json.Unmarshal(temp, &amp;amp;p)
+        b2 := p[&amp;quot;B_key1&amp;quot;]
+        temp, _ = json.Marshal(b2)
+        json.Unmarshal(temp, &amp;amp;p)
+        b3 := p[&amp;quot;C_key&amp;quot;]
+        _ = b1 // --&amp;gt; map[B_key1:map[C_key:value]]
+        _ = b2 // --&amp;gt; map[C_key:value]
+        _ = b3 // --&amp;gt; value
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;result&#34;&gt;Result :&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$ go test -bench .
+BenchmarkB1-4             300000              4177 ns/op
+BenchmarkB2-4             100000             13619 ns/op
+PASS
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;It was found that the process cost of &lt;code&gt;json.Unmarshal()&lt;/code&gt; was high. &lt;code&gt;json.Unmarshal()&lt;/code&gt; for test 2 is 3 times larger than that for test 1.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Reopening Current File as a File with New Name at Sublime</title>
@@ -403,11 +477,11 @@ var                : [], 0
     </item>
     
     <item>
-      <title>Effect of Comprehension for GAS</title>
-      <link>https://tanaikech.github.io/2017/06/07/effect-of-comprehension-for-gas</link>
+      <title>Benchmark: Effect of Comprehension for GAS</title>
+      <link>https://tanaikech.github.io/2017/06/07/benchmark-effect-of-comprehension-for-gas</link>
       <pubDate>Wed, 07 Jun 2017 09:21:54 +0900</pubDate>
       
-      <guid>https://tanaikech.github.io/2017/06/07/effect-of-comprehension-for-gas</guid>
+      <guid>https://tanaikech.github.io/2017/06/07/benchmark-effect-of-comprehension-for-gas</guid>
       <description>
 
 &lt;h1 id=&#34;description&#34;&gt;Description&lt;/h1&gt;
@@ -1047,38 +1121,6 @@ func main() {
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;&lt;a href=&#34;https://play.golang.org/p/kHroZ1rHVQ&#34;&gt;Go Playground&lt;/a&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Replacing JSON Key by Golang</title>
-      <link>https://tanaikech.github.io/2017/06/02/replacing-json-key-by-golang</link>
-      <pubDate>Fri, 02 Jun 2017 11:56:30 +0900</pubDate>
-      
-      <guid>https://tanaikech.github.io/2017/06/02/replacing-json-key-by-golang</guid>
-      <description>&lt;p&gt;This sample is for replacing JSON key by golang.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;package main
-
-import (
-    &amp;quot;encoding/json&amp;quot;
-    &amp;quot;fmt&amp;quot;
-)
-
-func main() {
-    json1 := `{&amp;quot;key1&amp;quot;: &amp;quot;value1&amp;quot;}`
-
-    obj := map[string]interface{}{}
-    json.Unmarshal([]byte(json1), &amp;amp;obj)
-
-    fmt.Println(obj) // &amp;lt;-- map[key1:value1]
-
-    obj[&amp;quot;key2&amp;quot;] = obj[&amp;quot;key1&amp;quot;]
-    delete(obj, &amp;quot;key1&amp;quot;)
-
-    fmt.Println(obj) // &amp;lt;-- map[key2:value1]
-}
-&lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>
     

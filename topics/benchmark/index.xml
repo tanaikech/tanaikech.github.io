@@ -1,14 +1,88 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Report on tanaike</title>
-    <link>https://tanaikech.github.io/topics/report/</link>
-    <description>Recent content in Report on tanaike</description>
+    <title>Benchmark on tanaike</title>
+    <link>https://tanaikech.github.io/topics/benchmark/</link>
+    <description>Recent content in Benchmark on tanaike</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Wed, 07 Jun 2017 09:21:54 +0900</lastBuildDate>
-    <atom:link href="https://tanaikech.github.io/topics/report/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 17 Jun 2017 10:06:24 +0900</lastBuildDate>
+    <atom:link href="https://tanaikech.github.io/topics/benchmark/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Benchmark: Retrieving Values from Deep Nested JSON at Golang</title>
+      <link>https://tanaikech.github.io/2017/06/17/benchmark-retrieving-values-from-deep-nested-json-at-golang</link>
+      <pubDate>Sat, 17 Jun 2017 10:06:24 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/06/17/benchmark-retrieving-values-from-deep-nested-json-at-golang</guid>
+      <description>
+
+&lt;p&gt;This sample script is for retrieving values from a deep nested JSON. There are 2 patterns. So for these, the benchmark were measured.&lt;/p&gt;
+
+&lt;h2 id=&#34;script&#34;&gt;Script :&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;package main
+
+import (
+    &amp;quot;encoding/json&amp;quot;
+    &amp;quot;testing&amp;quot;
+)
+
+const (
+    data = `{
+      &amp;quot;A_key1&amp;quot;: {
+        &amp;quot;B_key1&amp;quot;: {
+          &amp;quot;C_key&amp;quot;: &amp;quot;value&amp;quot;
+        }
+      }
+    }`
+)
+
+func BenchmarkB1(b *testing.B) {
+    b.ResetTimer()
+    for i := 0; i &amp;lt; b.N; i++ {
+        var p map[string]interface{}
+        json.Unmarshal([]byte(data), &amp;amp;p)
+        a1 := p[&amp;quot;A_key1&amp;quot;]
+        a2 := p[&amp;quot;A_key1&amp;quot;].(map[string]interface{})[&amp;quot;B_key1&amp;quot;]
+        a3 := p[&amp;quot;A_key1&amp;quot;].(map[string]interface{})[&amp;quot;B_key1&amp;quot;].(map[string]interface{})[&amp;quot;C_key&amp;quot;]
+        _ = a1 // --&amp;gt; map[B_key1:map[C_key:value]]
+        _ = a2 // --&amp;gt; map[C_key:value]
+        _ = a3 // --&amp;gt; value
+    }
+}
+
+func BenchmarkB2(b *testing.B) {
+    b.ResetTimer()
+    for i := 0; i &amp;lt; b.N; i++ {
+        var p map[string]interface{}
+        json.Unmarshal([]byte(data), &amp;amp;p)
+        b1 := p[&amp;quot;A_key1&amp;quot;]
+        temp, _ := json.Marshal(b1)
+        json.Unmarshal(temp, &amp;amp;p)
+        b2 := p[&amp;quot;B_key1&amp;quot;]
+        temp, _ = json.Marshal(b2)
+        json.Unmarshal(temp, &amp;amp;p)
+        b3 := p[&amp;quot;C_key&amp;quot;]
+        _ = b1 // --&amp;gt; map[B_key1:map[C_key:value]]
+        _ = b2 // --&amp;gt; map[C_key:value]
+        _ = b3 // --&amp;gt; value
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;result&#34;&gt;Result :&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$ go test -bench .
+BenchmarkB1-4             300000              4177 ns/op
+BenchmarkB2-4             100000             13619 ns/op
+PASS
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;It was found that the process cost of &lt;code&gt;json.Unmarshal()&lt;/code&gt; was high. &lt;code&gt;json.Unmarshal()&lt;/code&gt; for test 2 is 3 times larger than that for test 1.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Benchmark: Effect of Comprehension for GAS</title>
@@ -117,6 +191,67 @@ function main2d() {
   Logger.log((end_P_time1 - start_P_time1)/1000 + &#39; [s]&#39;)
 }
 &lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Benchmark: Splitting Command-Line Arguments by Golang</title>
+      <link>https://tanaikech.github.io/2017/06/02/benchmark-splitting-command-line-arguments-by-golang</link>
+      <pubDate>Fri, 02 Jun 2017 10:59:31 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/06/02/benchmark-splitting-command-line-arguments-by-golang</guid>
+      <description>
+
+&lt;p&gt;This sample script is for splitting command-line arguments by golang. There are 2 types. One is the regular expression is used. Another is that &lt;code&gt;Split()&lt;/code&gt; and &lt;code&gt;TrimSpace()&lt;/code&gt; are used.&lt;/p&gt;
+
+&lt;p&gt;Here, each process speed was compared.&lt;/p&gt;
+
+&lt;h2 id=&#34;script&#34;&gt;Script :&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;package main
+
+import (
+    &amp;quot;regexp&amp;quot;
+    &amp;quot;strings&amp;quot;
+    &amp;quot;testing&amp;quot;
+)
+
+func BenchmarkB1(b *testing.B) {
+    str := &amp;quot;test1.txt, test2.txt&amp;quot;
+    b.ResetTimer()
+    for i := 0; i &amp;lt; b.N; i++ {
+        ar := regexp.MustCompile(`\s*,\s*`).Split(str, -1)
+        var result []string
+        for _, x := range ar {
+            result = append(result, x) // --&amp;gt; &#39;test.js&#39;, &#39;test2.py&#39;
+        }
+        _ = result
+    }
+}
+
+func BenchmarkB2(b *testing.B) {
+    str := &amp;quot;test1.txt, test2.txt&amp;quot;
+    b.ResetTimer()
+    for i := 0; i &amp;lt; b.N; i++ {
+        ar := strings.Split(str, &amp;quot;,&amp;quot;)
+        var result []string
+        for _, x := range ar {
+            result = append(result, strings.TrimSpace(x)) // --&amp;gt; &#39;test.js&#39;, &#39;test2.py&#39;
+        }
+        _ = result
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;result&#34;&gt;Result :&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$ go test -bench .
+BenchmarkB1-4             100000             13048 ns/op
+BenchmarkB2-4            3000000               399 ns/op
+PASS
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Just as expected, the regular expression was slow. And it&amp;rsquo;s much slower than that of &lt;code&gt;Split()&lt;/code&gt; and &lt;code&gt;TrimSpace()&lt;/code&gt;.&lt;/p&gt;
 </description>
     </item>
     
