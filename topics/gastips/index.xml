@@ -7,8 +7,30 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Wed, 21 Jun 2017 10:24:50 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 27 Jun 2017 16:21:52 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/topics/gastips/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>GAS Library - ImgApp - getSize()</title>
+      <link>https://tanaikech.github.io/2017/06/27/gas-library---imgapp---getsize</link>
+      <pubDate>Tue, 27 Jun 2017 16:21:52 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/06/27/gas-library---imgapp---getsize</guid>
+      <description>
+
+&lt;h2 id=&#34;1-getsize&#34;&gt;1. getSize()&lt;/h2&gt;
+
+&lt;h3 id=&#34;overview&#34;&gt;Overview&lt;/h3&gt;
+
+&lt;p&gt;This method is for retrieving the width and height of image as the unit of pixel.&lt;/p&gt;
+
+&lt;h3 id=&#34;description&#34;&gt;Description&lt;/h3&gt;
+
+&lt;p&gt;Unfortunately, there are no methods to directly retrieve the image size at Google Apps Script. As a workaround, there is a method that it imports the image in Google Document and retrieves the size using &lt;code&gt;getWidth()&lt;/code&gt; and &lt;code&gt;getHeight()&lt;/code&gt;. But in this method, it uses much time and resources on Google. So I thought of retrieving the information of image at the binary level, and created this. By this, the low process cost could be achieved.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;You can see the detail information here &lt;a href=&#34;https://github.com/tanaikech/ImgApp&#34;&gt;https://github.com/tanaikech/ImgApp&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Retrieving Access Token for Google APIs</title>
@@ -1312,135 +1334,6 @@ function main() {
   );
   Logger.log(res)
 }
-&lt;/code&gt;&lt;/pre&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Retrieving User Information with Shared Spreadsheet</title>
-      <link>https://tanaikech.github.io/2017/04/27/retrieving-user-information-with-shared-spreadsheet</link>
-      <pubDate>Thu, 27 Apr 2017 14:34:22 +0900</pubDate>
-      
-      <guid>https://tanaikech.github.io/2017/04/27/retrieving-user-information-with-shared-spreadsheet</guid>
-      <description>&lt;p&gt;This sample script retrieves the user information which is editing the shared spreadsheet.&lt;/p&gt;
-
-&lt;p&gt;It was found as follows.&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;User information retrieving by Class Session is the owner and users which installed triggers by themselves.&lt;/li&gt;
-&lt;li&gt;When each user installs a trigger, user information retrieving by Class Session losts the accuracy. So user information has to be retrieved using a temporally installed trigger.&lt;/li&gt;
-&lt;li&gt;Using &lt;code&gt;onOpen()&lt;/code&gt;, it cannot directly install triggers and authorize.&lt;/li&gt;
-&lt;li&gt;Using menu bar, it can install triggers and authorize Google Services using API.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Here, I thought 2 problems.&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;The confirmation whether the authorization was done.
-
-&lt;ul&gt;
-&lt;li&gt;At &lt;code&gt;onOpen()&lt;/code&gt;, although many methods using Google API can be executed without the authorization, there are also some methods which cannot be executed without the authorization. Furthermore, there are some methods which cannot execute even if the authorization was done. It&amp;rsquo;s &lt;code&gt;trigger&lt;/code&gt;. On the other hand, &lt;code&gt;DriveApp&lt;/code&gt; requires the authorization for only the first time, but it can use without the authorization after 2nd times.&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;I thought that users can find easily by displaying information in a dialog box when spreadsheet is launched. So I adopted displaying information using the dialog box. But, there is a big limitation for the dialog box.
-
-&lt;ul&gt;
-&lt;li&gt;Using a click of button on a dialog box, it can install triggers. However it cannot authorize Google Services using API.&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;Using above information, I thought a flow to retrieve user information.&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;When user opens the spreadsheet for the first time, it displays &amp;lsquo;Please authorize at &amp;ldquo;Authorization&amp;rdquo; of menu bar.&amp;rsquo; using a dialog box, and creates a menu bar &amp;ldquo;Authorization&amp;rdquo;.&lt;/li&gt;
-&lt;li&gt;The user clicks &amp;ldquo;OK&amp;rdquo; button on the dialog box and run &amp;ldquo;Authorization&amp;rdquo; at the menu bar. By running &amp;ldquo;Authorization&amp;rdquo;, the user information is retrieved by a temporally installed trigger.&lt;/li&gt;
-&lt;li&gt;When the user opens the spreadsheet after the 2nd time, the authorization is checked by &lt;code&gt;DriveApp&lt;/code&gt;. A dialog box with &amp;lsquo;Push OK button.&amp;rsquo; is displayed. By clicking &amp;ldquo;OK&amp;rdquo;, the user information is retrieved by a temporally installed trigger.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;By this flow, the user information which is editing the shared spreadsheet can be retrieved. Although I think that there may be also other solutions, I proposal this as one of solutions.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Script :&lt;/strong&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function showDialog(html, title){
-  SpreadsheetApp.getActiveSpreadsheet().show(
-    HtmlService
-    .createHtmlOutput(html)
-    .setTitle(title)
-    .setWidth(400)
-    .setHeight(100)
-  );
-}
-
-function getUser(){
-  var triggerId = ScriptApp.newTrigger(&#39;getUser&#39;)
-    .forSpreadsheet(SpreadsheetApp.getActive())
-    .onEdit()
-    .create()
-    .getUniqueId();
-  var userInf = Session.getEffectiveUser();
-  CacheService.getUserCache().putAll({
-    &amp;quot;username&amp;quot;: userInf.getUsername(),
-    &amp;quot;usermail&amp;quot;: userInf.getEmail()
-  }, 7200);
-  var triggers = ScriptApp.getProjectTriggers();
-  [ScriptApp.deleteTrigger(i) for each (i in triggers) if (i.getUniqueId() == triggerId)];
-}
-
-function dialogForGetUser(){
-  showDialog(&#39;&amp;lt;input type=&amp;quot;button&amp;quot;\
-      value=&amp;quot;OK&amp;quot;\
-      onclick=&amp;quot;google.script.run.withSuccessHandler(function(){google.script.host.close()})\
-      .getUser()&amp;quot;&amp;gt;&#39;,
-      &#39;Push OK button.&#39;
-  );
-}
-
-function dialogForAuth(){
-  showDialog(&#39;&amp;lt;input type=&amp;quot;button&amp;quot;\
-      value=&amp;quot;OK&amp;quot;\
-      onclick=&amp;quot;google.script.host.close()&amp;quot;&amp;gt;&#39;,
-      &#39;Please authorize at &amp;quot;Authorization&amp;quot; of menu bar.&#39;
-  );
-}
-
-function getAuth() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  ss.removeMenu(&amp;quot;Authorization&amp;quot;);
-  getUser();
-  ss.toast(&amp;quot;Done.&amp;quot;, &amp;quot;Authorization&amp;quot;, 3);
-}
-
-function onOpen(){
-  try {
-    var temp = DriveApp.getFileById(SpreadsheetApp.getActiveSpreadsheet().getId())
-    dialogForGetUser();
-  } catch(e) {
-    dialogForAuth();
-    SpreadsheetApp.getActiveSpreadsheet().addMenu(
-      &amp;quot;Authorization&amp;quot;,
-      [{
-        functionName:&amp;quot;getAuth&amp;quot;,
-        name:&amp;quot;Run this only when the first time&amp;quot;
-      }]
-    );
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ol&gt;
-&lt;li&gt;When the spreadsheet is opened, at first, &lt;code&gt;onOpen()&lt;/code&gt; is executed. It is checked whether the user has already authorized. The dialog box is as follows.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170427-1st.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;If the user has never authorized yet, &lt;code&gt;dialogForAuth()&lt;/code&gt; is executed. If the user has already authorized. &lt;code&gt;dialogForGetUser()&lt;/code&gt; is executed. The dialog box is as follows.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170427-2nd.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;The user information is retrieved as follows. You can use this by &lt;code&gt;onEdit()&lt;/code&gt; and trigger.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;var user = CacheService.getUserCache().getAll([&amp;quot;username&amp;quot;, &amp;quot;usermail&amp;quot;]);
 &lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>
