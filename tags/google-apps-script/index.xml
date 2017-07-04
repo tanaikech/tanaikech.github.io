@@ -7,8 +7,302 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Thu, 29 Jun 2017 16:09:57 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 04 Jul 2017 15:57:20 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/tags/google-apps-script/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Downloading Files From Google Drive Under No Authorization Using Browser</title>
+      <link>https://tanaikech.github.io/2017/07/04/downloading-files-from-google-drive-under-no-authorization-using-browser</link>
+      <pubDate>Tue, 04 Jul 2017 15:57:20 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/07/04/downloading-files-from-google-drive-under-no-authorization-using-browser</guid>
+      <description>
+
+&lt;p&gt;&lt;a name=&#34;TOP&#34;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;This is a sample script for downloading files from Google Drive under no authorization using browser. By using this sample, you can make other users download files from your Google Drive. Even if the other users are not Google users, they can download the files.&lt;/p&gt;
+
+&lt;p&gt;&lt;a name=&#34;demo&#34;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;demo&#34;&gt;Demo&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170704-demo_simple.gif&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;This is a demonstration for downloading files from Google Drive under no authorization using browser. From the top document, You can see that an user who is not owner of Google Drive is downloading files.&lt;/p&gt;
+
+&lt;h2 id=&#34;problems-and-workaround&#34;&gt;Problems and Workaround&lt;/h2&gt;
+
+&lt;p&gt;In order to download files from Google Drive under no authorization, there are some problems. When files are downloaded from Google Drive, it is necessary to use Download Link and Drive API.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;In the case of use the Download Link for each file, only owner of Google Drive can download the files, even if the permission of files are changed as the ANYONE.&lt;/li&gt;
+&lt;li&gt;In the case of use the Drive API, users have to authorize at Google using OAuth2 process.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;I have already known that files can download under no authorization using &lt;a href=&#34;https://tanaikech.github.io/2017/03/20/download-files-without-authorization-from-google-drive/&#34;&gt;base64&lt;/a&gt; and &lt;a href=&#34;https://tanaikech.github.io/2017/05/10/file-transfer-for-google-drive-without-authorization/&#34;&gt;byte array&lt;/a&gt;. For these problems, I solved this using base64.&lt;/p&gt;
+
+&lt;h2 id=&#34;sample-script&#34;&gt;Sample Script&lt;/h2&gt;
+
+&lt;p&gt;In order to use this sample script, it is necessary to deploy Web Apps. The how to deploy Web Apps is as follows.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;On the Script Editor
+
+&lt;ul&gt;
+&lt;li&gt;File&lt;/li&gt;
+&lt;li&gt;-&amp;gt; Manage Versions&lt;/li&gt;
+&lt;li&gt;-&amp;gt; Save New Version&lt;/li&gt;
+&lt;li&gt;Publish&lt;/li&gt;
+&lt;li&gt;-&amp;gt; Deploy as Web App&lt;/li&gt;
+&lt;li&gt;-&amp;gt; At Execute the app as, select &lt;strong&gt;&amp;ldquo;your account&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;-&amp;gt; At Who has access to the app, select &lt;strong&gt;&amp;ldquo;Anyone, even anonymous&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;-&amp;gt; Click &amp;ldquo;Deploy&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;-&amp;gt; Copy &lt;strong&gt;&amp;ldquo;Current web app URL&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;-&amp;gt; Click &amp;ldquo;OK&amp;rdquo;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;And then, please copy and paste following respective HTML and GAS to your script editor. You can use the sample for the script of both container-bound script and standalone script. Following image is the project pasted the sample script. You can see the 2 files in the project.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170704-project.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;script&#34;&gt;Script&lt;/h3&gt;
+
+&lt;h4 id=&#34;html&#34;&gt;HTML&lt;/h4&gt;
+
+&lt;p&gt;Filename is &lt;code&gt;index.html&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;&amp;lt;!DOCTYPE html&amp;gt;
+&amp;lt;html&amp;gt;
+
+&amp;lt;head&amp;gt;
+    &amp;lt;meta http-equiv=&amp;quot;Content-Type&amp;quot; content=&amp;quot;text/html; charset=UTF-8&amp;quot;&amp;gt;
+    &amp;lt;script src=&amp;quot;https://code.jquery.com/jquery-3.2.1.min.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+&amp;lt;/head&amp;gt;
+
+&amp;lt;body&amp;gt;
+    &amp;lt;div class=&amp;quot;files&amp;quot;&amp;gt;
+        &amp;lt;form&amp;gt;
+            &amp;lt;table class=&amp;quot;table table-striped table-hover&amp;quot;&amp;gt;
+                &amp;lt;thead&amp;gt;
+                    &amp;lt;tr&amp;gt;
+                        &amp;lt;th&amp;gt;Download&amp;lt;/th&amp;gt;
+                        &amp;lt;th&amp;gt;FileName&amp;lt;/th&amp;gt;
+                        &amp;lt;th&amp;gt;Size[byte]&amp;lt;/th&amp;gt;
+                        &amp;lt;th&amp;gt;Parents&amp;lt;/th&amp;gt;
+                        &amp;lt;th&amp;gt;Updated&amp;lt;/th&amp;gt;
+                        &amp;lt;th&amp;gt;Created&amp;lt;/th&amp;gt;
+                    &amp;lt;/tr&amp;gt;
+                &amp;lt;/thead&amp;gt;
+                &amp;lt;tbody&amp;gt;
+                    &amp;lt;? for (var i = 0; i &amp;lt; data.length; i++) { ?&amp;gt;
+                        &amp;lt;tr&amp;gt;
+                            &amp;lt;td&amp;gt;
+                                &amp;lt;input type=&amp;quot;checkbox&amp;quot; id=&amp;quot;checkbox&amp;quot; name=&amp;quot;fileId&amp;quot; value=&amp;quot;&amp;lt;?= data[i].file_id  ?&amp;gt;&amp;quot; /&amp;gt;
+                            &amp;lt;/td&amp;gt;
+                            &amp;lt;td&amp;gt;
+                                &amp;lt;?= data[i].file_name ?&amp;gt;
+                            &amp;lt;/td&amp;gt;
+                            &amp;lt;td&amp;gt;
+                                &amp;lt;?= data[i].file_size ?&amp;gt;
+                            &amp;lt;/td&amp;gt;
+                            &amp;lt;td&amp;gt;
+                                &amp;lt;?= data[i].folder_tree ?&amp;gt;
+                            &amp;lt;/td&amp;gt;
+                            &amp;lt;td&amp;gt;
+                                &amp;lt;?= data[i].file_updated ?&amp;gt;
+                            &amp;lt;/td&amp;gt;
+                            &amp;lt;td&amp;gt;
+                                &amp;lt;?= data[i].file_created ?&amp;gt;
+                            &amp;lt;/td&amp;gt;
+                        &amp;lt;/tr&amp;gt;
+                        &amp;lt;? } ?&amp;gt;
+                &amp;lt;/tbody&amp;gt;
+            &amp;lt;/table&amp;gt;
+            &amp;lt;div class=&amp;quot;allchk&amp;quot;&amp;gt;
+                &amp;lt;input type=&amp;quot;checkbox&amp;quot; id=&amp;quot;allCheck01&amp;quot;&amp;gt;
+                &amp;lt;label for=&amp;quot;allCheck01&amp;quot;&amp;gt;Check All&amp;lt;/label&amp;gt;
+            &amp;lt;/div&amp;gt;
+            &amp;lt;input type=&amp;quot;button&amp;quot; class=&amp;quot;create&amp;quot; value=&amp;quot;Download&amp;quot; onclick=&amp;quot;google.script.run.withSuccessHandler(executeDownload).getparams(this.parentNode)&amp;quot;&amp;gt;
+        &amp;lt;/form&amp;gt;
+    &amp;lt;/div&amp;gt;
+    &amp;lt;a id=&amp;quot;dl&amp;quot; target=&amp;quot;_blank&amp;quot; href=&amp;quot;#&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;
+&amp;lt;/body&amp;gt;
+
+&amp;lt;script&amp;gt;
+$(function() {
+    $(&#39;.table tr&#39;).click(function(event) {
+        if (event.target.type !== &#39;checkbox&#39;) {
+            $(&#39;:checkbox&#39;, this).trigger(&#39;click&#39;);
+        }
+    });
+
+    $(&#39;.allchk input&#39;).click(function() {
+        var files = $(&#39;.files&#39;).find(&#39;input&#39;);
+        if ($(this).is(&#39;:checked&#39;)) {
+            $(files).prop(&#39;checked&#39;, true);
+        } else {
+            $(files).prop(&#39;checked&#39;, false);
+        }
+    });
+});
+
+function executeDownload(base64dat) {
+    $(&amp;quot;#dl&amp;quot;).prop(&amp;quot;href&amp;quot;, window.URL.createObjectURL(toBlob(base64dat))).prop(&amp;quot;download&amp;quot;, &amp;quot;dl_&amp;quot; + getfmtDate() + &amp;quot;.zip&amp;quot;)[0].click();
+}
+
+function toBlob(base64) {
+    var bin = atob(base64.replace(/^.*,/, &#39;&#39;));
+    var buffer = new Uint8Array(bin.length);
+    for (var i = 0; i &amp;lt; bin.length; i++) {
+        buffer[i] = bin.charCodeAt(i);
+    }
+    try {
+        var blob = new Blob([buffer.buffer], {
+            type: &#39;application/zip&#39;
+        });
+    } catch (e) {
+        return false;
+    }
+    return blob;
+}
+
+function getfmtDate() {
+    var dt = new Date();
+    return dt.getFullYear().toString() +
+        cd((dt.getMonth() + 1).toString()) +
+        cd(dt.getDate().toString()) +
+        &amp;quot;_&amp;quot; +
+        cd(dt.getHours().toString()) +
+        cd(dt.getMinutes().toString()) +
+        cd(dt.getSeconds().toString());
+};
+
+function cd(dat) {
+    return dat.length == 1 ? &amp;quot;0&amp;quot; + dat : dat;
+};
+&amp;lt;/script&amp;gt;
+
+&amp;lt;/html&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;google-apps-script&#34;&gt;Google Apps Script&lt;/h4&gt;
+
+&lt;p&gt;Filename is &lt;code&gt;code.gs&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;var folderId = &amp;quot;### Folder ID ###&amp;quot;; // &amp;lt;--- Your shared folder ID
+
+function doGet() {
+    var t = HtmlService.createTemplateFromFile(&#39;index&#39;);
+    t.data = getFileList();
+    return t.evaluate();
+}
+
+function getparams(e) {
+    return zipping(typeof(e.fileId) == &amp;quot;string&amp;quot; ? [e.fileId] : e.fileId);
+}
+
+function getFileList() {
+    var folderlist = (function(folder, folderSt, results) {
+        var ar = [];
+        var folders = folder.getFolders();
+        while (folders.hasNext()) ar.push(folders.next());
+        folderSt += folder.getId() + &amp;quot;#_aabbccddee_#&amp;quot;;
+        var array_folderSt = folderSt.split(&amp;quot;#_aabbccddee_#&amp;quot;);
+        array_folderSt.pop()
+        results.push(array_folderSt);
+        ar.length == 0 &amp;amp;&amp;amp; (folderSt = &amp;quot;&amp;quot;);
+        for (var i in ar) arguments.callee(ar[i], folderSt, results);
+        return results;
+    })(DriveApp.getFolderById(folderId), &amp;quot;&amp;quot;, []);
+    var localTimeZone = Session.getScriptTimeZone();
+    var filelist = [];
+    var temp = {};
+    for (var i in folderlist) {
+        var folderid = folderlist[i][folderlist[i].length - 1];
+        var folder = DriveApp.getFolderById(folderid);
+        var files = folder.getFiles();
+        while (files.hasNext()) {
+            var file = files.next();
+            temp = {
+                folder_tree: function(folderlist, i) {
+                    if (i &amp;gt; 0) {
+                        return &amp;quot;/&amp;quot; + [DriveApp.getFolderById(folderlist[i][j]).getName() for (j in folderlist[i])
+                            if (j &amp;gt; 0)].join(&amp;quot;/&amp;quot;) + &amp;quot;/&amp;quot;;
+                    } else {
+                        return &amp;quot;/&amp;quot;;
+                    }
+                }(folderlist, i),
+                file_id: file.getId(),
+                file_name: file.getName(),
+                file_size: file.getBlob().getBytes().length,
+                file_created: Utilities.formatDate(file.getDateCreated(), localTimeZone, &amp;quot;yyyy/MM/dd HH:mm:ss&amp;quot;),
+                file_updated: Utilities.formatDate(file.getLastUpdated(), localTimeZone, &amp;quot;yyyy/MM/dd HH:mm:ss&amp;quot;),
+            };
+            filelist.push(temp);
+            temp = {}
+        }
+    }
+    var sortedlist = filelist.sort(function(e1, e2) {
+        return (e1.folder_tree &amp;gt; e2.folder_tree ? 1 : -1) });
+    return sortedlist;
+}
+
+function zipping(fileId) {
+    var blobs = [];
+    var mimeType = &amp;quot;&amp;quot;;
+    fileId.forEach(function(e) {
+        try {
+            var file = DriveApp.getFileById(e);
+            var mime = file.getMimeType();
+            var name = file.getName();
+        } catch (e) {
+            return e
+        }
+        var blob;
+        if (mime.indexOf(&#39;google-apps&#39;) &amp;gt; 0) {
+            mimeType =
+                mime == &amp;quot;application/vnd.google-apps.spreadsheet&amp;quot; ? &amp;quot;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&amp;quot; : mime == &amp;quot;application/vnd.google-apps.document&amp;quot; ? &amp;quot;application/vnd.openxmlformats-officedocument.wordprocessingml.document&amp;quot; : mime == &amp;quot;application/vnd.google-apps.presentation&amp;quot; ? &amp;quot;application/vnd.openxmlformats-officedocument.presentationml.presentation&amp;quot; : &amp;quot;application/pdf&amp;quot;;
+            blob = UrlFetchApp.fetch(&amp;quot;https://www.googleapis.com/drive/v3/files/&amp;quot; + e + &amp;quot;/export?mimeType=&amp;quot; + mimeType, {
+                method: &amp;quot;GET&amp;quot;,
+                headers: { &amp;quot;Authorization&amp;quot;: &amp;quot;Bearer &amp;quot; + ScriptApp.getOAuthToken() },
+                muteHttpExceptions: true
+            }).getBlob().setName(name);
+        } else {
+            blob = UrlFetchApp.fetch(&amp;quot;https://www.googleapis.com/drive/v3/files/&amp;quot; + e + &amp;quot;?alt=media&amp;quot;, {
+                method: &amp;quot;GET&amp;quot;,
+                headers: { &amp;quot;Authorization&amp;quot;: &amp;quot;Bearer &amp;quot; + ScriptApp.getOAuthToken() },
+                muteHttpExceptions: true
+            }).getBlob().setName(name);
+        }
+        blobs.push(blob);
+    });
+    var zip = Utilities.zip(blobs, Utilities.formatDate(new Date(), Session.getScriptTimeZone(), &amp;quot;yyyyMMdd_HHmmss&amp;quot;) + &#39;.zip&#39;);
+    var bytedat = DriveApp.createFile(zip).getBlob().getBytes();
+    return Utilities.base64Encode(bytedat);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;flow-of-sample-script&#34;&gt;Flow of sample script&lt;/h4&gt;
+
+&lt;ol&gt;
+&lt;li&gt;All files in a folder that owner of Google Drive decided display as a list using &lt;a href=&#34;https://developers.google.com/apps-script/guides/web&#34;&gt;Web Apps&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Users access to the site which was used by Web Apps using own browser.&lt;/li&gt;
+&lt;li&gt;When users clicked the files from the list and pushed DOWNLOAD button, the files are converted to base64 using Google Apps Script.&lt;/li&gt;
+&lt;li&gt;The converted-base64 data are transfered to the site and are converted to blob using Javascript in HTML.&lt;/li&gt;
+&lt;li&gt;The blob data are compressed by ZIP, and then they are downloaded.&lt;/li&gt;
+&lt;li&gt;Google Spreadsheet, Google Document and Google Slide are converted to Microsoft Excel, Word and Powerpoint, respectively. Images and PDF are not converted to other format.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h4 id=&#34;sample-folder-structure&#34;&gt;Sample Folder Structure&lt;/h4&gt;
+
+&lt;p&gt;The folder structure as a sample is as follows. &lt;code&gt;sharedFolder&lt;/code&gt; is the top directory that owner was set. All of files and directories in the directory that owner defined is displayed as a list. At the &lt;a href=&#34;#demo&#34;&gt;demonstration&lt;/a&gt;, you can see it.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170704-samplestructure.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;#TOP&#34;&gt;TOP&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Updated: GAS Library - ImgApp</title>
@@ -1196,25 +1490,6 @@ function doGet(e) {
 
 &lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;curl -L https://script.google.com/macros/s/#####/exec?id=### Docx File ID ###
 &lt;/code&gt;&lt;/pre&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Updated ggsrun to v120</title>
-      <link>https://tanaikech.github.io/2017/05/19/updated-ggsrun-to-v120</link>
-      <pubDate>Fri, 19 May 2017 08:49:06 +0900</pubDate>
-      
-      <guid>https://tanaikech.github.io/2017/05/19/updated-ggsrun-to-v120</guid>
-      <description>
-
-&lt;h1 id=&#34;ggsrun-was-updated-to-v-1-2-0&#34;&gt;ggsrun was updated to v.1.2.0&lt;/h1&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Added a command for retrieving revision files on Google Drive.&lt;/li&gt;
-&lt;li&gt;Some modifications.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;You can check this at &lt;a href=&#34;https://github.com/tanaikech/ggsrun&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
 </description>
     </item>
     
