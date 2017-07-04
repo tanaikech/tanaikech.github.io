@@ -252,7 +252,7 @@ function getFileList() {
 
 function zipping(fileId) {
     var blobs = [];
-    var mimeType = &amp;quot;&amp;quot;;
+    var mimeInf = [];
     fileId.forEach(function(e) {
         try {
             var file = DriveApp.getFileById(e);
@@ -261,15 +261,16 @@ function zipping(fileId) {
         } catch (e) {
             return e
         }
+        Logger.log(mime)
         var blob;
         if (mime.indexOf(&#39;google-apps&#39;) &amp;gt; 0) {
-            mimeType =
-                mime == &amp;quot;application/vnd.google-apps.spreadsheet&amp;quot; ? &amp;quot;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&amp;quot; : mime == &amp;quot;application/vnd.google-apps.document&amp;quot; ? &amp;quot;application/vnd.openxmlformats-officedocument.wordprocessingml.document&amp;quot; : mime == &amp;quot;application/vnd.google-apps.presentation&amp;quot; ? &amp;quot;application/vnd.openxmlformats-officedocument.presentationml.presentation&amp;quot; : &amp;quot;application/pdf&amp;quot;;
-            blob = UrlFetchApp.fetch(&amp;quot;https://www.googleapis.com/drive/v3/files/&amp;quot; + e + &amp;quot;/export?mimeType=&amp;quot; + mimeType, {
+            mimeInf =
+                mime == &amp;quot;application/vnd.google-apps.spreadsheet&amp;quot; ? [&amp;quot;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&amp;quot;, name + &amp;quot;.xlsx&amp;quot;] : mime == &amp;quot;application/vnd.google-apps.document&amp;quot; ? [&amp;quot;application/vnd.openxmlformats-officedocument.wordprocessingml.document&amp;quot;, name + &amp;quot;.docx&amp;quot;] : mime == &amp;quot;application/vnd.google-apps.presentation&amp;quot; ? [&amp;quot;application/vnd.openxmlformats-officedocument.presentationml.presentation&amp;quot;, name + &amp;quot;.pptx&amp;quot;] : [&amp;quot;application/pdf&amp;quot;, name + &amp;quot;.pdf&amp;quot;];
+            blob = UrlFetchApp.fetch(&amp;quot;https://www.googleapis.com/drive/v3/files/&amp;quot; + e + &amp;quot;/export?mimeType=&amp;quot; + mimeInf[0], {
                 method: &amp;quot;GET&amp;quot;,
                 headers: { &amp;quot;Authorization&amp;quot;: &amp;quot;Bearer &amp;quot; + ScriptApp.getOAuthToken() },
                 muteHttpExceptions: true
-            }).getBlob().setName(name);
+            }).getBlob().setName(mimeInf[1]);
         } else {
             blob = UrlFetchApp.fetch(&amp;quot;https://www.googleapis.com/drive/v3/files/&amp;quot; + e + &amp;quot;?alt=media&amp;quot;, {
                 method: &amp;quot;GET&amp;quot;,
