@@ -7,8 +7,101 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Wed, 14 Jun 2017 17:35:47 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 05 Jul 2017 16:45:01 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/tags/spreadsheet/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Pseudo Browser with Google Spreadsheet</title>
+      <link>https://tanaikech.github.io/2017/07/05/pseudo-browser-with-google-spreadsheet</link>
+      <pubDate>Wed, 05 Jul 2017 16:45:01 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/07/05/pseudo-browser-with-google-spreadsheet</guid>
+      <description>
+
+&lt;h2 id=&#34;overview&#34;&gt;Overview&lt;/h2&gt;
+
+&lt;p&gt;This is a sample script for creating the pseudo browser using Google Spreadsheet.&lt;/p&gt;
+
+&lt;h2 id=&#34;description&#34;&gt;Description&lt;/h2&gt;
+
+&lt;p&gt;I unexpectedly noticed this. I think that this is for off-line browsing using HTML data. So there are many limitations. At first, please confirm them.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Limitations&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;It cannot move from opened site to other outside site. If the outer site is opened as a new wind, your own browser is opened and move there.&lt;/li&gt;
+&lt;li&gt;For URL, it can move directories which is one low. But it cannot move directories more than two deeper.
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Because it retrieves the HTML data from the inputted URL using &lt;code&gt;UrlFetchApp&lt;/code&gt;. It cannot move to the out side of data retrieved by &lt;code&gt;UrlFetchApp&lt;/code&gt;.&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;The access to the site opened by inputting URL is run at Google side.&lt;/li&gt;
+&lt;li&gt;Javascript on the opened site is run at your local PC side.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;User-Agent&lt;/code&gt; cannot be changed from &lt;code&gt;Mozilla/5.0 (compatible; Google-Apps-Script)&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;By using this, the sites which are slow speed at your environment might be able to be opened smoothly.&lt;/p&gt;
+
+&lt;h2 id=&#34;demo&#34;&gt;Demo&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170705a-demo.gif&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;script&#34;&gt;Script&lt;/h2&gt;
+
+&lt;p&gt;Please copy and paste following respective HTML and GAS to your script editor. Please launch the script editor on container-bound script for spreadsheet.&lt;/p&gt;
+
+&lt;h3 id=&#34;1-html&#34;&gt;1. HTML&lt;/h3&gt;
+
+&lt;p&gt;Filename is &lt;code&gt;index.html&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;&amp;lt;!DOCTYPE html&amp;gt;
+&amp;lt;html&amp;gt;
+  &amp;lt;head&amp;gt;
+    &amp;lt;style&amp;gt;
+      input.in1 {
+        width: 90%;
+      }
+    &amp;lt;/style&amp;gt;
+  &amp;lt;/head&amp;gt;
+  &amp;lt;body&amp;gt;
+    &amp;lt;form&amp;gt;
+      &amp;lt;input type=&amp;quot;text&amp;quot; name=&amp;quot;url&amp;quot; class=&amp;quot;in1&amp;quot;&amp;gt;
+      &amp;lt;input type=&amp;quot;button&amp;quot; value=&amp;quot;Run&amp;quot; class=&amp;quot;in2&amp;quot;
+        onclick=&amp;quot;
+        google.script.run
+        .withSuccessHandler(google.script.host.close)
+        .launchbrowser(this.parentNode)
+      &amp;quot;&amp;gt;
+    &amp;lt;/form&amp;gt;
+  &amp;lt;/body&amp;gt;
+&amp;lt;/html&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;2-gas&#34;&gt;2. GAS&lt;/h3&gt;
+
+&lt;p&gt;Filename is &lt;code&gt;code.gs&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function inputurl() {
+  var html = HtmlService.createHtmlOutputFromFile(&#39;index&#39;)
+    .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+    .setWidth(600)
+    .setHeight(80);
+  SpreadsheetApp.getUi().showModalDialog(html, &#39;URL?&#39;);
+}
+
+function launchbrowser(p) {
+  var html = UrlFetchApp.fetch(p.url);
+  var blob = HtmlService.createHtmlOutput(html)
+    .setWidth(800)
+    .setHeight(500)
+    .setTitle(&amp;quot;Sample Browser&amp;quot;);
+  SpreadsheetApp.getActiveSpreadsheet().show(blob);
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
     
     <item>
       <title>Search Route and Embedding Map using Custom Function on Spreadsheet</title>

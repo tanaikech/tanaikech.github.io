@@ -7,8 +7,101 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Tue, 04 Jul 2017 15:57:20 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 05 Jul 2017 16:45:01 +0900</lastBuildDate>
     <atom:link href="https://tanaikech.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Pseudo Browser with Google Spreadsheet</title>
+      <link>https://tanaikech.github.io/2017/07/05/pseudo-browser-with-google-spreadsheet</link>
+      <pubDate>Wed, 05 Jul 2017 16:45:01 +0900</pubDate>
+      
+      <guid>https://tanaikech.github.io/2017/07/05/pseudo-browser-with-google-spreadsheet</guid>
+      <description>
+
+&lt;h2 id=&#34;overview&#34;&gt;Overview&lt;/h2&gt;
+
+&lt;p&gt;This is a sample script for creating the pseudo browser using Google Spreadsheet.&lt;/p&gt;
+
+&lt;h2 id=&#34;description&#34;&gt;Description&lt;/h2&gt;
+
+&lt;p&gt;I unexpectedly noticed this. I think that this is for off-line browsing using HTML data. So there are many limitations. At first, please confirm them.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Limitations&lt;/strong&gt;
+
+&lt;ul&gt;
+&lt;li&gt;It cannot move from opened site to other outside site. If the outer site is opened as a new wind, your own browser is opened and move there.&lt;/li&gt;
+&lt;li&gt;For URL, it can move directories which is one low. But it cannot move directories more than two deeper.
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Because it retrieves the HTML data from the inputted URL using &lt;code&gt;UrlFetchApp&lt;/code&gt;. It cannot move to the out side of data retrieved by &lt;code&gt;UrlFetchApp&lt;/code&gt;.&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;The access to the site opened by inputting URL is run at Google side.&lt;/li&gt;
+&lt;li&gt;Javascript on the opened site is run at your local PC side.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;User-Agent&lt;/code&gt; cannot be changed from &lt;code&gt;Mozilla/5.0 (compatible; Google-Apps-Script)&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;By using this, the sites which are slow speed at your environment might be able to be opened smoothly.&lt;/p&gt;
+
+&lt;h2 id=&#34;demo&#34;&gt;Demo&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170705a-demo.gif&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;script&#34;&gt;Script&lt;/h2&gt;
+
+&lt;p&gt;Please copy and paste following respective HTML and GAS to your script editor. Please launch the script editor on container-bound script for spreadsheet.&lt;/p&gt;
+
+&lt;h3 id=&#34;1-html&#34;&gt;1. HTML&lt;/h3&gt;
+
+&lt;p&gt;Filename is &lt;code&gt;index.html&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;&amp;lt;!DOCTYPE html&amp;gt;
+&amp;lt;html&amp;gt;
+  &amp;lt;head&amp;gt;
+    &amp;lt;style&amp;gt;
+      input.in1 {
+        width: 90%;
+      }
+    &amp;lt;/style&amp;gt;
+  &amp;lt;/head&amp;gt;
+  &amp;lt;body&amp;gt;
+    &amp;lt;form&amp;gt;
+      &amp;lt;input type=&amp;quot;text&amp;quot; name=&amp;quot;url&amp;quot; class=&amp;quot;in1&amp;quot;&amp;gt;
+      &amp;lt;input type=&amp;quot;button&amp;quot; value=&amp;quot;Run&amp;quot; class=&amp;quot;in2&amp;quot;
+        onclick=&amp;quot;
+        google.script.run
+        .withSuccessHandler(google.script.host.close)
+        .launchbrowser(this.parentNode)
+      &amp;quot;&amp;gt;
+    &amp;lt;/form&amp;gt;
+  &amp;lt;/body&amp;gt;
+&amp;lt;/html&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;2-gas&#34;&gt;2. GAS&lt;/h3&gt;
+
+&lt;p&gt;Filename is &lt;code&gt;code.gs&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function inputurl() {
+  var html = HtmlService.createHtmlOutputFromFile(&#39;index&#39;)
+    .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+    .setWidth(600)
+    .setHeight(80);
+  SpreadsheetApp.getUi().showModalDialog(html, &#39;URL?&#39;);
+}
+
+function launchbrowser(p) {
+  var html = UrlFetchApp.fetch(p.url);
+  var blob = HtmlService.createHtmlOutput(html)
+    .setWidth(800)
+    .setHeight(500)
+    .setTitle(&amp;quot;Sample Browser&amp;quot;);
+  SpreadsheetApp.getActiveSpreadsheet().show(blob);
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
     
     <item>
       <title>Downloading Files From Google Drive Under No Authorization Using Browser</title>
@@ -917,31 +1010,6 @@ false
 In the same way, when the parameters is retrieved from the chart, it retrieves from the JSON data.&lt;/p&gt;
 
 &lt;p&gt;By using this method, it is possible to create a Google Apps Script from the charts which was manually created.&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Error Handling for Subprocess at Python</title>
-      <link>https://tanaikech.github.io/2017/06/09/error-handling-for-subprocess-at-python</link>
-      <pubDate>Fri, 09 Jun 2017 14:27:19 +0900</pubDate>
-      
-      <guid>https://tanaikech.github.io/2017/06/09/error-handling-for-subprocess-at-python</guid>
-      <description>&lt;p&gt;This sample is for error handling for subprocess.Popen. It confirms whether the execution file is existing. If the execution file is also not in the path, the error message is shown.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import subprocess
-
-res = subprocess.Popen(
-    &amp;quot;application&amp;quot;,  #  &amp;lt;- Execution file
-    stdout=subprocess.PIPE,
-    stderr=subprocess.PIPE,
-    shell=True
-).communicate()
-
-if len(res[1]) == 0:
-    print(&amp;quot;ok: Application is existing.&amp;quot;)
-else:
-    print(&amp;quot;Error: Application is not found.&amp;quot;)
-&lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>
     

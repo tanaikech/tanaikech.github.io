@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.16" />
 
-  <title>Tags &middot; tanaike</title>
+  <title>Pseudo Browser with Google Spreadsheet &middot; tanaike</title>
 
   
   
@@ -36,8 +36,6 @@
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
 
   
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike" href="https://tanaikech.github.io/tags/index.xml" />
   
 
   
@@ -113,10 +111,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://tanaikech.github.io/tags/index.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
-    </li>
     
 
     
@@ -206,263 +200,163 @@
 
 
 <div class="header">
-  <h1>Tags</h1>
+  <h1>Pseudo Browser with Google Spreadsheet</h1>
+  <h2></h2>
 </div>
 <div class="content">
-  <ul>
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>05 Jul 2017, 16:45</time>
+  </div>
+
+  
+
   
   
-    <li>
-      <a href="google-apps-script">google-apps-script</a>
-      <span>&#40;42&#41;</span>
-    </li>
   
-    <li>
-      <a href="golang">golang</a>
-      <span>&#40;22&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    
+  </div>
   
-    <li>
-      <a href="spreadsheet">spreadsheet</a>
-      <span>&#40;15&#41;</span>
-    </li>
   
-    <li>
-      <a href="cli">cli</a>
-      <span>&#40;12&#41;</span>
-    </li>
+
   
-    <li>
-      <a href="google">google</a>
-      <span>&#40;10&#41;</span>
-    </li>
   
-    <li>
-      <a href="python">python</a>
-      <span>&#40;10&#41;</span>
-    </li>
   
-    <li>
-      <a href="drive-api">drive-api</a>
-      <span>&#40;8&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>
+    
+  </div>
   
-    <li>
-      <a href="library">library</a>
-      <span>&#40;6&#41;</span>
-    </li>
   
-    <li>
-      <a href="google-drive">google-drive</a>
-      <span>&#40;5&#41;</span>
-    </li>
+
+</div>
+
   
-    <li>
-      <a href="chart">chart</a>
-      <span>&#40;4&#41;</span>
-    </li>
+
+<h2 id="overview">Overview</h2>
+
+<p>This is a sample script for creating the pseudo browser using Google Spreadsheet.</p>
+
+<h2 id="description">Description</h2>
+
+<p>I unexpectedly noticed this. I think that this is for off-line browsing using HTML data. So there are many limitations. At first, please confirm them.</p>
+
+<ul>
+<li><strong>Limitations</strong>
+
+<ul>
+<li>It cannot move from opened site to other outside site. If the outer site is opened as a new wind, your own browser is opened and move there.</li>
+<li>For URL, it can move directories which is one low. But it cannot move directories more than two deeper.
+
+<ul>
+<li><strong>Because it retrieves the HTML data from the inputted URL using <code>UrlFetchApp</code>. It cannot move to the out side of data retrieved by <code>UrlFetchApp</code>.</strong></li>
+</ul></li>
+<li>The access to the site opened by inputting URL is run at Google side.</li>
+<li>Javascript on the opened site is run at your local PC side.</li>
+<li><code>User-Agent</code> cannot be changed from <code>Mozilla/5.0 (compatible; Google-Apps-Script)</code>.</li>
+</ul></li>
+</ul>
+
+<p>By using this, the sites which are slow speed at your environment might be able to be opened smoothly.</p>
+
+<h2 id="demo">Demo</h2>
+
+<p><img src="https://tanaikech.github.io/img/20170705a-demo.gif" alt="" /></p>
+
+<h2 id="script">Script</h2>
+
+<p>Please copy and paste following respective HTML and GAS to your script editor. Please launch the script editor on container-bound script for spreadsheet.</p>
+
+<h3 id="1-html">1. HTML</h3>
+
+<p>Filename is <code>index.html</code>.</p>
+
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;style&gt;
+      input.in1 {
+        width: 90%;
+      }
+    &lt;/style&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;form&gt;
+      &lt;input type=&quot;text&quot; name=&quot;url&quot; class=&quot;in1&quot;&gt;
+      &lt;input type=&quot;button&quot; value=&quot;Run&quot; class=&quot;in2&quot;
+        onclick=&quot;
+        google.script.run
+        .withSuccessHandler(google.script.host.close)
+        .launchbrowser(this.parentNode)
+      &quot;&gt;
+    &lt;/form&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<h3 id="2-gas">2. GAS</h3>
+
+<p>Filename is <code>code.gs</code>.</p>
+
+<pre><code class="language-javascript">function inputurl() {
+  var html = HtmlService.createHtmlOutputFromFile('index')
+    .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+    .setWidth(600)
+    .setHeight(80);
+  SpreadsheetApp.getUi().showModalDialog(html, 'URL?');
+}
+
+function launchbrowser(p) {
+  var html = UrlFetchApp.fetch(p.url);
+  var blob = HtmlService.createHtmlOutput(html)
+    .setWidth(800)
+    .setHeight(500)
+    .setTitle(&quot;Sample Browser&quot;);
+  SpreadsheetApp.getActiveSpreadsheet().show(blob);
+}
+</code></pre>
+
+
   
-    <li>
-      <a href="ggsrun">ggsrun</a>
-      <span>&#40;4&#41;</span>
-    </li>
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2017/07/04/downloading-files-from-google-drive-under-no-authorization-using-browser"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2017/07/04/downloading-files-from-google-drive-under-no-authorization-using-browser">Downloading Files From Google Drive Under No Authorization Using Browser</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
+</div>
+
+
+
   
-    <li>
-      <a href="slack">slack</a>
-      <span>&#40;4&#41;</span>
-    </li>
-  
-    <li>
-      <a href="coffeescript">coffeescript</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="curl">curl</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="gist">gist</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="image">image</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="javascript">javascript</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="sublime">sublime</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="gislack">gislack</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="go">go</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="map">map</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="oauth2">oauth2</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="one-liner">one-liner</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href=""></a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="algorithm">algorithm</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="awk">awk</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="bash">bash</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="c&#43;&#43;">c&#43;&#43;</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="class">class</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="dos">dos</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="download">download</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="etc">etc</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="file">file</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="folder">folder</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="gas">gas</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="gislacks">gislacks</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="goris">goris</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="java">java</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="mail">mail</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="netatmo">netatmo</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="node.js">node.js</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="plugin">plugin</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="ruby">ruby</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="sample">sample</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="search">search</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="souwapy">souwapy</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="subprocess">subprocess</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="trigger">trigger</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="webapps">webapps</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="wget">wget</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-  </ul>
+
 </div>
 
 </div>
@@ -498,4 +392,5 @@
 
 </body>
 </html>
+
 
