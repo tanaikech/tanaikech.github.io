@@ -6,1448 +6,179 @@
     <description>Recent content in Spreadsheet on tanaike</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <copyright>&amp;copy; 2016. All rights reserved.</copyright>
+    <copyright>&amp;copy; 2017. All rights reserved.</copyright>
     <lastBuildDate>Wed, 05 Jul 2017 16:45:01 +0900</lastBuildDate>
-    <atom:link href="https://tanaikech.github.io/tags/spreadsheet/index.xml" rel="self" type="application/rss+xml" />
+    
+	<atom:link href="https://tanaikech.github.io/tags/spreadsheet/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
       <title>Pseudo Browser with Google Spreadsheet</title>
-      <link>https://tanaikech.github.io/2017/07/05/pseudo-browser-with-google-spreadsheet</link>
+      <link>https://tanaikech.github.io/2017/07/05/pseudo-browser-with-google-spreadsheet/</link>
       <pubDate>Wed, 05 Jul 2017 16:45:01 +0900</pubDate>
       
-      <guid>https://tanaikech.github.io/2017/07/05/pseudo-browser-with-google-spreadsheet</guid>
-      <description>
-
-&lt;p&gt;&lt;a href=&#34;https://gist.github.com/tanaikech/a290509e3d3f6997d248b88763fc69b9&#34;&gt;Gist&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;overview&#34;&gt;Overview&lt;/h2&gt;
-
-&lt;p&gt;This is a sample script for creating the pseudo browser using Google Spreadsheet.&lt;/p&gt;
-
-&lt;h2 id=&#34;description&#34;&gt;Description&lt;/h2&gt;
-
-&lt;p&gt;I unexpectedly noticed this. I think that this is for off-line browsing using HTML data. So there are many limitations. At first, please confirm them.&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;Limitations&lt;/strong&gt;
-
-&lt;ul&gt;
-&lt;li&gt;It cannot move from opened site to other outside site. If the outer site is opened as a new wind, your own browser is opened and move there.&lt;/li&gt;
-&lt;li&gt;For URL, it can move directories which is one low. But it cannot move directories more than two deeper.
-
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;Because it retrieves the HTML data from the inputted URL using &lt;code&gt;UrlFetchApp&lt;/code&gt;. It cannot move to the out side of data retrieved by &lt;code&gt;UrlFetchApp&lt;/code&gt;.&lt;/strong&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;The access to the site opened by inputting URL is run at Google side.&lt;/li&gt;
-&lt;li&gt;Javascript on the opened site is run at your local PC side.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;User-Agent&lt;/code&gt; cannot be changed from &lt;code&gt;Mozilla/5.0 (compatible; Google-Apps-Script)&lt;/code&gt;.&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;What I thought the interesting is that the appearance of the site has been maintained at this pseudo browser. And, by using this, the sites which are slow speed at your environment might be able to be opened smoothly.&lt;/p&gt;
-
-&lt;h2 id=&#34;demo&#34;&gt;Demo&lt;/h2&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170705a-demo.gif&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;script&#34;&gt;Script&lt;/h2&gt;
-
-&lt;p&gt;Please copy and paste following respective HTML and GAS to your script editor. Please launch the script editor on container-bound script for spreadsheet.&lt;/p&gt;
-
-&lt;h3 id=&#34;1-html&#34;&gt;1. HTML&lt;/h3&gt;
-
-&lt;p&gt;Filename is &lt;code&gt;index.html&lt;/code&gt;.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;&amp;lt;!DOCTYPE html&amp;gt;
-&amp;lt;html&amp;gt;
-  &amp;lt;head&amp;gt;
-    &amp;lt;style&amp;gt;
-      input.in1 {
-        width: 90%;
-      }
-    &amp;lt;/style&amp;gt;
-  &amp;lt;/head&amp;gt;
-  &amp;lt;body&amp;gt;
-    &amp;lt;form&amp;gt;
-      &amp;lt;input type=&amp;quot;text&amp;quot; name=&amp;quot;url&amp;quot; class=&amp;quot;in1&amp;quot;&amp;gt;
-      &amp;lt;input type=&amp;quot;button&amp;quot; value=&amp;quot;Run&amp;quot; class=&amp;quot;in2&amp;quot;
-        onclick=&amp;quot;
-        google.script.run
-        .withSuccessHandler(google.script.host.close)
-        .launchbrowser(this.parentNode)
-      &amp;quot;&amp;gt;
-    &amp;lt;/form&amp;gt;
-  &amp;lt;/body&amp;gt;
-&amp;lt;/html&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;2-gas&#34;&gt;2. GAS&lt;/h3&gt;
-
-&lt;p&gt;Filename is &lt;code&gt;code.gs&lt;/code&gt;.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function inputurl() {
-  var html = HtmlService.createHtmlOutputFromFile(&#39;index&#39;)
-    .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-    .setWidth(600)
-    .setHeight(80);
-  SpreadsheetApp.getUi().showModalDialog(html, &#39;URL?&#39;);
-}
-
-function launchbrowser(p) {
-  var html = UrlFetchApp.fetch(p.url);
-  var blob = HtmlService.createHtmlOutput(html)
-    .setWidth(800)
-    .setHeight(500)
-    .setTitle(&amp;quot;Sample Browser&amp;quot;);
-  SpreadsheetApp.getActiveSpreadsheet().show(blob);
-}
-&lt;/code&gt;&lt;/pre&gt;
-</description>
+      <guid>https://tanaikech.github.io/2017/07/05/pseudo-browser-with-google-spreadsheet/</guid>
+      <description>Gist
+Overview This is a sample script for creating the pseudo browser using Google Spreadsheet.
+Description I unexpectedly noticed this. I think that this is for off-line browsing using HTML data. So there are many limitations. At first, please confirm them.
+ Limitations  It cannot move from opened site to other outside site. If the outer site is opened as a new wind, your own browser is opened and move there.</description>
     </item>
     
     <item>
       <title>Search Route and Embedding Map using Custom Function on Spreadsheet</title>
-      <link>https://tanaikech.github.io/2017/06/14/search-route-and-embedding-map-using-custom-function-on-spreadsheet</link>
+      <link>https://tanaikech.github.io/2017/06/14/search-route-and-embedding-map-using-custom-function-on-spreadsheet/</link>
       <pubDate>Wed, 14 Jun 2017 17:35:47 +0900</pubDate>
       
-      <guid>https://tanaikech.github.io/2017/06/14/search-route-and-embedding-map-using-custom-function-on-spreadsheet</guid>
-      <description>
-
-&lt;p&gt;This sample script is for searching route between place A and B and embedding a map by custom function on Spreadsheet.&lt;/p&gt;
-
-&lt;p&gt;I think that this method is one of various ideas.&lt;/p&gt;
-
-&lt;h2 id=&#34;problem&#34;&gt;Problem&lt;/h2&gt;
-
-&lt;p&gt;When the map is embedded to a cell on spreadsheet as an image, the function &lt;code&gt;=IMAGE()&lt;/code&gt; is suitable for this situation. However, &lt;code&gt;Class Maps&lt;/code&gt;, &lt;code&gt;setFormula()&lt;/code&gt; for importing &lt;code&gt;=IMAGE()&lt;/code&gt; and &lt;code&gt;DriveApp.createFile()&lt;/code&gt; for creating images from maps also cannot be used for custom functions.&lt;/p&gt;
-
-&lt;h2 id=&#34;solution&#34;&gt;Solution&lt;/h2&gt;
-
-&lt;p&gt;In order to avoid these limitations, I used &lt;a href=&#34;https://developers.google.com/apps-script/guides/web&#34;&gt;Web Apps&lt;/a&gt;. From previous research, it has been found that Web Apps can avoid various limitations. Also in the case of this situation, Web Apps could avoid the above limitations.&lt;/p&gt;
-
-&lt;p&gt;To use this sample script, please deploy Web Apps as follows.&lt;/p&gt;
-
-&lt;p&gt;On the Script Editor,&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;File
-
-&lt;ul&gt;
-&lt;li&gt;-&amp;gt; Manage Versions&lt;/li&gt;
-&lt;li&gt;-&amp;gt; Save New Version&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;Publish
-
-&lt;ul&gt;
-&lt;li&gt;-&amp;gt; Deploy as Web App&lt;/li&gt;
-&lt;li&gt;-&amp;gt; At Execute the app as, select &lt;strong&gt;&amp;ldquo;your account&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;-&amp;gt; At Who has access to the app, select &lt;strong&gt;&amp;ldquo;Anyone, even anonymous&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;-&amp;gt; Click &lt;strong&gt;&amp;ldquo;Deploy&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;-&amp;gt; Copy &lt;strong&gt;&amp;ldquo;Current web app URL&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;-&amp;gt; Click &lt;strong&gt;&amp;ldquo;OK&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;When it deploys Web Apps, the approval required authorization can be done, simultaneously.&lt;/p&gt;
-
-&lt;h2 id=&#34;sample-script&#34;&gt;Sample Script :&lt;/h2&gt;
-
-&lt;p&gt;Please copy and paste this script to a bound script of spreadsheet. This sample uses &lt;code&gt;UrlShortener API&lt;/code&gt;. So before use this, please enable UrlShortener API at Advanced Google Services and console API.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;var folderId = &#39;### Folder ID ###&#39;; // Please input this.
-
-function getroute(pos1, pos2, mode) {
-  var ac = SpreadsheetApp.getActiveSheet().getActiveCell();
-  var q1 = &#39;?pos1=&#39; + pos1;
-  var q2 = &#39;&amp;amp;pos2=&#39; + pos2;
-  var q3 = &#39;&amp;amp;mode=&#39; + mode;
-  var q4 = &#39;&amp;amp;row=&#39; + ac.getRow();
-  var q5 = &#39;&amp;amp;col=&#39; + ac.getColumn();
-  UrlFetchApp.fetch(ScriptApp.getService().getUrl() + q1 + q2 + q3 + q4 + q5);
-}
-
-function doGet(e) {
-  var data = createMap(e.parameters.pos1, e.parameters.pos2, e.parameters.mode);
-  if (data) {
-    try {
-      var blob = UrlFetchApp.fetch(data[0]).getBlob().setName(e.parameters.pos1 + &#39;_&#39; + e.parameters.pos2);
-      var file = DriveApp.getFolderById(folderId).createFile(blob);
-      file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-      SpreadsheetApp
-      .getActiveSheet()
-      .getRange(e.parameters.row, e.parameters.col, 1, 4)
-      .setFormulas([[
-        &#39;=T(&amp;quot;&#39; + data[1].duration.value + &#39;&amp;quot;)&#39;,
-        &#39;=T(&amp;quot;&#39; + data[1].distance.value + &#39;&amp;quot;)&#39;,
-        &#39;=T(&amp;quot;&#39; + data[0] + &#39;&amp;quot;)&#39;,
-        &#39;=IMAGE(&amp;quot;&#39; + &#39;http://drive.google.com/uc?id=&#39; + file.getId() + &#39;&amp;quot;)&#39;,
-      ]]);
-    } catch(m) {
-      err(e.parameters.row, e.parameters.col);
-    }
-  } else {
-    err(e.parameters.row, e.parameters.col);
-  }
-}
-
-function createMap(pos1s, pos2s, mode) {
-  var geo = Maps.newGeocoder();
-  var pos1 = geo.geocode(pos1s).results[0];
-  var pos2 = geo.geocode(pos2s).results[0];
-  var map = Maps.newStaticMap().setSize(1000, 1000).setLanguage(&#39;en&#39;);
-  var directions = Maps.newDirectionFinder()
-  .setOrigin(pos1.geometry.location.lat, pos1.geometry.location.lng)
-  .setDestination(pos2.geometry.location.lat, pos2.geometry.location.lng)
-  .setMode(function(mode) {
-    switch (mode) {
-      case &#39;transit&#39;: return Maps.DirectionFinder.Mode.TRANSIT; break;
-      case &#39;driving&#39;: return Maps.DirectionFinder.Mode.DRIVING; break;
-      case &#39;walking&#39;: return Maps.DirectionFinder.Mode.WALKING; break;
-      case &#39;bicycling&#39;: return Maps.DirectionFinder.Mode.BICYCLING; break;
-      default : return Maps.DirectionFinder.Mode.DRIVING; break;
-    }
-  }(mode))
-  .setDepart(new Date())
-  .getDirections();
-  map.setPathStyle(5, Maps.StaticMap.Color.GREEN, null);
-  map.beginPath();
-  directions.routes.forEach(function(e1) {
-    e1.legs.forEach(function(e2) {
-      e2.steps.forEach(function(e3) {
-        map.addPath(Maps.decodePolyline(e3.polyline.points));
-      });
-    });
-  });
-  map.endPath();
-  map.setMarkerStyle(Maps.StaticMap.MarkerSize.MID, Maps.StaticMap.Color.RED, &#39;A&#39;).addMarker(pos1s);
-  map.setMarkerStyle(Maps.StaticMap.MarkerSize.MID, Maps.StaticMap.Color.BLUE, &#39;B&#39;).addMarker(pos2s);
-  try {
-    return [UrlShortener.Url.insert({longUrl: map.getMapUrl()}).id, directions.routes[0].legs[0]];
-  } catch(e) {
-    return null;
-  }
-}
-
-function err(row, col) {
-  SpreadsheetApp
-    .getActiveSheet()
-    .getRange(row, col, 1, 2)
-    .setFormulas([[
-      &#39;=T(&amp;quot;Route was not found.&amp;quot;)&#39;,
-      &#39;=T(&amp;quot;Route was not found.&amp;quot;)&#39;,
-  ]]);
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;flow-of-script&#34;&gt;Flow of Script :&lt;/h3&gt;
-
-&lt;p&gt;&lt;strong&gt;getroute()&lt;/strong&gt;&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Input &lt;code&gt;=getroute(A2, B2, C2)&lt;/code&gt; in cell &lt;code&gt;D2&lt;/code&gt;.&lt;/li&gt;
-&lt;li&gt;Using &lt;code&gt;fetch()&lt;/code&gt;, sends data of &lt;code&gt;&amp;quot;Tokyo station&amp;quot;, &amp;quot;Ginza station&amp;quot;, &amp;quot;transit&amp;quot;&lt;/code&gt; and the inputted coordinate to &lt;code&gt;doGet()&lt;/code&gt;.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;&lt;strong&gt;doGet()&lt;/strong&gt;&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Using &lt;code&gt;doGet()&lt;/code&gt;, get the data.&lt;/li&gt;
-&lt;li&gt;Searches the route from &amp;ldquo;Tokyo station&amp;rdquo; to &amp;ldquo;Ginza station&amp;rdquo;.&lt;/li&gt;
-&lt;li&gt;Creates the map with the route.&lt;/li&gt;
-&lt;li&gt;Saves a map as an image. (in this case, saves as PNG)&lt;/li&gt;
-&lt;li&gt;Updates a permission of the image file to use for &lt;code&gt;=IMAGE()&lt;/code&gt;.&lt;/li&gt;
-&lt;li&gt;Embeds the text data and image using &lt;code&gt;=T()&lt;/code&gt; and &lt;code&gt;=IMAGE()&lt;/code&gt; which was imported by &lt;code&gt;setFormula()&lt;/code&gt;.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2 id=&#34;result&#34;&gt;Result :&lt;/h2&gt;
-
-&lt;p&gt;By inputting &lt;code&gt;=getroute(A2, B2, C2)&lt;/code&gt; in cell &lt;code&gt;D2&lt;/code&gt; as a custom function, following result can be obtained.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Although this demo movie seems short loading time, this loading time is edited. Actual loading time is about 40 seconds.&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170614_demo.gif&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;note&#34;&gt;Note :&lt;/h2&gt;
-
-&lt;ol&gt;
-&lt;li&gt;When the custom function &lt;code&gt;getroute()&lt;/code&gt; is used, loading time is about 40 seconds. (I don&amp;rsquo;t know whether this occurs only my environment.)&lt;/li&gt;
-&lt;li&gt;Permissions of the created image are &lt;a href=&#34;https://developers.google.com/apps-script/reference/drive/access&#34;&gt;ANYONE_WITH_LINK&lt;/a&gt;, &lt;a href=&#34;https://developers.google.com/apps-script/reference/drive/permission&#34;&gt;VIEW&lt;/a&gt;.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2 id=&#34;related-tips&#34;&gt;Related Tips&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://tanaikech.github.io/2017/06/06/embedding-animation-gif-in-a-cell-on-spreadsheet/&#34;&gt;Embedding Animation GIF in A Cell on Spreadsheet&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://tanaikech.github.io/2017/06/06/ocr-using-custom-function-on-spreadsheet/&#34;&gt;OCR using Custom Function on Spreadsheet&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://tanaikech.github.io/2017/06/04/embedding-a-map-to-a-cell-using-custom-function-on-spreadsheet/&#34;&gt;Embedding a Map to a Cell using Custom Function on Spreadsheet&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://tanaikech.github.io/2017/05/26/embedding-a-chart-to-a-cell-using-custom-function-on-spreadsheet/&#34;&gt;Embedding a Chart to a Cell using Custom Function on Spreadsheet&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-</description>
+      <guid>https://tanaikech.github.io/2017/06/14/search-route-and-embedding-map-using-custom-function-on-spreadsheet/</guid>
+      <description>This sample script is for searching route between place A and B and embedding a map by custom function on Spreadsheet.
+I think that this method is one of various ideas.
+Problem When the map is embedded to a cell on spreadsheet as an image, the function =IMAGE() is suitable for this situation. However, Class Maps, setFormula() for importing =IMAGE() and DriveApp.createFile() for creating images from maps also cannot be used for custom functions.</description>
     </item>
     
     <item>
       <title>Giving and Retrieving Parameters for Chart at GAS</title>
-      <link>https://tanaikech.github.io/2017/06/12/giving-and-retrieving-parameters-for-chart-at-gas</link>
+      <link>https://tanaikech.github.io/2017/06/12/giving-and-retrieving-parameters-for-chart-at-gas/</link>
       <pubDate>Mon, 12 Jun 2017 11:11:06 +0900</pubDate>
       
-      <guid>https://tanaikech.github.io/2017/06/12/giving-and-retrieving-parameters-for-chart-at-gas</guid>
-      <description>
-
-&lt;p&gt;This sample script is for retrieving parameters from a chart. The chart created by both Google Apps Script and manually operation can be used.&lt;/p&gt;
-
-&lt;h2 id=&#34;creates-chart&#34;&gt;Creates Chart&lt;/h2&gt;
-
-&lt;p&gt;When a chart is created, it supposes following parameters.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;var parameters = {
-  &amp;quot;title&amp;quot;: &amp;quot;x axis&amp;quot;,
-  &amp;quot;fontName&amp;quot;: &amp;quot;Arial&amp;quot;,
-  &amp;quot;minValue&amp;quot;: 0,
-  &amp;quot;maxValue&amp;quot;: 100,
-  &amp;quot;titleTextStyle&amp;quot;: {
-    &amp;quot;color&amp;quot;: &amp;quot;#c0c0c0&amp;quot;,
-    &amp;quot;fontSize&amp;quot;: 10,
-    &amp;quot;fontName&amp;quot;: &amp;quot;Roboto&amp;quot;,
-    &amp;quot;italic&amp;quot;: true,
-    &amp;quot;bold&amp;quot;: false
-  }
-};
-
-.setOption(&#39;hAxis&#39;, parameters)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;retrieve-parameters-from-chart&#34;&gt;Retrieve Parameters From Chart&lt;/h2&gt;
-
-&lt;p&gt;For the chart created by above parameters, in order to retrieve the parameters, it uses following script.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;var hAxis_title = chart.getOptions().get(&#39;hAxis.title&#39;)
-var hAxis_fontName = chart.getOptions().get(&#39;hAxis.fontName&#39;)
-var hAxis_minValue = chart.getOptions().get(&#39;hAxis.minValue&#39;)
-var hAxis_maxValue = chart.getOptions().get(&#39;hAxis.maxValue&#39;)
-var hAxis_titleTextStyle_color = chart.getOptions().get(&#39;hAxis.titleTextStyle.color&#39;)
-var hAxis_titleTextStyle_fontSize = chart.getOptions().get(&#39;hAxis.titleTextStyle.fontSize&#39;)
-var hAxis_titleTextStyle_fontName = chart.getOptions().get(&#39;hAxis.titleTextStyle.fontName&#39;)
-var hAxis_titleTextStyle_italic = chart.getOptions().get(&#39;hAxis.titleTextStyle.italic&#39;)
-var hAxis_titleTextStyle_bold = chart.getOptions().get(&#39;hAxis.titleTextStyle.bold&#39;)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;strong&gt;Result :&lt;/strong&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;x axis
-Arial
-0.0
-100.0
-#c0c0c0
-10.0
-Roboto
-true
-false
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;At Google chart, the parameters is constructed by JSON data. So when the chart is created, JSON data is used.
-In the same way, when the parameters is retrieved from the chart, it retrieves from the JSON data.&lt;/p&gt;
-
-&lt;p&gt;By using this method, it is possible to create a Google Apps Script from the charts which was manually created.&lt;/p&gt;
-</description>
+      <guid>https://tanaikech.github.io/2017/06/12/giving-and-retrieving-parameters-for-chart-at-gas/</guid>
+      <description>This sample script is for retrieving parameters from a chart. The chart created by both Google Apps Script and manually operation can be used.
+Creates Chart When a chart is created, it supposes following parameters.
+var parameters = { &amp;quot;title&amp;quot;: &amp;quot;x axis&amp;quot;, &amp;quot;fontName&amp;quot;: &amp;quot;Arial&amp;quot;, &amp;quot;minValue&amp;quot;: 0, &amp;quot;maxValue&amp;quot;: 100, &amp;quot;titleTextStyle&amp;quot;: { &amp;quot;color&amp;quot;: &amp;quot;#c0c0c0&amp;quot;, &amp;quot;fontSize&amp;quot;: 10, &amp;quot;fontName&amp;quot;: &amp;quot;Roboto&amp;quot;, &amp;quot;italic&amp;quot;: true, &amp;quot;bold&amp;quot;: false } }; .setOption(&#39;hAxis&#39;, parameters)  Retrieve Parameters From Chart For the chart created by above parameters, in order to retrieve the parameters, it uses following script.</description>
     </item>
     
     <item>
       <title>Embedding Animation GIF in A Cell on Spreadsheet</title>
-      <link>https://tanaikech.github.io/2017/06/06/embedding-animation-gif-in-a-cell-on-spreadsheet</link>
+      <link>https://tanaikech.github.io/2017/06/06/embedding-animation-gif-in-a-cell-on-spreadsheet/</link>
       <pubDate>Tue, 06 Jun 2017 16:47:41 +0900</pubDate>
       
-      <guid>https://tanaikech.github.io/2017/06/06/embedding-animation-gif-in-a-cell-on-spreadsheet</guid>
-      <description>
-
-&lt;p&gt;This sample script is for embedding animation GIF in a cell using custom function on Spreadsheet.&lt;/p&gt;
-
-&lt;p&gt;I think that this method is one of various ideas.&lt;/p&gt;
-
-&lt;h2 id=&#34;problem&#34;&gt;Problem&lt;/h2&gt;
-
-&lt;p&gt;There are some limitations.&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Images of jpeg and png can be embedded in a cell using &lt;code&gt;=IMAGE()&lt;/code&gt;. But when animation GIF is embedded using it, GIF is not played.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;insertImage()&lt;/code&gt; can insert the animation GIF to sheet. But it is not imported to one cell. It floats on several cells.&lt;/li&gt;
-&lt;li&gt;In order to float the animation GIF on one cell, the size of GIF has to be retrieved. But the size of image cannot be retrieved at spreadsheet APIs.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;=IMAGE()&lt;/code&gt; and &lt;code&gt;insertImage()&lt;/code&gt; cannot be used by custom functions.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2 id=&#34;solution&#34;&gt;Solution&lt;/h2&gt;
-
-&lt;p&gt;I thought a method to floating an animation GIF on one cell using &lt;code&gt;insertImage()&lt;/code&gt;. By this, I thought that it will be easy to use as a sheet with GIF images.&lt;/p&gt;
-
-&lt;p&gt;In order to retrieve the size of image, it uses Google Document APIs. Class InlineImage of Document APIs has &lt;code&gt;getHeight()&lt;/code&gt; and &lt;code&gt;getWidth()&lt;/code&gt;. By this, the image size can be retrieved, and the size of cell can be changed using this. Although I have tried to resize image using &lt;code&gt;setHeight()&lt;/code&gt; and &lt;code&gt;setWidth()&lt;/code&gt;, when the image resized using them is retrieved, the size was original one.&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;insertImage()&lt;/code&gt; can be used by Web Apps &lt;a href=&#34;https://developers.google.com/apps-script/guides/web&#34;&gt;Web Apps&lt;/a&gt;. From previous research, it has been found that Web Apps can avoid various limitations. Also in the case of this situation, Web Apps could avoid the above limitations.&lt;/p&gt;
-
-&lt;p&gt;To use this sample script, please deploy Web Apps as follows.&lt;/p&gt;
-
-&lt;p&gt;On the Script Editor,&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;File
-
-&lt;ul&gt;
-&lt;li&gt;-&amp;gt; Manage Versions&lt;/li&gt;
-&lt;li&gt;-&amp;gt; Save New Version&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;Publish
-
-&lt;ul&gt;
-&lt;li&gt;-&amp;gt; Deploy as Web App&lt;/li&gt;
-&lt;li&gt;-&amp;gt; At Execute the app as, select &lt;strong&gt;&amp;ldquo;your account&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;-&amp;gt; At Who has access to the app, select &lt;strong&gt;&amp;ldquo;Anyone, even anonymous&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;-&amp;gt; Click &lt;strong&gt;&amp;ldquo;Deploy&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;-&amp;gt; Copy &lt;strong&gt;&amp;ldquo;Current web app URL&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;-&amp;gt; Click &lt;strong&gt;&amp;ldquo;OK&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;When it deploys Web Apps, the approval required authorization can be done, simultaneously.&lt;/p&gt;
-
-&lt;h2 id=&#34;sample-script&#34;&gt;Sample Script :&lt;/h2&gt;
-
-&lt;p&gt;Please copy and paste this script to a bound script of spreadsheet.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function gif(filename) {
-  var ac = SpreadsheetApp.getActiveSheet().getActiveCell();
-  var q1 = &amp;quot;?file=&amp;quot; + filename;
-  var q2 = &amp;quot;&amp;amp;row=&amp;quot; + ac.getRow();
-  var q3 = &amp;quot;&amp;amp;col=&amp;quot; + ac.getColumn();
-  var url = ScriptApp.getService().getUrl() + q1 + q2 + q3;
-  UrlFetchApp.fetch(url);
-}
-
-function doGet(e) {
-  var srcfile = DriveApp.getFilesByName(e.parameters.file).next();
-  srcfile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-  var fileid = Drive.Files.insert({
-      title: &amp;quot;temp&amp;quot;,
-      mimeType: &amp;quot;application/vnd.google-apps.document&amp;quot;,
-      parents:  [{&amp;quot;id&amp;quot;: srcfile.getParents().next().getId()}]
-  }).getId();
-  var img = DocumentApp.openById(fileid)
-            .insertImage(
-              0,
-              UrlFetchApp.fetch(Drive.Files.get(srcfile.getId())
-              .webContentLink)
-              .getBlob()
-            );
-  var sheet = SpreadsheetApp.getActiveSheet();
-  sheet.setRowHeight(e.parameters.row, img.getHeight() + 4);
-  sheet.setColumnWidth(e.parameters.col, img.getWidth() + 3);
-  sheet.getRange(e.parameters.row, e.parameters.col).setFormula(&amp;quot;&amp;quot;);
-  sheet.insertImage(Drive.Files.get(srcfile.getId()).webContentLink, e.parameters.row, e.parameters.col);
-  Utilities.sleep(1000);
-  Drive.Files.remove(fileid);
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;flow-of-script&#34;&gt;Flow of Script :&lt;/h3&gt;
-
-&lt;p&gt;&lt;strong&gt;gif()&lt;/strong&gt;&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Input &lt;code&gt;=gif(&amp;quot;sample.gif&amp;quot;)&lt;/code&gt; in cell &lt;code&gt;B2&lt;/code&gt;. &lt;code&gt;&amp;quot;sample.gif&amp;quot;&lt;/code&gt; is an animation GIF.&lt;/li&gt;
-&lt;li&gt;Using &lt;code&gt;fetch()&lt;/code&gt;, sends data of &lt;code&gt;&amp;quot;sample.gif&amp;quot;&lt;/code&gt; and the inputted coordinate to &lt;code&gt;doGet()&lt;/code&gt;.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;&lt;strong&gt;doGet()&lt;/strong&gt;&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Using &lt;code&gt;doGet()&lt;/code&gt;, get the data.&lt;/li&gt;
-&lt;li&gt;Update the permission of GIF.&lt;/li&gt;
-&lt;li&gt;Create Document file as new file.&lt;/li&gt;
-&lt;li&gt;Import GIF to the Document and retrieve the image size of GIF.&lt;/li&gt;
-&lt;li&gt;Using the size, change the size of cell for importing GIF.&lt;/li&gt;
-&lt;li&gt;Import GIF to the cell.&lt;/li&gt;
-&lt;li&gt;Delete Document file.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2 id=&#34;result&#34;&gt;Result :&lt;/h2&gt;
-
-&lt;p&gt;By inputting &lt;code&gt;=gif(&amp;quot;sample.png&amp;quot;)&lt;/code&gt; in cell &lt;code&gt;B2&lt;/code&gt; as a custom function, following result can be obtained.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Although this demo movie seems short loading time, this loading time is edited. Actual loading time is about 40 seconds.&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170606c_demo.gif&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;note&#34;&gt;Note :&lt;/h2&gt;
-
-&lt;ol&gt;
-&lt;li&gt;When the custom function &lt;code&gt;gif()&lt;/code&gt; is used, loading time is about 40 seconds. (I don&amp;rsquo;t know whether this occurs only my environment.)&lt;/li&gt;
-&lt;li&gt;Permissions of GIF are &lt;a href=&#34;https://developers.google.com/apps-script/reference/drive/access&#34;&gt;ANYONE_WITH_LINK&lt;/a&gt;, &lt;a href=&#34;https://developers.google.com/apps-script/reference/drive/permission&#34;&gt;VIEW&lt;/a&gt;.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2 id=&#34;related-tips&#34;&gt;Related Tips&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://tanaikech.github.io/2017/06/06/ocr-using-custom-function-on-spreadsheet/&#34;&gt;OCR using Custom Function on Spreadsheet&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://tanaikech.github.io/2017/05/26/embedding-a-chart-to-a-cell-using-custom-function-on-spreadsheet/&#34;&gt;Embedding a Chart to a Cell using Custom Function on Spreadsheet&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://tanaikech.github.io/2017/06/04/embedding-a-map-to-a-cell-using-custom-function-on-spreadsheet/&#34;&gt;Embedding a Map to a Cell using Custom Function on Spreadsheet&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-</description>
+      <guid>https://tanaikech.github.io/2017/06/06/embedding-animation-gif-in-a-cell-on-spreadsheet/</guid>
+      <description>This sample script is for embedding animation GIF in a cell using custom function on Spreadsheet.
+I think that this method is one of various ideas.
+Problem There are some limitations.
+ Images of jpeg and png can be embedded in a cell using =IMAGE(). But when animation GIF is embedded using it, GIF is not played. insertImage() can insert the animation GIF to sheet. But it is not imported to one cell.</description>
     </item>
     
     <item>
       <title>OCR using Custom Function on Spreadsheet</title>
-      <link>https://tanaikech.github.io/2017/06/06/ocr-using-custom-function-on-spreadsheet</link>
+      <link>https://tanaikech.github.io/2017/06/06/ocr-using-custom-function-on-spreadsheet/</link>
       <pubDate>Tue, 06 Jun 2017 07:53:57 +0900</pubDate>
       
-      <guid>https://tanaikech.github.io/2017/06/06/ocr-using-custom-function-on-spreadsheet</guid>
-      <description>
-
-&lt;p&gt;This sample script performs OCR and imports resultant text to a cell using custom function on Spreadsheet.&lt;/p&gt;
-
-&lt;p&gt;Drive API has a function to do OCR. It was used for this sample.&lt;/p&gt;
-
-&lt;p&gt;I think that this method is one of various ideas.&lt;/p&gt;
-
-&lt;h2 id=&#34;problem&#34;&gt;Problem&lt;/h2&gt;
-
-&lt;p&gt;When OCR is performed and imported the result to a cell on spreadsheet, there are some limitations. &lt;code&gt;DriveApp&lt;/code&gt;, &lt;code&gt;UrlFetchApp&lt;/code&gt;, &lt;code&gt;setFormula()&lt;/code&gt; cannot be used for custom functions.&lt;/p&gt;
-
-&lt;h2 id=&#34;solution&#34;&gt;Solution&lt;/h2&gt;
-
-&lt;p&gt;In order to avoid these limitations, I used &lt;a href=&#34;https://developers.google.com/apps-script/guides/web&#34;&gt;Web Apps&lt;/a&gt;. From previous research, it has been found that Web Apps can avoid various limitations. Also in the case of this situation, Web Apps could avoid the above limitations.&lt;/p&gt;
-
-&lt;p&gt;To use this sample script, please deploy Web Apps as follows.&lt;/p&gt;
-
-&lt;p&gt;On the Script Editor,&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;File
-
-&lt;ul&gt;
-&lt;li&gt;-&amp;gt; Manage Versions&lt;/li&gt;
-&lt;li&gt;-&amp;gt; Save New Version&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;Publish
-
-&lt;ul&gt;
-&lt;li&gt;-&amp;gt; Deploy as Web App&lt;/li&gt;
-&lt;li&gt;-&amp;gt; At Execute the app as, select &lt;strong&gt;&amp;ldquo;your account&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;-&amp;gt; At Who has access to the app, select &lt;strong&gt;&amp;ldquo;Anyone, even anonymous&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;-&amp;gt; Click &lt;strong&gt;&amp;ldquo;Deploy&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;-&amp;gt; Copy &lt;strong&gt;&amp;ldquo;Current web app URL&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;-&amp;gt; Click &lt;strong&gt;&amp;ldquo;OK&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;When it deploys Web Apps, the approval required authorization can be done, simultaneously.&lt;/p&gt;
-
-&lt;h2 id=&#34;sample-script&#34;&gt;Sample Script :&lt;/h2&gt;
-
-&lt;p&gt;Please copy and paste this script to a bound script of spreadsheet.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;var folderId = &amp;quot;### Folder ID ###&amp;quot;;
-
-function OCR(filename) {
-  var ac = SpreadsheetApp.getActiveSheet().getActiveCell();
-  var q1 = &amp;quot;?file=&amp;quot; + filename;
-  var q2 = &amp;quot;&amp;amp;row=&amp;quot; + ac.getRow();
-  var q3 = &amp;quot;&amp;amp;col=&amp;quot; + ac.getColumn();
-  var url = ScriptApp.getService().getUrl() + q1 + q2 + q3;
-  UrlFetchApp.fetch(url);
-}
-
-function doGet(e) {
-  var res = doOCR(e.parameters.file);
-  SpreadsheetApp
-  .getActiveSheet()
-  .getRange(e.parameters.row, e.parameters.col, 1, 2)
-  .setFormulas([[
-    &#39;=T(&amp;quot;&#39; + e.parameters.file + &#39;&amp;quot;)&#39;,
-    &#39;=T(&amp;quot;&#39; + res + &#39;&amp;quot;)&#39;
-  ]]);
-}
-
-function doOCR(src) {
-  var srcfile = DriveApp.getFilesByName(src).next();
-  var fileid = Drive.Files.insert(
-    {
-      title: srcfile.getName(),
-      mimeType: Drive.Files.get(srcfile.getId(), {fields: &amp;quot;mimeType&amp;quot;}).mimeType,
-      parents:  [{&amp;quot;id&amp;quot;: srcfile.getParents().next().getId()}]
-    },
-    srcfile.getBlob(),
-    {
-      ocr: true,
-      ocrLanguage: &#39;en&#39;
-    }
-  ).getId();
-  var textdata = UrlFetchApp.fetch(
-    &amp;quot;https://www.googleapis.com/drive/v3/files/&amp;quot; +
-    fileid +
-    &amp;quot;/export?mimeType=text/plain&amp;quot;,
-    {
-      headers : {Authorization: &amp;quot;Bearer &amp;quot; + ScriptApp.getOAuthToken()},
-      muteHttpExceptions : true
-    }
-  ).getContentText();
-  Drive.Files.remove(fileid);
-  return textdata.replace(&amp;quot;________________&amp;quot;, &amp;quot;&amp;quot;);
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The text data obtained by OCR is included a text &lt;code&gt;&amp;quot;________________&amp;quot;&lt;/code&gt;. I don&amp;rsquo;t know the reason. But this can be remove using &lt;code&gt;replace()&lt;/code&gt;.&lt;/p&gt;
-
-&lt;h3 id=&#34;flow-of-script&#34;&gt;Flow of Script :&lt;/h3&gt;
-
-&lt;p&gt;&lt;strong&gt;OCR()&lt;/strong&gt;&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Input &lt;code&gt;=OCR(&amp;quot;sample.png&amp;quot;)&lt;/code&gt; in cell &lt;code&gt;A1&lt;/code&gt;. &lt;code&gt;&amp;quot;sample.png&amp;quot;&lt;/code&gt; is a source image file. Also PDF files can be used for a source file. &lt;code&gt;&amp;quot;sample.png&amp;quot;&lt;/code&gt; is as follows.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170606a_sample.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Using &lt;code&gt;fetch()&lt;/code&gt;, sends data of &lt;code&gt;&amp;quot;sample.png&amp;quot;&lt;/code&gt; and the inputted coordinate to &lt;code&gt;doGet()&lt;/code&gt;.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;&lt;strong&gt;doGet()&lt;/strong&gt;&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Using &lt;code&gt;doGet()&lt;/code&gt;, get the data.&lt;/li&gt;
-&lt;li&gt;The source file is converted to a Google Document using &lt;code&gt;Drive API&lt;/code&gt;.&lt;/li&gt;
-&lt;li&gt;The created Document is converted to text data using &lt;code&gt;Drive API&lt;/code&gt;.&lt;/li&gt;
-&lt;li&gt;Imports the text data by &lt;code&gt;setFormula()&lt;/code&gt;. &lt;code&gt;setFormula()&lt;/code&gt; is used for overwriting &lt;code&gt;=OCR(&amp;quot;sample.png&amp;quot;)&lt;/code&gt;.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2 id=&#34;result&#34;&gt;Result :&lt;/h2&gt;
-
-&lt;p&gt;By inputting &lt;code&gt;=OCR(&amp;quot;sample.png&amp;quot;)&lt;/code&gt; in cell &lt;code&gt;A1&lt;/code&gt; as a custom function, following result can be obtained.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170606b.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;note&#34;&gt;Note :&lt;/h2&gt;
-
-&lt;ol&gt;
-&lt;li&gt;When the custom function &lt;code&gt;OCR()&lt;/code&gt; is used, loading time is about 40 seconds. (I don&amp;rsquo;t know whether this occurs only my environment.)&lt;/li&gt;
-&lt;li&gt;Permissions of the created image are &lt;a href=&#34;https://developers.google.com/apps-script/reference/drive/access&#34;&gt;ANYONE_WITH_LINK&lt;/a&gt;, &lt;a href=&#34;https://developers.google.com/apps-script/reference/drive/permission&#34;&gt;VIEW&lt;/a&gt;.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2 id=&#34;related-tips&#34;&gt;Related Tips&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://tanaikech.github.io/2017/05/26/embedding-a-chart-to-a-cell-using-custom-function-on-spreadsheet/&#34;&gt;Embedding a Chart to a Cell using Custom Function on Spreadsheet&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://tanaikech.github.io/2017/06/04/embedding-a-map-to-a-cell-using-custom-function-on-spreadsheet/&#34;&gt;Embedding a Map to a Cell using Custom Function on Spreadsheet&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-</description>
+      <guid>https://tanaikech.github.io/2017/06/06/ocr-using-custom-function-on-spreadsheet/</guid>
+      <description>This sample script performs OCR and imports resultant text to a cell using custom function on Spreadsheet.
+Drive API has a function to do OCR. It was used for this sample.
+I think that this method is one of various ideas.
+Problem When OCR is performed and imported the result to a cell on spreadsheet, there are some limitations. DriveApp, UrlFetchApp, setFormula() cannot be used for custom functions.
+Solution In order to avoid these limitations, I used Web Apps.</description>
     </item>
     
     <item>
       <title>Embedding a Map to a Cell using Custom Function on Spreadsheet</title>
-      <link>https://tanaikech.github.io/2017/06/04/embedding-a-map-to-a-cell-using-custom-function-on-spreadsheet</link>
+      <link>https://tanaikech.github.io/2017/06/04/embedding-a-map-to-a-cell-using-custom-function-on-spreadsheet/</link>
       <pubDate>Sun, 04 Jun 2017 12:02:28 +0900</pubDate>
       
-      <guid>https://tanaikech.github.io/2017/06/04/embedding-a-map-to-a-cell-using-custom-function-on-spreadsheet</guid>
-      <description>
-
-&lt;p&gt;This sample script embeds a map to a cell using custom function on Spreadsheet.&lt;/p&gt;
-
-&lt;p&gt;I think that this method is one of various ideas.&lt;/p&gt;
-
-&lt;h2 id=&#34;problem&#34;&gt;Problem&lt;/h2&gt;
-
-&lt;p&gt;When the map is embeded to a cell on spreadsheet as an image, the function &lt;code&gt;=IMAGE()&lt;/code&gt; is suitable for this situation. However, &lt;code&gt;setFormula()&lt;/code&gt; for importing &lt;code&gt;=IMAGE()&lt;/code&gt; and &lt;code&gt;DriveApp.createFile()&lt;/code&gt; for creating images from maps also cannot be used for custom functions.&lt;/p&gt;
-
-&lt;h2 id=&#34;solution&#34;&gt;Solution&lt;/h2&gt;
-
-&lt;p&gt;In order to avoid these limitations, I used &lt;a href=&#34;https://developers.google.com/apps-script/guides/web&#34;&gt;Web Apps&lt;/a&gt;. From previous research, it has been found that Web Apps can avoid various limitations. Also in the case of this situation, Web Apps could avoid the above limitations.&lt;/p&gt;
-
-&lt;p&gt;To use this sample script, please deploy Web Apps as follows.&lt;/p&gt;
-
-&lt;p&gt;On the Script Editor,&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;File
-
-&lt;ul&gt;
-&lt;li&gt;-&amp;gt; Manage Versions&lt;/li&gt;
-&lt;li&gt;-&amp;gt; Save New Version&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;Publish
-
-&lt;ul&gt;
-&lt;li&gt;-&amp;gt; Deploy as Web App&lt;/li&gt;
-&lt;li&gt;-&amp;gt; At Execute the app as, select &lt;strong&gt;&amp;ldquo;your account&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;-&amp;gt; At Who has access to the app, select &lt;strong&gt;&amp;ldquo;Anyone, even anonymous&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;-&amp;gt; Click &lt;strong&gt;&amp;ldquo;Deploy&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;-&amp;gt; Copy &lt;strong&gt;&amp;ldquo;Current web app URL&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;-&amp;gt; Click &lt;strong&gt;&amp;ldquo;OK&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;When it deploys Web Apps, the approval required authorization can be done, simultaneously.&lt;/p&gt;
-
-&lt;h2 id=&#34;sample-script&#34;&gt;Sample Script :&lt;/h2&gt;
-
-&lt;p&gt;Please copy and paste this script to a bound script of spreadsheet.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;var folderId = &amp;quot;### Folder ID ###&amp;quot;;
-
-function embedMap(range, zoom) {
-  var ac = SpreadsheetApp.getActiveSheet().getActiveCell();
-  var q1 = &amp;quot;?address=&amp;quot; + range;
-  var q2 = &amp;quot;&amp;amp;zoom=&amp;quot; + zoom;
-  var q3 = &amp;quot;&amp;amp;row=&amp;quot; + ac.getRow();
-  var q4 = &amp;quot;&amp;amp;col=&amp;quot; + ac.getColumn();
-  UrlFetchApp.fetch(ScriptApp.getService().getUrl() + q1 + q2 + q3 + q4);
-}
-
-function doGet(e) {
-  var data = Maps.newGeocoder().geocode(e.parameters.address).results[0];
-  var file = DriveApp.getFolderById(folderId).createFile(
-    Maps.newStaticMap()
-    .setSize(800, 600)
-    .setCenter(data.geometry.location.lat, data.geometry.location.lng)
-    .setZoom(parseInt(e.parameters.zoom, 10))
-    .setLanguage(&amp;quot;en&amp;quot;)
-    .getBlob()
-    .getAs(&#39;image/png&#39;)
-    .setName(&amp;quot;map.png&amp;quot;)
-  );
-  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-  SpreadsheetApp
-  .getActiveSheet()
-  .getRange(e.parameters.row, e.parameters.col, 1, 2)
-  .setFormulas([[
-    &#39;=T(&amp;quot;&#39; + data.formatted_address + &#39;&amp;quot;)&#39;,
-    &#39;=IMAGE(&amp;quot;&#39; + &amp;quot;http://drive.google.com/uc?id=&amp;quot; + file.getId() + &#39;&amp;quot;)&#39;
-  ]]);
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;flow-of-script&#34;&gt;Flow of Script :&lt;/h3&gt;
-
-&lt;p&gt;&lt;strong&gt;embedMap()&lt;/strong&gt;&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Input &lt;code&gt;=embedMap(&amp;quot;Tokyo station&amp;quot;, 16)&lt;/code&gt; in cell &lt;code&gt;B3&lt;/code&gt;. &lt;code&gt;&amp;quot;Tokyo station&amp;quot;&lt;/code&gt; and &lt;code&gt;16&lt;/code&gt; are a name of place and zoom, respectively.&lt;/li&gt;
-&lt;li&gt;Using &lt;code&gt;fetch()&lt;/code&gt;, sends data of &lt;code&gt;&amp;quot;Tokyo station&amp;quot;, 16&lt;/code&gt; and the inputted coordinate to &lt;code&gt;doGet()&lt;/code&gt;.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;&lt;strong&gt;doGet()&lt;/strong&gt;&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Using &lt;code&gt;doGet()&lt;/code&gt;, get the data.&lt;/li&gt;
-&lt;li&gt;Creates the map from the name of place.&lt;/li&gt;
-&lt;li&gt;Saves a map as an image. (in this case, saves as PNG)&lt;/li&gt;
-&lt;li&gt;Updates a permission of the image file to use for &lt;code&gt;=IMAGE()&lt;/code&gt;.&lt;/li&gt;
-&lt;li&gt;Embeds the address and image using &lt;code&gt;=T()&lt;/code&gt; and &lt;code&gt;=IMAGE()&lt;/code&gt; which was imported by &lt;code&gt;setFormula()&lt;/code&gt;.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2 id=&#34;result&#34;&gt;Result :&lt;/h2&gt;
-
-&lt;p&gt;By inputting &lt;code&gt;=embedMap(&amp;quot;Tokyo station&amp;quot;, 16)&lt;/code&gt; in cell &lt;code&gt;B3&lt;/code&gt; as a custom function, following result can be obtained.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170604a.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;note&#34;&gt;Note :&lt;/h2&gt;
-
-&lt;ol&gt;
-&lt;li&gt;When the custom function &lt;code&gt;embedMap()&lt;/code&gt; is used, loading time is about 40 seconds. (I don&amp;rsquo;t know whether this occurs only my environment.)&lt;/li&gt;
-&lt;li&gt;Permissions of the created image are &lt;a href=&#34;https://developers.google.com/apps-script/reference/drive/access&#34;&gt;ANYONE_WITH_LINK&lt;/a&gt;, &lt;a href=&#34;https://developers.google.com/apps-script/reference/drive/permission&#34;&gt;VIEW&lt;/a&gt;.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;embedMap()&lt;/code&gt; is overwritten by &lt;code&gt;=IMAGE()&lt;/code&gt;. So when the spreadsheet is reopened, the response of &lt;code&gt;=IMAGE()&lt;/code&gt; is much faster than that of &lt;code&gt;embedMap()&lt;/code&gt;.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2 id=&#34;related-tips&#34;&gt;Related Tips&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://tanaikech.github.io/2017/06/06/ocr-using-custom-function-on-spreadsheet/&#34;&gt;OCR using Custom Function on Spreadsheet&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://tanaikech.github.io/2017/05/26/embedding-a-chart-to-a-cell-using-custom-function-on-spreadsheet/&#34;&gt;Embedding a Chart to a Cell using Custom Function on Spreadsheet&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-</description>
+      <guid>https://tanaikech.github.io/2017/06/04/embedding-a-map-to-a-cell-using-custom-function-on-spreadsheet/</guid>
+      <description>This sample script embeds a map to a cell using custom function on Spreadsheet.
+I think that this method is one of various ideas.
+Problem When the map is embeded to a cell on spreadsheet as an image, the function =IMAGE() is suitable for this situation. However, setFormula() for importing =IMAGE() and DriveApp.createFile() for creating images from maps also cannot be used for custom functions.
+Solution In order to avoid these limitations, I used Web Apps.</description>
     </item>
     
     <item>
       <title>Embedding a Chart to a Cell using Custom Function on Spreadsheet</title>
-      <link>https://tanaikech.github.io/2017/05/26/embedding-a-chart-to-a-cell-using-custom-function-on-spreadsheet</link>
+      <link>https://tanaikech.github.io/2017/05/26/embedding-a-chart-to-a-cell-using-custom-function-on-spreadsheet/</link>
       <pubDate>Fri, 26 May 2017 11:59:06 +0900</pubDate>
       
-      <guid>https://tanaikech.github.io/2017/05/26/embedding-a-chart-to-a-cell-using-custom-function-on-spreadsheet</guid>
-      <description>
-
-&lt;p&gt;This sample script embeds a chart to a cell using custom function on Spreadsheet.&lt;/p&gt;
-
-&lt;p&gt;I think that this method is one of various ideas.&lt;/p&gt;
-
-&lt;h2 id=&#34;problem&#34;&gt;Problem&lt;/h2&gt;
-
-&lt;p&gt;When you want to create a chart and embed it to a cell using custom functions, you notice that &lt;code&gt;insertChart()&lt;/code&gt; cannot be used. There are some limitations for using custom functions. But &lt;code&gt;insertChart()&lt;/code&gt; creates floating charts. So in order to embed a chart to a cell, the function &lt;code&gt;=IMAGE()&lt;/code&gt; is suitable for this situation. Here, &lt;code&gt;setFormula()&lt;/code&gt; for setting &lt;code&gt;=IMAGE()&lt;/code&gt; and &lt;code&gt;DriveApp.createFile()&lt;/code&gt; for creating images from charts also cannot be used for custom functions.&lt;/p&gt;
-
-&lt;h2 id=&#34;solution&#34;&gt;Solution&lt;/h2&gt;
-
-&lt;p&gt;In order to avoid these limitations, I used &lt;a href=&#34;https://developers.google.com/apps-script/guides/web&#34;&gt;Web Apps&lt;/a&gt;. From previous research, it has been found that Web Apps can avoid various limitations. Also in the case of this situation, Web Apps could avoid the above limitations.&lt;/p&gt;
-
-&lt;p&gt;To use this sample script, please deploy Web Apps as follows.&lt;/p&gt;
-
-&lt;p&gt;On the Script Editor,&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;File
-
-&lt;ul&gt;
-&lt;li&gt;-&amp;gt; Manage Versions&lt;/li&gt;
-&lt;li&gt;-&amp;gt; Save New Version&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;Publish
-
-&lt;ul&gt;
-&lt;li&gt;-&amp;gt; Deploy as Web App&lt;/li&gt;
-&lt;li&gt;-&amp;gt; At Execute the app as, select &lt;strong&gt;&amp;ldquo;your account&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;-&amp;gt; At Who has access to the app, select &lt;strong&gt;&amp;ldquo;Anyone, even anonymous&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;-&amp;gt; Click &lt;strong&gt;&amp;ldquo;Deploy&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;-&amp;gt; Copy &lt;strong&gt;&amp;ldquo;Current web app URL&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;-&amp;gt; Click &lt;strong&gt;&amp;ldquo;OK&amp;rdquo;&lt;/strong&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;When it deploys Web Apps, the approval required authorization can be done, simultaneously.&lt;/p&gt;
-
-&lt;h2 id=&#34;sample-script&#34;&gt;Sample Script :&lt;/h2&gt;
-
-&lt;p&gt;Please copy and paste this script to a bound script of spreadsheet.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;var folderId = &amp;quot;### Folder ID ###&amp;quot;;
-var webappsurl = &amp;quot;https://script.google.com/macros/s/######/exec&amp;quot;;
-
-function embedChart(range) {
-  var ac = SpreadsheetApp.getActiveSheet().getActiveCell();
-  var q1 = &amp;quot;?datarange=&amp;quot; + range;
-  var q2 = &amp;quot;&amp;amp;row=&amp;quot; + ac.getRow();
-  var q3 = &amp;quot;&amp;amp;col=&amp;quot; + ac.getColumn();
-  var url = webappsurl + q1 + q2 + q3;
-  UrlFetchApp.fetch(url);
-}
-
-function doGet(e) {
-  var sheet = SpreadsheetApp.getActiveSheet();
-  var chart = sheet.newChart()
-    .setChartType(Charts.ChartType.PIE)
-    .addRange(sheet.getRange(e.parameters.datarange))
-    .setOption(&#39;height&#39;, 280)
-    .setOption(&#39;width&#39;, 480)
-    .setOption(&#39;title&#39;, &#39;Sample chart&#39;)
-    .build();
-  var file = DriveApp.getFolderById(folderId).createFile(
-    chart.getAs(&#39;image/png&#39;).setName(&amp;quot;chart_image.png&amp;quot;)
-  );
-  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-  sheet.getRange(e.parameters.row, e.parameters.col).setFormula(
-    &#39;=IMAGE(&amp;quot;&#39; + &amp;quot;http://drive.google.com/uc?id=&amp;quot; + file.getId() + &#39;&amp;quot;)&#39;
-  );
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;flow-of-script&#34;&gt;Flow of Script :&lt;/h3&gt;
-
-&lt;p&gt;&lt;strong&gt;embedChart()&lt;/strong&gt;&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Input &lt;code&gt;=embedChart(&amp;quot;a2:a6&amp;quot;)&lt;/code&gt; in cell &lt;code&gt;B7&lt;/code&gt;.&lt;/li&gt;
-&lt;li&gt;Using &lt;code&gt;fetch()&lt;/code&gt;, sends data of &lt;code&gt;a2:a6&lt;/code&gt; and the inputted coordinate to &lt;code&gt;doGet()&lt;/code&gt;.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;&lt;strong&gt;doGet()&lt;/strong&gt;&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Using &lt;code&gt;doGet()&lt;/code&gt;, get the data.&lt;/li&gt;
-&lt;li&gt;Creates a chart using inputted range &lt;code&gt;a2:a6&lt;/code&gt;. (in this case, creates a pie chart)&lt;/li&gt;
-&lt;li&gt;Saves a chart as an image.  (in this case, saves as PNG)&lt;/li&gt;
-&lt;li&gt;Updates a permission of the image file to use for &lt;code&gt;=IMAGE()&lt;/code&gt;.&lt;/li&gt;
-&lt;li&gt;Embeds the image using &lt;code&gt;=IMAGE()&lt;/code&gt; which was imported by &lt;code&gt;setFormula()&lt;/code&gt;.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2 id=&#34;result&#34;&gt;Result :&lt;/h2&gt;
-
-&lt;p&gt;By inputting &lt;code&gt;=embedChart(&amp;quot;a2:a6&amp;quot;)&lt;/code&gt; in cell &lt;code&gt;B7&lt;/code&gt; as a custom function, following result can be obtained.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170526a.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;note&#34;&gt;Note :&lt;/h2&gt;
-
-&lt;ol&gt;
-&lt;li&gt;When the custom function &lt;code&gt;embedChart()&lt;/code&gt; is used, loading time is about 40 seconds. (I don&amp;rsquo;t know whether this occurs only my environment.)&lt;/li&gt;
-&lt;li&gt;Permissions of the created image are &lt;a href=&#34;https://developers.google.com/apps-script/reference/drive/access&#34;&gt;ANYONE_WITH_LINK&lt;/a&gt;, &lt;a href=&#34;https://developers.google.com/apps-script/reference/drive/permission&#34;&gt;VIEW&lt;/a&gt;.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;embedChart()&lt;/code&gt; is overwritten by &lt;code&gt;=IMAGE()&lt;/code&gt;. So when the spreadsheet is reopened, the response of &lt;code&gt;=IMAGE()&lt;/code&gt; is much faster than that of &lt;code&gt;embedChart()&lt;/code&gt;.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2 id=&#34;related-tips&#34;&gt;Related Tips&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://tanaikech.github.io/2017/06/06/ocr-using-custom-function-on-spreadsheet/&#34;&gt;OCR using Custom Function on Spreadsheet&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://tanaikech.github.io/2017/06/04/embedding-a-map-to-a-cell-using-custom-function-on-spreadsheet/&#34;&gt;Embedding a Map to a Cell using Custom Function on Spreadsheet&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-</description>
+      <guid>https://tanaikech.github.io/2017/05/26/embedding-a-chart-to-a-cell-using-custom-function-on-spreadsheet/</guid>
+      <description>This sample script embeds a chart to a cell using custom function on Spreadsheet.
+I think that this method is one of various ideas.
+Problem When you want to create a chart and embed it to a cell using custom functions, you notice that insertChart() cannot be used. There are some limitations for using custom functions. But insertChart() creates floating charts. So in order to embed a chart to a cell, the function =IMAGE() is suitable for this situation.</description>
     </item>
     
     <item>
       <title>Changing Line to Bars for Combo Chart using GAS</title>
-      <link>https://tanaikech.github.io/2017/05/16/changing-line-to-bars-for-combo-chart-using-gas</link>
+      <link>https://tanaikech.github.io/2017/05/16/changing-line-to-bars-for-combo-chart-using-gas/</link>
       <pubDate>Tue, 16 May 2017 11:42:56 +0900</pubDate>
       
-      <guid>https://tanaikech.github.io/2017/05/16/changing-line-to-bars-for-combo-chart-using-gas</guid>
-      <description>
-
-&lt;h2 id=&#34;sample-data&#34;&gt;Sample data&lt;/h2&gt;
-
-&lt;p&gt;This is a sample data for this sample script. The column B was created by the normal distribution formula, and the column C was created by multiplying random number for column B.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-csv&#34;&gt;A, B, C
-1.0, 0.0001, 0.0000
-1.5, 0.0009, 0.0006
-2.0, 0.0044, 0.0037
-2.5, 0.0175, 0.0133
-3.0, 0.0540, 0.0236
-3.5, 0.1296, 0.0533
-4.0, 0.2420, 0.0073
-4.5, 0.3522, 0.2468
-5.0, 0.3990, 0.0843
-5.5, 0.3522, 0.3352
-6.0, 0.2420, 0.2201
-6.5, 0.1296, 0.0607
-7.0, 0.0540, 0.0256
-7.5, 0.0175, 0.0006
-8.0, 0.0044, 0.0030
-8.5, 0.0009, 0.0005
-9.0, 0.0001, 0.0001
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;create-chart&#34;&gt;Create chart&lt;/h2&gt;
-
-&lt;p&gt;&lt;code&gt;createChart()&lt;/code&gt; creates a chart from data. A chart with 2 lines is created by this method.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function createChart(){
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var chart = sheet.newChart()
-    .setChartType(Charts.ChartType.COMBO)
-    .addRange(sheet.getRange(&#39;a1:a18&#39;))
-    .addRange(sheet.getRange(&#39;b1:b18&#39;))
-    .addRange(sheet.getRange(&#39;c1:c18&#39;))
-    .setPosition(5, 5, 0, 0)
-    .setOption(&#39;series&#39;, {
-      0:{type: &#39;line&#39;, color: &#39;red&#39;, curveType: &#39;function&#39;},
-      1:{type: &#39;line&#39;, color: &#39;blue&#39;, curveType: &#39;function&#39;},
-    })
-    .setOption(&#39;useFirstColumnAsDomain&#39;, true)
-    .setOption(&#39;height&#39;, 280)
-    .setOption(&#39;width&#39;, 480)
-    .setOption(&#39;title&#39;, &#39;Sample chart&#39;)
-    .setOption(&#39;vAxis&#39;, {
-      minValue: 0,
-      maxValue: 0.4,
-      gridlines: {
-        count: 10
-      }
-    })
-    .build();
-  sheet.insertChart(chart);
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;created-chart&#34;&gt;Created chart&lt;/h3&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170516_fig1.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;h3 id=&#34;note&#34;&gt;note&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;.setChartType(Charts.ChartType.COMBO)&lt;/code&gt; defines COMBO chart.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;.setOption(&#39;series&#39;, {})&lt;/code&gt; defines each type for range &lt;code&gt;&#39;b1:b18&#39;&lt;/code&gt; and &lt;code&gt;&#39;c1:c18&#39;&lt;/code&gt;.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;0:{}&lt;/code&gt; and &lt;code&gt;1:{}&lt;/code&gt; of &lt;code&gt;.setOption(&#39;series&#39;, {})&lt;/code&gt; mean range &lt;code&gt;&#39;b1:b18&#39;&lt;/code&gt; and &lt;code&gt;&#39;c1:c18&#39;&lt;/code&gt;, respectively.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;modify-chart&#34;&gt;Modify chart&lt;/h2&gt;
-
-&lt;p&gt;&lt;code&gt;modifyChart()&lt;/code&gt; modifies the chart with 2 lines. It modifies from red line to red bars.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function modifyChart(){
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var chart = sheet.getCharts()[0];
-  chart = chart.modify()
-    .setChartType(Charts.ChartType.COMBO)
-    .addRange(sheet.getRange(&#39;a1:a18&#39;))
-    .addRange(sheet.getRange(&#39;b1:b18&#39;))
-    .addRange(sheet.getRange(&#39;c1:c18&#39;))
-    .setPosition(5, 5, 0, 0)
-    .setOption(&#39;series&#39;, {
-      0:{type: &#39;bars&#39;, color: &#39;red&#39;},
-      1:{type: &#39;line&#39;, color: &#39;blue&#39;, curveType: &#39;function&#39;},
-    })
-    .setOption(&#39;useFirstColumnAsDomain&#39;, true)
-    .setOption(&#39;height&#39;, 280)
-    .setOption(&#39;width&#39;, 480)
-    .setOption(&#39;title&#39;, &#39;Sample chart&#39;)
-    .setOption(&#39;vAxis&#39;, {
-      minValue: 0,
-      maxValue: 0.4,
-      gridlines: {
-        count: 10
-      }
-    })
-    .build();
-  sheet.updateChart(chart);
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;modified-chart&#34;&gt;Modified chart&lt;/h3&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170516_fig2.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;h3 id=&#34;note-1&#34;&gt;note&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;0:{type: &#39;bars&#39;, color: &#39;red&#39;}&lt;/code&gt; was modified.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;reference&#34;&gt;Reference&lt;/h2&gt;
-
-&lt;p&gt;Reference pages are &lt;a href=&#34;https://developers.google.com/apps-script/reference/spreadsheet/embedded-line-chart-builder&#34;&gt;here&lt;/a&gt; and &lt;a href=&#34;https://developers.google.com/chart/interactive/docs/gallery/areachart#configuration-options&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
-
-&lt;h2 id=&#34;commission&#34;&gt;Commission&lt;/h2&gt;
-
-&lt;p&gt;This was accepted as a commission.&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;May 13, 2017, Dr. Mehmet TEKDAL (Çukurova University)&lt;/li&gt;
-&lt;/ul&gt;
-</description>
+      <guid>https://tanaikech.github.io/2017/05/16/changing-line-to-bars-for-combo-chart-using-gas/</guid>
+      <description>Sample data This is a sample data for this sample script. The column B was created by the normal distribution formula, and the column C was created by multiplying random number for column B.
+A, B, C 1.0, 0.0001, 0.0000 1.5, 0.0009, 0.0006 2.0, 0.0044, 0.0037 2.5, 0.0175, 0.0133 3.0, 0.0540, 0.0236 3.5, 0.1296, 0.0533 4.0, 0.2420, 0.0073 4.5, 0.3522, 0.2468 5.0, 0.3990, 0.0843 5.5, 0.3522, 0.3352 6.0, 0.2420, 0.</description>
     </item>
     
     <item>
       <title>Sending E-mail When Spreadsheet was Edited from Outside by Sheet API</title>
-      <link>https://tanaikech.github.io/2017/05/14/sending-e-mail-when-spreadsheet-was-edited-from-outside-by-sheet-api</link>
+      <link>https://tanaikech.github.io/2017/05/14/sending-e-mail-when-spreadsheet-was-edited-from-outside-by-sheet-api/</link>
       <pubDate>Sun, 14 May 2017 17:43:52 +0900</pubDate>
       
-      <guid>https://tanaikech.github.io/2017/05/14/sending-e-mail-when-spreadsheet-was-edited-from-outside-by-sheet-api</guid>
-      <description>&lt;p&gt;This sample script sends an e-mail, when spreadsheet was edited from outside by Sheet API v4. When you use this sample, please create a container bound script with spreadsheet which is edited by Sheet API. And please input your e-mail and run firstly a method of &lt;code&gt;createTrigger()&lt;/code&gt;. By this, a trigger is installed as &lt;code&gt;onChange()&lt;/code&gt;. After this, edit spreadsheet from outside by Sheet API v4.&lt;/p&gt;
-
-&lt;p&gt;When when spreadsheet was edited from outside by Sheet API v4, I used &lt;code&gt;sendEmail()&lt;/code&gt; as a sample, because script editor is closed.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Sample script :&lt;/strong&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function createTrigger(){
-  ScriptApp.newTrigger(&#39;sendMail&#39;)
-      .forSpreadsheet(SpreadsheetApp.getActive())
-      .onChange()
-      .create();
-}
-
-function sendMail() {
-  MailApp.sendEmail(&amp;quot;### Your e-mail address ###&amp;quot;, &amp;quot;test mail&amp;quot;, &amp;quot;Spreadsheet was edited.&amp;quot;);
-}
-&lt;/code&gt;&lt;/pre&gt;
-</description>
+      <guid>https://tanaikech.github.io/2017/05/14/sending-e-mail-when-spreadsheet-was-edited-from-outside-by-sheet-api/</guid>
+      <description>This sample script sends an e-mail, when spreadsheet was edited from outside by Sheet API v4. When you use this sample, please create a container bound script with spreadsheet which is edited by Sheet API. And please input your e-mail and run firstly a method of createTrigger(). By this, a trigger is installed as onChange(). After this, edit spreadsheet from outside by Sheet API v4.
+When when spreadsheet was edited from outside by Sheet API v4, I used sendEmail() as a sample, because script editor is closed.</description>
     </item>
     
     <item>
       <title>Retrieving User Information with Shared Spreadsheet</title>
-      <link>https://tanaikech.github.io/2017/04/27/retrieving-user-information-with-shared-spreadsheet</link>
+      <link>https://tanaikech.github.io/2017/04/27/retrieving-user-information-with-shared-spreadsheet/</link>
       <pubDate>Thu, 27 Apr 2017 14:34:22 +0900</pubDate>
       
-      <guid>https://tanaikech.github.io/2017/04/27/retrieving-user-information-with-shared-spreadsheet</guid>
-      <description>&lt;p&gt;This sample script retrieves the user information which is editing the shared spreadsheet.&lt;/p&gt;
-
-&lt;p&gt;It was found as follows.&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;User information retrieving by Class Session is the owner and users which installed triggers by themselves.&lt;/li&gt;
-&lt;li&gt;When each user installs a trigger, user information retrieving by Class Session losts the accuracy. So user information has to be retrieved using a temporally installed trigger.&lt;/li&gt;
-&lt;li&gt;Using &lt;code&gt;onOpen()&lt;/code&gt;, it cannot directly install triggers and authorize.&lt;/li&gt;
-&lt;li&gt;Using menu bar, it can install triggers and authorize Google Services using API.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Here, I thought 2 problems.&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;The confirmation whether the authorization was done.
-
-&lt;ul&gt;
-&lt;li&gt;At &lt;code&gt;onOpen()&lt;/code&gt;, although many methods using Google API can be executed without the authorization, there are also some methods which cannot be executed without the authorization. Furthermore, there are some methods which cannot execute even if the authorization was done. It&amp;rsquo;s &lt;code&gt;trigger&lt;/code&gt;. On the other hand, &lt;code&gt;DriveApp&lt;/code&gt; requires the authorization for only the first time, but it can use without the authorization after 2nd times.&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;I thought that users can find easily by displaying information in a dialog box when spreadsheet is launched. So I adopted displaying information using the dialog box. But, there is a big limitation for the dialog box.
-
-&lt;ul&gt;
-&lt;li&gt;Using a click of button on a dialog box, it can install triggers. However it cannot authorize Google Services using API.&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;Using above information, I thought a flow to retrieve user information.&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;When user opens the spreadsheet for the first time, it displays &amp;lsquo;Please authorize at &amp;ldquo;Authorization&amp;rdquo; of menu bar.&amp;rsquo; using a dialog box, and creates a menu bar &amp;ldquo;Authorization&amp;rdquo;.&lt;/li&gt;
-&lt;li&gt;The user clicks &amp;ldquo;OK&amp;rdquo; button on the dialog box and run &amp;ldquo;Authorization&amp;rdquo; at the menu bar. By running &amp;ldquo;Authorization&amp;rdquo;, the user information is retrieved by a temporally installed trigger.&lt;/li&gt;
-&lt;li&gt;When the user opens the spreadsheet after the 2nd time, the authorization is checked by &lt;code&gt;DriveApp&lt;/code&gt;. A dialog box with &amp;lsquo;Push OK button.&amp;rsquo; is displayed. By clicking &amp;ldquo;OK&amp;rdquo;, the user information is retrieved by a temporally installed trigger.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;By this flow, the user information which is editing the shared spreadsheet can be retrieved. Although I think that there may be also other solutions, I proposal this as one of solutions.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Script :&lt;/strong&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;function showDialog(html, title){
-  SpreadsheetApp.getActiveSpreadsheet().show(
-    HtmlService
-    .createHtmlOutput(html)
-    .setTitle(title)
-    .setWidth(400)
-    .setHeight(100)
-  );
-}
-
-function getUser(){
-  var triggerId = ScriptApp.newTrigger(&#39;getUser&#39;)
-    .forSpreadsheet(SpreadsheetApp.getActive())
-    .onEdit()
-    .create()
-    .getUniqueId();
-  var userInf = Session.getEffectiveUser();
-  CacheService.getUserCache().putAll({
-    &amp;quot;username&amp;quot;: userInf.getUsername(),
-    &amp;quot;usermail&amp;quot;: userInf.getEmail()
-  }, 7200);
-  var triggers = ScriptApp.getProjectTriggers();
-  [ScriptApp.deleteTrigger(i) for each (i in triggers) if (i.getUniqueId() == triggerId)];
-}
-
-function dialogForGetUser(){
-  showDialog(&#39;&amp;lt;input type=&amp;quot;button&amp;quot;\
-      value=&amp;quot;OK&amp;quot;\
-      onclick=&amp;quot;google.script.run.withSuccessHandler(function(){google.script.host.close()})\
-      .getUser()&amp;quot;&amp;gt;&#39;,
-      &#39;Push OK button.&#39;
-  );
-}
-
-function dialogForAuth(){
-  showDialog(&#39;&amp;lt;input type=&amp;quot;button&amp;quot;\
-      value=&amp;quot;OK&amp;quot;\
-      onclick=&amp;quot;google.script.host.close()&amp;quot;&amp;gt;&#39;,
-      &#39;Please authorize at &amp;quot;Authorization&amp;quot; of menu bar.&#39;
-  );
-}
-
-function getAuth() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  ss.removeMenu(&amp;quot;Authorization&amp;quot;);
-  getUser();
-  ss.toast(&amp;quot;Done.&amp;quot;, &amp;quot;Authorization&amp;quot;, 3);
-}
-
-function onOpen(){
-  try {
-    var temp = DriveApp.getFileById(SpreadsheetApp.getActiveSpreadsheet().getId())
-    dialogForGetUser();
-  } catch(e) {
-    dialogForAuth();
-    SpreadsheetApp.getActiveSpreadsheet().addMenu(
-      &amp;quot;Authorization&amp;quot;,
-      [{
-        functionName:&amp;quot;getAuth&amp;quot;,
-        name:&amp;quot;Run this only when the first time&amp;quot;
-      }]
-    );
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ol&gt;
-&lt;li&gt;When the spreadsheet is opened, at first, &lt;code&gt;onOpen()&lt;/code&gt; is executed. It is checked whether the user has already authorized. The dialog box is as follows.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170427-1st.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;If the user has never authorized yet, &lt;code&gt;dialogForAuth()&lt;/code&gt; is executed. If the user has already authorized. &lt;code&gt;dialogForGetUser()&lt;/code&gt; is executed. The dialog box is as follows.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/20170427-2nd.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;The user information is retrieved as follows. You can use this by &lt;code&gt;onEdit()&lt;/code&gt; and trigger.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;var user = CacheService.getUserCache().getAll([&amp;quot;username&amp;quot;, &amp;quot;usermail&amp;quot;]);
-&lt;/code&gt;&lt;/pre&gt;
-</description>
+      <guid>https://tanaikech.github.io/2017/04/27/retrieving-user-information-with-shared-spreadsheet/</guid>
+      <description>This sample script retrieves the user information which is editing the shared spreadsheet.
+It was found as follows.
+ User information retrieving by Class Session is the owner and users which installed triggers by themselves. When each user installs a trigger, user information retrieving by Class Session losts the accuracy. So user information has to be retrieved using a temporally installed trigger. Using onOpen(), it cannot directly install triggers and authorize.</description>
     </item>
     
     <item>
       <title>Send E-mail with Excel file converted from Spreadsheet</title>
-      <link>https://tanaikech.github.io/2017/02/16/send-e-mail-with-excel-file-converted-from-spreadsheet</link>
+      <link>https://tanaikech.github.io/2017/02/16/send-e-mail-with-excel-file-converted-from-spreadsheet/</link>
       <pubDate>Thu, 16 Feb 2017 11:53:50 +0900</pubDate>
       
-      <guid>https://tanaikech.github.io/2017/02/16/send-e-mail-with-excel-file-converted-from-spreadsheet</guid>
-      <description>&lt;p&gt;This sample script sends an e-mail with an Excel file exported from Spreadsheet as an attachment file.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;function excelSender() {
-  var sheetID = [Sheet ID];
-  var xlsxName = [Excel file name];
-  var params = {
-    &amp;quot;headers&amp;quot; : {Authorization: &amp;quot;Bearer [Retrieved AccessToken]&amp;quot;},
-    &amp;quot;muteHttpExceptions&amp;quot; : true
-  };
-  var dUrl = &amp;quot;https://www.googleapis.com/drive/v3/files/&amp;quot; + sheetID + &amp;quot;/export?mimeType=application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&amp;quot;
-  var xlsxlFile = UrlFetchApp.fetch(dUrl, params).getBlob().setName(xlsxName);
-  MailApp.sendEmail({
-    to: [Mail address],
-    subject: &amp;quot;sample subject&amp;quot;,
-    body: &amp;quot;sample body&amp;quot;,
-    attachments: [xlsxlFile]
-  });
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/170216b.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Is &lt;code&gt;ScriptApp.getOAuthToken()&lt;/code&gt; unstable? When it creates new GAS project, it can be used. But when the time has elapsed, the script cannot be used. On the other hand, when an access token manually retrieves without &lt;code&gt;getOAuthToken()&lt;/code&gt;, it can be used stably. The scopes I used are &lt;code&gt;https://www.googleapis.com/auth/drive&lt;/code&gt; and &lt;code&gt;https://www.googleapis.com/auth/drive.file&lt;/code&gt;. I don&amp;rsquo;t know about this reason.&lt;/p&gt;
-</description>
+      <guid>https://tanaikech.github.io/2017/02/16/send-e-mail-with-excel-file-converted-from-spreadsheet/</guid>
+      <description>This sample script sends an e-mail with an Excel file exported from Spreadsheet as an attachment file.
+function excelSender() { var sheetID = [Sheet ID]; var xlsxName = [Excel file name]; var params = { &amp;quot;headers&amp;quot; : {Authorization: &amp;quot;Bearer [Retrieved AccessToken]&amp;quot;}, &amp;quot;muteHttpExceptions&amp;quot; : true }; var dUrl = &amp;quot;https://www.googleapis.com/drive/v3/files/&amp;quot; + sheetID + &amp;quot;/export?mimeType=application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&amp;quot; var xlsxlFile = UrlFetchApp.fetch(dUrl, params).getBlob().setName(xlsxName); MailApp.sendEmail({ to: [Mail address], subject: &amp;quot;sample subject&amp;quot;, body: &amp;quot;sample body&amp;quot;, attachments: [xlsxlFile] }); }  Is ScriptApp.</description>
     </item>
     
     <item>
       <title>Download a CSV File from Spreadsheet Using Google HTML Service</title>
-      <link>https://tanaikech.github.io/2017/02/16/download-a-csv-file-from-spreadsheet-using-google-html-service</link>
+      <link>https://tanaikech.github.io/2017/02/16/download-a-csv-file-from-spreadsheet-using-google-html-service/</link>
       <pubDate>Thu, 16 Feb 2017 10:31:37 +0900</pubDate>
       
-      <guid>https://tanaikech.github.io/2017/02/16/download-a-csv-file-from-spreadsheet-using-google-html-service</guid>
-      <description>
-
-&lt;p&gt;Here, I introduce how to download a CSV file from spreadsheet using Google HTML Service.&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Using &amp;ldquo;onOpen()&amp;rdquo;, it addes menu for launching a dialog.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/170216a.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;After launching the dialog, &amp;ldquo;getFileUrl()&amp;rdquo; is launched by pushing a button. &amp;ldquo;getFileUrl()&amp;rdquo; exports a CSV file and outputs download URL.&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;The CSV file is downloaded by &amp;ldquo;executeDownload()&amp;rdquo;.&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;&lt;u&gt;Please put both HTML and GAS to a GAS project.&lt;/u&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;html-download-html&#34;&gt;HTML : download.html&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;lt;!DOCTYPE html&amp;gt;
-&amp;lt;html&amp;gt;
-  &amp;lt;body&amp;gt;
-    Download CSV?
-    &amp;lt;form&amp;gt;
-      &amp;lt;input type=&amp;quot;button&amp;quot; value=&amp;quot;ok&amp;quot; onclick=&amp;quot;google.script.run
-                                              .withSuccessHandler(executeDownload)
-                                              .getFileUrl();&amp;quot; /&amp;gt;
-    &amp;lt;/form&amp;gt;
-  &amp;lt;/body&amp;gt;
-  &amp;lt;script&amp;gt;
-    function executeDownload(url) {
-      window.location.href = url;
-    }
-  &amp;lt;/script&amp;gt;
-&amp;lt;/html&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;gas&#34;&gt;GAS :&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;function onOpen() {
-  SpreadsheetApp.getUi()
-                .createMenu(&#39;export&#39;)
-                .addItem(&#39;export csv files&#39;, &#39;dialog&#39;)
-                .addToUi();
-}
-
-function dialog() {
-  var html = HtmlService.createHtmlOutputFromFile(&#39;download&#39;);
-  SpreadsheetApp.getUi().showModalDialog(html, &#39;CSV download dialog&#39;);
-}
-
-function getFileUrl() {
-    var filename = &amp;quot;#####&amp;quot;; // CSV file name
-    var folder = &amp;quot;#####&amp;quot;; // Folder ID
-
-    var csv = &amp;quot;&amp;quot;;
-    var v = SpreadsheetApp // Now spreadsheet is an active sheet.
-            .getActiveSpreadsheet()
-            .getActiveSheet()
-            .getDataRange()
-            .getValues();
-    v.forEach(function(e) {
-      csv += e.join(&amp;quot;,&amp;quot;) + &amp;quot;\n&amp;quot;;
-    });
-    var url = DriveApp.getFolderById(folder)
-              .createFile(filename, csv, MimeType.CSV)
-              .getDownloadUrl()
-              .replace(&amp;quot;?e=download&amp;amp;gd=true&amp;quot;,&amp;quot;&amp;quot;);
-    return url;
-}
-&lt;/code&gt;&lt;/pre&gt;
-</description>
+      <guid>https://tanaikech.github.io/2017/02/16/download-a-csv-file-from-spreadsheet-using-google-html-service/</guid>
+      <description>Here, I introduce how to download a CSV file from spreadsheet using Google HTML Service.
+ Using &amp;ldquo;onOpen()&amp;rdquo;, it addes menu for launching a dialog.   After launching the dialog, &amp;ldquo;getFileUrl()&amp;rdquo; is launched by pushing a button. &amp;ldquo;getFileUrl()&amp;rdquo; exports a CSV file and outputs download URL.
+ The CSV file is downloaded by &amp;ldquo;executeDownload()&amp;rdquo;.
+  Please put both HTML and GAS to a GAS project.
+HTML : download.</description>
     </item>
     
     <item>
       <title>Making charts at spreadsheet</title>
-      <link>https://tanaikech.github.io/2017/02/13/making-charts-at-spreadsheet</link>
+      <link>https://tanaikech.github.io/2017/02/13/making-charts-at-spreadsheet/</link>
       <pubDate>Mon, 13 Feb 2017 08:57:58 +0900</pubDate>
       
-      <guid>https://tanaikech.github.io/2017/02/13/making-charts-at-spreadsheet</guid>
-      <description>&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/table.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt; var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
- var chart = sheet.newChart()
-    .setChartType(Charts.ChartType.LINE)
-    .asLineChart()
-    .addRange(sheet.getRange(&#39;a1:a21&#39;))
-    .addRange(sheet.getRange(&#39;b1:b21&#39;))
-    .addRange(sheet.getRange(&#39;c1:c21&#39;))
-    .setColors([&amp;quot;green&amp;quot;, &amp;quot;red&amp;quot;])
-    .setBackgroundColor(&amp;quot;black&amp;quot;)
-    .setPosition(5, 5, 0, 0)
-    .setPointStyle(Charts.PointStyle.MEDIUM)
-    .setOption(&#39;useFirstColumnAsDomain&#39;, true)
-    .setOption(&#39;height&#39;, 280)
-    .setOption(&#39;width&#39;, 480)
-    .setOption(&#39;title&#39;, &#39;Sample chart&#39;)
-    .setOption(&#39;hAxis&#39;, {
-      title: &#39;x axis&#39;,
-      minValue: 0,
-      maxValue: 20,
-      titleTextStyle: {
-        color: &#39;#c0c0c0&#39;,
-        fontSize: 20,
-        italic: false,
-        bold: false
-      },
-      textStyle: {
-        color: &#39;#c0c0c0&#39;,
-        fontSize: 12,
-        bold: false,
-        italic: false
-      },
-      baselineColor: &#39;#c0c0c0&#39;,
-      gridlines: {
-        color: &#39;#c0c0c0&#39;,
-        count: 4
-      }
-    })
-    .setOption(&#39;vAxis&#39;, {title: &#39;y axis&#39;,
-      minValue: 0,
-      maxValue: 800,
-      titleTextStyle: {
-        color: &#39;#c0c0c0&#39;,
-        fontSize: 20,
-        italic: false,
-        bold: false
-      },
-      textStyle: {
-        color: &#39;#c0c0c0&#39;,
-        fontSize: 12,
-        bold: false,
-        italic: false
-      },
-      baselineColor: &#39;#c0c0c0&#39;,
-        gridlines: {
-        color: &#39;#c0c0c0&#39;,
-        count: 4
-      }
-    })
-    .setOption(&#39;legend&#39;, {
-      position: &#39;right&#39;,
-      textStyle: {
-        color: &#39;yellow&#39;,
-        fontSize: 16
-      }
-    })
-    .build();
-    sheet.insertChart(chart);
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://tanaikech.github.io/img/chart.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Reference pages are &lt;a href=&#34;https://developers.google.com/apps-script/reference/spreadsheet/embedded-line-chart-builder&#34;&gt;here&lt;/a&gt; and &lt;a href=&#34;https://developers.google.com/chart/interactive/docs/gallery/areachart#configuration-options&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
-</description>
+      <guid>https://tanaikech.github.io/2017/02/13/making-charts-at-spreadsheet/</guid>
+      <description>var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet(); var chart = sheet.newChart() .setChartType(Charts.ChartType.LINE) .asLineChart() .addRange(sheet.getRange(&#39;a1:a21&#39;)) .addRange(sheet.getRange(&#39;b1:b21&#39;)) .addRange(sheet.getRange(&#39;c1:c21&#39;)) .setColors([&amp;quot;green&amp;quot;, &amp;quot;red&amp;quot;]) .setBackgroundColor(&amp;quot;black&amp;quot;) .setPosition(5, 5, 0, 0) .setPointStyle(Charts.PointStyle.MEDIUM) .setOption(&#39;useFirstColumnAsDomain&#39;, true) .setOption(&#39;height&#39;, 280) .setOption(&#39;width&#39;, 480) .setOption(&#39;title&#39;, &#39;Sample chart&#39;) .setOption(&#39;hAxis&#39;, { title: &#39;x axis&#39;, minValue: 0, maxValue: 20, titleTextStyle: { color: &#39;#c0c0c0&#39;, fontSize: 20, italic: false, bold: false }, textStyle: { color: &#39;#c0c0c0&#39;, fontSize: 12, bold: false, italic: false }, baselineColor: &#39;#c0c0c0&#39;, gridlines: { color: &#39;#c0c0c0&#39;, count: 4 } }) .</description>
     </item>
     
     <item>
       <title>Sample Array Script for Spreadsheet</title>
-      <link>https://tanaikech.github.io/2017/02/08/sample-array-script-for-spreadsheet</link>
+      <link>https://tanaikech.github.io/2017/02/08/sample-array-script-for-spreadsheet/</link>
       <pubDate>Wed, 08 Feb 2017 08:50:38 +0900</pubDate>
       
-      <guid>https://tanaikech.github.io/2017/02/08/sample-array-script-for-spreadsheet</guid>
-      <description>&lt;p&gt;This is a Sample Array Script for Spreadsheet. It makes an 2D array filled by strings and number. The strings and number are column strings and row number, respectively.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;However, because this is a sample, the maximum column number is 26.&lt;/strong&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;function sa(row, col){
-  if (col &amp;gt; 26) return;
-
-  var ar = new Array(row);
-  for(var i = 0; i &amp;lt; row; i++) ar[i] = new Array(col);
-  for (var i = 0; i &amp;lt; row; i++){
-    for (var j = 0; j &amp;lt; col; j++){
-      ar[i][j] = String.fromCharCode(i + 97) + String(j + 1);
-    }
-  }
-  return ar.map(function(x, i){return x.map(function(y, j){return ar[j][i]})});
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;When &amp;ldquo;sa(10,10)&amp;rdquo; is given, following array can be output.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;[
-    [a1, b1, c1, d1, e1, f1, g1, h1, i1, j1],
-    [a2, b2, c2, d2, e2, f2, g2, h2, i2, j2],
-    [a3, b3, c3, d3, e3, f3, g3, h3, i3, j3],
-    [a4, b4, c4, d4, e4, f4, g4, h4, i4, j4],
-    [a5, b5, c5, d5, e5, f5, g5, h5, i5, j5],
-    [a6, b6, c6, d6, e6, f6, g6, h6, i6, j6],
-    [a7, b7, c7, d7, e7, f7, g7, h7, i7, j7],
-    [a8, b8, c8, d8, e8, f8, g8, h8, i8, j8],
-    [a9, b9, c9, d9, e9, f9, g9, h9, i9, j9],
-    [a10, b10, c10, d10, e10, f10, g10, h10, i10, j10]
-]
-&lt;/code&gt;&lt;/pre&gt;
-</description>
+      <guid>https://tanaikech.github.io/2017/02/08/sample-array-script-for-spreadsheet/</guid>
+      <description>This is a Sample Array Script for Spreadsheet. It makes an 2D array filled by strings and number. The strings and number are column strings and row number, respectively.
+However, because this is a sample, the maximum column number is 26.
+function sa(row, col){ if (col &amp;gt; 26) return; var ar = new Array(row); for(var i = 0; i &amp;lt; row; i++) ar[i] = new Array(col); for (var i = 0; i &amp;lt; row; i++){ for (var j = 0; j &amp;lt; col; j++){ ar[i][j] = String.</description>
     </item>
     
     <item>
       <title>Event of onEdit() for Google spreadsheet</title>
-      <link>https://tanaikech.github.io/2017/02/07/event-of-onedit-for-google-spreadsheet</link>
+      <link>https://tanaikech.github.io/2017/02/07/event-of-onedit-for-google-spreadsheet/</link>
       <pubDate>Tue, 07 Feb 2017 11:03:56 +0900</pubDate>
       
-      <guid>https://tanaikech.github.io/2017/02/07/event-of-onedit-for-google-spreadsheet</guid>
-      <description>
-
-&lt;h1 id=&#34;about-event-objects&#34;&gt;About Event Objects&lt;/h1&gt;
-
-&lt;p&gt;For example, it thinks the situation of input text of &amp;lsquo;test&amp;rsquo; to &amp;lsquo;A1&amp;rsquo; on a sheet.&lt;/p&gt;
-
-&lt;p&gt;When you use only &amp;lsquo;onEdit(e)&amp;rsquo; without an installing trigger, &amp;lsquo;e&amp;rsquo; has following parameters.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{authMode=LIMITED, range=Range, source=Spreadsheet, user=, value=test}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;In this case, the event cannot send an e-mail because of &amp;lsquo;authMode=LIMITED&amp;rsquo;.&lt;/p&gt;
-
-&lt;p&gt;When you use &amp;ldquo;onEdit(e)&amp;rdquo; with an installing trigger of &amp;ldquo;Edit&amp;rdquo;, &amp;lsquo;e&amp;rsquo; has following parameters.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{authMode=FULL, range=Range, source=Spreadsheet, value=test, triggerUid=#####}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;In this case, the event can send an e-mail because of &amp;lsquo;authMode=FULL&amp;rsquo;.&lt;/p&gt;
-
-&lt;p&gt;&amp;lsquo;range&amp;rsquo; and &amp;lsquo;source&amp;rsquo; are the coordinate and spreadsheet of the edited cell, respectively. They can confirm using &amp;lsquo;e.range.getA1Notation()&amp;rsquo; and &amp;lsquo;getId()&amp;rsquo;, respectively.&lt;/p&gt;
-
-&lt;h2 id=&#34;about-ljava-lang-object&#34;&gt;About [Ljava.lang.Object;&lt;/h2&gt;
-
-&lt;p&gt;About &amp;ldquo;Form submit event&amp;rdquo; of GAS with spreadsheet, e.values and e.namedValues have &amp;ldquo;[Ljava.lang.Object;&amp;ldquo;. Using &amp;ldquo;JSON.Stringify()&amp;rdquo; like &amp;ldquo;JSON.stringify(e.values)&amp;rdquo;, &amp;ldquo;JSON.stringify(e.namedValues)&amp;rdquo;, values from &amp;ldquo;[Ljava.lang.Object;&amp;rdquo; can be retrieved.&lt;/p&gt;
-
-&lt;h2 id=&#34;reference&#34;&gt;Reference&lt;/h2&gt;
-
-&lt;p&gt;You can see the detailed information of sheet events from &lt;a href=&#34;https://developers.google.com/apps-script/guides/triggers/events&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
-</description>
+      <guid>https://tanaikech.github.io/2017/02/07/event-of-onedit-for-google-spreadsheet/</guid>
+      <description>About Event Objects For example, it thinks the situation of input text of &amp;lsquo;test&amp;rsquo; to &amp;lsquo;A1&amp;rsquo; on a sheet.
+When you use only &amp;lsquo;onEdit(e)&amp;rsquo; without an installing trigger, &amp;lsquo;e&amp;rsquo; has following parameters.
+{authMode=LIMITED, range=Range, source=Spreadsheet, user=, value=test}  In this case, the event cannot send an e-mail because of &amp;lsquo;authMode=LIMITED&amp;rsquo;.
+When you use &amp;ldquo;onEdit(e)&amp;rdquo; with an installing trigger of &amp;ldquo;Edit&amp;rdquo;, &amp;lsquo;e&amp;rsquo; has following parameters.
+{authMode=FULL, range=Range, source=Spreadsheet, value=test, triggerUid=#####}  In this case, the event can send an e-mail because of &amp;lsquo;authMode=FULL&amp;rsquo;.</description>
     </item>
     
   </channel>

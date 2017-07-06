@@ -5,19 +5,19 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.16" />
+  <meta name="generator" content="Hugo 0.24.1" />
 
   <title>tanaike</title>
 
   
   
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.2/pure-min.css">
 
   <!--[if lte IE 8]>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.2/grids-responsive-old-ie-min.css">
   <![endif]-->
   <!--[if gt IE 8]><!-->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.2/grids-responsive-min.css">
   <!--<![endif]-->
 
   <!--[if lte IE 8]>
@@ -30,7 +30,7 @@
   <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
 
   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
@@ -41,8 +41,8 @@
   
 
   
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/styles/androidstudio.min.css">
-  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/highlight.min.js"></script>
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/androidstudio.min.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script>
   
 
@@ -70,12 +70,6 @@
 
   <div class="pure-menu">
     <ul class="pure-menu-list">
-      
-      
-        <li class="pure-menu-item">
-          <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
-      
-        </li>
       
       
         <li class="pure-menu-item">
@@ -107,6 +101,12 @@
       
         </li>
       
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
+      
+        </li>
+      
     </ul>
   </div>
 
@@ -117,6 +117,10 @@
     <li class="pure-menu-item">
       <a class="pure-menu-link" href="https://tanaikech.github.io/index.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
     </li>
+    
+
+    
+
     
 
     
@@ -185,13 +189,19 @@
 
     
 
+    
+
+    
+
+    
+
   </ul>
 </div>
 
 
   <div>
   <div class="small-print">
-    <small>&copy; 2016. All rights reserved.</small>
+    <small>&copy; 2017. All rights reserved.</small>
   </div>
   <div class="small-print">
     <small>Built with&nbsp;<a href="https://gohugo.io/" target="_blank">Hugo</a></small>
@@ -214,7 +224,7 @@
   
     <article>
   <header>
-    <h2><a href="https://tanaikech.github.io/2017/06/17/benchmark-retrieving-values-from-deep-nested-json-at-golang">Benchmark: Retrieving Values from Deep Nested JSON at Golang</a></h2>
+    <h2><a href="https://tanaikech.github.io/2017/06/17/benchmark-retrieving-values-from-deep-nested-json-at-golang/">Benchmark: Retrieving Values from Deep Nested JSON at Golang</a></h2>
 
     <div class="post-meta">
 
@@ -256,12 +266,13 @@
   </header>
 
   <p>
-  This sample script is for retrieving values from a deep nested JSON. There are 2 patterns. So for these, the benchmark were measured. Script : package main import ( &quot;encoding/json&quot; &quot;testing&quot; ) const ( data = `{ &quot;A_key1&quot;: { &quot;B_key1&quot;: { &quot;C_key&quot;: &quot;value&quot; } } }` ) func BenchmarkB1(b *testing.B) { b.ResetTimer() for i := 0; i &lt; b.N; i++ { var p map[string]interface{} json.Unmarshal([]byte(data), &amp;p) a1 := p[&quot;A_key1&quot;] a2 := p[&quot;A_key1&quot;].(map[string]interface{})[&quot;B_key1&quot;] a3 := p[&quot;A_key1&quot;].(map[string]interface{})[&quot;B_key1&quot;].(map[string]interface{})[&quot;C_key&quot;] _ = a1 // --&gt; map[B_key1:map[C_key:value]] _ = a2 // --&gt; map[C_key:value] _ = a3 // --&gt; value } } func BenchmarkB2(b *testing.B) { b.ResetTimer() for i := 0; i &lt; b.N; i++ { var p map[string]interface{} json.Unmarshal([]byte(data), &amp;p) b1 := p[&quot;A_key1&quot;] temp, _ := json.Marshal(b1) json.Unmarshal(temp, &amp;p) b2 := p[&quot;B_key1&quot;] temp, _ = json.Marshal(b2) json.Unmarshal(temp, &amp;p) b3 := p[&quot;C_key&quot;] _ = b1 // --&gt; map[B_key1:map[C_key:value]] _ = b2 // --&gt; map[C_key:value] _ = b3 // --&gt; value } } Result : $ go test -bench .
+  This sample script is for retrieving values from a deep nested JSON. There are 2 patterns. So for these, the benchmark were measured.
+Script : package main import ( &quot;encoding/json&quot; &quot;testing&quot; ) const ( data = `{ &quot;A_key1&quot;: { &quot;B_key1&quot;: { &quot;C_key&quot;: &quot;value&quot; } } }` ) func BenchmarkB1(b *testing.B) { b.ResetTimer() for i := 0; i &lt; b.N; i++ { var p map[string]interface{} json.Unmarshal([]byte(data), &amp;p) a1 := p[&quot;A_key1&quot;] a2 := p[&quot;A_key1&quot;].
   </p>
 
   
   <footer>
-    <a href="https://tanaikech.github.io/2017/06/17/benchmark-retrieving-values-from-deep-nested-json-at-golang">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+    <a href="https://tanaikech.github.io/2017/06/17/benchmark-retrieving-values-from-deep-nested-json-at-golang/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
   </footer>
   
 </article>
@@ -269,7 +280,7 @@
   
     <article>
   <header>
-    <h2><a href="https://tanaikech.github.io/2017/06/15/reopening-current-file-as-a-file-with-new-name-at-sublime">Reopening Current File as a File with New Name at Sublime</a></h2>
+    <h2><a href="https://tanaikech.github.io/2017/06/15/reopening-current-file-as-a-file-with-new-name-at-sublime/">Reopening Current File as a File with New Name at Sublime</a></h2>
 
     <div class="post-meta">
 
@@ -309,12 +320,14 @@
   </header>
 
   <p>
-  This is for Sublime Text. This sample is for reopening current file as a file with new file name. The current file is closed when reopening a new file. newfilename = &quot;new file name&quot; contents = self.view.substr(sublime.Region(0, self.view.size())) window = self.view.window() window.run_command('close_file') view = window.new_file() view.set_name(newfilename) view.settings().set(&quot;auto_indent&quot;, False) view.run_command(&quot;insert&quot;, {&quot;characters&quot;: contents}) view.set_scratch(True) view.run_command(&quot;prompt_save_as&quot;) Flow of this sample Copy all text on current file to memory (contents). Close current file. Create new file with new file name.
+  This is for Sublime Text. This sample is for reopening current file as a file with new file name. The current file is closed when reopening a new file.
+newfilename = &quot;new file name&quot; contents = self.view.substr(sublime.Region(0, self.view.size())) window = self.view.window() window.run_command('close_file') view = window.new_file() view.set_name(newfilename) view.settings().set(&quot;auto_indent&quot;, False) view.run_command(&quot;insert&quot;, {&quot;characters&quot;: contents}) view.set_scratch(True) view.run_command(&quot;prompt_save_as&quot;)  Flow of this sample
+ Copy all text on current file to memory (contents). Close current file.
   </p>
 
   
   <footer>
-    <a href="https://tanaikech.github.io/2017/06/15/reopening-current-file-as-a-file-with-new-name-at-sublime">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+    <a href="https://tanaikech.github.io/2017/06/15/reopening-current-file-as-a-file-with-new-name-at-sublime/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
   </footer>
   
 </article>
@@ -322,7 +335,7 @@
   
     <article>
   <header>
-    <h2><a href="https://tanaikech.github.io/2017/06/14/search-route-and-embedding-map-using-custom-function-on-spreadsheet">Search Route and Embedding Map using Custom Function on Spreadsheet</a></h2>
+    <h2><a href="https://tanaikech.github.io/2017/06/14/search-route-and-embedding-map-using-custom-function-on-spreadsheet/">Search Route and Embedding Map using Custom Function on Spreadsheet</a></h2>
 
     <div class="post-meta">
 
@@ -366,12 +379,14 @@
   </header>
 
   <p>
-  This sample script is for searching route between place A and B and embedding a map by custom function on Spreadsheet. I think that this method is one of various ideas. Problem When the map is embedded to a cell on spreadsheet as an image, the function =IMAGE() is suitable for this situation. However, Class Maps, setFormula() for importing =IMAGE() and DriveApp.createFile() for creating images from maps also cannot be used for custom functions.
+  This sample script is for searching route between place A and B and embedding a map by custom function on Spreadsheet.
+I think that this method is one of various ideas.
+Problem When the map is embedded to a cell on spreadsheet as an image, the function =IMAGE() is suitable for this situation. However, Class Maps, setFormula() for importing =IMAGE() and DriveApp.createFile() for creating images from maps also cannot be used for custom functions.
   </p>
 
   
   <footer>
-    <a href="https://tanaikech.github.io/2017/06/14/search-route-and-embedding-map-using-custom-function-on-spreadsheet">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+    <a href="https://tanaikech.github.io/2017/06/14/search-route-and-embedding-map-using-custom-function-on-spreadsheet/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
   </footer>
   
 </article>
@@ -379,7 +394,7 @@
   
     <article>
   <header>
-    <h2><a href="https://tanaikech.github.io/2017/06/13/updated-cli-tool---goris">Updated: CLI Tool - goris</a></h2>
+    <h2><a href="https://tanaikech.github.io/2017/06/13/updated-cli-tool---goris/">Updated: CLI Tool - goris</a></h2>
 
     <div class="post-meta">
 
@@ -423,7 +438,9 @@
   </header>
 
   <p>
-  goris is a CLI tool to search for images with Google Reverse Image Search. Today, it was updated to v1.1.0. Please check it out. https://github.com/tanaikech/goris When images are matched to a searched image, web pages with matching images are retrieved. These are web pages displayed on Google top page. When this is not used, images are retrieved. This was added as a boolean option. (This was added by a request.)
+  goris is a CLI tool to search for images with Google Reverse Image Search.
+Today, it was updated to v1.1.0. Please check it out. https://github.com/tanaikech/goris
+When images are matched to a searched image, web pages with matching images are retrieved. These are web pages displayed on Google top page. When this is not used, images are retrieved. This was added as a boolean option. (This was added by a request.)
   </p>
 
   
@@ -432,7 +449,7 @@
   
     <article>
   <header>
-    <h2><a href="https://tanaikech.github.io/2017/06/12/giving-and-retrieving-parameters-for-chart-at-gas">Giving and Retrieving Parameters for Chart at GAS</a></h2>
+    <h2><a href="https://tanaikech.github.io/2017/06/12/giving-and-retrieving-parameters-for-chart-at-gas/">Giving and Retrieving Parameters for Chart at GAS</a></h2>
 
     <div class="post-meta">
 
@@ -478,12 +495,14 @@
   </header>
 
   <p>
-  This sample script is for retrieving parameters from a chart. The chart created by both Google Apps Script and manually operation can be used. Creates Chart When a chart is created, it supposes following parameters. var parameters = { &quot;title&quot;: &quot;x axis&quot;, &quot;fontName&quot;: &quot;Arial&quot;, &quot;minValue&quot;: 0, &quot;maxValue&quot;: 100, &quot;titleTextStyle&quot;: { &quot;color&quot;: &quot;#c0c0c0&quot;, &quot;fontSize&quot;: 10, &quot;fontName&quot;: &quot;Roboto&quot;, &quot;italic&quot;: true, &quot;bold&quot;: false } }; .setOption('hAxis', parameters) Retrieve Parameters From Chart For the chart created by above parameters, in order to retrieve the parameters, it uses following script.
+  This sample script is for retrieving parameters from a chart. The chart created by both Google Apps Script and manually operation can be used.
+Creates Chart When a chart is created, it supposes following parameters.
+var parameters = { &quot;title&quot;: &quot;x axis&quot;, &quot;fontName&quot;: &quot;Arial&quot;, &quot;minValue&quot;: 0, &quot;maxValue&quot;: 100, &quot;titleTextStyle&quot;: { &quot;color&quot;: &quot;#c0c0c0&quot;, &quot;fontSize&quot;: 10, &quot;fontName&quot;: &quot;Roboto&quot;, &quot;italic&quot;: true, &quot;bold&quot;: false } }; .setOption('hAxis', parameters)  Retrieve Parameters From Chart For the chart created by above parameters, in order to retrieve the parameters, it uses following script.
   </p>
 
   
   <footer>
-    <a href="https://tanaikech.github.io/2017/06/12/giving-and-retrieving-parameters-for-chart-at-gas">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+    <a href="https://tanaikech.github.io/2017/06/12/giving-and-retrieving-parameters-for-chart-at-gas/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
   </footer>
   
 </article>
@@ -540,5 +559,4 @@
 
 </body>
 </html>
-
 

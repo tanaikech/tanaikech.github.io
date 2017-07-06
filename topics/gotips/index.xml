@@ -6,452 +6,124 @@
     <description>Recent content in Gotips on tanaike</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <copyright>&amp;copy; 2016. All rights reserved.</copyright>
+    <copyright>&amp;copy; 2017. All rights reserved.</copyright>
     <lastBuildDate>Wed, 21 Jun 2017 14:17:39 +0900</lastBuildDate>
-    <atom:link href="https://tanaikech.github.io/topics/gotips/index.xml" rel="self" type="application/rss+xml" />
+    
+	<atom:link href="https://tanaikech.github.io/topics/gotips/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
       <title>Go Library - getcode</title>
-      <link>https://tanaikech.github.io/2017/06/21/go-library---getcode</link>
+      <link>https://tanaikech.github.io/2017/06/21/go-library---getcode/</link>
       <pubDate>Wed, 21 Jun 2017 14:17:39 +0900</pubDate>
       
-      <guid>https://tanaikech.github.io/2017/06/21/go-library---getcode</guid>
-      <description>
-
-&lt;h2 id=&#34;overview&#34;&gt;Overview&lt;/h2&gt;
-
-&lt;p&gt;This is a Golang library to automatically get an authorization code for retrieving access token using OAuth2.&lt;/p&gt;
-
-&lt;h2 id=&#34;description&#34;&gt;Description&lt;/h2&gt;
-
-&lt;p&gt;When it retrieves an access token and refresh token using OAuth2, the code for retrieving them has to be got by authorization on own browser. In order to retrieve the code, in generally, users have to click the authorization button and copy the code on the browser. This library can be automatically got the code by launching HTML server as a redirected server. At first, I have used this for retrieving the code from Google. But recently I noticed that this can be used for other sites. They are Google, GitHub, Slack and so on. This library can be used for creating such applications.&lt;/p&gt;
-
-&lt;p&gt;This method was used for gogauth. Next, it was used for ggsrun And, this was recreated as a library.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;You can get this from &lt;a href=&#34;https://github.com/tanaikech/getcode&#34;&gt;https://github.com/tanaikech/getcode&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
-</description>
+      <guid>https://tanaikech.github.io/2017/06/21/go-library---getcode/</guid>
+      <description>Overview This is a Golang library to automatically get an authorization code for retrieving access token using OAuth2.
+Description When it retrieves an access token and refresh token using OAuth2, the code for retrieving them has to be got by authorization on own browser. In order to retrieve the code, in generally, users have to click the authorization button and copy the code on the browser. This library can be automatically got the code by launching HTML server as a redirected server.</description>
     </item>
     
     <item>
       <title>Benchmark: Retrieving Values from Deep Nested JSON at Golang</title>
-      <link>https://tanaikech.github.io/2017/06/17/benchmark-retrieving-values-from-deep-nested-json-at-golang</link>
+      <link>https://tanaikech.github.io/2017/06/17/benchmark-retrieving-values-from-deep-nested-json-at-golang/</link>
       <pubDate>Sat, 17 Jun 2017 10:06:24 +0900</pubDate>
       
-      <guid>https://tanaikech.github.io/2017/06/17/benchmark-retrieving-values-from-deep-nested-json-at-golang</guid>
-      <description>
-
-&lt;p&gt;This sample script is for retrieving values from a deep nested JSON. There are 2 patterns. So for these, the benchmark were measured.&lt;/p&gt;
-
-&lt;h2 id=&#34;script&#34;&gt;Script :&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;package main
-
-import (
-    &amp;quot;encoding/json&amp;quot;
-    &amp;quot;testing&amp;quot;
-)
-
-const (
-    data = `{
-      &amp;quot;A_key1&amp;quot;: {
-        &amp;quot;B_key1&amp;quot;: {
-          &amp;quot;C_key&amp;quot;: &amp;quot;value&amp;quot;
-        }
-      }
-    }`
-)
-
-func BenchmarkB1(b *testing.B) {
-    b.ResetTimer()
-    for i := 0; i &amp;lt; b.N; i++ {
-        var p map[string]interface{}
-        json.Unmarshal([]byte(data), &amp;amp;p)
-        a1 := p[&amp;quot;A_key1&amp;quot;]
-        a2 := p[&amp;quot;A_key1&amp;quot;].(map[string]interface{})[&amp;quot;B_key1&amp;quot;]
-        a3 := p[&amp;quot;A_key1&amp;quot;].(map[string]interface{})[&amp;quot;B_key1&amp;quot;].(map[string]interface{})[&amp;quot;C_key&amp;quot;]
-        _ = a1 // --&amp;gt; map[B_key1:map[C_key:value]]
-        _ = a2 // --&amp;gt; map[C_key:value]
-        _ = a3 // --&amp;gt; value
-    }
-}
-
-func BenchmarkB2(b *testing.B) {
-    b.ResetTimer()
-    for i := 0; i &amp;lt; b.N; i++ {
-        var p map[string]interface{}
-        json.Unmarshal([]byte(data), &amp;amp;p)
-        b1 := p[&amp;quot;A_key1&amp;quot;]
-        temp, _ := json.Marshal(b1)
-        json.Unmarshal(temp, &amp;amp;p)
-        b2 := p[&amp;quot;B_key1&amp;quot;]
-        temp, _ = json.Marshal(b2)
-        json.Unmarshal(temp, &amp;amp;p)
-        b3 := p[&amp;quot;C_key&amp;quot;]
-        _ = b1 // --&amp;gt; map[B_key1:map[C_key:value]]
-        _ = b2 // --&amp;gt; map[C_key:value]
-        _ = b3 // --&amp;gt; value
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;result&#34;&gt;Result :&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$ go test -bench .
-BenchmarkB1-4             300000              4177 ns/op
-BenchmarkB2-4             100000             13619 ns/op
-PASS
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;It was found that the process cost of &lt;code&gt;json.Unmarshal()&lt;/code&gt; was high. &lt;code&gt;json.Unmarshal()&lt;/code&gt; for test 2 is 3 times larger than that for test 1.&lt;/p&gt;
-</description>
+      <guid>https://tanaikech.github.io/2017/06/17/benchmark-retrieving-values-from-deep-nested-json-at-golang/</guid>
+      <description>This sample script is for retrieving values from a deep nested JSON. There are 2 patterns. So for these, the benchmark were measured.
+Script : package main import ( &amp;quot;encoding/json&amp;quot; &amp;quot;testing&amp;quot; ) const ( data = `{ &amp;quot;A_key1&amp;quot;: { &amp;quot;B_key1&amp;quot;: { &amp;quot;C_key&amp;quot;: &amp;quot;value&amp;quot; } } }` ) func BenchmarkB1(b *testing.B) { b.ResetTimer() for i := 0; i &amp;lt; b.N; i++ { var p map[string]interface{} json.Unmarshal([]byte(data), &amp;amp;p) a1 := p[&amp;quot;A_key1&amp;quot;] a2 := p[&amp;quot;A_key1&amp;quot;].</description>
     </item>
     
     <item>
       <title>Slice Created by Split at Golang</title>
-      <link>https://tanaikech.github.io/2017/06/09/slice-created-by-split-at-golang</link>
+      <link>https://tanaikech.github.io/2017/06/09/slice-created-by-split-at-golang/</link>
       <pubDate>Fri, 09 Jun 2017 09:16:56 +0900</pubDate>
       
-      <guid>https://tanaikech.github.io/2017/06/09/slice-created-by-split-at-golang</guid>
-      <description>
-
-&lt;p&gt;When a string without no strings is split by &lt;code&gt;strings.Split()&lt;/code&gt;, the created slice is the same to the slice created by &lt;code&gt;make()&lt;/code&gt;. The length of the slice doesn&amp;rsquo;t become zero.&lt;/p&gt;
-
-&lt;h2 id=&#34;sample-script&#34;&gt;Sample script :&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;package main
-
-import (
-    &amp;quot;fmt&amp;quot;
-    &amp;quot;strings&amp;quot;
-)
-
-func main() {
-    sample1a := strings.Split(&amp;quot;&amp;quot;, &amp;quot; &amp;quot;)
-    fmt.Printf(&amp;quot;%v, %v, &#39;%v&#39;, %v, %+q\n&amp;quot;, sample1a, len(sample1a), sample1a[0], len(sample1a[0]), sample1a[0])
-
-    sample1b := make([]string, 1)
-    fmt.Printf(&amp;quot;%v, %v, &#39;%v&#39;, %v, %+q\n&amp;quot;, sample1b, len(sample1b), sample1b[0], len(sample1b[0]), sample1b[0])
-
-    var sample2a []string
-    fmt.Printf(&amp;quot;%v, %v\n&amp;quot;, sample2a, len(sample2a))
-
-    sample2b := []string{}
-    fmt.Printf(&amp;quot;%v, %v\n&amp;quot;, sample2b, len(sample2b))
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;result&#34;&gt;Result :&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;strings.Split() : [], 1, &#39;&#39;, 0, &amp;quot;&amp;quot;
-make()          : [], 1, &#39;&#39;, 0, &amp;quot;&amp;quot;
-var                : [], 0
-[]string{}      : [], 0
-&lt;/code&gt;&lt;/pre&gt;
-</description>
+      <guid>https://tanaikech.github.io/2017/06/09/slice-created-by-split-at-golang/</guid>
+      <description>When a string without no strings is split by strings.Split(), the created slice is the same to the slice created by make(). The length of the slice doesn&amp;rsquo;t become zero.
+Sample script : package main import ( &amp;quot;fmt&amp;quot; &amp;quot;strings&amp;quot; ) func main() { sample1a := strings.Split(&amp;quot;&amp;quot;, &amp;quot; &amp;quot;) fmt.Printf(&amp;quot;%v, %v, &#39;%v&#39;, %v, %+q\n&amp;quot;, sample1a, len(sample1a), sample1a[0], len(sample1a[0]), sample1a[0]) sample1b := make([]string, 1) fmt.Printf(&amp;quot;%v, %v, &#39;%v&#39;, %v, %+q\n&amp;quot;, sample1b, len(sample1b), sample1b[0], len(sample1b[0]), sample1b[0]) var sample2a []string fmt.</description>
     </item>
     
     <item>
       <title>Changing from &#39;float64&#39; to &#39;int&#39; for Values did Unmarshal using &#39;map[string]interface{}&#39;</title>
-      <link>https://tanaikech.github.io/2017/06/02/changing-from-float64-to-int-for-values-did-unmarshal-using-mapstringinterface</link>
+      <link>https://tanaikech.github.io/2017/06/02/changing-from-float64-to-int-for-values-did-unmarshal-using-mapstringinterface/</link>
       <pubDate>Fri, 02 Jun 2017 17:22:13 +0900</pubDate>
       
-      <guid>https://tanaikech.github.io/2017/06/02/changing-from-float64-to-int-for-values-did-unmarshal-using-mapstringinterface</guid>
-      <description>&lt;p&gt;This sample is for changing from &amp;ldquo;float64&amp;rdquo; to &amp;ldquo;int&amp;rdquo; for values did unmarshal using &lt;code&gt;map[string]interface{}&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;When it did unmarshal using map[string]interface{}, a number with &amp;ldquo;int&amp;rdquo; was changed to &amp;ldquo;float64&amp;rdquo;. And it shows an error as follows.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Error :&lt;/strong&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;panic: interface conversion: interface {} is float64, not int
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;strong&gt;Sample Script :&lt;/strong&gt;
-It solves using following script.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;package main
-
-import (
-    &amp;quot;encoding/json&amp;quot;
-    &amp;quot;fmt&amp;quot;
-    &amp;quot;reflect&amp;quot;
-)
-
-func main() {
-    data := `{&amp;quot;key&amp;quot;: 10}`
-    var i map[string]interface{}
-    json.Unmarshal([]byte(data), &amp;amp;i)
-
-    val1 := i[&amp;quot;key&amp;quot;]
-    fmt.Printf(&amp;quot;%v, %v\n&amp;quot;, val1, reflect.TypeOf(val1)) // 10, float64
-
-    i[&amp;quot;key&amp;quot;] = int(i[&amp;quot;key&amp;quot;].(float64))
-    val2 := i[&amp;quot;key&amp;quot;]
-    fmt.Printf(&amp;quot;%v, %v\n&amp;quot;, val2, reflect.TypeOf(val2)) // 10, int
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://play.golang.org/p/kHroZ1rHVQ&#34;&gt;Go Playground&lt;/a&gt;&lt;/p&gt;
-</description>
+      <guid>https://tanaikech.github.io/2017/06/02/changing-from-float64-to-int-for-values-did-unmarshal-using-mapstringinterface/</guid>
+      <description>This sample is for changing from &amp;ldquo;float64&amp;rdquo; to &amp;ldquo;int&amp;rdquo; for values did unmarshal using map[string]interface{}.
+When it did unmarshal using map[string]interface{}, a number with &amp;ldquo;int&amp;rdquo; was changed to &amp;ldquo;float64&amp;rdquo;. And it shows an error as follows.
+Error :
+panic: interface conversion: interface {} is float64, not int  Sample Script : It solves using following script.
+package main import ( &amp;quot;encoding/json&amp;quot; &amp;quot;fmt&amp;quot; &amp;quot;reflect&amp;quot; ) func main() { data := `{&amp;quot;key&amp;quot;: 10}` var i map[string]interface{} json.</description>
     </item>
     
     <item>
       <title>Replacing JSON Key by Golang</title>
-      <link>https://tanaikech.github.io/2017/06/02/replacing-json-key-by-golang</link>
+      <link>https://tanaikech.github.io/2017/06/02/replacing-json-key-by-golang/</link>
       <pubDate>Fri, 02 Jun 2017 11:56:30 +0900</pubDate>
       
-      <guid>https://tanaikech.github.io/2017/06/02/replacing-json-key-by-golang</guid>
-      <description>&lt;p&gt;This sample is for replacing JSON key by golang.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;package main
-
-import (
-    &amp;quot;encoding/json&amp;quot;
-    &amp;quot;fmt&amp;quot;
-)
-
-func main() {
-    json1 := `{&amp;quot;key1&amp;quot;: &amp;quot;value1&amp;quot;}`
-
-    obj := map[string]interface{}{}
-    json.Unmarshal([]byte(json1), &amp;amp;obj)
-
-    fmt.Println(obj) // &amp;lt;-- map[key1:value1]
-
-    obj[&amp;quot;key2&amp;quot;] = obj[&amp;quot;key1&amp;quot;]
-    delete(obj, &amp;quot;key1&amp;quot;)
-
-    fmt.Println(obj) // &amp;lt;-- map[key2:value1]
-}
-&lt;/code&gt;&lt;/pre&gt;
-</description>
+      <guid>https://tanaikech.github.io/2017/06/02/replacing-json-key-by-golang/</guid>
+      <description>This sample is for replacing JSON key by golang.
+package main import ( &amp;quot;encoding/json&amp;quot; &amp;quot;fmt&amp;quot; ) func main() { json1 := `{&amp;quot;key1&amp;quot;: &amp;quot;value1&amp;quot;}` obj := map[string]interface{}{} json.Unmarshal([]byte(json1), &amp;amp;obj) fmt.Println(obj) // &amp;lt;-- map[key1:value1] obj[&amp;quot;key2&amp;quot;] = obj[&amp;quot;key1&amp;quot;] delete(obj, &amp;quot;key1&amp;quot;) fmt.Println(obj) // &amp;lt;-- map[key2:value1] }  </description>
     </item>
     
     <item>
       <title>Benchmark: Splitting Command-Line Arguments by Golang</title>
-      <link>https://tanaikech.github.io/2017/06/02/benchmark-splitting-command-line-arguments-by-golang</link>
+      <link>https://tanaikech.github.io/2017/06/02/benchmark-splitting-command-line-arguments-by-golang/</link>
       <pubDate>Fri, 02 Jun 2017 10:59:31 +0900</pubDate>
       
-      <guid>https://tanaikech.github.io/2017/06/02/benchmark-splitting-command-line-arguments-by-golang</guid>
-      <description>
-
-&lt;p&gt;This sample script is for splitting command-line arguments by golang. There are 2 types. One is the regular expression is used. Another is that &lt;code&gt;Split()&lt;/code&gt; and &lt;code&gt;TrimSpace()&lt;/code&gt; are used.&lt;/p&gt;
-
-&lt;p&gt;Here, each process speed was compared.&lt;/p&gt;
-
-&lt;h2 id=&#34;script&#34;&gt;Script :&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;package main
-
-import (
-    &amp;quot;regexp&amp;quot;
-    &amp;quot;strings&amp;quot;
-    &amp;quot;testing&amp;quot;
-)
-
-func BenchmarkB1(b *testing.B) {
-    str := &amp;quot;test1.txt, test2.txt&amp;quot;
-    b.ResetTimer()
-    for i := 0; i &amp;lt; b.N; i++ {
-        ar := regexp.MustCompile(`\s*,\s*`).Split(str, -1)
-        var result []string
-        for _, x := range ar {
-            result = append(result, x) // --&amp;gt; &#39;test.js&#39;, &#39;test2.py&#39;
-        }
-        _ = result
-    }
-}
-
-func BenchmarkB2(b *testing.B) {
-    str := &amp;quot;test1.txt, test2.txt&amp;quot;
-    b.ResetTimer()
-    for i := 0; i &amp;lt; b.N; i++ {
-        ar := strings.Split(str, &amp;quot;,&amp;quot;)
-        var result []string
-        for _, x := range ar {
-            result = append(result, strings.TrimSpace(x)) // --&amp;gt; &#39;test.js&#39;, &#39;test2.py&#39;
-        }
-        _ = result
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;result&#34;&gt;Result :&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$ go test -bench .
-BenchmarkB1-4             100000             13048 ns/op
-BenchmarkB2-4            3000000               399 ns/op
-PASS
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Just as expected, the regular expression was slow. And it&amp;rsquo;s much slower than that of &lt;code&gt;Split()&lt;/code&gt; and &lt;code&gt;TrimSpace()&lt;/code&gt;.&lt;/p&gt;
-</description>
+      <guid>https://tanaikech.github.io/2017/06/02/benchmark-splitting-command-line-arguments-by-golang/</guid>
+      <description>This sample script is for splitting command-line arguments by golang. There are 2 types. One is the regular expression is used. Another is that Split() and TrimSpace() are used.
+Here, each process speed was compared.
+Script : package main import ( &amp;quot;regexp&amp;quot; &amp;quot;strings&amp;quot; &amp;quot;testing&amp;quot; ) func BenchmarkB1(b *testing.B) { str := &amp;quot;test1.txt, test2.txt&amp;quot; b.ResetTimer() for i := 0; i &amp;lt; b.N; i++ { ar := regexp.MustCompile(`\s*,\s*`).Split(str, -1) var result []string for _, x := range ar { result = append(result, x) // --&amp;gt; &#39;test.</description>
     </item>
     
     <item>
       <title>Decoding JSON by Golang</title>
-      <link>https://tanaikech.github.io/2017/05/21/decoding-json-by-golang</link>
+      <link>https://tanaikech.github.io/2017/05/21/decoding-json-by-golang/</link>
       <pubDate>Sun, 21 May 2017 11:55:34 +0900</pubDate>
       
-      <guid>https://tanaikech.github.io/2017/05/21/decoding-json-by-golang</guid>
-      <description>&lt;p&gt;Decoding JSON by Golang&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;func main() {
-    data := `{
-      &amp;quot;A_key1&amp;quot;: {
-        &amp;quot;B_key1&amp;quot;: {
-          &amp;quot;C_key&amp;quot;: &amp;quot;value&amp;quot;
-        }
-      },
-      &amp;quot;A_key2&amp;quot;: {
-        &amp;quot;B_key2&amp;quot;: {
-          &amp;quot;C_key&amp;quot;: &amp;quot;value&amp;quot;
-        }
-      },
-      &amp;quot;A_key3&amp;quot;: {
-        &amp;quot;B_key3&amp;quot;: {
-          &amp;quot;C_key&amp;quot;: &amp;quot;value&amp;quot;
-        }
-      },
-      &amp;quot;A_key4&amp;quot;: {
-        &amp;quot;B_key4&amp;quot;: {
-          &amp;quot;C_key&amp;quot;: &amp;quot;value&amp;quot;
-        }
-      },
-      &amp;quot;A_key5&amp;quot;: {
-        &amp;quot;B_key5&amp;quot;: {
-          &amp;quot;C_key&amp;quot;: &amp;quot;value&amp;quot;
-        }
-      }
-    }`
-    var p interface{}
-    json.NewDecoder(strings.NewReader(data)).Decode(&amp;amp;p)
-    fmt.Println(p)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://play.golang.org/p/A86B8YHd5m&#34;&gt;Go Playground&lt;/a&gt;&lt;/p&gt;
-</description>
+      <guid>https://tanaikech.github.io/2017/05/21/decoding-json-by-golang/</guid>
+      <description>Decoding JSON by Golang
+func main() { data := `{ &amp;quot;A_key1&amp;quot;: { &amp;quot;B_key1&amp;quot;: { &amp;quot;C_key&amp;quot;: &amp;quot;value&amp;quot; } }, &amp;quot;A_key2&amp;quot;: { &amp;quot;B_key2&amp;quot;: { &amp;quot;C_key&amp;quot;: &amp;quot;value&amp;quot; } }, &amp;quot;A_key3&amp;quot;: { &amp;quot;B_key3&amp;quot;: { &amp;quot;C_key&amp;quot;: &amp;quot;value&amp;quot; } }, &amp;quot;A_key4&amp;quot;: { &amp;quot;B_key4&amp;quot;: { &amp;quot;C_key&amp;quot;: &amp;quot;value&amp;quot; } }, &amp;quot;A_key5&amp;quot;: { &amp;quot;B_key5&amp;quot;: { &amp;quot;C_key&amp;quot;: &amp;quot;value&amp;quot; } } }` var p interface{} json.NewDecoder(strings.NewReader(data)).Decode(&amp;amp;p) fmt.Println(p) }  Go Playground</description>
     </item>
     
     <item>
       <title>Dynamically Creating JSON by Golang</title>
-      <link>https://tanaikech.github.io/2017/05/21/dynamically-creating-json-by-golang</link>
+      <link>https://tanaikech.github.io/2017/05/21/dynamically-creating-json-by-golang/</link>
       <pubDate>Sun, 21 May 2017 10:55:35 +0900</pubDate>
       
-      <guid>https://tanaikech.github.io/2017/05/21/dynamically-creating-json-by-golang</guid>
-      <description>&lt;p&gt;Dynamically Creating JSON by Golang&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;obj := map[string]interface{}{}
-obj[&amp;quot;hoge&amp;quot;] = &amp;quot;huga&amp;quot;
-fmt.Println(obj)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://play.golang.org/p/7mLXgwddWO&#34;&gt;Go Playground&lt;/a&gt;&lt;/p&gt;
-</description>
+      <guid>https://tanaikech.github.io/2017/05/21/dynamically-creating-json-by-golang/</guid>
+      <description>Dynamically Creating JSON by Golang
+obj := map[string]interface{}{} obj[&amp;quot;hoge&amp;quot;] = &amp;quot;huga&amp;quot; fmt.Println(obj)  Go Playground</description>
     </item>
     
     <item>
       <title>Retrieving Response Headers by Golang</title>
-      <link>https://tanaikech.github.io/2017/05/21/retrieving-response-headers-by-golang</link>
+      <link>https://tanaikech.github.io/2017/05/21/retrieving-response-headers-by-golang/</link>
       <pubDate>Sun, 21 May 2017 10:43:32 +0900</pubDate>
       
-      <guid>https://tanaikech.github.io/2017/05/21/retrieving-response-headers-by-golang</guid>
-      <description>&lt;p&gt;Retrieving Response Headers by Golang&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;res, _ := client.Do(req)
-contentType := res.Header.Get(&amp;quot;Content-Type&amp;quot;)
-contentLength := res.Header.Get(&amp;quot;Content-Length&amp;quot;)
-&lt;/code&gt;&lt;/pre&gt;
-</description>
+      <guid>https://tanaikech.github.io/2017/05/21/retrieving-response-headers-by-golang/</guid>
+      <description>Retrieving Response Headers by Golang
+res, _ := client.Do(req) contentType := res.Header.Get(&amp;quot;Content-Type&amp;quot;) contentLength := res.Header.Get(&amp;quot;Content-Length&amp;quot;)  </description>
     </item>
     
     <item>
       <title>Dynamical Nested JSON Objects by Golang</title>
-      <link>https://tanaikech.github.io/2017/05/09/dynamical-nested-json-objects-by-golang</link>
+      <link>https://tanaikech.github.io/2017/05/09/dynamical-nested-json-objects-by-golang/</link>
       <pubDate>Tue, 09 May 2017 15:58:08 +0900</pubDate>
       
-      <guid>https://tanaikech.github.io/2017/05/09/dynamical-nested-json-objects-by-golang</guid>
-      <description>
-
-&lt;p&gt;This sample script dynamically creates nested JSON objects.&lt;/p&gt;
-
-&lt;h3 id=&#34;script&#34;&gt;Script&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;obj := map[string]interface{}{}
-for i := 1; i &amp;lt;= 5; i++ {
-    value := map[string]interface{}{
-        fmt.Sprintf(&amp;quot;B_key%d&amp;quot;, i): map[string]interface{}{
-            &amp;quot;C_key&amp;quot;: &amp;quot;value&amp;quot;,
-        },
-    }
-    obj[fmt.Sprintf(&amp;quot;A_key%d&amp;quot;, i)] = value
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;result&#34;&gt;Result&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;{
-  &amp;quot;A_key1&amp;quot;: {
-    &amp;quot;B_key1&amp;quot;: {
-      &amp;quot;C_key&amp;quot;: &amp;quot;value&amp;quot;
-    }
-  },
-  &amp;quot;A_key2&amp;quot;: {
-    &amp;quot;B_key2&amp;quot;: {
-      &amp;quot;C_key&amp;quot;: &amp;quot;value&amp;quot;
-    }
-  },
-  &amp;quot;A_key3&amp;quot;: {
-    &amp;quot;B_key3&amp;quot;: {
-      &amp;quot;C_key&amp;quot;: &amp;quot;value&amp;quot;
-    }
-  },
-  &amp;quot;A_key4&amp;quot;: {
-    &amp;quot;B_key4&amp;quot;: {
-      &amp;quot;C_key&amp;quot;: &amp;quot;value&amp;quot;
-    }
-  },
-  &amp;quot;A_key5&amp;quot;: {
-    &amp;quot;B_key5&amp;quot;: {
-      &amp;quot;C_key&amp;quot;: &amp;quot;value&amp;quot;
-    }
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;
-</description>
+      <guid>https://tanaikech.github.io/2017/05/09/dynamical-nested-json-objects-by-golang/</guid>
+      <description> This sample script dynamically creates nested JSON objects.
+Script obj := map[string]interface{}{} for i := 1; i &amp;lt;= 5; i++ { value := map[string]interface{}{ fmt.Sprintf(&amp;quot;B_key%d&amp;quot;, i): map[string]interface{}{ &amp;quot;C_key&amp;quot;: &amp;quot;value&amp;quot;, }, } obj[fmt.Sprintf(&amp;quot;A_key%d&amp;quot;, i)] = value }  Result { &amp;quot;A_key1&amp;quot;: { &amp;quot;B_key1&amp;quot;: { &amp;quot;C_key&amp;quot;: &amp;quot;value&amp;quot; } }, &amp;quot;A_key2&amp;quot;: { &amp;quot;B_key2&amp;quot;: { &amp;quot;C_key&amp;quot;: &amp;quot;value&amp;quot; } }, &amp;quot;A_key3&amp;quot;: { &amp;quot;B_key3&amp;quot;: { &amp;quot;C_key&amp;quot;: &amp;quot;value&amp;quot; } }, &amp;quot;A_key4&amp;quot;: { &amp;quot;B_key4&amp;quot;: { &amp;quot;C_key&amp;quot;: &amp;quot;value&amp;quot; } }, &amp;quot;A_key5&amp;quot;: { &amp;quot;B_key5&amp;quot;: { &amp;quot;C_key&amp;quot;: &amp;quot;value&amp;quot; } } }  </description>
     </item>
     
     <item>
       <title>Put a channel to a channel for golang</title>
-      <link>https://tanaikech.github.io/2017/03/29/put-a-channel-to-a-channel-for-golang</link>
+      <link>https://tanaikech.github.io/2017/03/29/put-a-channel-to-a-channel-for-golang/</link>
       <pubDate>Wed, 29 Mar 2017 07:53:51 +0900</pubDate>
       
-      <guid>https://tanaikech.github.io/2017/03/29/put-a-channel-to-a-channel-for-golang</guid>
-      <description>&lt;p&gt;I have never heard this. I would like to use this from now.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;package main
-
-import &amp;quot;fmt&amp;quot;
-
-type st struct {
-    data1 int
-    data2 int
-}
-
-func main() {
-    c1 := make(chan *st, 1)
-    c2 := make(chan *st, 1)
-    c1 &amp;lt;- &amp;amp;st{1, 2}
-    c2 &amp;lt;- &amp;lt;-c1
-    close(c1)
-    close(c2)
-    res, _ := &amp;lt;-c2
-    fmt.Println(res.data2)
-}
-
-&amp;gt;&amp;gt;&amp;gt; 2
-&lt;/code&gt;&lt;/pre&gt;
-</description>
+      <guid>https://tanaikech.github.io/2017/03/29/put-a-channel-to-a-channel-for-golang/</guid>
+      <description>I have never heard this. I would like to use this from now.
+package main import &amp;quot;fmt&amp;quot; type st struct { data1 int data2 int } func main() { c1 := make(chan *st, 1) c2 := make(chan *st, 1) c1 &amp;lt;- &amp;amp;st{1, 2} c2 &amp;lt;- &amp;lt;-c1 close(c1) close(c2) res, _ := &amp;lt;-c2 fmt.Println(res.data2) } &amp;gt;&amp;gt;&amp;gt; 2  </description>
     </item>
     
   </channel>
