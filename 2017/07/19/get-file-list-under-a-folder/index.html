@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>tanaike</title>
+  <title>Get File List Under a Folder &middot; tanaike</title>
 
   
   
@@ -36,8 +36,6 @@
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
 
   
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike" href="https://tanaikech.github.io/index.xml" />
   
 
   
@@ -113,10 +111,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://tanaikech.github.io/index.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
-    </li>
     
 
     
@@ -216,21 +210,16 @@
 
 
 <div class="header">
-  <h1>tanaike</h1>
-  <h2>The Thinker</h2>
+  <h1>Get File List Under a Folder</h1>
+  <h2></h2>
 </div>
-
 <div class="content">
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2016/10/13/improved-algorithms-for-summation-of-array-elements/">Improved Algorithms for Summation of Array Elements</a></h2>
 
-    <div class="post-meta">
+  <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>13 Oct 2016, 14:39</time>
+    <time>19 Jul 2017, 08:51</time>
   </div>
 
   
@@ -241,9 +230,7 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/report">report</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/benchmark">Benchmark</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
     
   </div>
   
@@ -255,11 +242,7 @@
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/gas">gas</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google">google</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/algorithm">algorithm</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>
     
   </div>
   
@@ -267,85 +250,130 @@
 
 </div>
 
-  </header>
+  
 
-  <p>
-  Kanshi TANAIKE 
-Abstract I considered an efficient algorithm for summation of array elements. All elements in an array are string. When those elements are summed using scripts, a standard method is to add each element in order. If the script is run without any optimize, the process becomes gradually sluggish, because the total amount of active data during the summation process is proportional to the square of the number of array elements.
-  </p>
+<p>This script is for retrieving all files and folders under a folder on Google Drive. All files and folders in the specific folder can be retrieved.</p>
+
+<p>If you want to retrieve file list with all files and folders on Google Drive, please use <code>DriveApp.getRootFolder().getId()</code> as <code>folderId</code>.</p>
+
+<p>When there are a lot of files in the folder, it may be over the limitation time to execute script.</p>
+
+<h3 id="script">Script :</h3>
+
+<pre><code class="language-javascript">function getFileList(folderId) {
+    var folderlist = (function(folder, folderSt, results) {
+        var ar = [];
+        var folders = folder.getFolders();
+        while (folders.hasNext()) ar.push(folders.next());
+        folderSt += folder.getId() + &quot;#_aabbccddee_#&quot;;
+        var array_folderSt = folderSt.split(&quot;#_aabbccddee_#&quot;);
+        array_folderSt.pop()
+        results.push(array_folderSt);
+        ar.length == 0 &amp;&amp; (folderSt = &quot;&quot;);
+        for (var i in ar) arguments.callee(ar[i], folderSt, results);
+        return results;
+    })(DriveApp.getFolderById(folderId), &quot;&quot;, []);
+
+    var localTimeZone = Session.getScriptTimeZone();
+    var filelist = [];
+    var temp = {};
+    for (var i in folderlist) {
+        var folderid = folderlist[i][folderlist[i].length - 1];
+        var folder = DriveApp.getFolderById(folderid);
+        var files = folder.getFiles();
+        while (files.hasNext()) {
+            var file = files.next();
+            temp = {
+                folder_tree: function(folderlist, i) {
+                    if (i &gt; 0) {
+                        return &quot;/&quot; + [DriveApp.getFolderById(folderlist[i][j]).getName() for (j in folderlist[i])
+                            if (j &gt; 0)].join(&quot;/&quot;) + &quot;/&quot;;
+                    } else {
+                        return &quot;/&quot;;
+                    }
+                }(folderlist, i),
+                file_id: file.getId(),
+                file_name: file.getName(),
+                file_mimetype: file.getMimeType(),
+                file_created: Utilities.formatDate(file.getDateCreated(), localTimeZone, &quot;yyyy/MM/dd HH:mm:ss&quot;),
+                file_updated: Utilities.formatDate(file.getLastUpdated(), localTimeZone, &quot;yyyy/MM/dd HH:mm:ss&quot;),
+            };
+            filelist.push(temp);
+            temp = {}
+        }
+    }
+    var sortedlist = filelist.sort(function(e1, e2) {
+        return (e1.folder_tree &gt; e2.folder_tree ? 1 : -1) });
+    return sortedlist;
+}
+</code></pre>
+
+<h3 id="result">Result :</h3>
+
+<pre><code class="language-json">[
+    {
+        &quot;folder_tree&quot;: &quot;/&quot;,
+        &quot;file_id&quot;: &quot;#####&quot;,
+        &quot;file_name&quot;: &quot;file name 1&quot;,
+        &quot;file_mimetype&quot;: &quot;application/vnd.google-apps.spreadsheet&quot;,
+        &quot;file_created&quot;: &quot;2010/01/01 00:00:00&quot;,
+        &quot;file_updated&quot;: &quot;2010/01/01 01:00:00&quot;
+    },
+    {
+        &quot;folder_tree&quot;: &quot;/folder1/&quot;,
+        &quot;file_id&quot;: &quot;#####&quot;,
+        &quot;file_name&quot;: &quot;file name 2&quot;,
+        &quot;file_mimetype&quot;: &quot;image/png&quot;,
+        &quot;file_created&quot;: &quot;2010/01/01 00:00:00&quot;,
+        &quot;file_updated&quot;: &quot;2010/01/01 01:00:00&quot;
+    },
+    {
+        &quot;folder_tree&quot;: &quot;/folder1/folder2/&quot;,
+        &quot;file_id&quot;: &quot;#####&quot;,
+        &quot;file_name&quot;: &quot;file name 3&quot;,
+        &quot;file_mimetype&quot;: &quot;image/gif&quot;,
+        &quot;file_created&quot;: &quot;2010/01/01 00:00:00&quot;,
+        &quot;file_updated&quot;: &quot;2010/01/01 01:00:00&quot;
+    },
+    ,
+    ,
+    ,
+]
+</code></pre>
+
+<p>In this script, <a href="http://localhost:1313/2017/03/13/create-folder-tree-on-google-drive/">Create Folder Tree on Google Drive</a> that I submitted before was used.</p>
+
+<p>Also this script was used at <a href="https://gist.github.com/tanaikech/c5b2811bce01cbcc26ffa357df496379">Downloading Files From Google Drive Under No Authorization Using Browser</a>.</p>
+
 
   
-  <footer>
-    <a href="https://tanaikech.github.io/2016/10/13/improved-algorithms-for-summation-of-array-elements/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2016/09/18/1stpost/">1stpost</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>18 Sep 2016, 15:02</time>
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2017/07/12/updated-ggsrun-to-v122/"><i class="fa fa-chevron-left"></i></a>
+    
   </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
+  <div class="pure-u-10-24">
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/etc">etc</a>
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2017/07/12/updated-ggsrun-to-v122/">Updated ggsrun to v122</a>
+    </nav>
     
   </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/etc">etc</a>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
     
   </div>
-  
-  
-
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
 </div>
 
-  </header>
 
-  <p>
-  This is a first post. Today this blog was launched. I would like to introduce some of my experimental results. I&rsquo;m Japanese. So I&rsquo;ll use both English and Japanese here. Thank you.
-  </p>
 
   
-</article>
-
-  
-
-  
-
-
-<nav class="pagination" role="pagination">
-  
-  <a href="https://tanaikech.github.io/page/17/"><i class="fa fa-chevron-left"></i></a>
-  
-  <span>&nbsp;18 / 18&nbsp;</span>
-  
-  <i class="fa fa-chevron-right"></i>
-  
-</nav>
-
-
 
 </div>
 
