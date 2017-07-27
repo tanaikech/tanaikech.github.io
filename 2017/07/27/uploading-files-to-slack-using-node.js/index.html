@@ -268,6 +268,8 @@
 </ul></li>
 </ul>
 
+<p><a href="https://tanaikech.github.io/2017/07/21/multipart-post-request-using-google-apps-script/">Basically, this is almost the same to the method using GAS</a>.</p>
+
 <pre><code class="language-javascript">var fs = require('fs');
 var request = require('request');
 var upfile = 'sample.zip';
@@ -275,26 +277,34 @@ fs.readFile(upfile, function(err, content){
     if(err){
         console.error(err);
     }
-    var token = '### access token ###';
-    var filetype = 'zip';
-    var filename = 'samplefilename';
-    var channel = 'sample';
-    var title = 'sampletitle';
-    var formString = &quot;\n--abcdefghijklmnop\nContent-Disposition: form-data; name=\&quot;token\&quot;;\n\n&quot; + token;
-    formString += &quot;\n--abcdefghijklmnop\nContent-Disposition: form-data; name=\&quot;filetype\&quot;;\n\n&quot; + filetype;
-    formString += &quot;\n--abcdefghijklmnop\nContent-Disposition: form-data; name=\&quot;filename\&quot;;\n\n&quot; + filename;
-    formString += &quot;\n--abcdefghijklmnop\nContent-Disposition: form-data; name=\&quot;channels\&quot;;\n\n&quot; + channel;
-    formString += &quot;\n--abcdefghijklmnop\nContent-Disposition: form-data; name=\&quot;title\&quot;;\n\n&quot; + title;
-    formString += &quot;\n--abcdefghijklmnop\nContent-Disposition: form-data; filename=\&quot;&quot; + upfile + &quot;\&quot;; name=\&quot;file\&quot;;\nContent-Type:application/octet-stream;\n\n&quot;;
+    var metadata = {
+        token: &quot;### access token ###&quot;,
+        channels: &quot;sample&quot;,
+        filename: &quot;samplefilename&quot;,
+        title: &quot;sampletitle&quot;,
+    };
+    var url = &quot;https://slack.com/api/files.upload&quot;;
+    var boundary = &quot;xxxxxxxxxx&quot;;
+    var data = &quot;&quot;;
+    for(var i in metadata) {
+        if ({}.hasOwnProperty.call(metadata, i)) {
+            data += &quot;--&quot; + boundary + &quot;\r\n&quot;;
+            data += &quot;Content-Disposition: form-data; name=\&quot;&quot; + i + &quot;\&quot;; \r\n\r\n&quot; + metadata[i] + &quot;\r\n&quot;;
+        }
+    };
+    data += &quot;--&quot; + boundary + &quot;\r\n&quot;;
+    data += &quot;Content-Disposition: form-data; name=\&quot;file\&quot;; filename=\&quot;&quot; + upfile + &quot;\&quot;\r\n&quot;;
+    data += &quot;Content-Type:application/octet-stream\r\n\r\n&quot;;
+    var payload = Buffer.concat([
+            Buffer.from(data, &quot;utf8&quot;),
+            new Buffer(content, 'binary'),
+            Buffer.from(&quot;\r\n--&quot; + boundary + &quot;\r\n&quot;, &quot;utf8&quot;),
+    ]);
     var options = {
         method: 'post',
-        url: 'https://slack.com/api/files.upload',
-        headers: {&quot;Content-Type&quot;: &quot;multipart/form-data; boundary=abcdefghijklmnop&quot;},
-        body: Buffer.concat([
-            Buffer.from(formString, &quot;utf8&quot;),
-            new Buffer(content, 'binary'),
-            Buffer.from(&quot;\n--abcdefghijklmnop\n&quot;, &quot;utf8&quot;),
-        ]),
+        url: url,
+        headers: {&quot;Content-Type&quot;: &quot;multipart/form-data; boundary=&quot; + boundary},
+        body: payload,
     };
     request(options, function(error, response, body) {
         console.log(body);
