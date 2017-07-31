@@ -258,11 +258,13 @@
 
 <p><a href="https://gist.github.com/tanaikech/95c7cd650837f33a564babcaf013cae0">Gists</a></p>
 
-<p>When it uses Google Sheets API v4, <a href="https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets#gridrange">GridRange</a> is used for it as the range property. This sample script is for converting from a1Notation to GridRange.</p>
+<p>When it uses Google Sheets API v4, <a href="https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets#gridrange">GridRange</a> is used for it as the range property. These sample scripts are for converting from a1Notation to GridRange. You can chose from following 2 scripts. Both scripts can retrieve the same result.</p>
 
-<h3 id="script">Script :</h3>
+<h3 id="script-1">Script 1 :</h3>
 
-<pre><code class="language-javascript">function a1notation2gridrange(sheetid, a1notation){
+<p>This is from me.</p>
+
+<pre><code class="language-javascript">function a1notation2gridrange1(sheetid, a1notation) {
   var data = a1notation.match(/(^.+)!(.+):(.+$)/);
   var ss = SpreadsheetApp.openById(sheetid).getSheetByName(data[1]);
   var range = ss.getRange(data[2] + &quot;:&quot; + data[3]);
@@ -275,6 +277,34 @@
   };
   if (!data[2].match(/[0-9]/)) delete gridRange.startRowIndex;
   if (!data[3].match(/[0-9]/)) delete gridRange.endRowIndex;
+  return gridRange;
+}
+</code></pre>
+
+<h3 id="script-2">Script 2 :</h3>
+
+<p><code>String.prototype.to10</code> was used for this script. <code>String.prototype.to10</code> is from <a href="https://gist.github.com/oshliaer/647d574208da5f3529a3">Alexander Ivanov</a>. I think that <code>String.prototype.to10</code> is a clever solution.</p>
+
+<pre><code class="language-javascript">String.prototype.to10 = function(base) {
+  var lvl = this.length - 1;
+  var val = (base || 0) + Math.pow(26, lvl) * (this[0].toUpperCase().charCodeAt() - 64 - (lvl ? 0 : 1));
+  return (this.length &gt; 1) ? (this.substr(1, this.length - 1)).to10(val) : val;
+}
+
+function a1notation2gridrange2(sheetid, a1notation) {
+  var data = a1notation.match(/(^.+)!(.+):(.+$)/);
+  var ss = SpreadsheetApp.openById(sheetid).getSheetByName(data[1]);
+  var co1 = data[2].match(/(\D+)(\d+)/);
+  var co2 = data[3].match(/(\D+)(\d+)/);
+  var gridRange = {
+    sheetId: ss.getSheetId(),
+    startRowIndex: co1 ? parseInt(co1[2], 10) - 1 : null,
+    endRowIndex: co2 ? parseInt(co2[2], 10) : null,
+    startColumnIndex: co1 ? co1[1].to10() : data[2].to10(),
+    endColumnIndex: co2 ? co2[1].to10(1) : data[3].to10(1),
+  };
+  if (gridRange.startRowIndex == null) delete gridRange.startRowIndex;
+  if (gridRange.endRowIndex == null) delete gridRange.endRowIndex;
   return gridRange;
 }
 </code></pre>
