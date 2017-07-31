@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>Multipart-POST Request Using Node.js &middot; tanaike</title>
+  <title>Converting a1Notation to GridRange for Google Sheets API &middot; tanaike</title>
 
   
   
@@ -210,7 +210,7 @@
 
 
 <div class="header">
-  <h1>Multipart-POST Request Using Node.js</h1>
+  <h1>Converting a1Notation to GridRange for Google Sheets API</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -219,7 +219,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>27 Jul 2017, 09:44</time>
+    <time>31 Jul 2017, 14:38</time>
   </div>
 
   
@@ -230,7 +230,7 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/slacktips">SlackTips</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
     
   </div>
   
@@ -242,9 +242,11 @@
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/node.js">Node.js</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/slack">Slack</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/sheets-api">Sheets API</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>
     
   </div>
   
@@ -254,107 +256,56 @@
 
   
 
-<p><a href="https://gist.github.com/tanaikech/40c9284e91d209356395b43022ffc5cc">Gists</a></p>
+<p><a href="https://gist.github.com/tanaikech/95c7cd650837f33a564babcaf013cae0">Gists</a></p>
 
-<p>Here, I introduce 2 scripts for uploading files to Slack using Node.js as samples. These 2 sample scripts are for uploading files to Slack.</p>
+<p>When it uses Google Sheets API v4, <a href="https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets#gridrange">GridRange</a> is used for it as the range property. This sample script is for converting from a1Notation to GridRange.</p>
 
-<h3 id="sample-script-1">Sample script 1:</h3>
+<h3 id="script">Script :</h3>
 
-<ul>
-<li>You can upload the zip file by converting byte array as follows.
-
-<ul>
-<li>At first, it builds <code>form-data</code>.</li>
-<li>Adds the zip file converted to byte array and <code>boundary</code> using <code>Buffer.concat()</code>.</li>
-<li>This is used as body in request.</li>
-</ul></li>
-</ul>
-
-<p><a href="https://tanaikech.github.io/2017/07/21/multipart-post-request-using-google-apps-script/">Basically, this is almost the same to the method using GAS</a>.</p>
-
-<pre><code class="language-javascript">var fs = require('fs');
-var request = require('request');
-var upfile = 'sample.zip';
-fs.readFile(upfile, function(err, content){
-    if(err){
-        console.error(err);
-    }
-    var metadata = {
-        token: &quot;### access token ###&quot;,
-        channels: &quot;sample&quot;,
-        filename: &quot;samplefilename&quot;,
-        title: &quot;sampletitle&quot;,
-    };
-    var url = &quot;https://slack.com/api/files.upload&quot;;
-    var boundary = &quot;xxxxxxxxxx&quot;;
-    var data = &quot;&quot;;
-    for(var i in metadata) {
-        if ({}.hasOwnProperty.call(metadata, i)) {
-            data += &quot;--&quot; + boundary + &quot;\r\n&quot;;
-            data += &quot;Content-Disposition: form-data; name=\&quot;&quot; + i + &quot;\&quot;; \r\n\r\n&quot; + metadata[i] + &quot;\r\n&quot;;
-        }
-    };
-    data += &quot;--&quot; + boundary + &quot;\r\n&quot;;
-    data += &quot;Content-Disposition: form-data; name=\&quot;file\&quot;; filename=\&quot;&quot; + upfile + &quot;\&quot;\r\n&quot;;
-    data += &quot;Content-Type:application/octet-stream\r\n\r\n&quot;;
-    var payload = Buffer.concat([
-            Buffer.from(data, &quot;utf8&quot;),
-            new Buffer(content, 'binary'),
-            Buffer.from(&quot;\r\n--&quot; + boundary + &quot;\r\n&quot;, &quot;utf8&quot;),
-    ]);
-    var options = {
-        method: 'post',
-        url: url,
-        headers: {&quot;Content-Type&quot;: &quot;multipart/form-data; boundary=&quot; + boundary},
-        body: payload,
-    };
-    request(options, function(error, response, body) {
-        console.log(body);
-    });
-});
-</code></pre>
-
-<h3 id="sample-script-2">Sample script 2:</h3>
-
-<ul>
-<li><code>fs.createReadStream()</code> can be used as a file for uploading to Slack.</li>
-</ul>
-
-<pre><code class="language-javascript">var fs = require('fs');
-var request = require('request');
-request.post({
-    url: 'https://slack.com/api/files.upload',
-    formData: {
-        file: fs.createReadStream('sample.zip'),
-        token: '### access token ###',
-        filetype: 'zip',
-        filename: 'samplefilename',
-        channels: 'sample',
-        title: 'sampletitle',
-    },
-}, function(error, response, body) {
-    console.log(body);
-});
+<pre><code class="language-javascript">function a1notation2gridrange(sheetid, a1notation){
+  var data = a1notation.match(/(^.+)!(.+):(.+$)/);
+  var ss = SpreadsheetApp.openById(sheetid).getSheetByName(data[1]);
+  var range = ss.getRange(data[2] + &quot;:&quot; + data[3]);
+  var gridRange = {
+    sheetId: ss.getSheetId(),
+    startRowIndex: range.getRow() - 1,
+    endRowIndex: range.getRow() - 1 + range.getNumRows(),
+    startColumnIndex: range.getColumn() - 1,
+    endColumnIndex: range.getColumn() - 1 + range.getNumColumns(),
+  };
+  if (!data[2].match(/[0-9]/)) delete gridRange.startRowIndex;
+  if (!data[3].match(/[0-9]/)) delete gridRange.endRowIndex;
+  return gridRange;
+}
 </code></pre>
 
 <h3 id="result">Result :</h3>
 
-<p>Both sample 1 and sample 2 can be uploaded zip file to Slack as follows. For both, even if <code>filetype</code> is not defined, the uploaded file is used automatically as a zip file.</p>
+<p>Following sample results are from  <a href="https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets#gridrange">the document for GridRange at Google Sheets API v4</a>.</p>
 
-<p><img src="https://tanaikech.github.io/img/20170727a.png" alt="" /></p>
+<p>For example, if &ldquo;Sheet1&rdquo; is sheet ID 0, then:</p>
+
+<pre><code>Sheet1!A1:A1 == sheetId: 0, startRowIndex: 0, endRowIndex: 1, startColumnIndex: 0, endColumnIndex: 1
+
+Sheet1!A3:B4 == sheetId: 0, startRowIndex: 2, endRowIndex: 4, startColumnIndex: 0, endColumnIndex: 2
+
+Sheet1!A:B == sheetId: 0, startColumnIndex: 0, endColumnIndex: 2
+
+Sheet1!A5:B == sheetId: 0, startRowIndex: 4, startColumnIndex: 0, endColumnIndex: 2
+</code></pre>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2017/07/21/multipart-post-request-using-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2017/07/27/multipart-post-request-using-node.js/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2017/07/21/multipart-post-request-using-google-apps-script/">Multipart-POST Request Using Google Apps Script</a>
+      <a href="https://tanaikech.github.io/2017/07/27/multipart-post-request-using-node.js/">Multipart-POST Request Using Node.js</a>
     </nav>
     
   </div>
@@ -363,14 +314,8 @@ request.post({
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2017/07/31/converting-a1notation-to-gridrange-for-google-sheets-api/">Converting a1Notation to GridRange for Google Sheets API</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2017/07/31/converting-a1notation-to-gridrange-for-google-sheets-api/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
