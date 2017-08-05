@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>Topics &middot; tanaike</title>
+  <title>Downloading Shared Files on Google Drive Using Curl &middot; tanaike</title>
 
   
   
@@ -36,8 +36,6 @@
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
 
   
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike" href="https://tanaikech.github.io/topics/index.xml" />
   
 
   
@@ -113,10 +111,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://tanaikech.github.io/topics/index.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
-    </li>
     
 
     
@@ -216,108 +210,126 @@
 
 
 <div class="header">
-  <h1>Topics</h1>
+  <h1>Downloading Shared Files on Google Drive Using Curl</h1>
+  <h2></h2>
 </div>
 <div class="content">
-  <ul>
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>05 Aug 2017, 11:06</time>
+  </div>
+
+  
+
   
   
-    <li>
-      <a href="gastips">gastips</a>
-      <span>&#40;44&#41;</span>
-    </li>
   
-    <li>
-      <a href="clitool">clitool</a>
-      <span>&#40;13&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/googleapitips">googleapitips </a>
+    
+  </div>
   
-    <li>
-      <a href="gotips">gotips</a>
-      <span>&#40;11&#41;</span>
-    </li>
   
-    <li>
-      <a href="googleapitips">googleapitips</a>
-      <span>&#40;9&#41;</span>
-    </li>
+
   
-    <li>
-      <a href="library">library</a>
-      <span>&#40;7&#41;</span>
-    </li>
   
-    <li>
-      <a href="benchmark">benchmark</a>
-      <span>&#40;6&#41;</span>
-    </li>
   
-    <li>
-      <a href="googlecharttips">googlecharttips</a>
-      <span>&#40;4&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/curl">curl</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/shared">shared</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/download">download</a>
+    
+  </div>
   
-    <li>
-      <a href="pythontips">pythontips</a>
-      <span>&#40;4&#41;</span>
-    </li>
   
-    <li>
-      <a href="report">report</a>
-      <span>&#40;4&#41;</span>
-    </li>
+
+</div>
+
   
-    <li>
-      <a href="jstips">jstips</a>
-      <span>&#40;3&#41;</span>
-    </li>
+
+<p><a href="https://gist.github.com/tanaikech/f0f2d122e05bf5f971611258c22c110f">Gists</a></p>
+
+<p>When the shared files on Google Drive is downloaded, it is necessary to change the download method by the file size. The boundary of file size when the method is changed is about <strong>40MB</strong>.</p>
+
+<h3 id="file-size-40mb">File size &lt; 40MB</h3>
+
+<h4 id="curl">CURL</h4>
+
+<pre><code class="language-bash">filename=&quot;### filename ###&quot;
+fileid=&quot;### file ID ###&quot;
+curl -L -o ${filename} &quot;https://drive.google.com/uc?export=download&amp;id=${fileid}&quot;
+</code></pre>
+
+<h3 id="file-size-40mb-1">File size &gt; 40MB</h3>
+
+<p>When it tries to download the file with more than 40MB, Google says to download from following URL.</p>
+
+<pre><code class="language-html">&lt;a id=&quot;uc-download-link&quot; class=&quot;goog-inline-block jfk-button jfk-button-action&quot; href=&quot;/uc?export=download&amp;amp;confirm=####&amp;amp;id=### file ID ###&quot;&gt;download&lt;/a&gt;
+</code></pre>
+
+<p>Query included <code>confirm=####</code> is important for downloading the files with large size. In order to retrieve the query from the HTML, it uses <a href="https://github.com/EricChiang/pup"><code>pup</code></a>.</p>
+
+<pre><code class="language-bash">pup 'a#uc-download-link attr{href}'
+</code></pre>
+
+<p>And <code>sed</code> is used to remove <code>amp;</code>.</p>
+
+<pre><code class="language-bash">sed -e 's/amp;//g'`
+</code></pre>
+
+<p>So curl command is as follows.</p>
+
+<h4 id="curl-1">CURL</h4>
+
+<pre><code class="language-bash">filename=&quot;### filename ###&quot;
+fileid=&quot;### file ID ###&quot;
+query=`curl -c ./cookie.txt -s -L &quot;https://drive.google.com/uc?export=download&amp;id=${fileid}&quot; | pup 'a#uc-download-link attr{href}' | sed -e 's/amp;//g'`
+curl -b ./cookie.txt -L -o ${filename} &quot;https://drive.google.com${query}&quot;
+</code></pre>
+
+<p>The value of <code>confirm</code> is changed every time. So when the value of <code>confirm</code> is retrieved, the cookie is saved using <code>-c ./cookie.txt</code>, and when the file is downloaded, the cookie has to be read using <code>-b ./cookie.txt</code>.</p>
+
+<p>Reference: <a href="http://qiita.com/netwing/items/f2a595389f39206235e8">http://qiita.com/netwing/items/f2a595389f39206235e8</a></p>
+
+
   
-    <li>
-      <a href="shtips">shtips</a>
-      <span>&#40;3&#41;</span>
-    </li>
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2017/08/04/retrieving-access-token-from-onedrive-using-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2017/08/04/retrieving-access-token-from-onedrive-using-google-apps-script/">Retrieving Access Token From OneDrive using Google Apps Script</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
+</div>
+
+
+
   
-    <li>
-      <a href="driveapitips">driveapitips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="etc">etc</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="slacktips">slacktips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="sublimetips">sublimetips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="coffeescripttips">coffeescripttips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="netatmotips">netatmotips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="plugin">plugin</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="sublime">sublime</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-  </ul>
+
 </div>
 
 </div>
@@ -353,3 +365,4 @@
 
 </body>
 </html>
+
