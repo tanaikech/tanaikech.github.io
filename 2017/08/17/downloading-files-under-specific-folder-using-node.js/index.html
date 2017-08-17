@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>GAS Library - OnedriveApp &middot; tanaike</title>
+  <title>Downloading Files Under Specific Folder using Node.js &middot; tanaike</title>
 
   
   
@@ -210,7 +210,7 @@
 
 
 <div class="header">
-  <h1>GAS Library - OnedriveApp</h1>
+  <h1>Downloading Files Under Specific Folder using Node.js</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -219,7 +219,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>16 Aug 2017, 10:31</time>
+    <time>17 Aug 2017, 09:25</time>
   </div>
 
   
@@ -230,9 +230,9 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/nodetips">NodeTips</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/googleapitips">googleapitips</a>
     
   </div>
   
@@ -244,11 +244,11 @@
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/node.js">Node.js</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/drive-api">drive-api</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/onedrive">OneDrive</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/download">download</a>
     
   </div>
   
@@ -258,38 +258,86 @@
 
   
 
-<p>This is a library of Google Apps Script for using Microsoft OneDrive.</p>
+<p><a href="https://gist.github.com/tanaikech/38b536923b1765da052c21aab093649d">Gists</a></p>
 
-<h2 id="feature">Feature</h2>
+<p>This sample script is for downloading files under a specific folder using Node.js. It can download files with Google Docs and others.</p>
 
-<p>This library can carry out following functions using OneDrive APIs.</p>
+<p>This sample supposes as follows. So please confirm it.</p>
+
+<ul>
+<li><a href="https://developers.google.com/drive/v3/web/quickstart/nodejs">quickstart</a> is used and default quickstart works fine.</li>
+</ul>
+
+<p>In order to use this sample, please carry out as follows.</p>
 
 <ol>
-<li>Retrieve file list on OneDrive.</li>
-<li>Delete files and folders on OneDrive.</li>
-<li>Create folder on OneDrive.</li>
-<li>Download files from OneDrive to Google Drive.</li>
-<li>Upload files from Google Drive to OneDrive.</li>
+<li>Replace <code>listFiles()</code> of the default quickstart to this sample.</li>
+<li>Set <code>folderid</code>. This script can retrieve files in the folder with <code>folderid</code>.</li>
+<li>Delete <code>drive-nodejs-quickstart.json</code>. I think that there is the file at <code>.credentials</code> in your home directory.</li>
+<li>Change the SCOPE from <code>var SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly'];</code> to <code>var SCOPES = ['https://www.googleapis.com/auth/drive.readonly'];</code>.</li>
+<li>Run script, retrieve the code and authorize.</li>
 </ol>
 
-<h2 id="demo">Demo</h2>
+<h2 id="script">Script :</h2>
 
-<p><img src="https://github.com/tanaikech/OnedriveApp/raw/master/images/demo.gif" alt="" /></p>
+<pre><code class="language-javascript">function listFiles(auth) {
+  var folderid = &quot;### folder ID ###&quot;; // Folder ID. This script downloads files in the folder with this folder ID.
+  var outputExtension = &quot;pdf&quot;; // Extension of output file. This is adapted to only Google Docs.
 
-<p><strong>You can see the detail information here <a href="https://github.com/tanaikech/OnedriveApp">https://github.com/tanaikech/OnedriveApp</a></strong></p>
+  var outputMimeType = mime.lookup(outputExtension);
+  var service = google.drive('v3');
+  service.files.list({
+    auth: auth,
+    q: &quot;'&quot; + folderid + &quot;' in parents and trashed=false&quot;,
+    fields: &quot;files(id, name, mimeType)&quot;
+  }, function(err, response) {
+    if (err) {
+      console.log('The API returned an error: ' + err);
+      return;
+    }
+    response.files.forEach(function(e){
+      if (e.mimeType.includes(&quot;application/vnd.google-apps&quot;)) {
+        var dlfile = fs.createWriteStream(e.name + &quot;.&quot; + outputExtension);
+        service.files.export({
+          auth: auth,
+          fileId: e.id,
+          mimeType: outputMimeType
+        }).on('end', function() {
+          console.log(&quot;'%s' was downloaded as %s.&quot;, e.name, outputExtension);
+        }).on('error', function(err) {
+          console.error(err);
+          return process.exit();
+        }).pipe(dlfile);
+      } else {
+        var dlfile = fs.createWriteStream(e.name);
+        service.files.get({
+          auth: auth,
+          fileId: e.id,
+          alt: 'media'
+        }).on('end', function() {
+          console.log(&quot;'%s' was downloaded as %s.&quot;, e.name, mime.extension(e.mimeType));
+        }).on('error', function(err) {
+          console.error(err);
+          return process.exit();
+        }).pipe(dlfile);
+      }
+    });
+  });
+}
+</code></pre>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2017/08/15/uploading-files-to-onedrive-using-node.js/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2017/08/16/gas-library---onedriveapp/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2017/08/15/uploading-files-to-onedrive-using-node.js/">Uploading Files to OneDrive Using Node.js</a>
+      <a href="https://tanaikech.github.io/2017/08/16/gas-library---onedriveapp/">GAS Library - OnedriveApp</a>
     </nav>
     
   </div>
@@ -298,14 +346,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2017/08/17/downloading-files-under-specific-folder-using-node.js/">Downloading Files Under Specific Folder using Node.js</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2017/08/17/downloading-files-under-specific-folder-using-node.js/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
