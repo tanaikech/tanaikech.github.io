@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>Topics &middot; tanaike</title>
+  <title>Updating Thumbnail of File on Google Drive using Python &middot; tanaike</title>
 
   
   
@@ -36,8 +36,6 @@
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
 
   
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike" href="https://tanaikech.github.io/topics/index.xml" />
   
 
   
@@ -113,10 +111,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://tanaikech.github.io/topics/index.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
-    </li>
     
 
     
@@ -216,118 +210,130 @@
 
 
 <div class="header">
-  <h1>Topics</h1>
+  <h1>Updating Thumbnail of File on Google Drive using Python</h1>
+  <h2></h2>
 </div>
 <div class="content">
-  <ul>
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>19 Aug 2017, 16:27</time>
+  </div>
+
+  
+
   
   
-    <li>
-      <a href="gastips">gastips</a>
-      <span>&#40;46&#41;</span>
-    </li>
   
-    <li>
-      <a href="clitool">clitool</a>
-      <span>&#40;13&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/pythontips">pythontips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/googleapitips">googleapitips</a>
+    
+  </div>
   
-    <li>
-      <a href="googleapitips">googleapitips</a>
-      <span>&#40;12&#41;</span>
-    </li>
   
-    <li>
-      <a href="gotips">gotips</a>
-      <span>&#40;11&#41;</span>
-    </li>
+
   
-    <li>
-      <a href="library">library</a>
-      <span>&#40;8&#41;</span>
-    </li>
   
-    <li>
-      <a href="benchmark">benchmark</a>
-      <span>&#40;6&#41;</span>
-    </li>
   
-    <li>
-      <a href="etc">etc</a>
-      <span>&#40;5&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/python">python</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/drive-api">drive-api </a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/thumbnail">Thumbnail</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/update">Update</a>
+    
+  </div>
   
-    <li>
-      <a href="pythontips">pythontips</a>
-      <span>&#40;5&#41;</span>
-    </li>
   
-    <li>
-      <a href="googlecharttips">googlecharttips</a>
-      <span>&#40;4&#41;</span>
-    </li>
+
+</div>
+
   
-    <li>
-      <a href="report">report</a>
-      <span>&#40;4&#41;</span>
-    </li>
+
+<p>[Gists]()</p>
+
+<p>This sample script is for updating thumbnail of file on Google Drive using Python.</p>
+
+<p>There are some limitations for updating thumbnail. Please confirm the detail information at <a href="https://developers.google.com/drive/v3/web/file#uploading_thumbnails">https://developers.google.com/drive/v3/web/file#uploading_thumbnails</a>.</p>
+
+<p>This sample supposes that <a href="https://developers.google.com/drive/v3/web/quickstart/python">quickstart</a> is used and default quickstart works fine. In order to use this sample, please carry out as follows.</p>
+
+<ul>
+<li>Replace <code>main()</code> of the default quickstart to this sample.</li>
+</ul>
+
+<h2 id="script">Script :</h2>
+
+<pre><code class="language-python">def main():
+    credentials = get_credentials()
+    http = credentials.authorize(httplib2.Http())
+    service = discovery.build('drive', 'v3', http=http)
+
+    with open(&quot;./sample.png&quot;, &quot;rb&quot;) as f:
+        res = service.files().update(
+            fileId=&quot;### file ID ###&quot;,
+            body={
+                &quot;contentHints&quot;: {
+                    &quot;thumbnail&quot;: {
+                        &quot;image&quot;: base64.urlsafe_b64encode(f.read()).decode('utf8'),
+                        &quot;mimeType&quot;: &quot;image/png&quot;,
+                    }
+                }
+            },
+        ).execute()
+        print(res)
+</code></pre>
+
+<p><code>contentHints.thumbnail.image</code> is URL-safe Base64-encoded image. So an image data that you want to use as new thumbnail has to be converted to URL-safe Base64-encoded data. For this, it uses <code>base64.urlsafe_b64encode()</code> at Python.</p>
+
+<h2 id="result">Result :</h2>
+
+<p><img src="https://tanaikech.github.io/img/demo20170819a.gif" alt="" /></p>
+
+<h2 id="note">Note :</h2>
+
+<p>I used zip file as a sample. Zip file doesn&rsquo;t have the thumbnail on Google Drive. When it confirms using <code>drive.files.get</code>, <code>hasThumbnail</code> is false. So this can be used. Although I used this script to Google Docs and images, the updated image was not reflected to them. This may touch to the limitations. When the thumbnail is given to the zip file, <code>hasThumbnail</code> becomes true. In my environment, at the first update, the update had sometimes been failed. But at that time, the second update had worked fine. I don&rsquo;t know about the reason. I&rsquo;m sorry.</p>
+
+
   
-    <li>
-      <a href="jstips">jstips</a>
-      <span>&#40;3&#41;</span>
-    </li>
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2017/08/17/downloading-files-under-specific-folder-using-node.js/"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2017/08/17/downloading-files-under-specific-folder-using-node.js/">Downloading Files Under Specific Folder using Node.js</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
+</div>
+
+
+
   
-    <li>
-      <a href="shtips">shtips</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="driveapitips">driveapitips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="nodetips">nodetips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="slacktips">slacktips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="sublimetips">sublimetips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="coffeescripttips">coffeescripttips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="netatmotips">netatmotips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="onedrivetips">onedrivetips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="plugin">plugin</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="sublime">sublime</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-  </ul>
+
 </div>
 
 </div>
@@ -363,3 +369,4 @@
 
 </body>
 </html>
+
