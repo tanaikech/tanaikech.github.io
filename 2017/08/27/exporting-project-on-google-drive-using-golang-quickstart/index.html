@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>Updated: GAS Library - OnedriveApp &middot; tanaike</title>
+  <title>Exporting Project on Google Drive using Golang Quickstart &middot; tanaike</title>
 
   
   
@@ -210,7 +210,7 @@
 
 
 <div class="header">
-  <h1>Updated: GAS Library - OnedriveApp</h1>
+  <h1>Exporting Project on Google Drive using Golang Quickstart</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -219,7 +219,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>21 Aug 2017, 11:22</time>
+    <time>27 Aug 2017, 12:01</time>
   </div>
 
   
@@ -230,9 +230,7 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gotips">GoTips</a>
     
   </div>
   
@@ -244,11 +242,13 @@
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/quickstart">quickstart</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/onedrive">OneDrive</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/export">export</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/project">project</a>
     
   </div>
   
@@ -256,26 +256,129 @@
 
 </div>
 
-  <p>OnedriveApp was updated to v1.0.1.</p>
+  
 
-<p><a href="https://github.com/tanaikech/OnedriveApp#authprocess">Added a method for retrieving access token and refresh token using this library.</a></p>
+<p><a href="https://gist.github.com/tanaikech/29d2d31cbe6e0d9bd662aedb121384f0">Gists</a></p>
 
-<p>By added this method, OneDrive APIs can be used by only this library.</p>
+<p>This is a sample script for exporting a project on Google Drive to local PC using Golang Quickstart. A file with refresh token is saved to the same directory with this script as <code>go-quickstart.json</code>. Before you run this script, please enable Drive API on your Google API console.</p>
 
-<p><a href="https://github.com/tanaikech/OnedriveApp">GitHub of OnedriveApp</a></p>
+<h2 id="points-for-exporting-project">Points for exporting project</h2>
+
+<ol>
+<li>In order to export project, both <code>drive.DriveScriptsScope</code> and <code>drive.DriveScope</code> have to be included in the scope.</li>
+<li>The mimeType for exporting has to be &ldquo;application/vnd.google-apps.script+json&rdquo;.</li>
+</ol>
+
+<p><strong>If you already have the file with refresh token, at first, please delete it and run this script. By this, the scopes of refresh token and access token are updated.</strong></p>
+
+<h2 id="script">Script :</h2>
+
+<pre><code class="language-golang">package main
+
+import (
+    &quot;encoding/json&quot;
+    &quot;fmt&quot;
+    &quot;io/ioutil&quot;
+    &quot;log&quot;
+    &quot;net/http&quot;
+    &quot;os&quot;
+
+    &quot;golang.org/x/net/context&quot;
+    &quot;golang.org/x/oauth2&quot;
+    &quot;golang.org/x/oauth2/google&quot;
+    &quot;google.golang.org/api/drive/v3&quot;
+)
+
+func getClient(ctx context.Context, config *oauth2.Config) *http.Client {
+    cacheFile := &quot;./go-quickstart.json&quot;
+    tok, err := tokenFromFile(cacheFile)
+    if err != nil {
+        tok = getTokenFromWeb(config)
+        saveToken(cacheFile, tok)
+    }
+    return config.Client(ctx, tok)
+}
+
+func getTokenFromWeb(config *oauth2.Config) *oauth2.Token {
+    authURL := config.AuthCodeURL(&quot;state-token&quot;, oauth2.AccessTypeOffline)
+    fmt.Printf(&quot;Go to the following link in your browser then type the &quot;+
+        &quot;authorization code: \n%v\n&quot;, authURL)
+
+    var code string
+    if _, err := fmt.Scan(&amp;code); err != nil {
+        log.Fatalf(&quot;Unable to read authorization code %v&quot;, err)
+    }
+
+    tok, err := config.Exchange(oauth2.NoContext, code)
+    if err != nil {
+        log.Fatalf(&quot;Unable to retrieve token from web %v&quot;, err)
+    }
+    return tok
+}
+
+func tokenFromFile(file string) (*oauth2.Token, error) {
+    f, err := os.Open(file)
+    if err != nil {
+        return nil, err
+    }
+    t := &amp;oauth2.Token{}
+    err = json.NewDecoder(f).Decode(t)
+    defer f.Close()
+    return t, err
+}
+
+func saveToken(file string, token *oauth2.Token) {
+    fmt.Printf(&quot;Saving credential file to: %s\n&quot;, file)
+    f, err := os.Create(file)
+    if err != nil {
+        log.Fatalf(&quot;Unable to cache oauth token: %v&quot;, err)
+    }
+    defer f.Close()
+    json.NewEncoder(f).Encode(token)
+}
+
+func main() {
+    ctx := context.Background()
+    b, err := ioutil.ReadFile(&quot;client_secret.json&quot;)
+    if err != nil {
+        log.Fatalf(&quot;Unable to read client secret file: %v&quot;, err)
+    }
+    // Here, in order to export project, drive.DriveScriptsScope, drive.DriveScope have to be included in the scope.
+    config, err := google.ConfigFromJSON(b, drive.DriveScriptsScope, drive.DriveScope)
+    if err != nil {
+        log.Fatalf(&quot;Unable to parse client secret file to config: %v&quot;, err)
+    }
+    client := getClient(ctx, config)
+    srv, err := drive.New(client)
+    if err != nil {
+        log.Fatalf(&quot;Unable to retrieve drive Client %v&quot;, err)
+    }
+
+    // Export project
+    res, err := srv.Files.Export(
+        &quot;### Script ID of project ###&quot;,
+        &quot;application/vnd.google-apps.script+json&quot;, // mimeType is this.
+    ).Download()
+    if err != nil {
+        log.Fatalf(&quot;Error: %v&quot;, err)
+    }
+    result, _ := ioutil.ReadAll(res.Body)
+    fmt.Println(string(result))
+}
+</code></pre>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2017/08/21/changing-values-by-checking-duplicated-values-of-json-for-javascript/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2017/08/21/updated-gas-library---onedriveapp/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2017/08/21/changing-values-by-checking-duplicated-values-of-json-for-javascript/">Changing Values by Checking Duplicated Values of JSON for Javascript</a>
+      <a href="https://tanaikech.github.io/2017/08/21/updated-gas-library---onedriveapp/">Updated: GAS Library - OnedriveApp</a>
     </nav>
     
   </div>
@@ -284,14 +387,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2017/08/21/updated-gas-library---onedriveapp/">Updated: GAS Library - OnedriveApp</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2017/08/21/updated-gas-library---onedriveapp/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
@@ -325,18 +422,6 @@
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
   })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-84325623-1', 'auto');
-  ga('send', 'pageview');
-
-</script>
-
-
-
-</body>
-</html>
-
-nalytics.com/analytics.js','ga');
 
   ga('create', 'UA-84325623-1', 'auto');
   ga('send', 'pageview');
