@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>Updated: GAS Library - OnedriveApp &middot; tanaike</title>
+  <title>Uploading Image Files to Slack Using Incoming Webhooks by Google Apps Script &middot; tanaike</title>
 
   
   
@@ -218,7 +218,7 @@
 
 
 <div class="header">
-  <h1>Updated: GAS Library - OnedriveApp</h1>
+  <h1>Uploading Image Files to Slack Using Incoming Webhooks by Google Apps Script</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -227,7 +227,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>21 Aug 2017, 11:22</time>
+    <time>07 Sep 2017, 12:37</time>
   </div>
 
   
@@ -238,9 +238,7 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
     
   </div>
   
@@ -254,9 +252,9 @@
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/slack">Slack</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/onedrive">OneDrive</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/upload">upload</a>
     
   </div>
   
@@ -264,26 +262,62 @@
 
 </div>
 
-  <p>OnedriveApp was updated to v1.0.1.</p>
+  
 
-<p><a href="https://github.com/tanaikech/OnedriveApp#authprocess">Added a method for retrieving access token and refresh token using this library.</a></p>
+<p><a href="https://gist.github.com/tanaikech/159cec05583c6f206e144f33b4042559">Gist</a></p>
 
-<p>By added this method, OneDrive APIs can be used by only this library.</p>
+<p>This sample script is for uploading image files to Slack using Incoming Webhooks by Google Apps Script.</p>
 
-<p><a href="https://github.com/tanaikech/OnedriveApp">GitHub of OnedriveApp</a></p>
+<p>When users try to upload image files to Slack using Incoming Webhooks, it has been known that although the access token is required to directly upload them, Incoming Webhooks can upload them by using the tag of <code>image_url</code>. In this sample script, it uploads image files (BMP, GIF, JPEG and PNG) on Google Drive to Slack using Incoming Webhooks. The script is written by Google Apps Script.</p>
+
+<p>In this sample, It supposes that there are image files on Google Drive.</p>
+
+<h2 id="script">Script :</h2>
+
+<pre><code class="language-javascript">var fileId = &quot;#####&quot;; // File ID of image file
+var url = &quot;https://hooks.slack.com/services/#####&quot;; // Incoming Webhooks URL retrieved at Slack
+
+var file = DriveApp.getFileById(fileId);
+file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+var res = UrlFetchApp.fetch(url, {
+  method: &quot;post&quot;,
+  payload: JSON.stringify({
+    &quot;channel&quot;:&quot;#####&quot;, // Channel name or channel ID
+    &quot;username&quot;:&quot;Sample Image&quot;,
+    &quot;text&quot;:&quot;Sample Text&quot;,
+    &quot;attachments&quot;:[{
+      &quot;image_url&quot;: &quot;http://drive.google.com/uc?export=download&amp;id=&quot; + fileId
+    }]
+  }),
+  muteHttpExceptions: true
+});
+Utilities.sleep(3000);
+file.setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.NONE);
+</code></pre>
+
+<h2 id="note">Note :</h2>
+
+<ol>
+<li>Modify permission of the image file to <code>Access.ANYONE_WITH_LINK</code> and <code>Permission.VIEW</code>.</li>
+<li>Make Slack download the image file from Google Drive by post request.</li>
+<li>Wait for 3 seconds until the download is finished.</li>
+<li>Undo the permission of the image file to <code>Access.PRIVATE</code> and <code>Permission.NONE</code>.</li>
+</ol>
+
+<p><strong>About uploading image file to Slack, when the upload was finished, even if the image file on Google Drive is removed, the image file on Slack is not removed.</strong></p>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2017/08/21/changing-values-by-checking-duplicated-values-of-json-for-javascript/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2017/09/07/retrieving-files-with-filename-included-special-characters-using-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2017/08/21/changing-values-by-checking-duplicated-values-of-json-for-javascript/">Changing Values by Checking Duplicated Values of JSON for Javascript</a>
+      <a href="https://tanaikech.github.io/2017/09/07/retrieving-files-with-filename-included-special-characters-using-google-apps-script/">Retrieving Files with Filename Included Special Characters using Google Apps Script</a>
     </nav>
     
   </div>
@@ -292,14 +326,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2017/08/21/updated-gas-library---onedriveapp/">Updated: GAS Library - OnedriveApp</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2017/08/21/updated-gas-library---onedriveapp/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
@@ -333,18 +361,6 @@
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
   })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-84325623-1', 'auto');
-  ga('send', 'pageview');
-
-</script>
-
-
-
-</body>
-</html>
-
-nalytics.com/analytics.js','ga');
 
   ga('create', 'UA-84325623-1', 'auto');
   ga('send', 'pageview');
