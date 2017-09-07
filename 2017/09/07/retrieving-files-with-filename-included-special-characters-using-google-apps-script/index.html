@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>Topics &middot; tanaike</title>
+  <title>Retrieving Files with Filename Included Special Characters using Google Apps Script &middot; tanaike</title>
 
   
   
@@ -36,8 +36,6 @@
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
 
   
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike" href="https://tanaikech.github.io/topics/index.xml" />
   
 
   
@@ -113,10 +111,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://tanaikech.github.io/topics/index.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
-    </li>
     
 
     
@@ -224,123 +218,131 @@
 
 
 <div class="header">
-  <h1>Topics</h1>
+  <h1>Retrieving Files with Filename Included Special Characters using Google Apps Script</h1>
+  <h2></h2>
 </div>
 <div class="content">
-  <ul>
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>07 Sep 2017, 10:40</time>
+  </div>
+
+  
+
   
   
-    <li>
-      <a href="gastips">gastips</a>
-      <span>&#40;54&#41;</span>
-    </li>
   
-    <li>
-      <a href="clitool">clitool</a>
-      <span>&#40;14&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    
+  </div>
   
-    <li>
-      <a href="googleapitips">googleapitips</a>
-      <span>&#40;12&#41;</span>
-    </li>
   
-    <li>
-      <a href="gotips">gotips</a>
-      <span>&#40;12&#41;</span>
-    </li>
+
   
-    <li>
-      <a href="library">library</a>
-      <span>&#40;11&#41;</span>
-    </li>
   
-    <li>
-      <a href="benchmark">benchmark</a>
-      <span>&#40;6&#41;</span>
-    </li>
   
-    <li>
-      <a href="etc">etc</a>
-      <span>&#40;5&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/driveapi">DriveAPI</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/specialcharacters">SpecialCharacters</a>
+    
+  </div>
   
-    <li>
-      <a href="pythontips">pythontips</a>
-      <span>&#40;5&#41;</span>
-    </li>
   
-    <li>
-      <a href="googlecharttips">googlecharttips</a>
-      <span>&#40;4&#41;</span>
-    </li>
+
+</div>
+
   
-    <li>
-      <a href="report">report</a>
-      <span>&#40;4&#41;</span>
-    </li>
+
+<p><a href="https://gist.github.com/tanaikech/e74ead2537b7b3718fc824b6ca60a531">Gists</a></p>
+
+<p>This sample script is for retrieving files with filename included special characters using Google Apps Script. The files are used on Google Drive.</p>
+
+<p>As a query parameter, <code>name contains 'filename with special characters'</code> is used. This <code>contains</code> is very important. <code>name='filename with special characters'</code> cannot retrieve such files. Today, it was found that <code>name contains 'filename with special characters'</code> is the workaround. I have been looking for this workaround before. Finally, I found this today. By using this method, filename included umlauts can be also retrieved.</p>
+
+<p>In this sample script, it supposes that there is a file with the filename of &ldquo;ÄÖÜÇÃÕÑÆŒØÞÁÉÍÓÚÝÀÈÌÒÙÂÊÎÔÛÄËÏÖÜ&rdquo;.</p>
+
+<p><strong>In order to use this script, please enable Drive API at <a href="https://developers.google.com/apps-script/guides/services/advanced">Advanced Google Services</a> for Script 1 and Drive API at <a href="https://console.developers.google.com/">API console</a> for Script 1 and Script 2.</strong></p>
+
+<h2 id="script-1-use-advanced-google-services-https-developers-google-com-apps-script-guides-services-advanced">Script 1 : Use <a href="https://developers.google.com/apps-script/guides/services/advanced">Advanced Google Services </a></h2>
+
+<p>In this case, Drive API is v2.</p>
+
+<pre><code class="language-javascript">var params = {
+  q: &quot;title contains 'ÄÖÜÇÃÕÑÆŒØÞÁÉÍÓÚÝÀÈÌÒÙÂÊÎÔÛÄËÏÖÜ' and trashed=false&quot;,
+  fields: &quot;items(id, title)&quot;
+};
+var res = Drive.Files.list(params)
+Logger.log(res)
+</code></pre>
+
+<h2 id="script-2-use-urlfetchapp-fetch">Script 2 : Use UrlFetchApp.fetch()</h2>
+
+<p>In this case, Drive API is v3.</p>
+
+<pre><code class="language-javascript">var filename = &quot;ÄÖÜÇÃÕÑÆŒØÞÁÉÍÓÚÝÀÈÌÒÙÂÊÎÔÛÄËÏÖÜ&quot;;
+var url = &quot;https://www.googleapis.com/drive/v3/files?fields=files(id,name)&amp;q=name+contains+'&quot; + filename + &quot;' and trashed=false&quot;;
+var params = {
+  method: &quot;GET&quot;,
+  headers: {&quot;Authorization&quot;: &quot;Bearer &quot; + ScriptApp.getOAuthToken()},
+  muteHttpExceptions: true
+}
+var res = UrlFetchApp.fetch(url, params).getContentText();
+Logger.log(res)
+</code></pre>
+
+<h2 id="result">Result :</h2>
+
+<pre><code class="language-json">{
+ &quot;files&quot;: [
+  {
+   &quot;id&quot;: &quot;#####&quot;,
+   &quot;name&quot;: &quot;ÄÖÜÇÃÕÑÆŒØÞÁÉÍÓÚÝÀÈÌÒÙÂÊÎÔÛÄËÏÖÜ&quot;
+  }
+ ]
+}
+</code></pre>
+
+
   
-    <li>
-      <a href="jstips">jstips</a>
-      <span>&#40;3&#41;</span>
-    </li>
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2017/09/06/removing-duplicated-values-in-array-using-coffeescript/"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2017/09/06/removing-duplicated-values-in-array-using-coffeescript/">Removing Duplicated Values in Array using CoffeeScript</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
+</div>
+
+
+
   
-    <li>
-      <a href="shtips">shtips</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="coffeescripttips">coffeescripttips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="driveapitips">driveapitips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="nodetips">nodetips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="slacktips">slacktips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="sublimetips">sublimetips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="javascripttips">javascripttips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="netatmotips">netatmotips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="onedrivetips">onedrivetips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="plugin">plugin</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="sublime">sublime</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-  </ul>
+
 </div>
 
 </div>
@@ -376,3 +378,4 @@
 
 </body>
 </html>
+
