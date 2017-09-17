@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>Updated: GAS Library - OnedriveApp &middot; tanaike</title>
+  <title>Selecting Files in Google Drive using Select Box for Google Apps Script &middot; tanaike</title>
 
   
   
@@ -218,7 +218,7 @@
 
 
 <div class="header">
-  <h1>Updated: GAS Library - OnedriveApp</h1>
+  <h1>Selecting Files in Google Drive using Select Box for Google Apps Script</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -227,7 +227,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>21 Aug 2017, 11:22</time>
+    <time>17 Sep 2017, 13:26</time>
   </div>
 
   
@@ -238,9 +238,7 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
     
   </div>
   
@@ -254,9 +252,7 @@
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/onedrive">OneDrive</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/html">HTML</a>
     
   </div>
   
@@ -264,26 +260,163 @@
 
 </div>
 
-  <p>OnedriveApp was updated to v1.0.1.</p>
+  
 
-<p><a href="https://github.com/tanaikech/OnedriveApp#authprocess">Added a method for retrieving access token and refresh token using this library.</a></p>
+<p>[Gists]()</p>
 
-<p>By added this method, OneDrive APIs can be used by only this library.</p>
+<p>This is a sample script for selecting files in Google Drive using HTML select box for Google Apps Script.</p>
 
-<p><a href="https://github.com/tanaikech/OnedriveApp">GitHub of OnedriveApp</a></p>
+<h1 id="feature">Feature</h1>
+
+<p>Feature of this sample.</p>
+
+<ul>
+<li>It is a simple and space saving.</li>
+<li>When the folder is selected, the files in the folder are shown.</li>
+<li>When the file is selected, the ID of file is retrieved. Users can use this ID at GAS.</li>
+<li>When a folder is opened, all files in the folder are cached. By this, the second access of the folder is faster.</li>
+<li>It doesn&rsquo;t retrieve all files in Google Drive at once, so the read of files from Google Drive becomes the minimum necessary.</li>
+</ul>
+
+<p><strong>I will use this for applications that users need to select files on Google Drive.</strong></p>
+
+<h1 id="demo">Demo</h1>
+
+<p><img src="https://tanaikech.github.io/img/20170917a-demo.gif" alt="" /></p>
+
+<p>From this demonstration, it is found that when a folder is selected for the first time, the time to retrieve files is required. At the second access for the folder, the speed is faster than that for the first time. Because the data of files is cached.</p>
+
+<h1 id="usage">Usage</h1>
+
+<ol>
+<li>Create Spreadsheet.</li>
+<li>Open the Spreadsheet and launch script editor.</li>
+<li>Copy and paste following GAS (code.gs) to the script editor.</li>
+<li>Create new HTML file on the script editor.</li>
+<li>Copy and paste following HTML (index.html) to the created HTML file on the script editor. The file name is <code>index.html</code>.</li>
+<li>Run <code>main()</code> at GAS (code.gs).</li>
+<li>See Spreadsheet. You can see the side bar like the demonstration.</li>
+</ol>
+
+<h2 id="gas-code-gs">GAS : code.gs</h2>
+
+<pre><code class="language-javascript">function main() {
+  SpreadsheetApp.getUi().showSidebar(
+    HtmlService
+    .createTemplateFromFile('index')
+    .evaluate()
+    .setTitle(&quot;File selector sample&quot;)
+  );
+}
+
+function getFiles(e) {
+  var data = {};
+  var idn = e;
+  e = e == &quot;root&quot; ? DriveApp.getRootFolder().getId() : e;
+  data[e] = {};
+  data[e].keyname = DriveApp.getFolderById(e).getName();
+  data[e].keyparent = idn == &quot;root&quot;
+    ? null : DriveApp.getFolderById(e).getParents().hasNext()
+    ? DriveApp.getFolderById(e).getParents().next().getId() : null;
+  data[e].files = [];
+  var da = idn == &quot;root&quot; ? DriveApp.getRootFolder() : DriveApp.getFolderById(e);
+  var folders = da.getFolders();
+  var files = da.getFiles();
+  while (folders.hasNext()) {
+    var folder = folders.next();
+    data[e].files.push({name: folder.getName(), id: folder.getId(), mimeType: &quot;folder&quot;});
+  }
+  while (files.hasNext()) {
+    var file = files.next();
+    data[e].files.push({name: file.getName(), id: file.getId(), mimeType: file.getMimeType()});
+  }
+  return data;
+}
+
+function doSomething(id) {
+  // do something
+  var res = id;
+  return res;
+}
+</code></pre>
+
+<h2 id="html-index-html">HTML : index.html</h2>
+
+<pre><code class="language-html">&lt;style&gt;
+  #select_file {
+    text-align: left;
+    width: 95%;
+    font-size: 1em;
+    margin: auto;
+    height: 3em;
+  }
+&lt;/style&gt;
+&lt;script src=&quot;https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.js&quot;&gt;&lt;/script&gt;
+
+&lt;select id=&quot;select_file&quot;&gt;&lt;/select&gt;
+&lt;p id=&quot;id&quot;&gt;&lt;/p&gt;
+
+&lt;script&gt;
+var alldata = {};
+
+$(function() {
+  google.script.run.withSuccessHandler(importData).getFiles(&quot;root&quot;);
+
+  $('#select_file').change(function() {
+    var id = $('#select_file').val();
+    var disp = $('#select_file option:selected').text();
+    if (~disp.indexOf(&quot;Folder&quot;) || ~disp.indexOf(&quot;../&quot;)) {
+      $('#select_file &gt; option').remove();
+      if (alldata[id]) {
+        var dat = {};
+        dat[id] = alldata[id];
+        importData(dat);
+        return;
+      } else {
+        google.script.run.withSuccessHandler(importData).getFiles(id);
+        return;
+      }
+      return;
+    }
+    google.script.run.withSuccessHandler(output).doSomething(id);
+  });
+});
+
+function importData(e) {
+  var key = Object.keys(e)[0];
+  if (!alldata[key]) alldata[key] = e[key];
+  if (e[key][&quot;keyparent&quot;]) {
+    $('#select_file').append($('&lt;option&gt;').html(&quot;./&quot; + e[key][&quot;keyname&quot;]).val(key));
+    $('#select_file').append($('&lt;option&gt;').html(&quot;../&quot;).val(e[key][&quot;keyparent&quot;]));
+  } else {
+    $('#select_file').append($('&lt;option&gt;').html(&quot;./&quot; + e[key][&quot;keyname&quot;]).val(key));
+  }
+  for (var i=0; i &lt; e[key][&quot;files&quot;].length; i++) {
+    $('#select_file').append($('&lt;option&gt;')
+      .html(e[key][&quot;files&quot;][i].mimeType == &quot;folder&quot; ? &quot;[Folder]&quot; + e[key][&quot;files&quot;][i].name : e[key][&quot;files&quot;][i].name)
+      .val(e[key][&quot;files&quot;][i].id)
+    );
+  }
+}
+
+function output(res){
+  $('#id').text(res);
+}
+&lt;/script&gt;
+</code></pre>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2017/08/21/changing-values-by-checking-duplicated-values-of-json-for-javascript/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2017/09/15/spreadsheets.values.batchupdate-using-golang/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2017/08/21/changing-values-by-checking-duplicated-values-of-json-for-javascript/">Changing Values by Checking Duplicated Values of JSON for Javascript</a>
+      <a href="https://tanaikech.github.io/2017/09/15/spreadsheets.values.batchupdate-using-golang/">spreadsheets.values.batchUpdate using Golang</a>
     </nav>
     
   </div>
@@ -292,14 +425,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2017/08/21/updated-gas-library---onedriveapp/">Updated: GAS Library - OnedriveApp</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2017/08/21/updated-gas-library---onedriveapp/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
