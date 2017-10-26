@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>Updated: GAS Library - OnedriveApp &middot; tanaike</title>
+  <title>Straightening Elements in 2 Dimensional Array using Google Apps Script &middot; tanaike</title>
 
   
   
@@ -218,7 +218,7 @@
 
 
 <div class="header">
-  <h1>Updated: GAS Library - OnedriveApp</h1>
+  <h1>Straightening Elements in 2 Dimensional Array using Google Apps Script</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -227,7 +227,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>21 Aug 2017, 11:22</time>
+    <time>26 Oct 2017, 16:51</time>
   </div>
 
   
@@ -238,9 +238,7 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
     
   </div>
   
@@ -254,9 +252,9 @@
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/onedrive">OneDrive</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/javascript">Javascript</a>
     
   </div>
   
@@ -264,26 +262,111 @@
 
 </div>
 
-  <p>OnedriveApp was updated to v1.0.1.</p>
+  
 
-<p><a href="https://github.com/tanaikech/OnedriveApp#authprocess">Added a method for retrieving access token and refresh token using this library.</a></p>
+<p><a href="https://gist.github.com/tanaikech/6a8b169cdcbda5a84f19964b81e447d9">Gists</a></p>
 
-<p>By added this method, OneDrive APIs can be used by only this library.</p>
+<p>This sample script is for straightening elements in 2 dimensional array using Google Apps Script (GAS). When applications using Spreadsheet are developed by GAS, it usually uses 2 dimensional array by <code>setValues()</code>. And the lengths of each element are required to be the same. On the other hand, data used for the applications might not be the same length for each element in 2 dimensional array. This sample script can be used under such situation.</p>
 
-<p><a href="https://github.com/tanaikech/OnedriveApp">GitHub of OnedriveApp</a></p>
+<h2 id="sample-1">Sample 1 :</h2>
+
+<pre><code class="language-javascript">var data = [
+  [&quot;string&quot;],
+  [&quot;string&quot;, &quot;string&quot;, &quot;string&quot;, &quot;string&quot;, &quot;string&quot;],
+  [&quot;string&quot;, &quot;string&quot;, &quot;string&quot;],
+  [&quot;string&quot;, &quot;string&quot;, &quot;string&quot;, &quot;string&quot;, &quot;string&quot;],
+  [&quot;string&quot;, &quot;string&quot;, &quot;string&quot;, &quot;string&quot;, &quot;string&quot;, &quot;string&quot;, &quot;string&quot;, &quot;string&quot;, &quot;string&quot;],
+  [&quot;string&quot;, &quot;string&quot;],
+  [&quot;string&quot;, &quot;string&quot;, &quot;string&quot;, &quot;string&quot;, &quot;string&quot;, &quot;string&quot;, &quot;string&quot;]
+];
+
+var n = 0;
+for (var i in data) {
+  if (n &lt; data[i].length) {
+    n = data[i].length;
+  }
+}
+var temp = data.slice();
+for (var i in temp) {
+  for (var j=0, len=temp[i].length; j&lt;n-len; j++) {
+    data[i].push(&quot;&quot;);
+  }
+}
+Logger.log(JSON.stringify(data))
+</code></pre>
+
+<h3 id="flow">Flow :</h3>
+
+<ol>
+<li>Retrieve maximum length of element by for loop.</li>
+<li>Add elements with the difference between the maximum length and the element for each element as <code>&quot;&quot;</code>.</li>
+</ol>
+
+<h2 id="sample-2">Sample 2 :</h2>
+
+<p>This is solved by one liner script.</p>
+
+<pre><code class="language-javascript">var data = [
+  [&quot;string&quot;],
+  [&quot;string&quot;, &quot;string&quot;, &quot;string&quot;, &quot;string&quot;, &quot;string&quot;],
+  [&quot;string&quot;, &quot;string&quot;, &quot;string&quot;],
+  [&quot;string&quot;, &quot;string&quot;, &quot;string&quot;, &quot;string&quot;, &quot;string&quot;],
+  [&quot;string&quot;, &quot;string&quot;, &quot;string&quot;, &quot;string&quot;, &quot;string&quot;, &quot;string&quot;, &quot;string&quot;, &quot;string&quot;, &quot;string&quot;],
+  [&quot;string&quot;, &quot;string&quot;],
+  [&quot;string&quot;, &quot;string&quot;, &quot;string&quot;, &quot;string&quot;, &quot;string&quot;, &quot;string&quot;, &quot;string&quot;]
+];
+
+var result = [
+  data[i].concat(
+    Array.apply(null, Array(
+      data.slice().sort(
+        function(a, b) {
+          return (a.length &lt; b.length ? 1 : -1);
+        }
+      )[0].length - data[i].length)
+    ).map(
+      function() {
+        return &quot;&quot;;
+      }
+    )
+  )
+  for (i in data)
+];
+Logger.log(JSON.stringify(result))
+</code></pre>
+
+<h3 id="flow-1">Flow :</h3>
+
+<ol>
+<li>Retrieve maximum length of element by sorting array.</li>
+<li>Add elements with the difference between the maximum length and the element for each element as <code>&quot;&quot;</code>.</li>
+</ol>
+
+<h2 id="result">Result :</h2>
+
+<pre><code>[
+    [&quot;string&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;],
+    [&quot;string&quot;,&quot;string&quot;,&quot;string&quot;,&quot;string&quot;,&quot;string&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;],
+    [&quot;string&quot;,&quot;string&quot;,&quot;string&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;],
+    [&quot;string&quot;,&quot;string&quot;,&quot;string&quot;,&quot;string&quot;,&quot;string&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;],
+    [&quot;string&quot;,&quot;string&quot;,&quot;string&quot;,&quot;string&quot;,&quot;string&quot;,&quot;string&quot;,&quot;string&quot;,&quot;string&quot;,&quot;string&quot;],
+    [&quot;string&quot;,&quot;string&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;],
+    [&quot;string&quot;,&quot;string&quot;,&quot;string&quot;,&quot;string&quot;,&quot;string&quot;,&quot;string&quot;,&quot;string&quot;,&quot;&quot;,&quot;&quot;]
+]
+</code></pre>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2017/08/21/changing-values-by-checking-duplicated-values-of-json-for-javascript/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2017/10/20/updated-ggsrun-to-v132/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2017/08/21/changing-values-by-checking-duplicated-values-of-json-for-javascript/">Changing Values by Checking Duplicated Values of JSON for Javascript</a>
+      <a href="https://tanaikech.github.io/2017/10/20/updated-ggsrun-to-v132/">Updated ggsrun to v132</a>
     </nav>
     
   </div>
@@ -292,14 +375,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2017/08/21/updated-gas-library---onedriveapp/">Updated: GAS Library - OnedriveApp</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2017/08/21/updated-gas-library---onedriveapp/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
