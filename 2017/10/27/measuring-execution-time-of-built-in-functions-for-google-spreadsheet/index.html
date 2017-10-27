@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>Updated: GAS Library - OnedriveApp &middot; tanaike</title>
+  <title>Measuring Execution Time of Built-In Functions for Google Spreadsheet &middot; tanaike</title>
 
   
   
@@ -218,7 +218,7 @@
 
 
 <div class="header">
-  <h1>Updated: GAS Library - OnedriveApp</h1>
+  <h1>Measuring Execution Time of Built-In Functions for Google Spreadsheet</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -227,7 +227,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>21 Aug 2017, 11:22</time>
+    <time>27 Oct 2017, 10:06</time>
   </div>
 
   
@@ -238,9 +238,7 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
     
   </div>
   
@@ -254,9 +252,7 @@
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/onedrive">OneDrive</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>
     
   </div>
   
@@ -264,26 +260,78 @@
 
 </div>
 
-  <p>OnedriveApp was updated to v1.0.1.</p>
+  
 
-<p><a href="https://github.com/tanaikech/OnedriveApp#authprocess">Added a method for retrieving access token and refresh token using this library.</a></p>
+<p><a href="https://gist.github.com/tanaikech/1e7df0d6991d4e39330cd2b353573e72">Gists</a></p>
 
-<p>By added this method, OneDrive APIs can be used by only this library.</p>
+<p>This sample script is for measuring the execution time of <a href="https://support.google.com/drive/topic/1361471">built-in functions</a> for Google Spreadsheet. Unfortunately, there are not measurement tools for retrieving the execution time of built-in functions. So I thought of about a workaround.</p>
 
-<p><a href="https://github.com/tanaikech/OnedriveApp">GitHub of OnedriveApp</a></p>
+<h2 id="flow">Flow :</h2>
+
+<ol>
+<li>Import a value to a cell. The value is anything good, because this is used as a trigger. Please do this by yourself.
+
+<ul>
+<li>Custom functions cannot use <code>setValue()</code>. So I used <code>onEdit()</code>.</li>
+</ul></li>
+<li><code>func1()</code> imports a formula that you want to measure the execution time by the script launched by the trigger.</li>
+<li>At <code>func2()</code>, after set the formula, the measurement is started. The confirmation when built-in function was completed is carried out using loop.
+
+<ul>
+<li>By measuring the cost per one call for <code>getValue()</code>, it was found that that was about 0.0003 s. So I thought that this can be used.</li>
+</ul></li>
+<li>The result of measurement can be seen at Stackdriver as milliseconds.</li>
+</ol>
+
+<h2 id="sample-script">Sample script :</h2>
+
+<pre><code class="language-javascript">function func1(range, formula) {
+  range.setValue(formula);
+}
+
+function func2(range) {
+  var d = range.getValue();
+  while (r == d) {
+    var r = range.getValue();
+  }
+}
+
+function onEdit() {
+  var formula = '### Built-in function ###'; // Set the built-in function you want to measure.
+
+  var label = &quot;Execution time for built-in functions.&quot;;
+  var ss = SpreadsheetApp.getActiveSheet();
+  var cell = ss.getActiveCell();
+  var range = ss.getRange(cell.getRow(), cell.getColumn());
+  func1(range, formula);
+  console.time(label);
+  func2(range);
+  console.timeEnd(label);
+}
+</code></pre>
+
+<h2 id="note">Note :</h2>
+
+<ul>
+<li>When built-in functions with very long time is measured, an error may occur at <code>getValue()</code>.
+
+<ul>
+<li>In my environment, the built-in function for 10 seconds worked fine.</li>
+</ul></li>
+</ul>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2017/08/21/changing-values-by-checking-duplicated-values-of-json-for-javascript/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2017/10/26/straightening-elements-in-2-dimensional-array-using-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2017/08/21/changing-values-by-checking-duplicated-values-of-json-for-javascript/">Changing Values by Checking Duplicated Values of JSON for Javascript</a>
+      <a href="https://tanaikech.github.io/2017/10/26/straightening-elements-in-2-dimensional-array-using-google-apps-script/">Straightening Elements in 2 Dimensional Array using Google Apps Script</a>
     </nav>
     
   </div>
@@ -292,14 +340,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2017/08/21/updated-gas-library---onedriveapp/">Updated: GAS Library - OnedriveApp</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2017/08/21/updated-gas-library---onedriveapp/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
@@ -333,18 +375,6 @@
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
   })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-84325623-1', 'auto');
-  ga('send', 'pageview');
-
-</script>
-
-
-
-</body>
-</html>
-
-nalytics.com/analytics.js','ga');
 
   ga('create', 'UA-84325623-1', 'auto');
   ga('send', 'pageview');
