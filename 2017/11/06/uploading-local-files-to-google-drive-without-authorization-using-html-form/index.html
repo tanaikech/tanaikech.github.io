@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>Create New Project with Original Manifests &middot; tanaike</title>
+  <title>Uploading Local Files to Google Drive without Authorization using HTML Form &middot; tanaike</title>
 
   
   
@@ -218,7 +218,7 @@
 
 
 <div class="header">
-  <h1>Create New Project with Original Manifests</h1>
+  <h1>Uploading Local Files to Google Drive without Authorization using HTML Form</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -227,7 +227,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>31 Oct 2017, 16:56</time>
+    <time>06 Nov 2017, 08:54</time>
   </div>
 
   
@@ -238,7 +238,7 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/clitool">CLITool</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
     
   </div>
   
@@ -250,13 +250,11 @@
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/ggsrun">ggsrun</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/cli">CLI</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/upload">upload</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/webapps">webapps</a>
     
   </div>
   
@@ -264,29 +262,109 @@
 
 </div>
 
-  <p>It was found that you can also create new project with your original Manifests using ggsrun. By using this, for example, when you created new project, the project can have libraries, Advanced Google Services and so on at the initial stage. I think that this can be used as a template for Project.</p>
+  
 
-<pre><code class="language-bash">$ ggsrun u -pn [Project name] -f appsscript.json
+<p><a href="https://gist.github.com/tanaikech/2f16f467c94612dc83920a3158614d95">Gists</a></p>
+
+<p>This is a sample script for uploading local file to Google Drive without the authorization using HTML form. A selected file in your local PC using HTML form is uploaded to Google Drive and saved to Google Drive.</p>
+
+<p>When you use this, at first, please <a href="https://developers.google.com/apps-script/guides/web#deploying_a_script_as_a_web_app">deploy Web Apps</a>. The script is <code>doPost()</code> of following scripts.</p>
+
+<h2 id="script-google-apps-script">Script : Google Apps Script</h2>
+
+<pre><code class="language-javascript">function doPost(e) {
+  var data = Utilities.base64Decode(e.parameters.data);
+  var blob = Utilities.newBlob(data, e.parameters.mimetype, e.parameters.filename);
+  DriveApp.createFile(blob);
+  return ContentService.createTextOutput(&quot;Done.&quot;)
+}
 </code></pre>
 
-<p><a href="https://github.com/tanaikech/ggsrun/blob/master/help/README.md#ModifyManifests">https://github.com/tanaikech/ggsrun/blob/master/help/README.md#ModifyManifests</a></p>
+<h3 id="flow">Flow :</h3>
 
-<p><img src="https://tanaikech.github.io/img/demo_manifests2.gif" alt="" /></p>
+<ul>
+<li>Retrieve data, filename and mimetype as <code>e.parameters.data</code>, <code>e.parameters.filename</code> and <code>e.parameters.mimetype</code>, respectively.</li>
+<li>Decode the data using <code>Utilities.base64Decode()</code>.</li>
+<li>Create blob using <code>Utilities.newBlob()</code>.</li>
+<li>Create the file in the root folder of Google Drive.</li>
+</ul>
 
-<p><font color="#3366CC"><strong>You can check this and download ggsrun at <a href="https://github.com/tanaikech/ggsrun">https://github.com/tanaikech/ggsrun</a>.</strong></font></p>
+<h2 id="script-html">Script : HTML</h2>
+
+<p><code>https://script.google.com/macros/s/#####/exec</code> is the URL obtained when the Web Apps was deployed. Please replace it to your Web Apps URL. You can open this HTML for the browser of your local PC.</p>
+
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+
+&lt;head&gt;
+    &lt;title&gt;Sample script for uploading file to Google Drive without authorization&lt;/title&gt;
+    &lt;script src=&quot;https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.js&quot;&gt;&lt;/script&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+    &lt;form action=&quot;https://script.google.com/macros/s/#####/exec&quot; id=&quot;form&quot; method=&quot;post&quot;&gt;
+        Upload a file
+        &lt;input name=&quot;file&quot; id=&quot;uploadfile&quot; type=&quot;file&quot;&gt;
+        &lt;input id=&quot;submit&quot; type=&quot;submit&quot;&gt;
+    &lt;/form&gt;
+    &lt;script&gt;
+    $('#uploadfile').on(&quot;change&quot;, function() {
+        var file = this.files[0];
+        var fr = new FileReader();
+        fr.fileName = file.name
+        fr.onload = function(e) {
+            e.target.result
+            html = '&lt;input type=&quot;hidden&quot; name=&quot;data&quot; value=&quot;' + e.target.result.replace(/^.*,/, '') + '&quot; &gt;';
+            html += '&lt;input type=&quot;hidden&quot; name=&quot;mimetype&quot; value=&quot;' + e.target.result.match(/^.*(?=;)/)[0] + '&quot; &gt;';
+            html += '&lt;input type=&quot;hidden&quot; name=&quot;filename&quot; value=&quot;' + e.target.fileName + '&quot; &gt;';
+            $(&quot;#form&quot;).append(html);
+        }
+        fr.readAsDataURL(file);
+    });
+    &lt;/script&gt;
+&lt;/body&gt;
+
+&lt;/html&gt;
+</code></pre>
+
+<h3 id="flow-1">Flow :</h3>
+
+<ul>
+<li>Using <code>FileReader()</code>, retrieve base64 encoded file, filename and mimetype.</li>
+<li>Add input with type=&ldquo;hidden&rdquo; to <code>#form</code> as text data.
+
+<ul>
+<li><code>replace(/^.*,/, '')</code> is used for removing a header of encoded data.</li>
+<li><code>match(/^.*(?=;)/)[0]</code> is used for retrieving mimetype of uploading file.</li>
+</ul></li>
+<li>When a submit button is clicked, the base64 data is sent to <code>doPost()</code> of GAS.</li>
+</ul>
+
+<h2 id="note">Note :</h2>
+
+<ul>
+<li>In order to use this, after the script is modified, please redeploy Web Apps as a new version. By this, the latest script is reflected to Web Apps.</li>
+<li>This sample script can upload one file. If you want to upload several files, please modify script.  <code>var file = this.files[0];</code> means the selected first file. When there are some files, it is <code>files[1], files[2] ....</code>.</li>
+</ul>
+
+<h2 id="reference">Reference :</h2>
+
+<ul>
+<li>For downloading files on Google Drive to local PC, I have already published <a href="https://gist.github.com/tanaikech/c5b2811bce01cbcc26ffa357df496379">here</a>.</li>
+</ul>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2017/10/30/updated-ggsrun-to-v133/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2017/10/31/create-new-project-with-original-manifests/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2017/10/30/updated-ggsrun-to-v133/">Updated ggsrun to v133</a>
+      <a href="https://tanaikech.github.io/2017/10/31/create-new-project-with-original-manifests/">Create New Project with Original Manifests</a>
     </nav>
     
   </div>
@@ -295,14 +373,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2017/11/06/uploading-local-files-to-google-drive-without-authorization-using-html-form/">Uploading Local Files to Google Drive without Authorization using HTML Form</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2017/11/06/uploading-local-files-to-google-drive-without-authorization-using-html-form/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
