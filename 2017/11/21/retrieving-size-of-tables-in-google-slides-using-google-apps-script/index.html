@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>Topics &middot; tanaike</title>
+  <title>Retrieving Size of Tables in Google Slides using Google Apps Script &middot; tanaike</title>
 
   
   
@@ -36,8 +36,6 @@
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
 
   
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike" href="https://tanaikech.github.io/topics/index.xml" />
   
 
   
@@ -113,10 +111,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://tanaikech.github.io/topics/index.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
-    </li>
     
 
     
@@ -224,128 +218,139 @@
 
 
 <div class="header">
-  <h1>Topics</h1>
+  <h1>Retrieving Size of Tables in Google Slides using Google Apps Script</h1>
+  <h2></h2>
 </div>
 <div class="content">
-  <ul>
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>21 Nov 2017, 11:24</time>
+  </div>
+
+  
+
   
   
-    <li>
-      <a href="gastips">gastips</a>
-      <span>&#40;67&#41;</span>
-    </li>
   
-    <li>
-      <a href="clitool">clitool</a>
-      <span>&#40;21&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    
+  </div>
   
-    <li>
-      <a href="library">library</a>
-      <span>&#40;16&#41;</span>
-    </li>
   
-    <li>
-      <a href="gotips">gotips</a>
-      <span>&#40;14&#41;</span>
-    </li>
+
   
-    <li>
-      <a href="googleapitips">googleapitips</a>
-      <span>&#40;12&#41;</span>
-    </li>
   
-    <li>
-      <a href="benchmark">benchmark</a>
-      <span>&#40;6&#41;</span>
-    </li>
   
-    <li>
-      <a href="etc">etc</a>
-      <span>&#40;5&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/slides">Slides</a>
+    
+  </div>
   
-    <li>
-      <a href="pythontips">pythontips</a>
-      <span>&#40;5&#41;</span>
-    </li>
   
-    <li>
-      <a href="googlecharttips">googlecharttips</a>
-      <span>&#40;4&#41;</span>
-    </li>
+
+</div>
+
   
-    <li>
-      <a href="report">report</a>
-      <span>&#40;4&#41;</span>
-    </li>
+
+<p><a href="https://gist.github.com/tanaikech/3143be7e7df8cc595d73427d22ae2e0e">Gists</a></p>
+
+<p>This sample script is for retrieving the size (width and height) of a table in Google Slides using Google Apps Script.</p>
+
+<p>There are no methods for directly retrieving the table size using SlidesApp yet. So I thought of a workaround using Slides API.</p>
+
+<ul>
+<li>When the slide information is retrieved using <code>Slides.Presentations.Pages.get()</code> of Slides API, the information of tables is also included. In the information, the height and width of table are also included.</li>
+<li>But the unit is EMU (English Metric Unit), and the height and width is separated by each cell. So it is required to sum each height and width while modifying the unit.</li>
+</ul>
+
+<p>The modified script reflected this is as follows.</p>
+
+<pre><code class="language-javascript">var s = SlidesApp.getActivePresentation();
+var presentationId = s.getId();
+var pageObjectId = s.getSlides()[0].getObjectId(); // In this sample, I use 1st page. But if you want to use other page, please get the &quot;getObjectId&quot;.
+
+var pageElements = Slides.Presentations.Pages.get(presentationId, pageObjectId).pageElements;
+var result = [];
+for (var i in pageElements) {
+  var rowHeight = 0;
+  var rowWidth = 0;
+  if (pageElements[i].table) {
+    for (var j in pageElements[i].table.tableRows) {
+      rowHeight += pageElements[i].table.tableRows[j].rowHeight.magnitude / 12700;
+    }
+    for (var k in pageElements[i].table.tableColumns) {
+      rowWidth += pageElements[i].table.tableColumns[k].columnWidth.magnitude / 12700;
+    }
+    result.push({Height: rowHeight, Width: rowWidth});
+  }
+}
+Logger.log(result)
+</code></pre>
+
+<h2 id="result">Result :</h2>
+
+<pre><code class="language-json">[
+    {
+        &quot;Height&quot;: 200,
+        &quot;Width&quot;: 300
+    }
+]
+</code></pre>
+
+<h2 id="note">Note :</h2>
+
+<ul>
+<li>Unit of output values is point.</li>
+<li>Because 12,700 EMUs per point, each values retrieved by <code>pageElements[i].table.tableRows[j].rowHeight.magnitude</code> and <code>pageElements[i].table.tableColumns[k].columnWidth.magnitude</code> are required to be divided by 12,700.</li>
+<li>When there are several tables in the slide, this sample script retrieves the width and height for each table.</li>
+</ul>
+
+<h2 id="references">References :</h2>
+
+<ul>
+<li><a href="https://developers.google.com/slides/reference/rest/v1/Unit">About the unit of EMU</a></li>
+</ul>
+
+
   
-    <li>
-      <a href="jstips">jstips</a>
-      <span>&#40;3&#41;</span>
-    </li>
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2017/11/13/slideapp-for-google-slides/"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2017/11/13/slideapp-for-google-slides/">SlideApp for Google Slides</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
+</div>
+
+
+
   
-    <li>
-      <a href="shtips">shtips</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="coffeescripttips">coffeescripttips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="driveapitips">driveapitips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="nodetips">nodetips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="slacktips">slacktips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="sublimetips">sublimetips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="javascripttips">javascripttips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="netatmotips">netatmotips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="onedrivetips">onedrivetips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="plugin">plugin</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="spreadsheet">spreadsheet</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="sublime">sublime</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-  </ul>
+
 </div>
 
 </div>
@@ -381,3 +386,4 @@
 
 </body>
 </html>
+
