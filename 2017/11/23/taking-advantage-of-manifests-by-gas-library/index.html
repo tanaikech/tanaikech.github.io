@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>Updated: GAS Library - OnedriveApp &middot; tanaike</title>
+  <title>Taking Advantage of Manifests by GAS Library &middot; tanaike</title>
 
   
   
@@ -218,7 +218,7 @@
 
 
 <div class="header">
-  <h1>Updated: GAS Library - OnedriveApp</h1>
+  <h1>Taking Advantage of Manifests by GAS Library</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -227,7 +227,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>21 Aug 2017, 15:02</time>
+    <time>23 Nov 2017, 20:21</time>
   </div>
 
   
@@ -238,9 +238,7 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
     
   </div>
   
@@ -254,9 +252,9 @@
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/manifests">manifests</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/onedrive">OneDrive</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>
     
   </div>
   
@@ -264,24 +262,98 @@
 
 </div>
 
-  <p>OnedriveApp was updated to v1.0.2.</p>
+  
 
-<p><a href="https://github.com/tanaikech/OnedriveApp#authprocess">Moved the instance of PropertiesService.getScriptProperties() to outside of this library. When there is the PropertiesService.getScriptProperties() inside the library, it was found that the parameters that users set was saved to the library. So this was modified. I&rsquo;m sorry that I couldn&rsquo;t notice this situation.</a></p>
+<p><a href="https://gist.github.com/tanaikech/23ddf599a4155b66f1029978bba8153b">Gists</a></p>
 
-<p><a href="https://github.com/tanaikech/OnedriveApp">GitHub of OnedriveApp</a></p>
+<h2 id="introduction">Introduction</h2>
+
+<p>By recent Google update (<a href="https://developers.google.com/apps-script/">Google update at October 24, 2017</a>), various new winds to GAS developers were blown. There is &ldquo;<a href="https://developers.google.com/apps-script/concepts/manifests">Manifests</a>&rdquo; as one of the new winds. &ldquo;Manifests&rdquo; makes us manage the project using JSON. Especially, the special scopes which have to use OAuth2 process can be used by only setting them to the Manifests. I think that this is the largest modification. However, when scopes are added to a project using Manifests, users who use the project can use only added scopes. This means that when users create scripts in the project, if there are some scopes which is required to be added, such scopes cannot be automatically added. So the error of &ldquo;Insufficient Permission&rdquo; occurs.</p>
+
+<p>In this report, I would like to introduce the workaround for avoiding this problem.</p>
+
+<h2 id="workaround">Workaround</h2>
+
+<p>I found the workaround for avoiding the problem by using a library as follows.</p>
+
+<ul>
+<li><strong>By installing the library which was given &ldquo;oauthScopes&rdquo; of Manifests, the new project can automatically have those scopes as the default scopes.</strong>
+
+<ul>
+<li>This can be seen at <code>On script editor -&gt; File -&gt; Project properties -&gt; Scopes</code>.</li>
+</ul></li>
+<li><strong>When users develop scripts in the project which installed the library, the scopes depended on the scripts are automatically installed to the project as the additional scopes.</strong>
+
+<ul>
+<li>This means that the above problem is avoided.</li>
+</ul></li>
+</ul>
+
+<p>By this workaround, users can use various scopes by only installing a library. Furthermore, also users can develop scripts in the project which installed the library, while they don&rsquo;t worry about the permission error by scopes.</p>
+
+<p>I think that this workaround can be applied to various applications. I have already applied this to my applications (<a href="https://github.com/tanaikech/ProjectApp">ProjectApp</a>, <a href="https://github.com/tanaikech/ManifestsApp">ManifestsApp</a>, <a href="https://github.com/tanaikech/RearrangeScripts">RearrangeScripts</a>).</p>
+
+<h2 id="sample">Sample</h2>
+
+<p>Here, I prepared a sample library for demonstrating the install of scopes using a library. The library has no script. But there are the following scopes in the Manifests.</p>
+
+<pre><code class="language-json">&quot;oauthScopes&quot;: [
+  &quot;https://www.googleapis.com/auth/analytics.readonly&quot;,
+  &quot;https://www.googleapis.com/auth/blogger.readonly&quot;,
+  &quot;https://www.googleapis.com/auth/calendar.readonly&quot;,
+  &quot;https://www.googleapis.com/auth/drive.readonly&quot;,
+  &quot;https://www.googleapis.com/auth/gmail.readonly&quot;,
+  &quot;https://www.googleapis.com/auth/presentations.readonly&quot;,
+  &quot;https://www.googleapis.com/auth/spreadsheets.readonly&quot;,
+  &quot;https://www.googleapis.com/auth/youtube.readonly&quot;
+]
+</code></pre>
+
+<p>As a demonstration, you can experience the workaround of this report. Please try as follows.</p>
+
+<ol>
+<li>Create a new project on your Google Drive.</li>
+<li>Confirm that there are no scopes on the new project at <code>On script editor -&gt; File -&gt; Project properties -&gt; Scopes</code>.</li>
+<li>Install a sample library.
+
+<ul>
+<li>library&rsquo;s project key is <code>1TYEitZm7SsAGPDI1PMfeZhIDqRrpLF8a5H9AlhGddCjJMOyHS4EBRH1c</code></li>
+</ul></li>
+<li>Confirm that there are 8 scopes on the new project at <code>On script editor -&gt; File -&gt; Project properties -&gt; Scopes</code>. You can see like the below figure.
+
+<ul>
+<li>This means that you can use the access token which included these scopes using <code>ScriptApp.getOAuthToken()</code>.</li>
+</ul></li>
+</ol>
+
+<p><strong>By this workaround, the other scopes depended on the developed scripts can be automatically added.</strong></p>
+
+<p><img src="https://tanaikech.github.io/img/20171123_fig1.png" alt="" /></p>
+
+<h1 id="references">References</h1>
+
+<ul>
+<li><a href="https://developers.google.com/apps-script/concepts/manifests">Manifests</a></li>
+</ul>
+
+<h1 id="acknowledgements">Acknowledgements</h1>
+
+<ul>
+<li><a href="https://github.com/mhawksey">mhawksey</a></li>
+</ul>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2017/08/21/updated-gas-library---onedriveapp/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2017/11/21/retrieving-size-of-tables-in-google-slides-using-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2017/08/21/updated-gas-library---onedriveapp/">Updated: GAS Library - OnedriveApp</a>
+      <a href="https://tanaikech.github.io/2017/11/21/retrieving-size-of-tables-in-google-slides-using-google-apps-script/">Retrieving Size of Tables in Google Slides using Google Apps Script</a>
     </nav>
     
   </div>
@@ -290,14 +362,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2017/08/27/exporting-project-on-google-drive-using-golang-quickstart/">Exporting Project on Google Drive using Golang Quickstart</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2017/08/27/exporting-project-on-google-drive-using-golang-quickstart/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
