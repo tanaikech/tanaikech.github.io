@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>Adding Object to Object by Javascript &middot; tanaike</title>
+  <title>Mixing 2 Array Objects Included Dictionary Object by Javascript &middot; tanaike</title>
 
   
   
@@ -218,7 +218,7 @@
 
 
 <div class="header">
-  <h1>Adding Object to Object by Javascript</h1>
+  <h1>Mixing 2 Array Objects Included Dictionary Object by Javascript</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -227,7 +227,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>01 Dec 2017, 12:12</time>
+    <time>03 Dec 2017, 15:45</time>
   </div>
 
   
@@ -238,7 +238,11 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/jstips">jstips</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/jstips">jstips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/coffeescripttips">CoffeeScriptTips</a>
     
   </div>
   
@@ -252,6 +256,10 @@
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/javascript">Javascript</a>&nbsp;&#47;
     
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/coffeescript">CoffeeScript</a>&nbsp;&#47;
+    
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/object">Object</a>
     
   </div>
@@ -262,56 +270,96 @@
 
   
 
-<p><a href="https://gist.github.com/tanaikech/7bd06771e627afd9957ef4f13c9661d5">Gists</a></p>
+<p><a href="https://gist.github.com/tanaikech/8141f8a063984a111124cd2f0e36f7fb">Gists</a></p>
 
-<p>This sample script is for adding object to object by javascript.</p>
+<p>This is a sample script for combining and mixing 2 objects. Each object is an array which included a dictionary type. When the key of the dictionary object is the same, the values are mixed.</p>
 
-<h3 id="script">Script :</h3>
+<p><strong>This can be also used for Google Apps Script.</strong></p>
 
-<pre><code class="language-javascript">var obj = {
-  key1: &quot;value1&quot;,
-  key2: &quot;value2&quot;,
-  key3: &quot;value3&quot;
-};
-var obj1 = {
-  key4: &quot;value4&quot;,
-  key5: &quot;value5&quot;,
-  key6: &quot;value6&quot;
-};
-Object.assign(obj, obj1);
-console.log(obj);
+<h2 id="input">Input</h2>
+
+<pre><code>var obj1 = [
+    {&quot;key1&quot;: [&quot;value1a1&quot;, &quot;value1a2&quot;]},
+    {&quot;key2&quot;: [&quot;value2a1&quot;, &quot;value2a2&quot;]},
+    {&quot;key3&quot;: [&quot;value3a1&quot;, &quot;value3a2&quot;]},
+];
+var obj2 = [
+    {&quot;key1&quot;: [&quot;value1b1&quot;, &quot;value1b2&quot;]},
+    {&quot;key3&quot;: [&quot;value3b1&quot;, &quot;value3b2&quot;]},
+    {&quot;key4&quot;: [&quot;value4b1&quot;, &quot;value4b2&quot;]},
+];
 </code></pre>
 
-<h2 id="result">Result :</h2>
+<h2 id="output">Output</h2>
 
-<pre><code class="language-json">{ key1: 'value1',
-  key2: 'value2',
-  key3: 'value3',
-  key4: 'value4',
-  key5: 'value5',
-  key6: 'value6' }
+<pre><code>[
+    {&quot;key1&quot;: [&quot;value1a1&quot;, &quot;value1a2&quot;, &quot;value1b1&quot;, &quot;value1b2&quot;]},
+    {&quot;key2&quot;: [&quot;value2a1&quot;, &quot;value2a2&quot;]},
+    {&quot;key3&quot;: [&quot;value3a1&quot;, &quot;value3a2&quot;, &quot;value3b1&quot;, &quot;value3b2&quot;]},
+    {&quot;key4&quot;: [&quot;value4b1&quot;, &quot;value4b2&quot;]}
+]
 </code></pre>
 
-<p><a href="https://jsfiddle.net/896feLjk/">jsfiddle demo</a></p>
+<h2 id="sample-script">Sample script :</h2>
 
-<h2 id="reference">Reference :</h2>
+<h3 id="javascript">Javascript :</h3>
 
-<ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign">Object.assign()</a></li>
-</ul>
+<pre><code class="language-javascript">function mixture(obj1, obj2) {
+    Array.prototype.push.apply(obj1, obj2);
+    var temp = [];
+    var res = [];
+    obj1.forEach(function(e, i){
+        temp[i] = !~temp.indexOf(Object.keys(e)[0]) ? Object.keys(e)[0] : false;
+        if (temp[i]) {
+            res.push(e);
+        } else {
+            Array.prototype.push.apply(res[temp.indexOf(Object.keys(e)[0])][Object.keys(e)[0]], e[Object.keys(e)[0]]);
+        }
+    });
+    return res;
+}
+
+var obj1 = [
+    {&quot;key1&quot;: [&quot;value1a1&quot;, &quot;value1a2&quot;]},
+    {&quot;key2&quot;: [&quot;value2a1&quot;, &quot;value2a2&quot;]},
+    {&quot;key3&quot;: [&quot;value3a1&quot;, &quot;value3a2&quot;]},
+];
+var obj2 = [
+    {&quot;key1&quot;: [&quot;value1b1&quot;, &quot;value1b2&quot;]},
+    {&quot;key3&quot;: [&quot;value3b1&quot;, &quot;value3b2&quot;]},
+    {&quot;key4&quot;: [&quot;value4b1&quot;, &quot;value4b2&quot;]},
+];
+var res = mixture(obj1, obj2);
+console.log(JSON.stringify(res))
+</code></pre>
+
+<h3 id="coffeescript">CoffeeScript :</h3>
+
+<p>This is a sample script for coffeescript.</p>
+
+<pre><code class="language-coffee">Array.prototype.push.apply obj1, obj2
+temp = []
+res = []
+for e, i in a
+    temp[i] = if !~temp.indexOf Object.keys(e)[0] then Object.keys(e)[0] else false
+    if temp[i]
+        res.push e
+    else
+        Array.prototype.push.apply res[temp.indexOf(Object.keys(e)[0])][Object.keys(e)[0]], e[Object.keys(e)[0]]
+</code></pre>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2017/11/23/taking-advantage-of-manifests-by-gas-library/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2017/12/01/adding-object-to-object-by-javascript/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2017/11/23/taking-advantage-of-manifests-by-gas-library/">Taking Advantage of Manifests by GAS Library</a>
+      <a href="https://tanaikech.github.io/2017/12/01/adding-object-to-object-by-javascript/">Adding Object to Object by Javascript</a>
     </nav>
     
   </div>
@@ -320,14 +368,8 @@ console.log(obj);
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2017/12/03/mixing-2-array-objects-included-dictionary-object-by-javascript/">Mixing 2 Array Objects Included Dictionary Object by Javascript</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2017/12/03/mixing-2-array-objects-included-dictionary-object-by-javascript/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
