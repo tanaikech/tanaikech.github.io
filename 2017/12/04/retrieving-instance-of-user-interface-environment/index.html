@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>Mixing 2 Array Objects Included Dictionary Object by Javascript &middot; tanaike</title>
+  <title>Retrieving Instance of User-Interface Environment &middot; tanaike</title>
 
   
   
@@ -218,7 +218,7 @@
 
 
 <div class="header">
-  <h1>Mixing 2 Array Objects Included Dictionary Object by Javascript</h1>
+  <h1>Retrieving Instance of User-Interface Environment</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -227,7 +227,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>03 Dec 2017, 15:45</time>
+    <time>04 Dec 2017, 14:11</time>
   </div>
 
   
@@ -238,11 +238,7 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/jstips">jstips</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/coffeescripttips">CoffeeScriptTips</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
     
   </div>
   
@@ -254,13 +250,9 @@
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/javascript">Javascript</a>&nbsp;&#47;
-    
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/coffeescript">CoffeeScript</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/object">Object</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/ui">ui</a>
     
   </div>
   
@@ -268,94 +260,30 @@
 
 </div>
 
-  
+  <p><a href="https://gist.github.com/tanaikech/f05e7d82b754b0348463b8dec1c741ad">Gists</a></p>
 
-<p><a href="https://gist.github.com/tanaikech/8141f8a063984a111124cd2f0e36f7fb">Gists</a></p>
+<p>This sample script is for retrieving an instance of user-interface environment for Spreadsheet, Document and Slides. When I create applications which use user interface (for example, sidebar, dialog and so on), the user interface can be used for Spreadsheet, Document and Slides. If the application doesn&rsquo;t use the methods depend on Spreadsheet, Document and Slides, this script can give 3 choices to users.</p>
 
-<p>This is a sample script for combining and mixing 2 objects. Each object is an array which included a dictionary type. When the key of the dictionary object is the same, the values are mixed.</p>
-
-<p><strong>This can be also used for Google Apps Script.</strong></p>
-
-<h2 id="input">Input</h2>
-
-<pre><code>var obj1 = [
-    {&quot;key1&quot;: [&quot;value1a1&quot;, &quot;value1a2&quot;]},
-    {&quot;key1&quot;: [&quot;value1aa1&quot;, &quot;value1aa2&quot;]},
-    {&quot;key2&quot;: [&quot;value2a1&quot;, &quot;value2a2&quot;]},
-    {&quot;key3&quot;: [&quot;value3a1&quot;, &quot;value3a2&quot;]},
-];
-var obj2 = [
-    {&quot;key1&quot;: [&quot;value1b1&quot;, &quot;value1b2&quot;]},
-    {&quot;key3&quot;: [&quot;value3b1&quot;, &quot;value3b2&quot;]},
-    {&quot;key3&quot;: [&quot;value3bb1&quot;, &quot;value3bb2&quot;]},
-    {&quot;key4&quot;: [&quot;value4b1&quot;, &quot;value4b2&quot;]},
-];
-</code></pre>
-
-<h2 id="output">Output</h2>
-
-<pre><code>[
-    {&quot;key1&quot;: [&quot;value1a1&quot;, &quot;value1a2&quot;, &quot;value1b1&quot;, &quot;value1b2&quot;, &quot;value1aa1&quot;, &quot;value1aa2&quot;]},
-    {&quot;key2&quot;: [&quot;value2a1&quot;, &quot;value2a2&quot;]},
-    {&quot;key3&quot;: [&quot;value3a1&quot;, &quot;value3a2&quot;, &quot;value3b1&quot;, &quot;value3b2&quot;, &quot;value3bb1&quot;, &quot;value3bb2&quot;]},
-    {&quot;key4&quot;: [&quot;value4b1&quot;, &quot;value4b2&quot;]}
-]
-</code></pre>
-
-<h2 id="sample-script">Sample script :</h2>
-
-<h3 id="javascript">Javascript :</h3>
-
-<pre><code class="language-javascript">function mixture(obj1, obj2) {
-    Array.prototype.push.apply(obj1, obj2);
-    var temp = [];
-    var res = [];
-    obj1.forEach(function(e, i){
-        temp[i] = !~temp.indexOf(Object.keys(e)[0]) ? Object.keys(e)[0] : false;
-        if (temp[i]) {
-            res.push(e);
-        } else {
-            res.forEach(function(f, j){
-                if (Object.keys(f)[0] == Object.keys(e)[0]) {
-                    Array.prototype.push.apply(res[j][Object.keys(f)[0]], e[Object.keys(e)[0]]);
-                }
-            });
-        }
-    });
-    return res;
+<pre><code class="language-javascript">function getUi() {
+    var ui;
+    try {
+        ui = SpreadsheetApp.getUi();
+    } catch(e) {}
+    try {
+        ui = DocumentApp.getUi();
+    } catch(e) {}
+    try {
+        ui = SlidesApp.getUi();
+    } catch(e) {}
+    return ui || null;
 }
 
-var obj1 = [
-    {&quot;key1&quot;: [&quot;value1a1&quot;, &quot;value1a2&quot;]},
-    {&quot;key1&quot;: [&quot;value1aa1&quot;, &quot;value1aa2&quot;]},
-    {&quot;key2&quot;: [&quot;value2a1&quot;, &quot;value2a2&quot;]},
-    {&quot;key3&quot;: [&quot;value3a1&quot;, &quot;value3a2&quot;]},
-];
-var obj2 = [
-    {&quot;key1&quot;: [&quot;value1b1&quot;, &quot;value1b2&quot;]},
-    {&quot;key3&quot;: [&quot;value3b1&quot;, &quot;value3b2&quot;]},
-    {&quot;key3&quot;: [&quot;value3bb1&quot;, &quot;value3bb2&quot;]},
-    {&quot;key4&quot;: [&quot;value4b1&quot;, &quot;value4b2&quot;]},
-];
-var res = mixture(obj1, obj2);
-console.log(JSON.stringify(res))
-</code></pre>
-
-<h3 id="coffeescript">CoffeeScript :</h3>
-
-<p>This is a sample script for coffeescript.</p>
-
-<pre><code class="language-coffee">Array.prototype.push.apply obj1, obj2
-temp = []
-res = []
-for e, i in a
-    temp[i] = if !~temp.indexOf Object.keys(e)[0] then Object.keys(e)[0] else false
-    if temp[i]
-        res.push e
-    else
-        for f, j in res
-            if Object.keys(f)[0] is Object.keys(e)[0]
-                Array.prototype.push.apply res[j][Object.keys(f)[0]], e[Object.keys(e)[0]]
+function main() {
+    var ui = getUi();
+    if (ui) {
+        ui.alert('Hello, world!');
+    }
+}
 </code></pre>
 
 
@@ -363,13 +291,13 @@ for e, i in a
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2017/12/01/adding-object-to-object-by-javascript/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2017/12/03/mixing-2-array-objects-included-dictionary-object-by-javascript/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2017/12/01/adding-object-to-object-by-javascript/">Adding Object to Object by Javascript</a>
+      <a href="https://tanaikech.github.io/2017/12/03/mixing-2-array-objects-included-dictionary-object-by-javascript/">Mixing 2 Array Objects Included Dictionary Object by Javascript</a>
     </nav>
     
   </div>
@@ -378,14 +306,8 @@ for e, i in a
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2017/12/04/retrieving-instance-of-user-interface-environment/">Retrieving Instance of User-Interface Environment</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2017/12/04/retrieving-instance-of-user-interface-environment/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
