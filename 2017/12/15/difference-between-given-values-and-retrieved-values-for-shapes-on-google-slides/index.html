@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>Slides &middot; tanaike</title>
+  <title>Difference Between Given Values and Retrieved Values for Shapes on Google Slides &middot; tanaike</title>
 
   
   
@@ -36,8 +36,6 @@
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
 
   
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike" href="https://tanaikech.github.io/tags/slides/index.xml" />
   
 
   
@@ -113,10 +111,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://tanaikech.github.io/tags/slides/index.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
-    </li>
     
 
     
@@ -224,16 +218,12 @@
 
 
 <div class="header">
-  <h1>Slides</h1>
+  <h1>Difference Between Given Values and Retrieved Values for Shapes on Google Slides</h1>
+  <h2></h2>
 </div>
-
 <div class="content">
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2017/12/15/difference-between-given-values-and-retrieved-values-for-shapes-on-google-slides/">Difference Between Given Values and Retrieved Values for Shapes on Google Slides</a></h2>
 
-    <div class="post-meta">
+  <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
@@ -270,137 +260,104 @@
 
 </div>
 
-  </header>
+  
 
-  <p>
-  Gists
-This is a document for explaining the difference between given values and retrieved values for shapes on Google Slides. When a shape is created to a slide using Slides API, most users give the size of height and width as pt. When the size is retrieved from the created shape as pt, the size is often difference from the given size.
-For example, when a square shape is created by giving the height and width of 100 pt, the size which is retrieved from the created square becomes 99.
-  </p>
+<p><a href="https://gist.github.com/tanaikech/953e630855e65de55d8e5bd448ad764f">Gists</a></p>
+
+<p>This is a document for explaining the difference between given values and retrieved values for shapes on Google Slides. When a shape is created to a slide using Slides API, most users give the size of height and width as <code>pt</code>. When the size is retrieved from the created shape as <code>pt</code>, the size is often difference from the given size.</p>
+
+<p>For example, when a square shape is created by giving the height and width of 100 pt, the size which is retrieved from the created square becomes 99.99212598425197 pt for the height and width.</p>
+
+<p>In this document, this will be explained.</p>
+
+<p>At Slides, EMU is used as the default base unit. Slides manages all objects in the Slides using EMU. When the square with 100 pt in size is created, Slides processes as follows.</p>
+
+<ol>
+<li><code>100 pt</code> is converted to EMU. <a href="https://developers.google.com/slides/reference/rest/v1/Unit">1 pt is 12,700 EMUs</a>.
+
+<ul>
+<li><code>100 pt x 12700 EMU/pt = 1270000 EMUs</code></li>
+</ul></li>
+<li>EMUs for <code>100 pt</code> is converted to <code>scaleX</code> and <code>scaleY</code> which are are unitless multiplying factors. <code>3000000</code> is the base value. You can see it using <code>slides.presentations.get</code>.
+
+<ul>
+<li><code>1270000 EMUs / 3000000 EMUs = 0.4233</code></li>
+<li>At Slides API, I seemed that this calculation is often rounded. I thought that this was strange.</li>
+</ul></li>
+<li>When users retrieve the size of width and height, using <code>scaleX</code> and <code>scaleY</code> EMU is converted to pt.
+
+<ul>
+<li><code>0.4233 x 3000000 EMUs / 12700 EMU/pt = 99.99212598425197 pt</code></li>
+<li>This was calculated by the default calculator of windows.</li>
+</ul></li>
+</ol>
+
+<p>By these flow, the square which was created by giving 100 pt in size has 99.99212598425197 pt in size.</p>
+
+<h2 id="references">References :</h2>
+
+<ul>
+<li><a href="https://developers.google.com/slides/reference/rest/v1/Unit">Unit</a></li>
+</ul>
+
+<h2 id="appendix">Appendix :</h2>
+
+<h3 id="create-a-square-with-100-pt-in-size">Create a square with 100 pt in size</h3>
+
+<pre><code class="language-javascript">var presentationId = &quot;### presentationId ###&quot;;
+var pageObjectId = &quot;### pageObjectId ###&quot;;
+var resource = {&quot;requests&quot;:[{
+    &quot;createShape&quot;:{
+        &quot;shapeType&quot;:&quot;RECTANGLE&quot;,
+        &quot;elementProperties&quot;:{
+            &quot;size&quot;:{
+                &quot;height&quot;:{&quot;magnitude&quot;:100,&quot;unit&quot;:&quot;pt&quot;},
+                &quot;width&quot;:{&quot;magnitude&quot;:100,&quot;unit&quot;:&quot;pt&quot;}},
+            &quot;pageObjectId&quot;:pageObjectId
+        }
+    }
+}]};
+Slides.Presentations.batchUpdate(resource, presentationId);
+</code></pre>
+
+<h3 id="retrieve-the-size-of-created-square">Retrieve the size of created square</h3>
+
+<pre><code class="language-javascript">var presentationId = &quot;### presentationId ###&quot;;
+var pageObjectId = &quot;### pageObjectId ###&quot;;
+var res = Slides.Presentations.Pages.get(presentationId, pageObjectId);
+Logger.log(&quot;size: %s, transform: %s&quot;, res.pageElements[0].size, res.pageElements[0].transform)
+</code></pre>
+
 
   
-  <footer>
-    <a href="https://tanaikech.github.io/2017/12/15/difference-between-given-values-and-retrieved-values-for-shapes-on-google-slides/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2017/11/21/retrieving-size-of-tables-in-google-slides-using-google-apps-script/">Retrieving Size of Tables in Google Slides using Google Apps Script</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>21 Nov 2017, 11:24</time>
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2017/12/08/retrieving-clientid-using-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
+    
   </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
+  <div class="pure-u-10-24">
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2017/12/08/retrieving-clientid-using-google-apps-script/">Retrieving ClientId using Google Apps Script</a>
+    </nav>
     
   </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/slides">Slides</a>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
     
   </div>
-  
-  
-
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
 </div>
 
-  </header>
 
-  <p>
-  Gists
-This sample script is for retrieving the size (width and height) of a table in Google Slides using Google Apps Script.
-There are no methods for directly retrieving the table size using SlidesApp yet. So I thought of a workaround using Slides API.
- When the slide information is retrieved using Slides.Presentations.Pages.get() of Slides API, the information of tables is also included. In the information, the height and width of table are also included.
-  </p>
-
-  
-  <footer>
-    <a href="https://tanaikech.github.io/2017/11/21/retrieving-size-of-tables-in-google-slides-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2017/11/13/slideapp-for-google-slides/">SlideApp for Google Slides</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>13 Nov 2017, 14:17</time>
-  </div>
 
   
 
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
-    
-  </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/slides">Slides</a>
-    
-  </div>
-  
-  
-
-</div>
-
-  </header>
-
-  <p>
-  Gists
-By recent Google updated, Class SlideApp is added to Google Slides. SlideApp will be bring a lot of applications. Here, I would like to introduce 2 samples.
-1. Sidebar function showSidebar() { var html = HtmlService .createHtmlOutput('Hello, world! &lt;input type=&quot;button&quot; value=&quot;Close&quot; onclick=&quot;google.script.host.close()&quot; /&gt;') .setTitle('My custom sidebar') .setWidth(300); SlidesApp.getUi().showSidebar(html); }  2. Copy slides in existing Slide to a new Slide This sample script create a new Slide with slides you want to copy.
-  </p>
-
-  
-  <footer>
-    <a href="https://tanaikech.github.io/2017/11/13/slideapp-for-google-slides/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
-  
-</article>
-
-  
 </div>
 
 </div>
@@ -436,3 +393,4 @@ By recent Google updated, Class SlideApp is added to Google Slides. SlideApp wil
 
 </body>
 </html>
+
