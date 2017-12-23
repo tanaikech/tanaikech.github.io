@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>Updated: GAS Library - OnedriveApp &middot; tanaike</title>
+  <title>Automatic Recalculation of Custom Function on Spreadsheet &middot; tanaike</title>
 
   
   
@@ -218,7 +218,7 @@
 
 
 <div class="header">
-  <h1>Updated: GAS Library - OnedriveApp</h1>
+  <h1>Automatic Recalculation of Custom Function on Spreadsheet</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -227,7 +227,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>21 Aug 2017, 11:22</time>
+    <time>23 Dec 2017, 09:59</time>
   </div>
 
   
@@ -240,7 +240,7 @@
     
       <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/spreadsheet">Spreadsheet</a>
     
   </div>
   
@@ -254,9 +254,9 @@
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">Spreadsheet</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/onedrive">OneDrive</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/custom-function">Custom function</a>
     
   </div>
   
@@ -264,26 +264,85 @@
 
 </div>
 
-  <p>OnedriveApp was updated to v1.0.1.</p>
+  
 
-<p><a href="https://github.com/tanaikech/OnedriveApp#authprocess">Added a method for retrieving access token and refresh token using this library.</a></p>
+<p><a href="https://gist.github.com/tanaikech/b8ea7bd7fd87bcd7bb28ddede1781889">Gists</a></p>
 
-<p>By added this method, OneDrive APIs can be used by only this library.</p>
+<p>In this report, I would like to introduce a workaround for automatically recalculating custom functions on Spreadsheet.</p>
 
-<p><a href="https://github.com/tanaikech/OnedriveApp">GitHub of OnedriveApp</a></p>
+<h2 id="1-situation">1. Situation</h2>
+
+<p>The sample situation is below. <strong>This is a sample situation for this document.</strong></p>
+
+<ul>
+<li>There are 3 sheets with &ldquo;sheet1&rdquo;, &ldquo;sheet2&rdquo; and &ldquo;sheet3&rdquo; of sheet name in a Spreadsheet.</li>
+<li>Calculate the summation of values of &ldquo;A1&rdquo; of each sheet using a custom function.</li>
+<li>Sample script of the custom function is as follows.</li>
+</ul>
+
+<pre><code class="language-javascript">function myFunction(e) {
+    var r = 0;
+    var sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
+    for (var i in sheets) {
+        r += sheets[i].getRange(e).getValue();
+    }
+    return r;
+}
+</code></pre>
+
+<h2 id="2-workaround-for-recalculating">2. Workaround for recalculating</h2>
+
+<p>When <code>=myFunction(&quot;A1&quot;)</code> is put in a cell, the custom function sums each &ldquo;A1&rdquo; of &ldquo;sheet1&rdquo;, &ldquo;sheet2&rdquo; and &ldquo;sheet3&rdquo;. But in this case, when &ldquo;A1&rdquo; of one of 3 sheets is changed, the custom function is not recalculated.</p>
+
+<p><strong>In order to make spreadsheet recalculate, it is required to make spreadsheet know that the cell value which is used for the custom function was changed.</strong></p>
+
+<p>So, I thought of a workaround. I think that this is one of several workarounds. In order to make spreadsheet know the change of the cell value, it added the information of cell value to <code>=myFunction(&quot;A1&quot;)</code> as follows.</p>
+
+<ul>
+<li>When <code>=myFunction(&quot;A1&quot;)</code> is used to sum each &ldquo;A1&rdquo; of &ldquo;sheet1&rdquo;, &ldquo;sheet2&rdquo; and &ldquo;sheet3&rdquo;, it uses <code>=myFunction(&quot;A1&quot;, sheet1!A1, sheet2!A1, sheet3!A1)</code> instead of <code>=myFunction(&quot;A1&quot;)</code>.</li>
+</ul>
+
+<p>By giving <code>sheet1!A1, sheet2!A1, sheet3!A1</code>, when one of each &ldquo;A1&rdquo; is changed, spreadsheet can know the change and recalculates the custom function.</p>
+
+<h3 id="note">Note :</h3>
+
+<ul>
+<li>The sample script is not required to modify.
+
+<ul>
+<li><code>sheet1!A1, sheet2!A1, sheet3!A1</code> is not used for the custom function. This is used only to make spreadsheet know the change of cell value.</li>
+<li>You can see a following sample script for this situation.</li>
+</ul></li>
+</ul>
+
+<pre><code class="language-javascript">function foo(e) {
+    return e;
+}
+
+function bar() {
+    var r = foo(1, 2, 3);
+    console.log(r); // &gt;&gt;&gt; 1
+}
+</code></pre>
+
+<h2 id="3-reference">3. Reference :</h2>
+
+<ul>
+<li><a href="https://developers.google.com/apps-script/guides/sheets/functions">Custom Functions in Google Sheets</a></li>
+</ul>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2017/08/21/changing-values-by-checking-duplicated-values-of-json-for-javascript/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2017/12/20/add-on---rearrangescripts/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2017/08/21/changing-values-by-checking-duplicated-values-of-json-for-javascript/">Changing Values by Checking Duplicated Values of JSON for Javascript</a>
+      <a href="https://tanaikech.github.io/2017/12/20/add-on---rearrangescripts/">Add-on - RearrangeScripts</a>
     </nav>
     
   </div>
@@ -292,14 +351,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2017/08/21/updated-gas-library---onedriveapp/">Updated: GAS Library - OnedriveApp</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2017/08/21/updated-gas-library---onedriveapp/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
