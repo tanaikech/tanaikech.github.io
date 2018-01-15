@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>Topics &middot; tanaike</title>
+  <title>Zaif API for Google Apps Script &middot; tanaike</title>
 
   
   
@@ -36,8 +36,6 @@
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
 
   
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike" href="https://tanaikech.github.io/topics/index.xml" />
   
 
   
@@ -113,10 +111,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://tanaikech.github.io/topics/index.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
-    </li>
     
 
     
@@ -224,148 +218,154 @@
 
 
 <div class="header">
-  <h1>Topics</h1>
+  <h1>Zaif API for Google Apps Script</h1>
+  <h2></h2>
 </div>
 <div class="content">
-  <ul>
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>15 Jan 2018, 09:47</time>
+  </div>
+
+  
+
   
   
-    <li>
-      <a href="gastips">gastips</a>
-      <span>&#40;83&#41;</span>
-    </li>
   
-    <li>
-      <a href="clitool">clitool</a>
-      <span>&#40;24&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/virtual-currency">virtual-currency</a>
+    
+  </div>
   
-    <li>
-      <a href="library">library</a>
-      <span>&#40;16&#41;</span>
-    </li>
   
-    <li>
-      <a href="gotips">gotips</a>
-      <span>&#40;14&#41;</span>
-    </li>
+
   
-    <li>
-      <a href="googleapitips">googleapitips</a>
-      <span>&#40;13&#41;</span>
-    </li>
   
-    <li>
-      <a href="benchmark">benchmark</a>
-      <span>&#40;6&#41;</span>
-    </li>
   
-    <li>
-      <a href="pythontips">pythontips</a>
-      <span>&#40;6&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/zaif">Zaif</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/api">API</a>
+    
+  </div>
   
-    <li>
-      <a href="etc">etc</a>
-      <span>&#40;5&#41;</span>
-    </li>
   
-    <li>
-      <a href="jstips">jstips</a>
-      <span>&#40;5&#41;</span>
-    </li>
+
+</div>
+
+  <p><a href="https://gist.github.com/tanaikech/77481c2621dc7429449194c0f1dbd58c">Gists</a></p>
+
+<p>This sample script is for using <a href="http://techbureau-api-document.readthedocs.io/ja/latest/index.html">Zaif API</a> by Google Apps Script.</p>
+
+<p>The following go script is a sample at <a href="http://techbureau-api-document.readthedocs.io/ja/latest/trade/3_how_to_implement/2_go.html">Zaif API</a>.</p>
+
+<pre><code>package main
+
+import (
+    &quot;fmt&quot;
+    &quot;time&quot;
+    &quot;strconv&quot;
+    &quot;crypto/hmac&quot;
+    &quot;crypto/sha512&quot;
+    &quot;io/ioutil&quot;
+    &quot;net/http&quot;
+    &quot;encoding/hex&quot;
+    &quot;net/url&quot;
+    &quot;strings&quot;
+)
+
+var key = &quot;&lt;your_key&gt;&quot;
+var secret = &quot;&lt;your_secret&gt;&quot;
+
+func main() {
+
+    uri := &quot;https://api.zaif.jp/tapi&quot;
+    values := url.Values{}
+    values.Add(&quot;method&quot;, &quot;get_info&quot;)
+    values.Add(&quot;nonce&quot;, strconv.FormatInt(time.Now().Unix(), 10))
+
+    encodedParams := values.Encode()
+    req, _ := http.NewRequest(&quot;POST&quot;, uri, strings.NewReader(encodedParams))
+
+    hash := hmac.New(sha512.New, []byte(secret))
+    hash.Write([]byte(encodedParams))
+    signature := hex.EncodeToString(hash.Sum(nil))
+
+    req.Header.Add(&quot;Key&quot;, key)
+    req.Header.Add(&quot;Sign&quot;, signature)
+    client := new(http.Client)
+    resp, _ := client.Do(req)
+    defer resp.Body.Close()
+
+    byteArray, _ := ioutil.ReadAll(resp.Body)
+    fmt.Println(string(byteArray))
+}
+</code></pre>
+
+<p>When this is converted to GAS, the script is as follows.</p>
+
+<pre><code class="language-javascript">function main(){
+  var key = &quot;### your key ###&quot;;
+  var secret = &quot;### your secret ###&quot;;
+
+  var nonce = (new Date().getTime() / 1000).toFixed(0);
+  var params = &quot;method=get_info&amp;nonce=&quot; + nonce;
+  var sign = Utilities.computeHmacSignature(Utilities.MacAlgorithm.HMAC_SHA_512, params, secret);
+  sign = sign.map(function(e) {return (&quot;0&quot; + (e &amp; 0xFF).toString(16)).slice(-2)}).join(&quot;&quot;);
+  var options = {
+    method: &quot;post&quot;,
+    headers: {
+      &quot;key&quot;: key,
+      &quot;sign&quot;: sign
+    },
+    muteHttpExceptions: true
+  };
+  var res = UrlFetchApp.fetch(&quot;https://api.zaif.jp/tapi&quot;, options);
+  Logger.log(res.getContentText())
+}
+</code></pre>
+
+
   
-    <li>
-      <a href="googlecharttips">googlecharttips</a>
-      <span>&#40;4&#41;</span>
-    </li>
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2018/01/12/bittrex-api-for-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2018/01/12/bittrex-api-for-google-apps-script/">Bittrex API for Google Apps Script</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
+</div>
+
+
+
   
-    <li>
-      <a href="report">report</a>
-      <span>&#40;4&#41;</span>
-    </li>
-  
-    <li>
-      <a href="virtual-currency">virtual-currency</a>
-      <span>&#40;4&#41;</span>
-    </li>
-  
-    <li>
-      <a href="add-on">add-on</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="coffeescripttips">coffeescripttips</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="nodetips">nodetips</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="shtips">shtips</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="driveapitips">driveapitips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="slacktips">slacktips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="spreadsheet">spreadsheet</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="sublimetips">sublimetips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="batch-file-tips">batch-file-tips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="issuetracker">issuetracker</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="javascripttips">javascripttips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="netatmotips">netatmotips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="onedrivetips">onedrivetips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="plugin">plugin</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="sublime">sublime</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-  </ul>
+
 </div>
 
 </div>
@@ -401,3 +401,4 @@
 
 </body>
 </html>
+
