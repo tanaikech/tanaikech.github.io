@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>Zaif API for Google Apps Script &middot; tanaike</title>
+  <title>Batching Requests for Google Apps Script &middot; tanaike</title>
 
   
   
@@ -218,7 +218,7 @@
 
 
 <div class="header">
-  <h1>Zaif API for Google Apps Script</h1>
+  <h1>Batching Requests for Google Apps Script</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -227,7 +227,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>15 Jan 2018, 09:47</time>
+    <time>19 Jan 2018, 09:38</time>
   </div>
 
   
@@ -238,9 +238,7 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/virtual-currency">virtual-currency</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
     
   </div>
   
@@ -254,9 +252,9 @@
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/zaif">Zaif</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/batch-request">batch request</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/api">API</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/batch">batch</a>
     
   </div>
   
@@ -264,90 +262,82 @@
 
 </div>
 
-  <p><a href="https://gist.github.com/tanaikech/77481c2621dc7429449194c0f1dbd58c">Gists</a></p>
+  
 
-<p>This sample script is for using <a href="http://techbureau-api-document.readthedocs.io/ja/latest/index.html">Zaif API</a> by Google Apps Script.</p>
+<p><a href="https://gist.github.com/tanaikech/f167b9280a8e710804e4061571b53fb9">Gists</a></p>
 
-<p>The following go script is a sample at <a href="http://techbureau-api-document.readthedocs.io/ja/latest/trade/3_how_to_implement/2_go.html">Zaif API</a>.</p>
+<p>There is <a href="https://developers.google.com/drive/v3/web/batch">the bathing requests</a> in the Google APIs. The bathing requests can use the several API calls as a single HTTP request. By using this, for example, users can modify filenames of a lot of files on Google Drive. But there are limitations for the number of API calls which can process in one batch request. For example, Drive API can be used the maximum of 100 calls in one batch request.</p>
 
-<pre><code>package main
+<p>The following sample script modifies the filenames of 2 files on own Google Drive using Google Apps Script. Drive API for modifying filenames is used as &ldquo;PATCH&rdquo;. The batch request including 2 API calls of Drive API is called using &ldquo;multipart/mixed&rdquo;. If you want more APIs, please add the elements to the array of &ldquo;body&rdquo;.</p>
 
-import (
-    &quot;fmt&quot;
-    &quot;time&quot;
-    &quot;strconv&quot;
-    &quot;crypto/hmac&quot;
-    &quot;crypto/sha512&quot;
-    &quot;io/ioutil&quot;
-    &quot;net/http&quot;
-    &quot;encoding/hex&quot;
-    &quot;net/url&quot;
-    &quot;strings&quot;
-)
+<pre><code class="language-javascript">function main() {
+  var body = [
+    {
+      method: &quot;PATCH&quot;,
+      endpoint: &quot;https://www.googleapis.com/drive/v3/files/### fileId ###?fields=name&quot;,
+      requestBody: {&quot;name&quot;: &quot;samplename1&quot;}
+    },
+    {
+      method: &quot;PATCH&quot;,
+      endpoint: &quot;https://www.googleapis.com/drive/v3/files/### fileId ###?fields=name&quot;,
+      requestBody: {&quot;name&quot;: &quot;samplename2&quot;}
+    }
+  ];
 
-var key = &quot;&lt;your_key&gt;&quot;
-var secret = &quot;&lt;your_secret&gt;&quot;
-
-func main() {
-
-    uri := &quot;https://api.zaif.jp/tapi&quot;
-    values := url.Values{}
-    values.Add(&quot;method&quot;, &quot;get_info&quot;)
-    values.Add(&quot;nonce&quot;, strconv.FormatInt(time.Now().Unix(), 10))
-
-    encodedParams := values.Encode()
-    req, _ := http.NewRequest(&quot;POST&quot;, uri, strings.NewReader(encodedParams))
-
-    hash := hmac.New(sha512.New, []byte(secret))
-    hash.Write([]byte(encodedParams))
-    signature := hex.EncodeToString(hash.Sum(nil))
-
-    req.Header.Add(&quot;Key&quot;, key)
-    req.Header.Add(&quot;Sign&quot;, signature)
-    client := new(http.Client)
-    resp, _ := client.Do(req)
-    defer resp.Body.Close()
-
-    byteArray, _ := ioutil.ReadAll(resp.Body)
-    fmt.Println(string(byteArray))
-}
-</code></pre>
-
-<p>When this is converted to GAS, the script is as follows.</p>
-
-<pre><code class="language-javascript">function main(){
-  var key = &quot;### your key ###&quot;;
-  var secret = &quot;### your secret ###&quot;;
-
-  var nonce = (new Date().getTime() / 1000).toFixed(0);
-  var params = &quot;method=get_info&amp;nonce=&quot; + nonce;
-  var sign = Utilities.computeHmacSignature(Utilities.MacAlgorithm.HMAC_SHA_512, params, secret);
-  sign = sign.map(function(e) {return (&quot;0&quot; + (e &amp; 0xFF).toString(16)).slice(-2)}).join(&quot;&quot;);
+  var url = &quot;https://www.googleapis.com/batch&quot;;
+  var boundary = &quot;xxxxxxxxxx&quot;;
+  var contentId = 0;
+  var data = &quot;--&quot; + boundary + &quot;\r\n&quot;;
+  for (var i in body) {
+    data += &quot;Content-Type: application/http\r\n&quot;;
+    data += &quot;Content-ID: &quot; + ++contentId + &quot;\r\n\r\n&quot;;
+    data += body[i].method + &quot; &quot; + body[i].endpoint + &quot;\r\n&quot;;
+    data += body[i].requestBody ? &quot;Content-Type: application/json; charset=utf-8\r\n\r\n&quot; : &quot;\r\n&quot;;
+    data += body[i].requestBody ? JSON.stringify(body[i].requestBody) + &quot;\r\n&quot; : &quot;&quot;;
+    data += &quot;--&quot; + boundary + &quot;\r\n&quot;;
+  }
+  var payload = Utilities.newBlob(data).getBytes();
   var options = {
     method: &quot;post&quot;,
-    headers: {
-      &quot;key&quot;: key,
-      &quot;sign&quot;: sign
-    },
-    muteHttpExceptions: true
+    contentType: &quot;multipart/mixed; boundary=&quot; + boundary,
+    payload: payload,
+    headers: {'Authorization': 'Bearer ' + ScriptApp.getOAuthToken()},
+    muteHttpExceptions: true,
   };
-  var res = UrlFetchApp.fetch(&quot;https://api.zaif.jp/tapi&quot;, options);
-  Logger.log(res.getContentText())
+  var res = UrlFetchApp.fetch(url, options).getContentText();
+  Logger.log(res);
 }
 </code></pre>
+
+<h2 id="note">Note :</h2>
+
+<ul>
+<li>For the batch request, each API call is no guaranteed ordering.</li>
+</ul>
+
+<h2 id="reference">Reference :</h2>
+
+<ul>
+<li><a href="https://developers.google.com/drive/v3/web/batch">Batching Requests</a>
+
+<ul>
+<li>This document shows how to batch API calls together to reduce the number of HTTP connections your client has to make.</li>
+<li>There are &ldquo;Example batch request&rdquo; and &ldquo;Example batch response&rdquo;.</li>
+</ul></li>
+</ul>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2018/01/12/bittrex-api-for-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2018/01/15/zaif-api-for-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2018/01/12/bittrex-api-for-google-apps-script/">Bittrex API for Google Apps Script</a>
+      <a href="https://tanaikech.github.io/2018/01/15/zaif-api-for-google-apps-script/">Zaif API for Google Apps Script</a>
     </nav>
     
   </div>
@@ -356,14 +346,8 @@ func main() {
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2018/01/19/batching-requests-for-google-apps-script/">Batching Requests for Google Apps Script</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2018/01/19/batching-requests-for-google-apps-script/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
