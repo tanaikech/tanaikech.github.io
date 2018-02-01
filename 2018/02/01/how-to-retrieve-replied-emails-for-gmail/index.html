@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>Updated: GAS Library - ManifestsApp &middot; tanaike</title>
+  <title>How to Retrieve Replied Emails for Gmail &middot; tanaike</title>
 
   
   
@@ -218,7 +218,7 @@
 
 
 <div class="header">
-  <h1>Updated: GAS Library - ManifestsApp</h1>
+  <h1>How to Retrieve Replied Emails for Gmail</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -227,7 +227,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>29 Jan 2018, 13:05</time>
+    <time>01 Feb 2018, 10:46</time>
   </div>
 
   
@@ -238,9 +238,7 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
     
   </div>
   
@@ -254,9 +252,7 @@
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/manifestsapp">ManifestsApp</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/gmail">gmail</a>
     
   </div>
   
@@ -264,39 +260,75 @@
 
 </div>
 
-  <p><a href="https://github.com/tanaikech/ManifestsApp">ManifestsApp</a> was updated to v1.0.2.</p>
+  
+
+<p><a href="https://gist.github.com/tanaikech/a047e5f67f30b93482986039daa16dbc">Gists</a></p>
+
+<h2 id="description">Description :</h2>
+
+<p>This sample script is for retrieving emails which replied for received mails. Because there are no samples which confirm whether the owner (me) replied to the received mails, I created this. The point is as follows.</p>
 
 <ul>
-<li><p>v1.0.2 (January 29, 2018)</p>
+<li>When there are more than 2 messages in a thread, there might be a possibility to have replied.</li>
+<li>For more than 2 messages in a thread
 
 <ul>
-<li><a href="https://github.com/tanaikech/ProjectApp2">ProjectApp2</a> is published, and got to be able to use both standalone script type and container-bound script type.
-
-<ul>
-<li>By this, this library also got to be able to be used for the both projects.</li>
-</ul></li>
-<li>For this update, please enable Apps Script API.
-
-<ul>
-<li>Please check <a href="https://github.com/tanaikech/ManifestsApp#HowToInstall">&ldquo;How to install&rdquo;</a>.</li>
-</ul></li>
+<li>The email address of &ldquo;from&rdquo; for the 1st message is the sender&rsquo;s address.</li>
+<li>When the email address of &ldquo;to&rdquo; of after 2nd messages is the same to that of &ldquo;from&rdquo; of 1st one, it is indicates that the thread was replied by owner.</li>
 </ul></li>
 </ul>
 
-<p><font color="#3366CC"><strong>You can check this at <a href="https://github.com/tanaikech/ManifestsApp">https://github.com/tanaikech/ManifestsApp</a>.</strong></font></p>
+<p>This sample script is made of Google Apps Script (GAS). But also this can be applied to other languages.</p>
+
+<h2 id="note">Note :</h2>
+
+<ul>
+<li>The mails that it was replied to the mails that owner sent cannot be retrieved.</li>
+<li>If you use this sample script, please test using for example <code>var th = GmailApp.getInboxThreads(0, 50);</code>, and understand the flow.</li>
+</ul>
+
+<pre><code class="language-javascript">function main() {
+  var th = GmailApp.getInboxThreads();
+  for (i in th) {
+    var ms = th[i].getMessages();
+    for (j in ms) {
+      var mm = ms[j].getThread().getMessages();
+      if (mm.length &gt; 0) {
+        var temp = [];
+        for (k in mm) {
+          var regexp = /&lt;(\w.+)&gt;/g;
+          var from  = mm[k].getFrom();
+          var to = mm[k].getTo();
+          var fromMail  = from.match(regexp) ? regexp.exec(from)[1] : from;
+          var toMail = to.match(regexp) ? regexp.exec(to)[1] : to;
+          temp.push({from: fromMail, to: toMail});
+        }
+        if (temp.length &gt; 1) {
+          if (temp.filter(function(e){return temp[0].from == e.to}).length &gt; 0) {
+            Logger.log(&quot;RepliedId: %s&quot;, ms[j].getId())
+
+            // do something
+
+          }
+        }
+      }
+    }
+  }
+}
+</code></pre>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2018/01/29/gas-library---projectapp2/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2018/01/29/updated-gas-library---manifestsapp/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2018/01/29/gas-library---projectapp2/">GAS Library - ProjectApp2</a>
+      <a href="https://tanaikech.github.io/2018/01/29/updated-gas-library---manifestsapp/">Updated: GAS Library - ManifestsApp</a>
     </nav>
     
   </div>
@@ -305,14 +337,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2018/02/01/how-to-retrieve-replied-emails-for-gmail/">How to Retrieve Replied Emails for Gmail</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2018/02/01/how-to-retrieve-replied-emails-for-gmail/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
