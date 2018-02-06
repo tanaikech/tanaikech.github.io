@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>Json &middot; tanaike</title>
+  <title>Copying Values from JSON to Struct using reflect Package &middot; tanaike</title>
 
   
   
@@ -36,8 +36,6 @@
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
 
   
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike" href="https://tanaikech.github.io/tags/json/index.xml" />
   
 
   
@@ -113,10 +111,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://tanaikech.github.io/tags/json/index.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
-    </li>
     
 
     
@@ -224,16 +218,12 @@
 
 
 <div class="header">
-  <h1>Json</h1>
+  <h1>Copying Values from JSON to Struct using reflect Package</h1>
+  <h2></h2>
 </div>
-
 <div class="content">
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2018/02/06/copying-values-from-json-to-struct-using-reflect-package/">Copying Values from JSON to Struct using reflect Package</a></h2>
 
-    <div class="post-meta">
+  <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
@@ -270,79 +260,96 @@
 
 </div>
 
-  </header>
+  
 
-  <p>
-  Gists
-This is a sample script for copying values from JSON to a struct using reflect package.
-Script : package main import ( &quot;encoding/json&quot; &quot;fmt&quot; &quot;reflect&quot; ) type obj struct { Key1 string `json:&quot;k1&quot;` Key2 string `json:&quot;k2&quot;` Key3 int `json:&quot;k3&quot;` Key4 int `json:&quot;k4&quot;` Key5 bool `json:&quot;k5&quot;` } func main() { data := `{&quot;k1&quot;: &quot;v1&quot;, &quot;k2&quot;: &quot;v2&quot;, &quot;k3&quot;: 123, &quot;k4&quot;: 456, &quot;k5&quot;: true}` d := map[string]interface{}{} json.Unmarshal([]byte(data), &amp;d) obj := &amp;obj{} s := reflect.
-  </p>
+<p><a href="https://gist.github.com/tanaikech/ada603db41ef0724a2e3d74cc392d9ed">Gists</a></p>
+
+<p>This is a sample script for copying values from JSON to a struct using <a href="https://golang.org/pkg/reflect/">reflect</a> package.</p>
+
+<h2 id="script">Script :</h2>
+
+<pre><code>package main
+
+import (
+    &quot;encoding/json&quot;
+    &quot;fmt&quot;
+    &quot;reflect&quot;
+)
+
+type obj struct {
+    Key1 string `json:&quot;k1&quot;`
+    Key2 string `json:&quot;k2&quot;`
+    Key3 int    `json:&quot;k3&quot;`
+    Key4 int    `json:&quot;k4&quot;`
+    Key5 bool   `json:&quot;k5&quot;`
+}
+
+func main() {
+    data := `{&quot;k1&quot;: &quot;v1&quot;, &quot;k2&quot;: &quot;v2&quot;, &quot;k3&quot;: 123, &quot;k4&quot;: 456, &quot;k5&quot;: true}`
+    d := map[string]interface{}{}
+    json.Unmarshal([]byte(data), &amp;d)
+    obj := &amp;obj{}
+    s := reflect.ValueOf(obj).Elem()
+    typeOfT := s.Type()
+    for i := 0; i &lt; s.NumField(); i++ {
+        for j, f := range d {
+            if typeOfT.Field(i).Tag.Get(&quot;json&quot;) == j {
+                fl := s.FieldByName(typeOfT.Field(i).Name)
+                switch fl.Kind() {
+                case reflect.Bool:
+                    fl.SetBool(f.(bool))
+                case reflect.Int:
+                    c, _ := f.(int64)
+                    fl.SetInt(c)
+                case reflect.String:
+                    fl.SetString(f.(string))
+                }
+            }
+        }
+    }
+    fmt.Printf(&quot;%+v\n&quot;, obj) // &amp;{Key1:v1 Key2:v2 Key3:0 Key4:0 Key5:true}
+}
+</code></pre>
+
+<h2 id="result">Result :</h2>
+
+<pre><code>&amp;{Key1:v1 Key2:v2 Key3:0 Key4:0 Key5:true}
+</code></pre>
+
+<h2 id="the-go-playground">The Go Playground</h2>
+
+<p><a href="https://play.golang.org/p/HvS5u_oge2g">https://play.golang.org/p/HvS5u_oge2g</a></p>
+
 
   
-  <footer>
-    <a href="https://tanaikech.github.io/2018/02/06/copying-values-from-json-to-struct-using-reflect-package/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2018/02/05/parsing-json-object-keys-are-number-and-changing-every-time/">Parsing JSON object (keys are number and changing every time)</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>05 Feb 2018, 13:25</time>
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2018/02/05/parsing-json-object-keys-are-number-and-changing-every-time/"><i class="fa fa-chevron-left"></i></a>
+    
   </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
+  <div class="pure-u-10-24">
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gotips">GoTips</a>
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2018/02/05/parsing-json-object-keys-are-number-and-changing-every-time/">Parsing JSON object (keys are number and changing every time)</a>
+    </nav>
     
   </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/json">JSON</a>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
     
   </div>
-  
-  
-
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
 </div>
 
-  </header>
 
-  <p>
-  Gists
-This sample script is for parsing JSON object. In the object, the keys are number and changing every time.
-Object : { &quot;key1&quot;: { &quot;key2&quot;: [ {&quot;0&quot;: [{&quot;key3&quot;: &quot;value3a&quot;}, {&quot;key3&quot;: &quot;value3b&quot;}]}, {&quot;1&quot;: [{&quot;key3&quot;: &quot;value3c&quot;}, {&quot;key3&quot;: &quot;value3d&quot;}]} ] } }  Script : package main import ( &quot;encoding/json&quot; &quot;fmt&quot; &quot;strconv&quot; ) type key1 struct { Key1 key2 `json:&quot;key1&quot;` } type key2 struct { Key2 []interface{} `json:&quot;key2&quot;` } func main() { data := `{&quot;key1&quot;: {&quot;key2&quot;: [{&quot;0&quot;: [{&quot;key3&quot;: &quot;value3a&quot;}, {&quot;key3&quot;: &quot;value3b&quot;}]},{&quot;1&quot;: [{&quot;key3&quot;: &quot;value3c&quot;}, {&quot;key3&quot;: &quot;value3d&quot;}]}]}}` k1 := &amp;key1{} json.
-  </p>
 
   
-  <footer>
-    <a href="https://tanaikech.github.io/2018/02/05/parsing-json-object-keys-are-number-and-changing-every-time/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
-  
-</article>
 
-  
 </div>
 
 </div>
@@ -378,3 +385,4 @@ Object : { &quot;key1&quot;: { &quot;key2&quot;: [ {&quot;0&quot;: [{&quot;key3&
 
 </body>
 </html>
+
