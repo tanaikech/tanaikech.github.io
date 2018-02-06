@@ -279,13 +279,13 @@ import (
 type obj struct {
     Key1 string `json:&quot;k1&quot;`
     Key2 string `json:&quot;k2&quot;`
-    Key3 int    `json:&quot;k3&quot;`
+    Key3 int64  `json:&quot;k3&quot;`
     Key4 int    `json:&quot;k4&quot;`
     Key5 bool   `json:&quot;k5&quot;`
 }
 
 func main() {
-    data := `{&quot;k1&quot;: &quot;v1&quot;, &quot;k2&quot;: &quot;v2&quot;, &quot;k3&quot;: 123, &quot;k4&quot;: 456, &quot;k5&quot;: true}`
+    data := `{&quot;k1&quot;: &quot;v1&quot;, &quot;k2&quot;: &quot;v2&quot;, &quot;k3&quot;: 1234567890, &quot;k4&quot;: 456, &quot;k5&quot;: true}`
     d := map[string]interface{}{}
     json.Unmarshal([]byte(data), &amp;d)
     obj := &amp;obj{}
@@ -298,27 +298,27 @@ func main() {
                 switch fl.Kind() {
                 case reflect.Bool:
                     fl.SetBool(f.(bool))
-                case reflect.Int:
-                    c, _ := f.(int64)
-                    fl.SetInt(c)
+                case reflect.Int, reflect.Int64:
+                    c, _ := f.(float64)
+                    fl.SetInt(int64(c))
                 case reflect.String:
                     fl.SetString(f.(string))
                 }
             }
         }
     }
-    fmt.Printf(&quot;%+v\n&quot;, obj) // &amp;{Key1:v1 Key2:v2 Key3:0 Key4:0 Key5:true}
+    fmt.Printf(&quot;%+v\n&quot;, obj) // &amp;{Key1:v1 Key2:v2 Key3:1234567890 Key4:456 Key5:true}
 }
 </code></pre>
 
 <h2 id="result">Result :</h2>
 
-<pre><code>&amp;{Key1:v1 Key2:v2 Key3:0 Key4:0 Key5:true}
+<pre><code>&amp;{Key1:v1 Key2:v2 Key3:1234567890 Key4:456 Key5:true}
 </code></pre>
 
 <h2 id="the-go-playground">The Go Playground</h2>
 
-<p><a href="https://play.golang.org/p/HvS5u_oge2g">https://play.golang.org/p/HvS5u_oge2g</a></p>
+<p><a href="https://play.golang.org/p/Rz-GNbFyDfh">https://play.golang.org/p/Rz-GNbFyDfh</a></p>
 
 
   
