@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>Transposing JSON Object using Google Apps Script &middot; tanaike</title>
+  <title>Append Values by Inserting Rows using Google Sheets API &middot; tanaike</title>
 
   
   
@@ -218,7 +218,7 @@
 
 
 <div class="header">
-  <h1>Transposing JSON Object using Google Apps Script</h1>
+  <h1>Append Values by Inserting Rows using Google Sheets API</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -227,7 +227,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>25 Feb 2018, 16:22</time>
+    <time>27 Feb 2018, 09:51</time>
   </div>
 
   
@@ -238,7 +238,7 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/spreadsheet">Spreadsheet</a>
     
   </div>
   
@@ -250,11 +250,13 @@
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/python">Python</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/json">json</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/object">object</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/sheetsapi">SheetsAPI</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/batchupdate">batchUpdate</a>
     
   </div>
   
@@ -264,40 +266,95 @@
 
   
 
-<p><a href="https://gist.github.com/tanaikech/806fe728f8cf964078ef1354307a433d">Gists</a></p>
+<p><a href="https://gist.github.com/tanaikech/7846ebcafbab8318ff74c9955a99e06b">Gists</a></p>
 
-<p>This is a sample script for transposing JSON object using Google Apps Script.</p>
+<p>In the case appending values to cell by inserting rows, when <code>sheets.spreadsheets.values.append</code> is used, the values are appended to the next empty row of the last row. If you want to append values to between cells with values by inserting row, you can achieve it using <code>sheets.spreadsheets.batchUpdate</code>.</p>
 
-<h3 id="input-data">Input data :</h3>
+<p>When you use this, please use your access token.</p>
 
-<pre><code class="language-json">[
-    {&quot;key1&quot;:&quot;a1&quot;,&quot;key2&quot;:&quot;a2&quot;,&quot;key3&quot;:&quot;a3&quot;,&quot;key4&quot;:&quot;a4&quot;,&quot;key5&quot;:&quot;a5&quot;},
-    {&quot;key1&quot;:&quot;b1&quot;,&quot;key2&quot;:&quot;b2&quot;,&quot;key3&quot;:&quot;b3&quot;,&quot;key4&quot;:&quot;b4&quot;,&quot;key5&quot;:&quot;b5&quot;},
-    {&quot;key1&quot;:&quot;c1&quot;,&quot;key2&quot;:&quot;c2&quot;,&quot;key3&quot;:&quot;c3&quot;,&quot;key4&quot;:&quot;c4&quot;,&quot;key5&quot;:&quot;c5&quot;},
-    {&quot;key1&quot;:&quot;d1&quot;,&quot;key2&quot;:&quot;d2&quot;,&quot;key3&quot;:&quot;d3&quot;,&quot;key4&quot;:&quot;d4&quot;,&quot;key5&quot;:&quot;d5&quot;},
-    {&quot;key1&quot;:&quot;e1&quot;,&quot;key2&quot;:&quot;e2&quot;,&quot;key3&quot;:&quot;e3&quot;,&quot;key4&quot;:&quot;e4&quot;,&quot;key5&quot;:&quot;e5&quot;}
-]
+<h2 id="endpoint">Endpoint :</h2>
+
+<pre><code>POST https://sheets.googleapis.com/v4/spreadsheets/### spreadsheet ID ###:batchUpdate
 </code></pre>
 
-<h3 id="output-data">Output data :</h3>
+<h2 id="request-body">Request body :</h2>
+
+<p>In this request body, it appends the data of &ldquo;sample1, sample2, sample3&rdquo; to &ldquo;A1:A3&rdquo; of the sheetId of &ldquo;1234567890&rdquo;. Before appends the data, it supposes that there are some values at &ldquo;A1:A3&rdquo;.</p>
+
+<p>The flow of request is as follows.</p>
+
+<ol>
+<li>Insert new row to row 1 using &ldquo;insertRange&rdquo;.</li>
+<li>Import values of &ldquo;sample1, sample2, sample3&rdquo; using &ldquo;pasteData&rdquo;.</li>
+</ol>
+
+<p>When the order of &ldquo;insertRange&rdquo; and &ldquo;pasteData&rdquo; is changed, at first, the value of &ldquo;A1:A3&rdquo; is overwritten. After this, the new row is inserted to the row 1. So it is found that the elements of &ldquo;requests&rdquo; which is an array run in the order.</p>
 
 <pre><code class="language-json">{
-    &quot;key1&quot;: [&quot;a1&quot;, &quot;b1&quot;, &quot;c1&quot;, &quot;d1&quot;, &quot;e1&quot;],
-    &quot;key2&quot;: [&quot;a2&quot;, &quot;b2&quot;, &quot;c2&quot;, &quot;d2&quot;, &quot;e2&quot;],
-    &quot;key3&quot;: [&quot;a3&quot;, &quot;b3&quot;, &quot;c3&quot;, &quot;d3&quot;, &quot;e3&quot;],
-    &quot;key4&quot;: [&quot;a4&quot;, &quot;b4&quot;, &quot;c4&quot;, &quot;d4&quot;, &quot;e4&quot;],
-    &quot;key5&quot;: [&quot;a5&quot;, &quot;b5&quot;, &quot;c5&quot;, &quot;d5&quot;, &quot;e5&quot;]
+ &quot;requests&quot;: [
+  {
+   &quot;insertRange&quot;: {
+    &quot;range&quot;: {
+     &quot;sheetId&quot;: 1234567890,
+     &quot;startRowIndex&quot;: 0,
+     &quot;endRowIndex&quot;: 1
+    },
+    &quot;shiftDimension&quot;: &quot;ROWS&quot;
+   }
+  },
+  {
+   &quot;pasteData&quot;: {
+    &quot;data&quot;: &quot;sample1, sample2, sample3&quot;,
+    &quot;type&quot;: &quot;PASTE_NORMAL&quot;,
+    &quot;delimiter&quot;: &quot;,&quot;,
+    &quot;coordinate&quot;: {
+     &quot;sheetId&quot;: 1234567890,
+     &quot;rowIndex&quot;: 0,
+    }
+   }
+  }
+ ]
 }
 </code></pre>
 
-<h3 id="script">Script :</h3>
+<h2 id="python-sample">Python sample :</h2>
 
-<p><strong>At first, keys have to be defined by yourself, because the order of json is not decided.</strong></p>
+<pre><code class="language-python">def main():
+    credentials = get_credentials()
+    http = credentials.authorize(httplib2.Http())
+    discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?' 'version=v4')
+    service = discovery.build('sheets', 'v4', http=http, discoveryServiceUrl=discoveryUrl)
 
-<pre><code class="language-javascript">var keys = [&quot;key1&quot;, &quot;key2&quot;, &quot;key3&quot;, &quot;key4&quot;, &quot;key5&quot;];
-var result = {};
-data.map(function(_, i){return keys.map(function(f, j){return data[i][keys[j]]})}).forEach(function(e, i){result[keys[i]] = e});
-Logger.log(JSON.stringify(result))
+    spreadsheet_id = '### spreadsheet ID ###'
+    batch_update_spreadsheet_request_body = {
+        &quot;requests&quot;: [
+            {
+                &quot;insertRange&quot;: {
+                    &quot;range&quot;: {
+                        &quot;sheetId&quot;: 1234567890,
+                        &quot;startRowIndex&quot;: 0,
+                        &quot;endRowIndex&quot;: 1
+                    },
+                    &quot;shiftDimension&quot;: &quot;ROWS&quot;
+                }
+            },
+            {
+                &quot;pasteData&quot;: {
+                    &quot;data&quot;: &quot;sample1, sample2, sample3&quot;,
+                    &quot;type&quot;: &quot;PASTE_NORMAL&quot;,
+                    &quot;delimiter&quot;: &quot;,&quot;,
+                    &quot;coordinate&quot;: {
+                        &quot;sheetId&quot;: 1234567890,
+                        &quot;rowIndex&quot;: 0
+                    }
+                }
+            }
+        ]
+    }
+
+    request = service.spreadsheets().batchUpdate(spreadsheetId=spreadsheet_id, body=batch_update_spreadsheet_request_body)
+    response = request.execute()
+    print(response)
 </code></pre>
 
 
@@ -305,13 +362,13 @@ Logger.log(JSON.stringify(result))
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2018/02/22/transposing-slice-from-n-x-m-to-m-x-n-for-golang/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2018/02/25/transposing-json-object-using-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2018/02/22/transposing-slice-from-n-x-m-to-m-x-n-for-golang/">Transposing Slice From (n x m) To (m x n) for golang</a>
+      <a href="https://tanaikech.github.io/2018/02/25/transposing-json-object-using-google-apps-script/">Transposing JSON Object using Google Apps Script</a>
     </nav>
     
   </div>
@@ -320,14 +377,8 @@ Logger.log(JSON.stringify(result))
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2018/02/27/append-values-by-inserting-rows-using-google-sheets-api/">Append Values by Inserting Rows using Google Sheets API</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2018/02/27/append-values-by-inserting-rows-using-google-sheets-api/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
