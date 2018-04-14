@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>Unicode normalization using Google Apps Script &middot; tanaike</title>
+  <title>Benchmark: Event Objects for Google Apps Script &middot; tanaike</title>
 
   
   
@@ -218,7 +218,7 @@
 
 
 <div class="header">
-  <h1>Unicode normalization using Google Apps Script</h1>
+  <h1>Benchmark: Event Objects for Google Apps Script</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -227,7 +227,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>16 Mar 2018, 12:41</time>
+    <time>14 Apr 2018, 14:45</time>
   </div>
 
   
@@ -238,7 +238,11 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/report">report</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/benchmark">Benchmark</a>
     
   </div>
   
@@ -250,13 +254,7 @@
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/nfd">NFD</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/nfc">NFC</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/unicode-normalization">unicode normalization</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>
     
   </div>
   
@@ -266,28 +264,113 @@
 
   
 
-<h1 id="overview">Overview</h1>
+<p><a href="https://gist.github.com/tanaikech/4892c97df7ac0504ffd715c2dd6cd546">Gists</a></p>
 
-<p>This is a script for converting strings from NFD (Normalization Form Decomposition) to NFC (Normalization Form Composition) using Google Apps Script.</p>
+<h1 id="introduction">Introduction</h1>
 
-<h1 id="description">Description</h1>
+<p>There are event objects at Google Apps Script. Typically, users which use Spreadsheet often use <code>onEdit(event)</code>. Here, I would like to introduce the process costs for the event objects using this <code>onEdit(event)</code>.</p>
 
-<p>Here, I would like to introduce a script for <a href="https://en.wikipedia.org/wiki/Unicode_equivalence#Normal_forms">the unicode normalization</a> using Google Apps Script. There are the characters with <code>゙</code> which is the voiced dot and the characters with <code>゚</code> which is the semi-voiced dot in Japanese language. When these are used for some applications, there are 2 kinds of usages for the character. For example, when for <code>は</code> (<code>\u306f</code>) HA with the voiced dot, there are <code>ば</code> and <code>ば</code>. These unicodes are <code>\u3070</code> and <code>\u306f\u3099</code>. Namely, there are the case which displayed 1 character as 2 characters. In most cases, the characters like <code>\u3070</code> are used. This called NFC (Normalization Form Composition). But we sometimes meet the characters like <code>\u306f\u3099</code>. This called NFD (Normalization Form Decomposition). When the document including such characters which are displayed as 2 characters is converted to PDF file, each character is separated like <code>は  ゙</code>. So users often want to convert the characters constructed by 2 characters to the single characters. Recently, <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize">String.prototype.normalize</a> was added at ES2015. But ES2015 cannot be used at Google Apps Script yet. And although I had looked for the scripts like this for GAS, unfortunately, I couldn&rsquo;t find. So I created this script.</p>
+<p>When <code>onEdit(event)</code> is used for the spreadsheet, <code>event</code> of <code>onEdit(event)</code> has the following structure.</p>
 
-<p><font color="#3366CC"><strong>The detail information and how to get this are <a href="https://github.com/tanaikech/ConvertNFDtoNFC">https://github.com/tanaikech/ConvertNFDtoNFC</a>.</strong></font></p>
+<pre><code class="language-json">{
+  &quot;authMode&quot;: {},
+  &quot;range&quot;: {
+    &quot;columnStart&quot;: 1,
+    &quot;rowStart&quot;: 1,
+    &quot;rowEnd&quot;: 1,
+    &quot;columnEnd&quot;: 1
+  },
+  &quot;source&quot;: {},
+  &quot;oldValue&quot;: &quot;old sample text&quot;,
+  &quot;user&quot;: {
+    &quot;nickname&quot;: &quot;sampleName&quot;,
+    &quot;email&quot;: &quot;sample email&quot;
+  },
+  &quot;value&quot;: &quot;sample text&quot;
+}
+</code></pre>
+
+<p>In this structure, for example, the range of active cell is <code>&quot;range&quot;: {&quot;columnStart&quot;: 1, &quot;rowStart&quot;: 1, &quot;rowEnd&quot;: 1, &quot;columnEnd&quot;: 1 }</code>. Namely, it&rsquo;s &ldquo;A1&rdquo;. Users can use the range of active cell using this event object. In this report, I have investigated the process cost for retrieving the range of active cell as a sample.</p>
+
+<h1 id="experimental-procedure">Experimental procedure</h1>
+
+<p>The sample script is as follows.</p>
+
+<pre><code class="language-javascript">function onEdit(e) {
+  var start = Date.now();
+  for (var i = 0; i &lt; 5000; i++) {
+    var range = e.range.getA1Notation(); // A1
+  }
+  Logger.log(&quot;%s [s]&quot;, (Date.now() - start) / 1000);
+
+  var start = Date.now();
+  for (var i = 0; i &lt; 5000; i++) {
+    var range = e.source.getActiveCell().getA1Notation(); // A1
+  }
+  Logger.log(&quot;%s [s]&quot;, (Date.now() - start) / 1000);
+
+  var start = Date.now();
+  for (var i = 0; i &lt; 5000; i++) {
+    var range = SpreadsheetApp.getActiveSheet().getActiveCell().getA1Notation(); // A1
+  }
+  Logger.log(&quot;%s [s]&quot;, (Date.now() - start) / 1000);
+}
+</code></pre>
+
+<p>In this sample script, the range of active cell is retrieved for 5000 times, and the time is measured. In this experiment, the average values of 10 times were used as the result.</p>
+
+<h1 id="results">Results</h1>
+
+<table>
+<thead>
+<tr>
+<th align="left">method</th>
+<th align="center">Time in 5000 times [s]</th>
+<th align="center">Time in 1 times [ms]</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="left">e.range.getA1Notation()</td>
+<td align="center">0.784</td>
+<td align="center">0.157</td>
+</tr>
+
+<tr>
+<td align="left">e.source.getActiveCell().getA1Notation()</td>
+<td align="center">4.048</td>
+<td align="center">0.810</td>
+</tr>
+
+<tr>
+<td align="left">SpreadsheetApp.getActiveSheet().getActiveCell().getA1Notation()</td>
+<td align="center">7.370</td>
+<td align="center">1.474</td>
+</tr>
+</tbody>
+</table>
+
+<p>From above table, it was found that the process cost of <code>e.range.getA1Notation()</code> was 20 % and 10 % for those of <code>e.source.getActiveCell().getA1Notation()</code> and <code>SpreadsheetApp.getActiveSheet().getActiveCell().getA1Notation()</code>, respectively. It is considered that these process costs depend on the number of use of APIs. As the result, it was found that the event objects can decrease the process cost in the scripts. Although this is the general result, also I think that it is important to quantitatively know this.</p>
+
+<h1 id="reference">Reference</h1>
+
+<ul>
+<li><a href="https://developers.google.com/apps-script/guides/triggers/events">Event Objects</a></li>
+</ul>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2018/03/03/remove-importerror-of-module-for-sublime-text/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2018/03/16/unicode-normalization-using-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2018/03/03/remove-importerror-of-module-for-sublime-text/">Remove ImportError of Module for Sublime Text</a>
+      <a href="https://tanaikech.github.io/2018/03/16/unicode-normalization-using-google-apps-script/">Unicode normalization using Google Apps Script</a>
     </nav>
     
   </div>
@@ -296,14 +379,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2018/04/14/benchmark-event-objects-for-google-apps-script/">Benchmark: Event Objects for Google Apps Script</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2018/04/14/benchmark-event-objects-for-google-apps-script/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
