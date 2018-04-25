@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>GAS Library - RunAll &middot; tanaike</title>
+  <title>Retrieves All Named Ranges in Spreadsheet as a1Notation &middot; tanaike</title>
 
   
   
@@ -218,7 +218,7 @@
 
 
 <div class="header">
-  <h1>GAS Library - RunAll</h1>
+  <h1>Retrieves All Named Ranges in Spreadsheet as a1Notation</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -227,7 +227,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>24 Apr 2018, 08:45</time>
+    <time>25 Apr 2018, 11:34</time>
   </div>
 
   
@@ -238,9 +238,7 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
     
   </div>
   
@@ -254,9 +252,11 @@
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/sheets-api">Sheets API</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/concurrent-processes">concurrent-processes</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/namedrange">namedRange</a>
     
   </div>
   
@@ -266,28 +266,107 @@
 
   
 
-<h1 id="overview">Overview</h1>
+<p><a href="https://gist.github.com/tanaikech/aa744c9a15818c002d90eaea6b4efd03">Gists</a></p>
 
-<p><strong>This is a library for running the concurrent processing using only native Google Apps Script (GAS).</strong></p>
+<p>This is a sample script for Google Apps Script (GAS). This script retrieves all named ranges in Spreadsheet. The names and range of the retrieved named ranges are output as the keys and the values of JSON object, respectively. The sample output is <code>{&quot;name1&quot;: &quot;Sheet1!A1:B2&quot;, &quot;name2&quot;: &quot;Sheet2!B1:C2&quot;,,,}</code>. The name of named range has to be only one in the spreadsheet. This was used.</p>
 
-<h1 id="description">Description</h1>
+<p><code>Sheets.Spreadsheets.get()</code> of Sheets API can retrieve all named ranges. But the retrieved range is the grid range. So in this sample script, the grid range was converted to a1Notation. The main part of this sample script is here.</p>
 
-<p>Have you ever thought about the concurrent processing using only native Google Apps Script (GAS)? So far, I had run the concurrent processing using golang, javascript and python. But the script cannot be used by the trigger event, because these are not native GAS. Recently, it was found that <a href="https://developers.google.com/apps-script/reference/url-fetch/url-fetch-app#fetchAll(Object)">the fetchAll method</a> added by the Google&rsquo;s update at January 19, 2018 is <a href="https://gist.github.com/tanaikech/c0f383034045ab63c19604139ecb0728">worked by the asynchronous processing</a>. By this, the concurrent processing using the native GAS got to be able to be achieved. This library makes users work the concurrent processing of functions using the fetchAll method and the execution API. This can drastically reduce the process cost in the script. And also this can be used under the trigger event. So it is considered that it will be useful for both the limit executing time of 6 minutes for GAS and the limit total executing time of 1 hour/day for the trigger event.</p>
+<p>In order to use this script, please enable Sheets API at Advanced Google Services and API console as follows.</p>
 
-<p><font color="#3366CC"><strong>You can check this at <a href="https://github.com/tanaikech/RunAll">https://github.com/tanaikech/RunAll</a>.</strong></font></p>
+<h2 id="enable-sheets-api-v4-at-advanced-google-services">Enable Sheets API v4 at Advanced Google Services</h2>
+
+<ul>
+<li>On script editor
+
+<ul>
+<li>Resources -&gt; Advanced Google Services</li>
+<li>Turn on Google Sheets API v4</li>
+</ul></li>
+</ul>
+
+<h2 id="enable-sheets-api-v4-at-api-console-https-console-cloud-google-com-apis-library-sheets-googleapis-com"><a href="https://console.cloud.google.com/apis/library/sheets.googleapis.com/">Enable Sheets API v4 at API console</a></h2>
+
+<ul>
+<li>On script editor
+
+<ul>
+<li>Resources -&gt; Cloud Platform project</li>
+<li>View API console</li>
+<li>At Getting started, click Enable APIs and get credentials like keys.</li>
+<li>At left side, click Library.</li>
+<li>At Search for APIs &amp; services, input &ldquo;sheets&rdquo;. And click Google Sheets API.</li>
+<li>Click Enable button.</li>
+<li>If API has already been enabled, please don&rsquo;t turn off.</li>
+</ul></li>
+</ul>
+
+<p>If now you are opening the script editor with the script for using Sheets API, you can enable Sheets API for the project by accessing this URL <a href="https://console.cloud.google.com/apis/library/sheets.googleapis.com/">https://console.cloud.google.com/apis/library/sheets.googleapis.com/</a></p>
+
+<h2 id="sample-script">Sample script :</h2>
+
+<p>When you use this sample script, please input <code>spreadsheetId</code> in <code>main()</code> and run it.</p>
+
+<pre><code class="language-javascript">function getNamedRanges2(spreadsheetId) {
+    var ss = SpreadsheetApp.openById(spreadsheetId);
+    var sheetIdToName = {};
+    ss.getSheets().forEach(function(e) {
+        sheetIdToName[e.getSheetId()] = e.getSheetName();
+    });
+    var result = {};
+    Sheets.Spreadsheets.get(spreadsheetId, {fields: &quot;namedRanges&quot;})
+        .namedRanges.forEach(function(e) {
+            var sheetName = sheetIdToName[e.range.sheetId.toString()];
+            var a1notation = ss.getSheetByName(sheetName).getRange(
+                e.range.startRowIndex + 1,
+                e.range.startColumnIndex + 1,
+                e.range.endRowIndex - e.range.startRowIndex,
+                e.range.endColumnIndex - e.range.startColumnIndex
+            ).getA1Notation();
+            result[e.name] = sheetName + &quot;!&quot; + a1notation;
+        });
+    return result;
+}
+
+function main() {
+    var spreadsheetId = &quot;### spreadsheet ID ###&quot;;
+    var result = getNamedRanges2(spreadsheetId);
+    Logger.log(JSON.stringify(result));
+}
+</code></pre>
+
+<h2 id="result">Result :</h2>
+
+<p>This is a sample result. The names and range of the named ranges are output as the keys and the values of JSON object, respectively.</p>
+
+<pre><code class="language-json">{
+  &quot;name1&quot;: &quot;Sheet1!A1:B2&quot;,
+  &quot;name2&quot;: &quot;Sheet2!B1:C2&quot;,
+  &quot;name3&quot;: &quot;Sheet3!C1:D2&quot;,
+  &quot;name4&quot;: &quot;Sheet4!D1:E2&quot;,
+  &quot;name5&quot;: &quot;Sheet5!E1:F2&quot;
+}
+</code></pre>
+
+<h2 id="references">References :</h2>
+
+<ul>
+<li>Advanced Google Services : <a href="https://developers.google.com/apps-script/guides/services/advanced">https://developers.google.com/apps-script/guides/services/advanced</a></li>
+<li>Sheets API v4: <a href="https://developers.google.com/sheets/api/">https://developers.google.com/sheets/api/</a></li>
+</ul>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2018/04/19/benchmark-fetchall-method-in-urlfetch-service-for-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2018/04/24/gas-library---runall/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2018/04/19/benchmark-fetchall-method-in-urlfetch-service-for-google-apps-script/">Benchmark: fetchAll method in UrlFetch service for Google Apps Script</a>
+      <a href="https://tanaikech.github.io/2018/04/24/gas-library---runall/">GAS Library - RunAll</a>
     </nav>
     
   </div>
@@ -296,14 +375,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2018/04/25/retrieves-all-named-ranges-in-spreadsheet-as-a1notation/">Retrieves All Named Ranges in Spreadsheet as a1Notation</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2018/04/25/retrieves-all-named-ranges-in-spreadsheet-as-a1notation/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
