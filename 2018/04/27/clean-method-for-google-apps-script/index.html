@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>Taking advantage of Web Apps with Google Apps Script &middot; tanaike</title>
+  <title>CLEAN method for Google Apps Script &middot; tanaike</title>
 
   
   
@@ -218,7 +218,7 @@
 
 
 <div class="header">
-  <h1>Taking advantage of Web Apps with Google Apps Script</h1>
+  <h1>CLEAN method for Google Apps Script</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -227,7 +227,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>26 Apr 2018, 08:35</time>
+    <time>27 Apr 2018, 09:11</time>
   </div>
 
   
@@ -237,8 +237,6 @@
   
   <div>
     <i class="fa fa-folder fa-fw"></i>
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/report">report</a>&nbsp;&#47;
     
       <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
     
@@ -254,7 +252,9 @@
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/webapps">WebApps</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/vba">VBA</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/clean">clean</a>
     
   </div>
   
@@ -262,30 +262,46 @@
 
 </div>
 
-  
+  <p><a href="https://gist.github.com/tanaikech/585597adda7954ba1cde3e724582bac5">Gists</a></p>
 
-<h1 id="overview">Overview</h1>
+<p>This is a sample script which works the same action with the <a href="https://msdn.microsoft.com/en-us/vba/excel-vba/articles/worksheetfunction-clean-method-excel">CLEAN method of VBA</a>. The CLEAN method of VBA removes the characters of <code>0-31, 127, 129, 141, 143, 144, 157</code>. Although I had looked for such method for Google Apps Script, I couldn&rsquo;t find it. So I created this. If this is useful for you, I&rsquo;m glad.</p>
 
-<p><strong>This is a report to take advantage of Web Apps with Google Apps Script (GAS).</strong></p>
+<pre><code class="language-javascript">function cleanForGAS(str) {
+  if (typeof str == &quot;string&quot;) {
+    var escaped = escape(str.trim());
+    for (var i = 0; i &lt;= 31; i++) {
+      var s = i.toString(16);
+      var re = new RegExp(&quot;%&quot; + (s.length == 1 ? &quot;0&quot; + s : s).toUpperCase(), &quot;g&quot;);
+      escaped = escaped.replace(re, &quot;&quot;);
+    }
+    var remove = [&quot;%7F&quot;, &quot;%81&quot;, &quot;%8D&quot;, &quot;%8F&quot;, &quot;%90&quot;, &quot;%9D&quot;];
+    remove.forEach(function(e) {
+      var re = new RegExp(e, &quot;g&quot;);
+      escaped = escaped.replace(re, &quot;&quot;);
+    });
+    return unescape(escaped).trim();
+  } else {
+    return str;
+  }
+}
 
-<h1 id="description">Description</h1>
-
-<p>There is <a href="https://developers.google.com/apps-script/guides/web">Web Apps</a> as one of applications using Google Apps Script (GAS). I sometimes use this Web Apps. But I have only a little the information for the specification of Web Apps. So in order to take more advantage of Web Apps, I investigated and summarized about this. The aim of this report is to become one of the basic information for creating various applications using Web Apps with GAS.</p>
-
-<p><font color="#3366CC"><strong>You can check this at <a href="https://github.com/tanaikech/taking-advantage-of-Web-Apps-with-google-apps-script">https://github.com/tanaikech/taking-advantage-of-Web-Apps-with-google-apps-script</a>.</strong></font></p>
+function main() {
+    var res = cleanForGAS(str);
+}
+</code></pre>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2018/04/25/retrieves-all-named-ranges-in-spreadsheet-as-a1notation/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2018/04/26/taking-advantage-of-web-apps-with-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2018/04/25/retrieves-all-named-ranges-in-spreadsheet-as-a1notation/">Retrieves All Named Ranges in Spreadsheet as a1Notation</a>
+      <a href="https://tanaikech.github.io/2018/04/26/taking-advantage-of-web-apps-with-google-apps-script/">Taking advantage of Web Apps with Google Apps Script</a>
     </nav>
     
   </div>
@@ -294,14 +310,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2018/04/27/clean-method-for-google-apps-script/">CLEAN method for Google Apps Script</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2018/04/27/clean-method-for-google-apps-script/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
