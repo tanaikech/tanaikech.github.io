@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>Topics &middot; tanaike</title>
+  <title>Resumable Upload for Web Apps using Google Apps Script &middot; tanaike</title>
 
   
   
@@ -36,8 +36,6 @@
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
 
   
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike" href="https://tanaikech.github.io/topics/index.xml" />
   
 
   
@@ -113,10 +111,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://tanaikech.github.io/topics/index.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
-    </li>
     
 
     
@@ -224,153 +218,131 @@
 
 
 <div class="header">
-  <h1>Topics</h1>
+  <h1>Resumable Upload for Web Apps using Google Apps Script</h1>
+  <h2></h2>
 </div>
 <div class="content">
-  <ul>
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>17 May 2018, 16:48</time>
+  </div>
+
+  
+
   
   
-    <li>
-      <a href="gastips">gastips</a>
-      <span>&#40;104&#41;</span>
-    </li>
   
-    <li>
-      <a href="clitool">clitool</a>
-      <span>&#40;28&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    
+  </div>
   
-    <li>
-      <a href="library">library</a>
-      <span>&#40;20&#41;</span>
-    </li>
   
-    <li>
-      <a href="gotips">gotips</a>
-      <span>&#40;17&#41;</span>
-    </li>
+
   
-    <li>
-      <a href="googleapitips">googleapitips</a>
-      <span>&#40;13&#41;</span>
-    </li>
   
-    <li>
-      <a href="benchmark">benchmark</a>
-      <span>&#40;9&#41;</span>
-    </li>
   
-    <li>
-      <a href="report">report</a>
-      <span>&#40;8&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/resumable-upload">resumable-upload</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/webapps">WebApps</a>
+    
+  </div>
   
-    <li>
-      <a href="etc">etc</a>
-      <span>&#40;7&#41;</span>
-    </li>
   
-    <li>
-      <a href="pythontips">pythontips</a>
-      <span>&#40;7&#41;</span>
-    </li>
+
+</div>
+
   
-    <li>
-      <a href="add-on">add-on</a>
-      <span>&#40;6&#41;</span>
-    </li>
+
+<h1 id="overview">Overview</h1>
+
+<p>This is a sample script for uploading files with large size (&gt; 50 MB) at Web Apps using Google Apps Script (GAS). The resumable upload method is used for uploading files. This script can be also applied to the script using gapi of javascript.</p>
+
+<h1 id="demo">Demo</h1>
+
+<p><img src="https://github.com/tanaikech/Resumable_Upload_For_WebApps/raw/master/images/demo.gif" alt="" /></p>
+
+<p>This is a demonstration of this script. As a demonstration, it uploads a file with the size of 100 MB to my Google Drive. When the file was selected, it is uploaded by the resumable upload. It is found that the file can be completely uploaded.</p>
+
+<h1 id="description">Description</h1>
+
+<p>Have you ever thought that you want to upload files with large size from local PC at Web Apps using GAS? Recently, I have thought it. So I investigated about this situation. At first, it was found that there are some limitations for uploading files to Google Drive from local PC.</p>
+
+<ol>
+<li>When &ldquo;uploadType&rdquo; is used as &ldquo;media&rdquo; and &ldquo;multipart&rdquo;, <a href="https://developers.google.com/drive/v3/web/manage-uploads">the limitation of size is less than 5 MB (5,242,880 bytes)</a>.
+
+<ul>
+<li>This is the specification of Drive API.</li>
+</ul></li>
+<li>When &ldquo;google.script.run.function(file)&rdquo; is used, the limitation of size if less than 50 MB (52,428,800 bytes).
+
+<ul>
+<li>This is the specification of &ldquo;DriveApp.createFile(blob)&rdquo;.</li>
+<li>&ldquo;blob&rdquo; can be used for the size more than 50 MB. But a file cannot be created using &ldquo;DriveApp.createFile(blob)&rdquo;. Furthermore, &ldquo;blob&rdquo; with the size more than 50 MB cannot be converted to the byte array.
+
+<ul>
+<li>This is due to my experiments.</li>
+</ul></li>
+</ul></li>
+</ol>
+
+<p>When users want to upload files with the size more than 50 MB to Google Drive, <a href="https://developers.google.com/drive/v3/web/resumable-upload">the Resumable Upload</a> is required to be used. As the next step, although I have looked for the sample script, Unfortunately, I couldn&rsquo;t find it. So I created this. The flow of this sample script is as follows.</p>
+
+<ol>
+<li>Retrieve a file.</li>
+<li>Retrieve an access token from GAS.
+
+<ul>
+<li>In this sample script, GAS is mainly used for retrieving the access token.</li>
+</ul></li>
+<li>Retrieve the endpoint for the resumable upload using the access token.</li>
+<li>Upload chunks for the resumable upload to the endpoint.</li>
+</ol>
+
+<p>If this was useful for you, I&rsquo;m glad.</p>
+
+<p><font color="#3366CC"><strong>You can check this at <a href="https://github.com/tanaikech/Resumable_Upload_For_WebApps">https://github.com/tanaikech/Resumable_Upload_For_WebApps</a>.</strong></font></p>
+
+
   
-    <li>
-      <a href="jstips">jstips</a>
-      <span>&#40;5&#41;</span>
-    </li>
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2018/05/11/updated-goodls-to-v102/"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2018/05/11/updated-goodls-to-v102/">Updated goodls to v102</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
+</div>
+
+
+
   
-    <li>
-      <a href="googlecharttips">googlecharttips</a>
-      <span>&#40;4&#41;</span>
-    </li>
-  
-    <li>
-      <a href="virtual-currency">virtual-currency</a>
-      <span>&#40;4&#41;</span>
-    </li>
-  
-    <li>
-      <a href="coffeescripttips">coffeescripttips</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="nodetips">nodetips</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="shtips">shtips</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="spreadsheet">spreadsheet</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="driveapitips">driveapitips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="slacktips">slacktips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="sublime">sublime</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="sublimetips">sublimetips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="batch-file-tips">batch-file-tips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="issuetracker">issuetracker</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="javascripttips">javascripttips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="netatmo">netatmo</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="netatmotips">netatmotips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="onedrivetips">onedrivetips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="plugin">plugin</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-  </ul>
+
 </div>
 
 </div>
@@ -406,3 +378,4 @@
 
 </body>
 </html>
+
