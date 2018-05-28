@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>Remove Third-party Apps with Account Access using Google Apps Script &middot; tanaike</title>
+  <title>Retrieving Reformatted Scripts without Comments in a Project using Google Apps Script &middot; tanaike</title>
 
   
   
@@ -218,7 +218,7 @@
 
 
 <div class="header">
-  <h1>Remove Third-party Apps with Account Access using Google Apps Script</h1>
+  <h1>Retrieving Reformatted Scripts without Comments in a Project using Google Apps Script</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -227,7 +227,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>23 May 2018, 15:51</time>
+    <time>28 May 2018, 12:55</time>
   </div>
 
   
@@ -254,7 +254,7 @@
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/accesstoken">accesstoken</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/script-editor">script editor</a>
     
   </div>
   
@@ -264,62 +264,96 @@
 
   
 
-<p><a href="https://gist.github.com/tanaikech/608e65fee105989df1a7b645c20572c2">Gists</a></p>
+<p><a href="https://gist.github.com/tanaikech/61f69fd2ce181865d3430c260c6a5d0b">Gists</a></p>
 
-<h2 id="overview">Overview</h2>
+<h1 id="overview">Overview</h1>
 
-<p>This is a method for removing Third-party Apps with Account Access using a script.</p>
+<p>This is a sample script for easily retrieving the reformatted scripts without comments in a project using Google Apps Script (GAS).</p>
 
-<h2 id="demo">Demo</h2>
+<h1 id="description">Description</h1>
 
-<p><img src="https://tanaikech.github.io/img/20180523a-demo.gif" alt="" /></p>
+<p>When I create GAS script, if the format of script is not correct, the script editor lets me know about it. By this, I can find that the script editor and/or Google Drive checks the format of scripts. I had wished if I could use this function. Recently, I noticed an interesting function. A GAS project is created and when <code>function myFunction() {Logger.log(this)}</code> is run in the script, I noticed that all scripts in the project are included in <code>this</code>. Furthermore, when I saw the retrieved script, also I noticed that their scripts are reformatted and all comments are removed. In the case of Apps Script API, when the scripts are retrieved by the API, the retrieved script is the same to the original one. So I think that this will help users retrieve simply the reformatted GAS scripts, and such the reformatted scripts will be able to be used for the various situations.</p>
 
-<h2 id="description">Description</h2>
+<p>If this will be useful for the developers, I&rsquo;m glad. And if this information has already been reported, I&rsquo;m sorry.</p>
 
-<p>When users create a script in a project and run the script, if the methods which are required to use scopes are included, users have to authorize to use the scopes using the browser. By authorizing it, users can use the script. The authorized projects can be seen at <a href="https://myaccount.google.com/permissions">Third-party Apps with Account Access</a>. One day, I had a situation that it required to remove the authorization of project, because of the security. Third-party Apps with Account Access can be manually removed as you know. But at that time, I wanted to remove using a script. So I came up with this method.</p>
+<h1 id="usage">Usage</h1>
 
-<p>This method achieve to remove Third-party Apps with Account Access by revoking access token of the project. In document, according to the official Google&rsquo;s document, the access token retrieved by refresh token can be revoked. When the access token was revoked, both the access token and the refresh token are revoked. I thought that this might be able to be also used for the project of standalone type and the container-bound script type. So I have tried and could confirm that it worked.</p>
+<ul>
+<li>Please put this script to the created script.
 
-<h2 id="usage">Usage</h2>
+<ul>
+<li>You can use this for the standalone type and the container-bound script type.</li>
+</ul></li>
+<li>Run <code>getScripts()</code>.
 
-<p>It supposes that a project has already been created and the authorization has also already been done. Under this situation, run the following sample script.</p>
+<ul>
+<li>In this script, the all scripts except for <code>getScripts()</code> are retrieved from the project, and save it as a text file.</li>
+</ul></li>
+</ul>
 
-<pre><code class="language-javascript">function myFunction() {
-  var url = &quot;https://accounts.google.com/o/oauth2/revoke?token=&quot; + ScriptApp.getOAuthToken();
-  var res = UrlFetchApp.fetch(url);
-  Logger.log(res.getResponseCode());
+<blockquote>
+<p><strong><code>this</code> includes only GAS scripts. HTML and json files are not included.</strong></p>
+</blockquote>
+
+<pre><code class="language-javascript">function getScripts() {
+  var scripts = Object.keys(this).map(function(e){return typeof this[e] == &quot;function&quot; &amp;&amp; e != &quot;getScripts&quot; ? this[e] : &quot;&quot;}).filter(String).reverse();
+  DriveApp.createFile(&quot;reformattedScripts.txt&quot;, scripts.join(&quot;\n&quot;), MimeType.PLAIN_TEXT);
 }
 </code></pre>
 
-<p>This sample script revokes the access token retrieved by <code>ScriptApp.getOAuthToken()</code>. I thought that <code>ScriptApp.getOAuthToken()</code> may retrieve the access token using a refresh token. If this access token was revoked, the refresh token is also revoked, and when the script is run again, the authorization is required again. My estimation was correct.</p>
+<h2 id="results">Results</h2>
 
-<p>This is a sample script of Google Apps Script. But if you want to revoke it from outside of the script editor, for example, you can use the following curl sample.</p>
+<p>As a sample, it supposes that the following scripts are in a project. These functions includes some comments. And also although there are no error as a script, the indent is no good.</p>
 
-<pre><code class="language-bash">curl https://accounts.google.com/o/oauth2/revoke?token=#####
+<pre><code class="language-javascript">function getScripts() {
+  var scripts = Object.keys(this).map(function(e){return typeof this[e] == &quot;function&quot; &amp;&amp; e != &quot;getScripts&quot; ? this[e] : &quot;&quot;}).filter(String).reverse();
+  DriveApp.createFile(&quot;reformattedScripts.txt&quot;, scripts.join(&quot;\n&quot;), MimeType.PLAIN_TEXT);
+}
+
+function myFunction1() {
+  // sample comment 1
+}
+
+function myFunction2() {
+  Logger.log(&quot;sample&quot;) // sample comment 2
+}
+
+// sample comment 3
+function myFunction3() {for(var i=0;i&lt;10;i++){for(var j=0;j&lt;10;j++){Logger.log(i+j)}}}
 </code></pre>
 
-<h2 id="references">References</h2>
+<p>When <code>getScripts()</code> is run, the following scripts can be retrieved. You can see the reformatted scripts without comments.</p>
 
-<ul>
-<li><a href="https://myaccount.google.com/permissions">Site for manually removing Third-party Apps with Account Access</a></li>
-<li><a href="https://support.google.com/accounts/answer/3466521">Apps with access to your account</a></li>
-<li><a href="https://developers.google.com/identity/protocols/OAuth2WebServer#tokenrevoke">Revoking a token</a></li>
-</ul>
+<pre><code class="language-javascript">function myFunction1() {
+}
 
-<p>If this information is useful for you, I&rsquo;m glad.</p>
+
+function myFunction2() {
+    Logger.log(&quot;sample&quot;);
+}
+
+
+function myFunction3() {
+    for (var i = 0; i &lt; 10; i++) {
+        for (var j = 0; j &lt; 10; j++) {
+            Logger.log(i + j);
+        }
+    }
+}
+</code></pre>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2018/05/20/create-folder-tree-of-google-drive-using-node.js/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2018/05/23/remove-third-party-apps-with-account-access-using-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2018/05/20/create-folder-tree-of-google-drive-using-node.js/">Create Folder Tree of Google Drive using Node.js</a>
+      <a href="https://tanaikech.github.io/2018/05/23/remove-third-party-apps-with-account-access-using-google-apps-script/">Remove Third-party Apps with Account Access using Google Apps Script</a>
     </nav>
     
   </div>
@@ -328,14 +362,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2018/05/28/retrieving-reformatted-scripts-without-comments-in-a-project-using-google-apps-script/">Retrieving Reformatted Scripts without Comments in a Project using Google Apps Script</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2018/05/28/retrieving-reformatted-scripts-without-comments-in-a-project-using-google-apps-script/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
