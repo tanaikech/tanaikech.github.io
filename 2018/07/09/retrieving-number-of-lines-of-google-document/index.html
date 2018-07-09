@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>Topics &middot; tanaike</title>
+  <title>Retrieving Number of Lines of Google Document &middot; tanaike</title>
 
   
   
@@ -36,8 +36,6 @@
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
 
   
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike" href="https://tanaikech.github.io/topics/index.xml" />
   
 
   
@@ -113,10 +111,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://tanaikech.github.io/topics/index.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
-    </li>
     
 
     
@@ -224,153 +218,127 @@
 
 
 <div class="header">
-  <h1>Topics</h1>
+  <h1>Retrieving Number of Lines of Google Document</h1>
+  <h2></h2>
 </div>
 <div class="content">
-  <ul>
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>09 Jul 2018, 09:02</time>
+  </div>
+
+  
+
   
   
-    <li>
-      <a href="gastips">gastips</a>
-      <span>&#40;113&#41;</span>
-    </li>
   
-    <li>
-      <a href="clitool">clitool</a>
-      <span>&#40;28&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    
+  </div>
   
-    <li>
-      <a href="library">library</a>
-      <span>&#40;21&#41;</span>
-    </li>
   
-    <li>
-      <a href="gotips">gotips</a>
-      <span>&#40;17&#41;</span>
-    </li>
+
   
-    <li>
-      <a href="googleapitips">googleapitips</a>
-      <span>&#40;14&#41;</span>
-    </li>
   
-    <li>
-      <a href="report">report</a>
-      <span>&#40;11&#41;</span>
-    </li>
   
-    <li>
-      <a href="benchmark">benchmark</a>
-      <span>&#40;10&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/document">Document</a>
+    
+  </div>
   
-    <li>
-      <a href="etc">etc</a>
-      <span>&#40;7&#41;</span>
-    </li>
   
-    <li>
-      <a href="pythontips">pythontips</a>
-      <span>&#40;7&#41;</span>
-    </li>
+
+</div>
+
   
-    <li>
-      <a href="add-on">add-on</a>
-      <span>&#40;6&#41;</span>
-    </li>
+
+<p><a href="https://gist.github.com/tanaikech/37def8eeeaf7780bb99d3289ee32385e">Gists</a></p>
+
+<p>There are no prepared methods for retrieving the number of lines in the Google Document. So I thought this workaround. If the end of each line can be detected, the number of lines can be retrieved. So I tried to add the end markers of each line using OCR.</p>
+
+<p>At Google Documents, when a sentence is over the page width, the sentence automatically has the line break. But the line break has no <code>\r\n</code> or <code>\n</code>. When users give the line break by the enter key, the line break has <code>\r\n</code> or <code>\n</code>. By this, the text data retrieved from the document has only the line breaks which were given by users. I thought that OCR may be able to be used for this situation. The flow is as follows.</p>
+
+<ol>
+<li>Convert Google Document to PDF.</li>
+<li>Convert PDF to text data using OCR.
+
+<ul>
+<li>I selected <a href="https://ocr.space/ocrapi">&ldquo;ocr.space&rdquo;</a> for OCR.
+
+<ul>
+<li>If you have already known APIs of OCR, you can try to do this.</li>
+</ul></li>
+<li>When I used OCR of Drive API, the line breaks of <code>\r\n</code> or <code>\n</code> were not added to the converted text data. So I used ocr.space. ocr.space can add the line breaks.</li>
+</ul></li>
+<li>Count <code>\n</code> in the converted text data.
+
+<ul>
+<li>This number means the number of lines.</li>
+</ul></li>
+</ol>
+
+<p>The sample script for above flow is as follows. When you use this, please retrieve your apikey at <a href="https://ocr.space/ocrapi">&ldquo;ocr.space&rdquo;</a>. When you input your information and email to the form, you will receive an email including API key. Please use it to this sample script. And please read the quota of API. I tested this using Free plan.</p>
+
+<h2 id="sample-script">Sample script :</h2>
+
+<pre><code class="language-javascript">var apikey = &quot;### Your API key for using ocr.space ###&quot;;
+
+var id = DocumentApp.getActiveDocument().getId();
+var url = &quot;https://docs.google.com/feeds/download/documents/export/Export?id=&quot; + id + &quot;&amp;format=pdf&amp;access_token=&quot; + ScriptApp.getOAuthToken();
+var blob = UrlFetchApp.fetch(url).getBlob();
+var payload = {method: &quot;POST&quot;, headers: {apikey: apikey}, payload: {file: blob}};
+var ocrRes = JSON.parse(UrlFetchApp.fetch(&quot;https://api.ocr.space/Parse/Image&quot;, payload));
+var result = ocrRes.ParsedResults.map(function(e){return e.ParsedText.match(/\n/g).length})[0];
+Logger.log(result);
+</code></pre>
+
+<h2 id="note">Note :</h2>
+
+<ul>
+<li>Even if the last line of the document has no <code>\r\n</code> or <code>\n</code>, the converted text data has <code>\r\n</code> at the end of all lines.</li>
+<li>In this case, the precision of OCR is not important. The important point is to retrieve the line breaks.</li>
+</ul>
+
+
   
-    <li>
-      <a href="jstips">jstips</a>
-      <span>&#40;6&#41;</span>
-    </li>
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2018/07/02/benchmark-search-for-array-processing-using-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2018/07/02/benchmark-search-for-array-processing-using-google-apps-script/">Benchmark: Search for Array Processing using Google Apps Script</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
+</div>
+
+
+
   
-    <li>
-      <a href="virtual-currency">virtual-currency</a>
-      <span>&#40;5&#41;</span>
-    </li>
-  
-    <li>
-      <a href="googlecharttips">googlecharttips</a>
-      <span>&#40;4&#41;</span>
-    </li>
-  
-    <li>
-      <a href="nodetips">nodetips</a>
-      <span>&#40;4&#41;</span>
-    </li>
-  
-    <li>
-      <a href="coffeescripttips">coffeescripttips</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="shtips">shtips</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="spreadsheet">spreadsheet</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="driveapitips">driveapitips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="slacktips">slacktips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="sublime">sublime</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="sublimetips">sublimetips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="batch-file-tips">batch-file-tips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="issuetracker">issuetracker</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="javascripttips">javascripttips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="netatmo">netatmo</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="netatmotips">netatmotips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="onedrivetips">onedrivetips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="plugin">plugin</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-  </ul>
+
 </div>
 
 </div>
@@ -406,3 +374,4 @@
 
 </body>
 </html>
+
