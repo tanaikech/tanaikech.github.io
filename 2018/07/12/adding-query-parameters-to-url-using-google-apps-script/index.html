@@ -272,15 +272,17 @@
 
 <pre><code class="language-javascript">String.prototype.addQuery = function(obj) {
   return this + Object.keys(obj).reduce(function(p, e, i) {
-    return p + (i == 0 ? &quot;?&quot; : &quot;&amp;&quot;) + e + &quot;=&quot; + encodeURIComponent(obj[e]);
+    Logger.log(&quot;%s, %s, %s&quot;, e, i, obj[e])
+    return p + (i == 0 ? &quot;?&quot; : &quot;&amp;&quot;) + (Array.isArray(obj[e]) ? obj[e].reduce(function(str, f, j){return str + e + &quot;=&quot; + encodeURIComponent(f) + (j != obj[e].length - 1 ? &quot;&amp;&quot; : &quot;&quot;)},&quot;&quot;) : e + &quot;=&quot; + encodeURIComponent(obj[e]));
   },&quot;&quot;);
 }
+
 
 function myFunction() {
   var url = &quot;https://sampleUrl&quot;;
   var query = {
-    query1: &quot;value1A+value1B&quot;,
-    query2: &quot;value2A,value2B&quot;,
+    query1: [&quot;value1A&quot;, &quot;value1B&quot;, &quot;value1C&quot;],
+    query2: &quot;value2A, value2B&quot;,
     query3: &quot;value3A/value3B&quot;,
   };
   var endpoint = url.addQuery(query);
@@ -290,7 +292,7 @@ function myFunction() {
 
 <h2 id="result">Result :</h2>
 
-<pre><code>https://sampleUrl?query1=value1A%2Bvalue1B&amp;query2=value2A%2Cvalue2B&amp;query3=value3A%2Fvalue3B
+<pre><code>https://sampleUrl?query1=value1A&amp;query1=value1B&amp;query1=value1C&amp;query2=value2A%2C%20value2B&amp;query3=value3A%2Fvalue3B
 </code></pre>
 
 
