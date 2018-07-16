@@ -266,7 +266,7 @@
 
 <p>This is a sample script for retrieving the last coordinate of the specific row and column. When the methods of <code>getLastRow()</code> and <code>getLastColumn()</code> of Class Range for Spreadsheet are used, the last coordinates of the vertical and horizontal data range can be retrieved. When users want to retrieve the last coordinates of each row and column, there are no methods. So I created this script. I think that there are several scripts for this situation. So please think of this as one of them. If this was useful for you, I&rsquo;m glad.</p>
 
-<p>As a sample situation, it supposes the following sheet and the container-bound script.</p>
+<p>As a sample situation, it supposes the following sheet and the container-bound script. If the formulas are included in the row and column you want to retrieve the last, this script can also check them.</p>
 
 <p><img src="https://tanaikech.github.io/img/20180716a-fig1.png" alt="" /></p>
 
@@ -274,18 +274,11 @@
 
 <pre><code class="language-javascript">function getLast(range) {
     var getResult = function(range) {
-        var values = range.getValues();
+        var v = Array.prototype.concat.apply([], range.getValues());
+        var f = Array.prototype.concat.apply([], range.getFormulas());
         var i;
-        if (range.getNumRows() &gt; 1 &amp;&amp; range.getNumColumns() == 1) {
-            for (i = values.length - 1; i &gt;= 0; i--) {
-                if (values[i][0] != &quot;&quot;) break;
-            }
-        } else if (range.getNumRows() == 1 &amp;&amp; range.getNumColumns() &gt; 1) {
-            for (i = values[0].length - 1; i &gt;= 0; i--) {
-                if (values[0][i] != &quot;&quot;) break;
-            }
-        } else {
-            throw new Error(&quot;Please input one row or one column.&quot;);
+        for (i = v.length - 1; i &gt;= 0; i--) {
+            if (v[i] != &quot;&quot; || f[i] != &quot;&quot;) break;
         }
         return i + 1;
     };
