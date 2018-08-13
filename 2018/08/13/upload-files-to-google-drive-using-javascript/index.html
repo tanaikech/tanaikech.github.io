@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>Topics &middot; tanaike</title>
+  <title>Upload Files to Google Drive using Javascript &middot; tanaike</title>
 
   
   
@@ -36,8 +36,6 @@
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
 
   
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike" href="https://tanaikech.github.io/topics/index.xml" />
   
 
   
@@ -113,10 +111,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://tanaikech.github.io/topics/index.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
-    </li>
     
 
     
@@ -224,158 +218,142 @@
 
 
 <div class="header">
-  <h1>Topics</h1>
+  <h1>Upload Files to Google Drive using Javascript</h1>
+  <h2></h2>
 </div>
 <div class="content">
-  <ul>
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>13 Aug 2018, 10:16</time>
+  </div>
+
+  
+
   
   
-    <li>
-      <a href="gastips">gastips</a>
-      <span>&#40;127&#41;</span>
-    </li>
   
-    <li>
-      <a href="clitool">clitool</a>
-      <span>&#40;28&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/javascripttips">JavascriptTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    
+  </div>
   
-    <li>
-      <a href="library">library</a>
-      <span>&#40;24&#41;</span>
-    </li>
   
-    <li>
-      <a href="gotips">gotips</a>
-      <span>&#40;17&#41;</span>
-    </li>
+
   
-    <li>
-      <a href="googleapitips">googleapitips</a>
-      <span>&#40;14&#41;</span>
-    </li>
   
-    <li>
-      <a href="report">report</a>
-      <span>&#40;14&#41;</span>
-    </li>
   
-    <li>
-      <a href="benchmark">benchmark</a>
-      <span>&#40;13&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/javascript">Javascript</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/drive-api">drive-api</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/upload">upload</a>
+    
+  </div>
   
-    <li>
-      <a href="etc">etc</a>
-      <span>&#40;7&#41;</span>
-    </li>
   
-    <li>
-      <a href="jstips">jstips</a>
-      <span>&#40;7&#41;</span>
-    </li>
+
+</div>
+
   
-    <li>
-      <a href="pythontips">pythontips</a>
-      <span>&#40;7&#41;</span>
-    </li>
+
+<p><a href="https://gist.github.com/tanaikech/bd53b366aedef70e35a35f449c51eced">Gists</a></p>
+
+<p>This is a sample script for uploading files to Google Drive using Javascript. The files are uploaded by <a href="https://developers.google.com/drive/api/v3/reference/">Drive API v3</a>. <code>gapi.client.drive.files.create()</code> can create an empty file on Google Drive. But it cannot directly upload files including contents. I think that this might not be able to upload files and metadata with the multipart/related, although this might be resolved by the future update. So now, as one of workarounds, I use using XMLHttpRequest.</p>
+
+<ul>
+<li>This sample uses <a href="https://developers.google.com/api-client-library/javascript/start/start-js">gapi</a>.
+
+<ul>
+<li>Before you use this, please enable Drive API at API console and carry out the installation of gapi.</li>
+</ul></li>
+<li>When this script is run, a text file including &ldquo;sample text&rdquo; is created to Google Drive.</li>
+<li>When you use this script, please set fileContent and metadata.</li>
+</ul>
+
+<p>In this sample script, a text file including contents is created under a folder.</p>
+
+<h2 id="sample-script">Sample script :</h2>
+
+<pre><code class="language-javascript">var fileContent = 'sample text'; // As a sample, upload a text file.
+var file = new Blob([fileContent], {type: 'text/plain'});
+var metadata = {
+    'name': 'sampleName', // Filename at Google Drive
+    'mimeType': 'text/plain', // mimeType at Google Drive
+    'parents': ['### folder ID ###'], // Folder ID at Google Drive
+};
+
+var accessToken = gapi.auth.getToken().access_token; // Here gapi is used for retrieving the access token.
+var form = new FormData();
+form.append('metadata', new Blob([JSON.stringify(metadata)], {type: 'application/json'}));
+form.append('file', file);
+
+var xhr = new XMLHttpRequest();
+xhr.open('post', 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&amp;fields=id');
+xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+xhr.responseType = 'json';
+xhr.onload = () =&gt; {
+    console.log(xhr.response.id); // Retrieve uploaded file ID.
+};
+xhr.send(form);
+</code></pre>
+
+<h2 id="request-body">Request body :</h2>
+
+<p>In this script, <code>form</code> is as follows. This is sent to Google Drive using the create method of Drive API.</p>
+
+<pre><code>------WebKitFormBoundaryxX0XmxgooMjdUECR
+Content-Disposition: form-data; name=&quot;metadata&quot;; filename=&quot;blob&quot;
+Content-Type: application/json
+
+{&quot;name&quot;:&quot;sampleName&quot;,&quot;mimeType&quot;:&quot;text/plain&quot;,&quot;parents&quot;:[&quot;#####&quot;]}
+------WebKitFormBoundaryxX0XmxgooMjdUECR
+Content-Disposition: form-data; name=&quot;file&quot;; filename=&quot;blob&quot;
+Content-Type: text/plain
+
+sample text
+------WebKitFormBoundaryxX0XmxgooMjdUECR--
+</code></pre>
+
+
   
-    <li>
-      <a href="add-on">add-on</a>
-      <span>&#40;6&#41;</span>
-    </li>
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2018/08/11/benchmark-decreasing-loop-for-array-processing-using-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2018/08/11/benchmark-decreasing-loop-for-array-processing-using-google-apps-script/">Benchmark: Decreasing Loop for Array Processing using Google Apps Script</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
+</div>
+
+
+
   
-    <li>
-      <a href="virtual-currency">virtual-currency</a>
-      <span>&#40;5&#41;</span>
-    </li>
-  
-    <li>
-      <a href="googlecharttips">googlecharttips</a>
-      <span>&#40;4&#41;</span>
-    </li>
-  
-    <li>
-      <a href="nodetips">nodetips</a>
-      <span>&#40;4&#41;</span>
-    </li>
-  
-    <li>
-      <a href="coffeescripttips">coffeescripttips</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="shtips">shtips</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="spreadsheet">spreadsheet</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="driveapitips">driveapitips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="javascripttips">javascripttips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="netatmo">netatmo</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="slacktips">slacktips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="sublime">sublime</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="sublimetips">sublimetips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="batch-file-tips">batch-file-tips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="issuetracker">issuetracker</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="netatmotips">netatmotips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="onedrivetips">onedrivetips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="plugin">plugin</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="stackoverflow">stackoverflow</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-  </ul>
+
 </div>
 
 </div>
@@ -411,3 +389,4 @@
 
 </body>
 </html>
+
