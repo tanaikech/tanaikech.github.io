@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>Upload Files to Google Drive using Javascript &middot; tanaike</title>
+  <title>Replacing Text to Image for Google Document using Google Apps Script &middot; tanaike</title>
 
   
   
@@ -218,7 +218,7 @@
 
 
 <div class="header">
-  <h1>Upload Files to Google Drive using Javascript</h1>
+  <h1>Replacing Text to Image for Google Document using Google Apps Script</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -227,7 +227,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>13 Aug 2018, 10:16</time>
+    <time>20 Aug 2018, 09:55</time>
   </div>
 
   
@@ -237,8 +237,6 @@
   
   <div>
     <i class="fa fa-folder fa-fw"></i>
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/javascripttips">JavascriptTips</a>&nbsp;&#47;
     
       <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
     
@@ -252,11 +250,11 @@
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/javascript">Javascript</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/drive-api">drive-api</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/document">Document</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/upload">upload</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/image">image</a>
     
   </div>
   
@@ -266,76 +264,81 @@
 
   
 
-<p><a href="https://gist.github.com/tanaikech/bd53b366aedef70e35a35f449c51eced">Gists</a></p>
+<p>[Gists]()</p>
 
-<p>This is a sample script for uploading files to Google Drive using Javascript. The files are uploaded by <a href="https://developers.google.com/drive/api/v3/reference/">Drive API v3</a>. <code>gapi.client.drive.files.create()</code> can create an empty file on Google Drive. But it cannot directly upload files including contents. I think that this might not be able to upload files and metadata with the multipart/related, although this might be resolved by the future update. So now, as one of workarounds, I use using XMLHttpRequest.</p>
+<p>This is a sample script for replacing text to image for Google Document using Google Apps Script (GAS). There is <a href="https://developers.google.com/apps-script/reference/document/text#replaceText(String,String)">a method for replacing text to text</a> at Class Text of DocumentApp. But there are not methods for replacing text to image. So I created this sample script.</p>
+
+<h2 id="demo">Demo :</h2>
+
+<p><img src="https://tanaikech.github.io/img/20180820a_demo.gif" alt="" /></p>
+
+<p>This sample image was created by <a href="https://www.deviantart.com/k3-studio/art/Colorful-triangles-288890875">k3-studio</a>.</p>
+
+<h2 id="usage">Usage :</h2>
+
+<pre><code class="language-javascript">replaceTextToImage(body, replaceText, image, width);
+</code></pre>
 
 <ul>
-<li>This sample uses <a href="https://developers.google.com/api-client-library/javascript/start/start-js">gapi</a>.
-
-<ul>
-<li>Before you use this, please enable Drive API at API console and carry out the installation of gapi.</li>
-</ul></li>
-<li>When this script is run, a text file including &ldquo;sample text&rdquo; is created to Google Drive.</li>
-<li>When you use this script, please set fileContent and metadata.</li>
+<li><code>body</code> : body of document. You can set by <code>DocumentApp.getActiveDocument().getBody()</code> and <code>DocumentApp.openById(documentId).getBody()</code>.</li>
+<li><code>replaceText</code> : string you want to replace.</li>
+<li><code>image</code> : blob of image you want to replace.</li>
+<li><code>width</code> : Width of replaced image. The aspect ratio is constant. The unit is pixels. If you don&rsquo;t use this, the original size is used.</li>
 </ul>
 
-<p>In this sample script, a text file including contents is created under a folder.</p>
+<h2 id="script">Script :</h2>
 
-<h2 id="sample-script">Sample script :</h2>
+<p>In this sample script, all strings of &ldquo;sample&rdquo; in the document are replaced to image with the file ID of <code>imageFileId</code>.</p>
 
-<pre><code class="language-javascript">var fileContent = 'sample text'; // As a sample, upload a text file.
-var file = new Blob([fileContent], {type: 'text/plain'});
-var metadata = {
-    'name': 'sampleName', // Filename at Google Drive
-    'mimeType': 'text/plain', // mimeType at Google Drive
-    'parents': ['### folder ID ###'], // Folder ID at Google Drive
-};
+<pre><code class="language-javascript">function myFunction() {
+  var replaceTextToImage = function(body, searchText, image, width) {
+    var next = body.findText(searchText);
+    if (!next) return;
+    var r = next.getElement();
+    r.asText().setText(&quot;&quot;);
+    var img = r.getParent().asParagraph().insertInlineImage(0, image);
+    if (width &amp;&amp; typeof width == &quot;number&quot;) {
+      var w = img.getWidth();
+      var h = img.getHeight();
+      img.setWidth(width);
+      img.setHeight(width * h / w);
+    }
+    return next;
+  };
 
-var accessToken = gapi.auth.getToken().access_token; // Here gapi is used for retrieving the access token.
-var form = new FormData();
-form.append('metadata', new Blob([JSON.stringify(metadata)], {type: 'application/json'}));
-form.append('file', file);
-
-var xhr = new XMLHttpRequest();
-xhr.open('post', 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&amp;fields=id');
-xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
-xhr.responseType = 'json';
-xhr.onload = () =&gt; {
-    console.log(xhr.response.id); // Retrieve uploaded file ID.
-};
-xhr.send(form);
+  var documentId = &quot;### Document ID ###&quot;;
+  var replaceText = &quot;sample&quot;;
+  var imageFileId = &quot;### File ID of image ###&quot;;
+  var body = DocumentApp.openById(documentId).getBody();
+  var image = DriveApp.getFileById(imageFileId).getBlob();
+  do {
+    var next = replaceTextToImage(body, replaceText, image, 200);
+  } while (next);
+}
 </code></pre>
 
-<h2 id="request-body">Request body :</h2>
+<h2 id="references">References :</h2>
 
-<p>In this script, <code>form</code> is as follows. This is sent to Google Drive using the create method of Drive API.</p>
-
-<pre><code>------WebKitFormBoundaryxX0XmxgooMjdUECR
-Content-Disposition: form-data; name=&quot;metadata&quot;; filename=&quot;blob&quot;
-Content-Type: application/json
-
-{&quot;name&quot;:&quot;sampleName&quot;,&quot;mimeType&quot;:&quot;text/plain&quot;,&quot;parents&quot;:[&quot;#####&quot;]}
-------WebKitFormBoundaryxX0XmxgooMjdUECR
-Content-Disposition: form-data; name=&quot;file&quot;; filename=&quot;blob&quot;
-Content-Type: text/plain
-
-sample text
-------WebKitFormBoundaryxX0XmxgooMjdUECR--
-</code></pre>
+<ul>
+<li><a href="https://developers.google.com/apps-script/reference/document/text#replaceText(String,String)">replaceText()</a></li>
+<li><a href="https://developers.google.com/apps-script/reference/document/text#findtextsearchpattern">findText()</a></li>
+<li><a href="https://developers.google.com/apps-script/reference/document/text#settexttext">setText()</a></li>
+<li><a href="https://developers.google.com/apps-script/reference/document/paragraph#insertinlineimagechildindex-image">insertInlineImage()</a></li>
+<li>I have proposed this sample script at <a href="https://stackoverflow.com/questions/51912364/embed-image-uploaded-by-form-to-google-doc-using-gas/51913863#51913863">this thread</a>.</li>
+</ul>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2018/08/11/benchmark-decreasing-loop-for-array-processing-using-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2018/08/13/upload-files-to-google-drive-using-javascript/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2018/08/11/benchmark-decreasing-loop-for-array-processing-using-google-apps-script/">Benchmark: Decreasing Loop for Array Processing using Google Apps Script</a>
+      <a href="https://tanaikech.github.io/2018/08/13/upload-files-to-google-drive-using-javascript/">Upload Files to Google Drive using Javascript</a>
     </nav>
     
   </div>
@@ -344,14 +347,8 @@ sample text
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2018/08/20/replacing-text-to-image-for-google-document-using-google-apps-script/">Replacing Text to Image for Google Document using Google Apps Script</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2018/08/20/replacing-text-to-image-for-google-document-using-google-apps-script/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
