@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>tanaike</title>
+  <title>GAS Library - DownloadLargeFilesByUrl &middot; tanaike</title>
 
   
   
@@ -36,8 +36,6 @@
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
 
   
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike" href="https://tanaikech.github.io/index.xml" />
   
 
   
@@ -113,10 +111,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://tanaikech.github.io/index.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
-    </li>
     
 
     
@@ -224,21 +218,16 @@
 
 
 <div class="header">
-  <h1>tanaike</h1>
-  <h2>The Thinker</h2>
+  <h1>GAS Library - DownloadLargeFilesByUrl</h1>
+  <h2></h2>
 </div>
-
 <div class="content">
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2017/05/21/decoding-json-by-golang/">Decoding JSON by Golang</a></h2>
 
-    <div class="post-meta">
+  <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>21 May 2017, 11:55</time>
+    <time>02 Sep 2018, 10:54</time>
   </div>
 
   
@@ -249,7 +238,9 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gotips">GoTips</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>
     
   </div>
   
@@ -261,7 +252,13 @@
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/largefiles">LargeFiles</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/download">Download</a>
     
   </div>
   
@@ -269,242 +266,78 @@
 
 </div>
 
-  </header>
+  
 
-  <p>
-  Decoding JSON by Golang
-func main() { data := `{ &quot;A_key1&quot;: { &quot;B_key1&quot;: { &quot;C_key&quot;: &quot;value&quot; } }, &quot;A_key2&quot;: { &quot;B_key2&quot;: { &quot;C_key&quot;: &quot;value&quot; } }, &quot;A_key3&quot;: { &quot;B_key3&quot;: { &quot;C_key&quot;: &quot;value&quot; } }, &quot;A_key4&quot;: { &quot;B_key4&quot;: { &quot;C_key&quot;: &quot;value&quot; } }, &quot;A_key5&quot;: { &quot;B_key5&quot;: { &quot;C_key&quot;: &quot;value&quot; } } }` var p interface{} json.NewDecoder(strings.NewReader(data)).Decode(&amp;p) fmt.Println(p) }  Go Playground
-  </p>
+<h1 id="overview">Overview</h1>
+
+<p>DownloadLargeFilesByUrl is a GAS library for downloading large files from URL to Google Drive using Google Apps Script (GAS).</p>
+
+<h1 id="description">Description</h1>
+
+<p>I had been thinking of about whether a large file from an URL can be downloaded to Google Drive using GAS. When I have tried to download such large files, I noticed the following limitations. These limitations are due to the specification of GAS.</p>
+
+<ul>
+<li>When users download a file from URL using GAS, at the most users, it retrieves the blob using <code>UrlFetchApp.fetch(url).getBlob()</code> and saves it as a file using <code>DriveApp.createFile(blob)</code>. In this case, only files less than 50 MB (52,428,800 bytes) can be created, because of the size limitation of Blob.</li>
+<li>There are a limit executing time for Google Apps Script (GAS). That is 6 min/execution.</li>
+<li>There are a limit of total executing time for running scripts by triggers. That is 90 min/day. (Recently, it became from 60 min/day to 90 min/day.)</li>
+</ul>
+
+<p>When it tries to create the application for downloading the large files, it is required to consider above limitations. On the other hand, there are the following relaxations of quotas by the recent Google&rsquo;s update.</p>
+
+<ul>
+<li>Quotes of URL Fetch response size and URL Fetch POST size became from  100 MB/day to 50 MB/call.
+
+<ul>
+<li>By this, I have been able to create a sample script for splitting large files in Google Drive.</li>
+</ul></li>
+<li>fetchAll method was added to the class UrlFetchApp.
+
+<ul>
+<li>It has been found that fetchAll method is worked by the asynchronous processing.</li>
+</ul></li>
+</ul>
+
+<p>From these limitations and relaxed quotas, I could notice a direction for achieving it. I came up with the following flow.</p>
+
+<ol>
+<li>When a large file is download from URL, the file is downloaded by splitting using the range to the header.</li>
+<li>Use fetchAll method to download the file. Downloading is run by the asynchronous processing.</li>
+<li>Use resumable upload to join the split data to the original file. Joining is run by the synchronous processing. Because the resumable upload has to be done by the synchronous processing.</li>
+</ol>
+
+<p>I could create this library using the flow like this. If this was useful for you, I&rsquo;m glad.</p>
+
+<p><font color="#3366CC"><strong>You can check this at <a href="https://github.com/tanaikech/DownloadLargeFilesByUrl">https://github.com/tanaikech/DownloadLargeFilesByUrl</a>.</strong></font></p>
+
 
   
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2017/05/21/dynamically-creating-json-by-golang/">Dynamically Creating JSON by Golang</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>21 May 2017, 10:55</time>
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2018/08/23/enhanced-makecopy-using-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
+    
   </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
+  <div class="pure-u-10-24">
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gotips">GoTips</a>
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2018/08/23/enhanced-makecopy-using-google-apps-script/">Enhanced makeCopy() using Google Apps Script</a>
+    </nav>
     
   </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
     
   </div>
-  
-  
-
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
 </div>
 
-  </header>
-
-  <p>
-  Dynamically Creating JSON by Golang
-obj := map[string]interface{}{} obj[&quot;hoge&quot;] = &quot;huga&quot; fmt.Println(obj)  Go Playground
-  </p>
-
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2017/05/21/retrieving-response-headers-by-golang/">Retrieving Response Headers by Golang</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>21 May 2017, 10:43</time>
-  </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gotips">GoTips</a>
-    
-  </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>
-    
-  </div>
-  
-  
-
-</div>
-
-  </header>
-
-  <p>
-  Retrieving Response Headers by Golang
-res, _ := client.Do(req) contentType := res.Header.Get(&quot;Content-Type&quot;) contentLength := res.Header.Get(&quot;Content-Length&quot;)  
-  </p>
-
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2017/05/19/updated-ggsrun-to-v120/">Updated ggsrun to v120</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>19 May 2017, 08:49</time>
-  </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/clitool">CLITool</a>
-    
-  </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/ggsrun">ggsrun</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/cli">CLI</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>
-    
-  </div>
-  
-  
-
-</div>
-
-  </header>
-
-  <p>
-  ggsrun was updated to v.1.2.0  Added a command for retrieving revision files on Google Drive. Some modifications.  You can check this at here.
-  </p>
-
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2017/05/16/updated-cli-tool---goris/">Updated: CLI Tool - goris</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>16 May 2017, 12:56</time>
-  </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/clitool">CLITool</a>
-    
-  </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google">Google</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/cli">CLI</a>
-    
-  </div>
-  
-  
-
-</div>
-
-  </header>
-
-  <p>
-  goris is a CLI tool to search for images with Google Reverse Image Search.
-Today, it was updated to v1.0.1. Please check it out. https://github.com/tanaikech/goris
-When number of retrieved URLs is smaller than number of default output, an error had occurred. This was fixed.
-  </p>
-
-  
-</article>
-
-  
-
-  
 
 
-<nav class="pagination" role="pagination">
   
-  <a href="https://tanaikech.github.io/page/33/"><i class="fa fa-chevron-left"></i></a>
-  
-  <span>&nbsp;34 / 44&nbsp;</span>
-  
-  <a href="https://tanaikech.github.io/page/35/"><i class="fa fa-chevron-right"></i></a>
-  
-</nav>
-
-
 
 </div>
 
