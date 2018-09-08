@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.24.1" />
 
-  <title>Updated goodls to v103 &middot; tanaike</title>
+  <title>Expanding A1Notations using Google Apps Script &middot; tanaike</title>
 
   
   
@@ -218,7 +218,7 @@
 
 
 <div class="header">
-  <h1>Updated goodls to v103</h1>
+  <h1>Expanding A1Notations using Google Apps Script</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -227,7 +227,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>04 Sep 2018, 11:30</time>
+    <time>08 Sep 2018, 10:57</time>
   </div>
 
   
@@ -238,7 +238,7 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/clitool">CLITool</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
     
   </div>
   
@@ -250,13 +250,11 @@
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/goodls">goodls</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/cli">CLI</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">Spreadsheet</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/googledrive">GoogleDrive</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/range">Range</a>
     
   </div>
   
@@ -266,35 +264,75 @@
 
   
 
-<h1 id="goodls-was-updated-to-v-1-0-3">goodls was updated to v.1.0.3</h1>
+<p><a href="https://gist.github.com/tanaikech/c59b90324c90935b13f9e7b26cbf436a">Gists</a></p>
 
-<ul>
-<li><p>v1.0.3 (September 4, 2018)</p>
+<p>This is a sample script for expanding a1Notations using Google Apps Script (GAS). In this script, for example, &ldquo;A1:E3&rdquo; is expanded to &ldquo;A1, B1, C1, D1, E1, A2, B2, C2, D2, E2, A3, B3, C3, D3, E3&rdquo;. When each cell in &ldquo;A1:E3&rdquo; is checked, this script might be able to be used. If this was useful for your situation, I&rsquo;m glad.</p>
 
-<ol>
-<li>When the files are downloaded, the progress of downloading got to be able to be displayed.
+<h2 id="script">Script:</h2>
 
-<ul>
-<li>This scene can be seen at <a href="https://github.com/tanaikech/goodls#demo2">this demonstration video</a>.</li>
-<li>If the new option of <code>--np</code> is used, the progress is not displayed.</li>
-</ul></li>
-</ol></li>
-</ul>
+<pre><code class="language-javascript">// This method is from https://stackoverflow.com/a/21231012/7108653
+function columnToLetter(column) {
+  var temp, letter = '';
+  while (column &gt; 0) {
+    temp = (column - 1) % 26;
+    letter = String.fromCharCode(temp + 65) + letter;
+    column = (column - temp - 1) / 26;
+  }
+  return letter;
+}
 
-<p><font color="#3366CC"><strong>The detail information and how to get this are <a href="https://github.com/tanaikech/goodls">https://github.com/tanaikech/goodls</a>.</strong></font></p>
+function expandA1Notation(sheet, a1Notations) {
+  return a1Notations.map(function(e) {
+    var temp = [];
+    var range = sheet.getRange(e);
+    var r = {
+      startRowIndex: range.getRow(),
+      endRowIndex: range.getRow() + range.getNumRows(),
+      startColumnIndex: range.getColumn(),
+      endColumnIndex: range.getColumn() + range.getNumColumns(),
+    };
+    for (var i = r.startRowIndex; i &lt; r.endRowIndex; i++) {
+      for (var j = r.startColumnIndex; j &lt; r.endColumnIndex; j++) {
+        temp.push(columnToLetter(j) + i);
+      }
+    }
+    return temp;
+  });
+}
+
+// When you use this script, please run main().
+function main() {
+  var sheet = SpreadsheetApp.getActiveSheet();
+  var a1Notations = [&quot;A1:E3&quot;, &quot;B10:W13&quot;, &quot;EZ5:FA8&quot;, &quot;AAA1:AAB3&quot;];
+  var res = expandA1Notation(sheet, a1Notations);
+  Logger.log(res);
+}
+</code></pre>
+
+<h2 id="result">Result:</h2>
+
+<pre><code>[
+  [&quot;A1&quot;,&quot;B1&quot;,&quot;C1&quot;,&quot;D1&quot;,&quot;E1&quot;,&quot;A2&quot;,&quot;B2&quot;,&quot;C2&quot;,&quot;D2&quot;,&quot;E2&quot;,&quot;A3&quot;,&quot;B3&quot;,&quot;C3&quot;,&quot;D3&quot;,&quot;E3&quot;],
+  [&quot;B10&quot;,&quot;C10&quot;,&quot;D10&quot;,&quot;E10&quot;,&quot;F10&quot;,&quot;G10&quot;,&quot;H10&quot;,&quot;I10&quot;,&quot;J10&quot;,&quot;K10&quot;,&quot;L10&quot;,&quot;M10&quot;,&quot;N10&quot;,&quot;O10&quot;,&quot;P10&quot;,&quot;Q10&quot;,&quot;R10&quot;,&quot;S10&quot;,&quot;T10&quot;,&quot;U10&quot;,&quot;V10&quot;,&quot;W10&quot;,&quot;B11&quot;,&quot;C11&quot;,&quot;D11&quot;,&quot;E11&quot;,&quot;F11&quot;,&quot;G11&quot;,&quot;H11&quot;,&quot;I11&quot;,&quot;J11&quot;,&quot;K11&quot;,&quot;L11&quot;,&quot;M11&quot;,&quot;N11&quot;,&quot;O11&quot;,&quot;P11&quot;,&quot;Q11&quot;,&quot;R11&quot;,&quot;S11&quot;,&quot;T11&quot;,&quot;U11&quot;,&quot;V11&quot;,&quot;W11&quot;,&quot;B12&quot;,&quot;C12&quot;,&quot;D12&quot;,&quot;E12&quot;,&quot;F12&quot;,&quot;G12&quot;,&quot;H12&quot;,&quot;I12&quot;,&quot;J12&quot;,&quot;K12&quot;,&quot;L12&quot;,&quot;M12&quot;,&quot;N12&quot;,&quot;O12&quot;,&quot;P12&quot;,&quot;Q12&quot;,&quot;R12&quot;,&quot;S12&quot;,&quot;T12&quot;,&quot;U12&quot;,&quot;V12&quot;,&quot;W12&quot;,&quot;B13&quot;,&quot;C13&quot;,&quot;D13&quot;,&quot;E13&quot;,&quot;F13&quot;,&quot;G13&quot;,&quot;H13&quot;,&quot;I13&quot;,&quot;J13&quot;,&quot;K13&quot;,&quot;L13&quot;,&quot;M13&quot;,&quot;N13&quot;,&quot;O13&quot;,&quot;P13&quot;,&quot;Q13&quot;,&quot;R13&quot;,&quot;S13&quot;,&quot;T13&quot;,&quot;U13&quot;,&quot;V13&quot;,&quot;W13&quot;],
+  [&quot;EZ5&quot;,&quot;FA5&quot;,&quot;EZ6&quot;,&quot;FA6&quot;,&quot;EZ7&quot;,&quot;FA7&quot;,&quot;EZ8&quot;,&quot;FA8&quot;],
+  [&quot;AAA1&quot;,&quot;AAB1&quot;,&quot;AAA2&quot;,&quot;AAB2&quot;,&quot;AAA3&quot;,&quot;AAB3&quot;]
+]
+</code></pre>
+
+<p>This script uses a method (<a href="https://stackoverflow.com/a/21231012/7108653">https://stackoverflow.com/a/21231012/7108653</a>) for converting index to letter.</p>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2018/09/03/updated-gas-library---filesapp/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2018/09/04/updated-goodls-to-v103/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2018/09/03/updated-gas-library---filesapp/">Updated: GAS Library - FilesApp</a>
+      <a href="https://tanaikech.github.io/2018/09/04/updated-goodls-to-v103/">Updated goodls to v103</a>
     </nav>
     
   </div>
@@ -303,14 +341,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2018/09/08/expanding-a1notations-using-google-apps-script/">Expanding A1Notations using Google Apps Script</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2018/09/08/expanding-a1notations-using-google-apps-script/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
