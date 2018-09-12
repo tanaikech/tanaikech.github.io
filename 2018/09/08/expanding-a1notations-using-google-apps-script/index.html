@@ -270,41 +270,51 @@
 
 <h2 id="script">Script:</h2>
 
-<pre><code class="language-javascript">// This method is from https://stackoverflow.com/a/21231012/7108653
-function columnToLetter(column) {
-  var temp, letter = '';
-  while (column &gt; 0) {
-    temp = (column - 1) % 26;
-    letter = String.fromCharCode(temp + 65) + letter;
-    column = (column - temp - 1) / 26;
-  }
-  return letter;
-}
+<pre><code class="language-javascript">function expandA1Notation(a1Notations) {
+  var columnToLetter = function(column) {
+    var temp, letter = '';
+    while (column &gt; 0) {
+      temp = (column - 1) % 26;
+      letter = String.fromCharCode(temp + 65) + letter;
+      column = (column - temp - 1) / 26;
+    }
+    return letter;
+  };
 
-function expandA1Notation(sheet, a1Notations) {
-  return a1Notations.map(function(e) {
-    var temp = [];
-    var range = sheet.getRange(e);
-    var r = {
-      startRowIndex: range.getRow(),
-      endRowIndex: range.getRow() + range.getNumRows(),
-      startColumnIndex: range.getColumn(),
-      endColumnIndex: range.getColumn() + range.getNumColumns(),
+  var letterToColumn = function(letter) {
+    var column = 0, length = letter.length;
+    for (var i = 0; i &lt; length; i++) {
+      column += (letter.charCodeAt(i) - 64) * Math.pow(26, length - i - 1);
+    }
+    return column;
+  };
+
+  var reg = new RegExp(&quot;([A-Z]+)([0-9]+)&quot;);
+  var res = a1Notations.map(function(e) {
+    var a1 = e.split(&quot;!&quot;);
+    var r = a1.length &gt; 1 ? a1[1] : a1[0];
+    var rr = r.split(&quot;:&quot;).map(function(f) {return f.toUpperCase().match(reg)});
+    var obj = {
+      startRowIndex: Number(rr[0][2]),
+      endRowIndex: rr.length == 1 ? Number(rr[0][2]) + 1 : Number(rr[1][2]) + 1,
+      startColumnIndex: letterToColumn(rr[0][1]),
+      endColumnIndex: rr.length == 1 ? letterToColumn(rr[0][1]) + 1 : letterToColumn(rr[1][1]) + 1,
     };
-    for (var i = r.startRowIndex; i &lt; r.endRowIndex; i++) {
-      for (var j = r.startColumnIndex; j &lt; r.endColumnIndex; j++) {
+    var temp = [];
+    for (var i = obj.startRowIndex; i &lt; obj.endRowIndex; i++) {
+      for (var j = obj.startColumnIndex; j &lt; obj.endColumnIndex; j++) {
         temp.push(columnToLetter(j) + i);
       }
     }
     return temp;
   });
+  return res;
 }
 
 // When you use this script, please run main().
 function main() {
-  var sheet = SpreadsheetApp.getActiveSheet();
   var a1Notations = [&quot;A1:E3&quot;, &quot;B10:W13&quot;, &quot;EZ5:FA8&quot;, &quot;AAA1:AAB3&quot;];
-  var res = expandA1Notation(sheet, a1Notations);
+  var res = expandA1Notation(a1Notations);
   Logger.log(res);
 }
 </code></pre>
@@ -319,7 +329,7 @@ function main() {
 ]
 </code></pre>
 
-<p>This script uses a method (<a href="https://stackoverflow.com/a/21231012/7108653">https://stackoverflow.com/a/21231012/7108653</a>) for converting index to letter.</p>
+<p>This script uses 2 methods (<a href="https://stackoverflow.com/a/21231012/7108653">https://stackoverflow.com/a/21231012/7108653</a>) for converting from index to letter and from letter to index.</p>
 
 
   
