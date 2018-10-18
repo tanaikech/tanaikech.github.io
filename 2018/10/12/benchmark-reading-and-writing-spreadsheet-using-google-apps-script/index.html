@@ -280,6 +280,10 @@
 October 12, 2018
     Published.</p>
 
+<p>October 18, 2018
+    Updated.
+        In order to compare with Advanced Google Service, a result of Sheets API by UrlFetchApp was added to <a href="#Appendix">Appendix</a>.</p>
+
 <p>Kanshi Tanaike
 </center></p>
 
@@ -418,7 +422,41 @@ October 12, 2018
 <li><a href="https://developers.google.com/sheets/api/reference/rest/">Google Sheets API</a></li>
 </ol>
 
+<p><a name="Appendix"></a></p>
+
 <h1 id="appendix">Appendix</h1>
+
+<h2 id="comparing-advanced-google-service-and-urlfetchapp">Comparing Advanced Google Service and UrlFetchApp</h2>
+
+<p>When Sheets API is used, there are 2 patterns.</p>
+
+<ol>
+<li>Use <a href="https://developers.google.com/apps-script/guides/services/advanced">Advanced Google Service</a>
+
+<ul>
+<li>All methods are prepared by a library.</li>
+</ul></li>
+<li>Use <a href="https://developers.google.com/apps-script/reference/url-fetch/url-fetch-app">UrlFetchApp</a>
+
+<ul>
+<li>In this case, all methods are required to directly call each endpoint with GET, POST and PUT methods.</li>
+</ul></li>
+</ol>
+
+<p>Here, as an appendix, when Sheets API was used by Advanced Google Service and UrlFetchApp, the process costs were compared. As a sample, the results of UrlFetchApp were put to Figs. 1(a), 1(h) and Figs. 2(b), 2(h). The conditions except for using UrlFetchApp are the same with Figs. 1(a), 1(h) and Figs. 2(b), 2(h).</p>
+
+<p><img src="https://tanaikech.github.io/img/20181018a-A_fig1.png" alt="" /></p>
+
+<p>A-Fig. 1. Results of UrlFetchApp were put to Figs. 1(a), 1(h) and Figs. 2(b), 2(h). About the detail explanation of these figures, please check those of Figs. 1 and 2.</p>
+
+<p><br></p>
+
+<p>From A-Fig. 1(a) - 1(d), it was found that when Sheets API is used, the process costs of Advanced Google Service and UrlFetchApp are a little difference.</p>
+
+<ul>
+<li>For reading, the cost of case using UrlFetchApp can be reduced from that of Advanced Google Service by about 6 % in the average.</li>
+<li>For writing, the cost of case using UrlFetchApp can be reduced from that of Advanced Google Service by about 4 % in the average.</li>
+</ul>
 
 <p><a name="SampleScripts"></a></p>
 
@@ -439,6 +477,25 @@ Sheets.Spreadsheets.Values.get(spreadsheetId, range).values;
 
 // Values.batchGet()
 Sheets.Spreadsheets.Values.batchGet(spreadsheetId, {ranges: range}).valueRanges[0].values;
+</code></pre>
+
+<h4 id="using-urlfetchapp">Using UrlFetchApp</h4>
+
+<pre><code class="language-javascript">// Values.get()
+var url = &quot;https://sheets.googleapis.com/v4/spreadsheets/&quot; + spreadsheetId + &quot;/values/&quot; + range + &quot;?fields=values&quot;;
+var params = {
+  method: &quot;get&quot;,
+  headers: {Authorization: &quot;Bearer &quot; + token},
+};
+UrlFetchApp.fetch(url, params);
+
+// Values.batchGet()
+var url = &quot;https://sheets.googleapis.com/v4/spreadsheets/&quot; + spreadsheetId + &quot;/values:batchGet?ranges=&quot; + range + &quot;&amp;fields=valueRanges%2Fvalues&quot;;
+var params = {
+  method: &quot;get&quot;,
+  headers: {Authorization: &quot;Bearer &quot; + token},
+};
+UrlFetchApp.fetch(url, params);
 </code></pre>
 
 <h3 id="for-writing-values">For writing values</h3>
@@ -468,6 +525,39 @@ Sheets.Spreadsheets.Values.batchUpdate({valueInputOption: &quot;USER_ENTERED&quo
 
 // Values.append()
 Sheets.Spreadsheets.Values.append({values: val}, spreadsheetId, range, {valueInputOption: &quot;USER_ENTERED&quot;});
+</code></pre>
+
+<h4 id="using-urlfetchapp-1">Using UrlFetchApp</h4>
+
+<pre><code class="language-javascript">// Values.update()
+var url = &quot;https://sheets.googleapis.com/v4/spreadsheets/&quot; + spreadsheetId + &quot;/values/&quot; + range + &quot;?valueInputOption=USER_ENTERED&quot;;
+var params = {
+  method: &quot;put&quot;,
+  headers: {Authorization: &quot;Bearer &quot; + token},
+  contentType: &quot;application/json&quot;,
+  payload: values,
+};
+UrlFetchApp.fetch(url, params);
+
+// Values.batchUpdate()
+var url = &quot;https://sheets.googleapis.com/v4/spreadsheets/&quot; + spreadsheetId + &quot;/values:batchUpdate&quot;;
+var params = {
+  method: &quot;post&quot;,
+  headers: {Authorization: &quot;Bearer &quot; + token},
+  contentType: &quot;application/json&quot;,
+  payload: values,
+};
+UrlFetchApp.fetch(url, params);
+
+// Values.append()
+var url = &quot;https://sheets.googleapis.com/v4/spreadsheets/&quot; + spreadsheetId + &quot;/values/&quot; + range + &quot;:append?valueInputOption=USER_ENTERED&quot;;
+var params = {
+  method: &quot;post&quot;,
+  headers: {Authorization: &quot;Bearer &quot; + token},
+  contentType: &quot;application/json&quot;,
+  payload: values,
+};
+UrlFetchApp.fetch(url, params);
 </code></pre>
 
 <h3 id="note">Note:</h3>
