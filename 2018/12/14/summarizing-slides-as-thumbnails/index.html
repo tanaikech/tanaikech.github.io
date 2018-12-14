@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.49.2" />
 
-  <title>Updated goodls to v122 &middot; tanaike</title>
+  <title>Summarizing Slides as Thumbnails &middot; tanaike</title>
 
   
   
@@ -222,7 +222,7 @@
 
 
 <div class="header">
-  <h1>Updated goodls to v122</h1>
+  <h1>Summarizing Slides as Thumbnails</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -231,7 +231,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>12 Dec 2018, 14:56</time>
+    <time>14 Dec 2018, 16:26</time>
   </div>
 
   
@@ -242,7 +242,7 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/clitool">CLITool</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
     
   </div>
   
@@ -254,13 +254,9 @@
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/goodls">goodls</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/cli">CLI</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/googledrive">GoogleDrive</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/slides">Slides</a>
     
   </div>
   
@@ -268,32 +264,126 @@
 
 </div>
 
-  <ul>
-<li><p>v1.2.2 (December 12, 2018)</p>
+  
+
+<p>[Gists]()</p>
+
+<p>This is a sample script for summarizing Slides as thumbnails. For example, it supposes a Slides including 15 pages. When this script is run, it summarizes 6 pages to one page as images. I created this because there are no methods for directly achieving this. This is useful for myself. If this is also useful for you, I&rsquo;m glad.</p>
+
+<p>The flow of this workaround is as follows.</p>
+
+<h3 id="flow">Flow:</h3>
 
 <ol>
-<li>When files are downloaded from a specific folder, it got to be able to select mimeType. By this, files with the specific mimeType in the specific folder can be retrieved. For this, I updated the go library <a href="https://github.com/tanaikech/go-getfilelist">go-getfilelist</a>.
+<li>Copy the original Slides file as a temporary file.</li>
+<li>Retrieve images of all slides.
 
 <ul>
-<li><code>$ goodls -u [URL] -key [APIkey] -m &quot;application/pdf,image/png&quot;</code></li>
+<li>When the Slides file is exported to PNG file, the top page is exported as PNG file. I used this.</li>
 </ul></li>
-</ol></li>
-</ul>
+<li>Put and arrange the retrieved images to the temporary file.
 
-<p><font color="#3366CC"><strong>The detail information and how to get this are <a href="https://github.com/tanaikech/goodls">https://github.com/tanaikech/goodls</a>.</strong></font></p>
+<ul>
+<li>When the image is inserted to a slide, retrieve the size and change the size, then put the image to the calculated position.</li>
+</ul></li>
+</ol>
+
+<h3 id="sample-script">Sample script:</h3>
+
+<pre><code class="language-javascript">function myFunction() {
+  // Please set these parameters
+  var id = &quot;### file ID ###&quot;; // file ID of original Slides
+  var col = 3; // Number of columns
+  var row = 2; // Number of rows
+  var wsize = 200; // Size of width of each image (pixels)
+  var sep = 5; // Space of each image (pexels)
+
+
+  // Create temporary file
+  var originalFile = DriveApp.getFileById(id);
+  var tempFile = originalFile.makeCopy();
+  var idt = tempFile.getId();
+  
+  // Retrieve slides as images
+  var s = SlidesApp.openById(idt);
+  var slides = s.getSlides();
+  var accessToken = ScriptApp.getOAuthToken();
+  var baseUrl = &quot;https://docs.google.com/presentation/d/&quot; + idt + &quot;/export/&quot;;
+  var url = baseUrl + &quot;png?access_token=&quot; + accessToken;
+  var blobs = slides.map(function(e) {
+    var blob = UrlFetchApp.fetch(url).getBlob();
+    slides[0].remove();
+    s.saveAndClose();
+    s = SlidesApp.openById(idt);
+    slides = s.getSlides();
+    return blob;
+  });
+
+  // Put images 
+  var ph = s.getPageHeight();
+  var pw = s.getPageWidth();
+  var leftOffset = (pw - ((wsize * col) + (sep * (col - 1)))) / 2;
+  if (leftOffset &lt; 0) throw new Error(&quot;Images are sticking out from a slide.&quot;);
+  var len = col * row;
+  var loops = Math.ceil(blobs.length / (col * row));
+  for (var loop = 0; loop &lt; loops; loop++) {
+    var ns = s.insertSlide(loop);
+    var topOffset, top;
+    var left = leftOffset;
+    for (var i = len * loop; i &lt; len + (len * loop); i++) {
+      if (i === blobs.length) break;
+      var image = ns.insertImage(blobs[i]);
+      var w = image.getWidth();
+      var h = image.getHeight();
+      var hsize = h * wsize / w;
+      if (i === 0 || i % len === 0) {
+        topOffset = (ph - ((hsize * row) + sep)) / 2;
+        if (topOffset &lt; 0) throw new Error(&quot;Images are sticking out from a slide.&quot;);
+        top = topOffset;
+      }
+      image.setWidth(wsize).setHeight(hsize).setTop(top).setLeft(left).getObjectId();
+      if (i === col - 1 + (loop * len)) {
+        top = topOffset + hsize + sep;
+        left = leftOffset;
+      } else {
+        left += wsize + sep;
+      }
+    }
+  }
+  s.saveAndClose();
+}
+</code></pre>
+
+<h2 id="input">Input:</h2>
+
+<p>This is the original Slides.</p>
+
+<p><img src="https://tanaikech.github.io/img/20181214a-fig1.png" alt="" /></p>
+
+<h2 id="output">Output:</h2>
+
+<p>This is the exported PDF file.</p>
+
+<p><img src="https://tanaikech.github.io/img/20181214a-fig2.png" alt="" /></p>
+
+<h2 id="note">Note:</h2>
+
+<ul>
+<li>This script was posted to <a href="https://stackoverflow.com/a/53775150/7108653">https://stackoverflow.com/a/53775150/7108653</a>.</li>
+</ul>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2018/12/12/updated-go-library---go-getfilelist-to-v102/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2018/12/12/updated-goodls-to-v122/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2018/12/12/updated-go-library---go-getfilelist-to-v102/">Updated: Go Library - go-getfilelist to v102</a>
+      <a href="https://tanaikech.github.io/2018/12/12/updated-goodls-to-v122/">Updated goodls to v122</a>
     </nav>
     
   </div>
@@ -302,14 +392,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2018/12/14/summarizing-slides-as-thumbnails/">Summarizing Slides as Thumbnails</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2018/12/14/summarizing-slides-as-thumbnails/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
