@@ -288,7 +288,7 @@
 </ul></li>
 </ol>
 
-<h3 id="sample-script">Sample script:</h3>
+<h3 id="sample-script-1">Sample script 1:</h3>
 
 <pre><code class="language-javascript">function myFunction() {
   // Please set these parameters
@@ -354,6 +354,80 @@
 }
 </code></pre>
 
+<h3 id="sample-script-2">Sample script 2:</h3>
+
+<pre><code class="language-javascript">function myFunction() {
+  // Please set these parameters
+  var id = &quot;### file ID ###&quot;; // file ID of original Slides
+  var col = 3; // Number of columns
+  var row = 2; // Number of rows
+  var wsize = 200; // Size of width of each image (pixels)
+  var sep = 5; // Space of each image (pexels)
+  
+  
+  // Retrieve slides as images
+  var originalFile = SlidesApp.openById(id);
+  var accessToken = ScriptApp.getOAuthToken();
+  var pageObjectIds = originalFile.getSlides().map(function(e) {return e.getObjectId()});
+  var reqUrls = pageObjectIds.map(function(pageObjectId) {
+    return {
+      method: &quot;get&quot;,
+      url: &quot;https://slides.googleapis.com/v1/presentations/&quot; + id + &quot;/pages/&quot; + pageObjectId + &quot;/thumbnail?access_token=&quot; + accessToken,
+    };
+  });
+  var reqBlobs = UrlFetchApp.fetchAll(reqUrls).map(function(e) {
+    var r = JSON.parse(e);
+    return {
+      method: &quot;get&quot;,
+      url: r.contentUrl,
+    };
+  });
+  var blobs = UrlFetchApp.fetchAll(reqBlobs).map(function(e) {return e.getBlob()});
+  
+  // Create a temporary Slides and put images 
+  var s = SlidesApp.create(&quot;temporarySlides&quot;);
+  s.getSlides()[0].remove();
+  var idt = s.getId();
+  var ph = s.getPageHeight();
+  var pw = s.getPageWidth();
+  var leftOffset = (pw - ((wsize * col) + (sep * (col - 1)))) / 2;
+  if (leftOffset &lt; 0) throw new Error(&quot;Images are sticking out from a slide.&quot;);
+  var len = col * row;
+  var loops = Math.ceil(blobs.length / (col * row));
+  for (var loop = 0; loop &lt; loops; loop++) {
+    var ns = s.insertSlide(loop);
+    var topOffset, top;
+    var left = leftOffset;
+    for (var i = len * loop; i &lt; len + (len * loop); i++) {
+      if (i === blobs.length) break;
+      var image = ns.insertImage(blobs[i]);
+      var w = image.getWidth();
+      var h = image.getHeight();
+      var hsize = h * wsize / w;
+      if (i === 0 || i % len === 0) {
+        topOffset = (ph - ((hsize * row) + sep)) / 2;
+        if (topOffset &lt; 0) throw new Error(&quot;Images are sticking out from a slide.&quot;);
+        top = topOffset;
+      }
+      image.setWidth(wsize).setHeight(hsize).setTop(top).setLeft(left).getObjectId();
+      if (i === col - 1 + (loop * len)) {
+        top = topOffset + hsize + sep;
+        left = leftOffset;
+      } else {
+        left += wsize + sep;
+      }
+    }
+  }
+  s.saveAndClose();
+
+  // Export PDF file
+  var urlPdf = &quot;https://docs.google.com/presentation/d/&quot; + idt + &quot;/export/&quot; + &quot;pdf?access_token=&quot; + accessToken;
+  var pdf = UrlFetchApp.fetch(urlPdf).getBlob();
+  DriveApp.createFile(pdf.setName(originalFile.getName() + &quot;.pdf&quot;));
+  DriveApp.getFileById(idt).setTrashed(true);
+}
+</code></pre>
+
 <h2 id="input">Input:</h2>
 
 <p>This is the original Slides.</p>
@@ -370,6 +444,9 @@
 
 <ul>
 <li>This script was posted to <a href="https://stackoverflow.com/a/53775150/7108653">https://stackoverflow.com/a/53775150/7108653</a>.</li>
+<li>Both samples can obtain the same result. So please select one of them.</li>
+<li>The process cost of &ldquo;Sample script 2&rdquo; is lower than that of &ldquo;Sample script 1&rdquo;, because at &ldquo;Sample script 2&rdquo;, all thumbnail images are retrieved using the fetchAll method.</li>
+<li>I think that when &ldquo;Sample script 1&rdquo; is used, the thumbnail list can be also created for other Google Docs (Spreadsheet and Document).</li>
 </ul>
 
 
