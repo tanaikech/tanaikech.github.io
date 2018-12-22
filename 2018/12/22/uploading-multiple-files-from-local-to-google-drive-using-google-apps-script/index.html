@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.49.2" />
 
-  <title>Updated: GAS Library - OnedriveApp &middot; tanaike</title>
+  <title>Uploading Multiple Files From Local To Google Drive using Google Apps Script &middot; tanaike</title>
 
   
   
@@ -222,7 +222,7 @@
 
 
 <div class="header">
-  <h1>Updated: GAS Library - OnedriveApp</h1>
+  <h1>Uploading Multiple Files From Local To Google Drive using Google Apps Script</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -231,7 +231,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>21 Aug 2017, 15:02</time>
+    <time>22 Dec 2018, 16:44</time>
   </div>
 
   
@@ -242,9 +242,7 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
     
   </div>
   
@@ -258,9 +256,7 @@
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/onedrive">OneDrive</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/upload">upload</a>
     
   </div>
   
@@ -268,24 +264,155 @@
 
 </div>
 
-  <p>OnedriveApp was updated to v1.0.2.</p>
+  
 
-<p><a href="https://github.com/tanaikech/OnedriveApp#authprocess">Moved the instance of PropertiesService.getScriptProperties() to outside of this library. When there is the PropertiesService.getScriptProperties() inside the library, it was found that the parameters that users set was saved to the library. So this was modified. I&rsquo;m sorry that I couldn&rsquo;t notice this situation.</a></p>
+<p><a href="https://gist.github.com/tanaikech/88fcae255abb4aac5bec81ad5ca213ef">Gists</a></p>
 
-<p><a href="https://github.com/tanaikech/OnedriveApp">GitHub of OnedriveApp</a></p>
+<p>This is a sample script for uploading multiple files from local PC to Google Drive using Google Apps Script. The dialog, sidebar and Web Apps can be used as the GUI interface.</p>
+
+<h2 id="sample-1">Sample 1</h2>
+
+<p>In this sample, the following flow is run.</p>
+
+<ol>
+<li>Select files at browser.</li>
+<li>Upload the files every file.</li>
+<li>Save each file in Google Drive.</li>
+</ol>
+
+<p>When you use this, please copy and paste the Google Apps Script and HTML to the script editor, and run the HTML using the dialog, sidebar and Web Apps.</p>
+
+<h3 id="google-apps-script-code-gs">Google Apps Script: Code.gs</h3>
+
+<pre><code class="language-javascript">function saveFile(obj) {
+  var blob = Utilities.newBlob(Utilities.base64Decode(obj.data), obj.mimeType, obj.fileName);
+  return DriveApp.createFile(blob).getId();
+}
+</code></pre>
+
+<h3 id="html-index-html">HTML: Index.html</h3>
+
+<pre><code class="language-html">&lt;input name=&quot;file&quot; id=&quot;files&quot; type=&quot;file&quot; multiple&gt;
+&lt;input type='button' value='Upload' onclick='getFiles()'&gt;
+
+&lt;script&gt;
+function getFiles() {
+  const f = document.getElementById('files');
+  [...f.files].forEach((file, i) =&gt; {
+    const fr = new FileReader();
+    fr.onload = (e) =&gt; {
+      const data = e.target.result.split(&quot;,&quot;);
+      const obj = {fileName: f.files[i].name, mimeType: data[0].match(/:(\w.+);/)[1], data: data[1]};
+      google.script.run.withSuccessHandler((id) =&gt; {
+        console.log(id);
+      }).saveFile(obj);
+    }
+    fr.readAsDataURL(file);
+  });
+}
+&lt;/script&gt;
+</code></pre>
+
+<h2 id="sample-2">Sample 2</h2>
+
+<p>In this sample, the following flow is run.</p>
+
+<ol>
+<li>Select files at browser.</li>
+<li>Upload the files as a one object.</li>
+<li>Parse each file and zip files.</li>
+<li>Save the zip file in Google Drive.</li>
+</ol>
+
+<p>When you use this, please copy and paste the Google Apps Script and HTML to the script editor, and run the HTML using the dialog, sidebar and Web Apps.</p>
+
+<h3 id="google-apps-script-code-gs-1">Google Apps Script: Code:gs</h3>
+
+<pre><code class="language-javascript">function createZip(obj) {
+    var blobs = obj.map(function(e) {
+        return Utilities.newBlob(Utilities.base64Decode(e.data), e.mimeType, e.fileName);
+    });
+    var zip = Utilities.zip(blobs, &quot;filename.zip&quot;);
+    return DriveApp.createFile(zip).getId();
+}
+</code></pre>
+
+<h3 id="html-index-html-1">HTML: Index.html</h3>
+
+<pre><code class="language-html">&lt;input name=&quot;file&quot; id=&quot;files&quot; type=&quot;file&quot; multiple&gt;
+&lt;input type='button' value='Upload' onclick='getFiles()'&gt;
+
+&lt;script&gt;
+function getFiles() {
+  const f = document.getElementById('files');
+  const r = Promise.all([...f.files].map((file, i) =&gt; {
+    const fr = new FileReader();
+    return new Promise((r) =&gt; {
+      fr.onload = (e) =&gt; {
+        const data = e.target.result.split(&quot;,&quot;);
+        return r({fileName: f.files[i].name, mimeType: data[0].match(/:(\w.+);/)[1], data: data[1]});
+      }
+      fr.readAsDataURL(file);
+    });
+  }))
+  .then((obj) =&gt; {
+    google.script.run.withSuccessHandler((id) =&gt; {
+      console.log(id);
+    }).createZip(obj);
+  });
+}
+&lt;/script&gt;
+</code></pre>
+
+<h2 id="limitations">Limitations</h2>
+
+<p>There are some limitations for this situation. Please be careful those when you use these scripts.</p>
+
+<ol>
+<li>Maximum size of the data which can be sent from HTML side to GAS side is 50 MB.
+
+<ul>
+<li>In this case, the size when the file is converted to base64 is the maximum size. Please be careful this.</li>
+</ul></li>
+<li>Maximum size of blob for creating a file at Google Apps Script is 50 MB.</li>
+</ol>
+
+<p>Namely, these indicates the following situations.</p>
+
+<ul>
+<li>When each file is uploaded and saved, the maximum size is 50 MB.</li>
+<li>When several files are uploaded and zipped as a zip file, the total size before the files are zipped is the maximum size which is 50 MB.</li>
+</ul>
+
+<p>When I used these scripts in my environment, the following results were obtained.</p>
+
+<ol>
+<li>Upload time were about 30 seconds and 90 seconds for 10 MB and 30 MB text file.</li>
+<li>Time for uploading and zipping files (5 MB and 30 MB) was about 90 seconds.</li>
+</ol>
+
+<h2 id="note">Note:</h2>
+
+<ul>
+<li>In the case of the method which sends the data using <code>google.script.run</code>, when the data size becomes large, the process speed becomes much slow. At that time, I recommend to use Drive API.
+
+<ul>
+<li><a href="https://gist.github.com/tanaikech/bd53b366aedef70e35a35f449c51eced">Upload Files to Google Drive using Javascript</a></li>
+</ul></li>
+</ul>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2017/08/21/updated-gas-library---onedriveapp/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2018/12/14/summarizing-slides-as-thumbnails/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2017/08/21/updated-gas-library---onedriveapp/">Updated: GAS Library - OnedriveApp</a>
+      <a href="https://tanaikech.github.io/2018/12/14/summarizing-slides-as-thumbnails/">Summarizing Slides as Thumbnails</a>
     </nav>
     
   </div>
@@ -294,14 +421,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2017/08/27/exporting-project-on-google-drive-using-golang-quickstart/">Exporting Project on Google Drive using Golang Quickstart</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2017/08/27/exporting-project-on-google-drive-using-golang-quickstart/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
