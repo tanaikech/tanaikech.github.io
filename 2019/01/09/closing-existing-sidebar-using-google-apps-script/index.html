@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.49.2" />
 
-  <title>Topics &middot; tanaike</title>
+  <title>Closing Existing Sidebar using Google Apps Script &middot; tanaike</title>
 
   
   
@@ -39,8 +39,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
  
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike" href="https://tanaikech.github.io/topics/index.xml" />
   
 
   
@@ -117,10 +115,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://tanaikech.github.io/topics/index.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
-    </li>
     
 
     
@@ -228,178 +222,141 @@
 
 
 <div class="header">
-  <h1>Topics</h1>
+  <h1>Closing Existing Sidebar using Google Apps Script</h1>
+  <h2></h2>
 </div>
 <div class="content">
-  <ul>
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>09 Jan 2019, 11:58</time>
+  </div>
+
+  
+
   
   
-    <li>
-      <a href="gastips">gastips</a>
-      <span>&#40;141&#41;</span>
-    </li>
   
-    <li>
-      <a href="clitool">clitool</a>
-      <span>&#40;40&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    
+  </div>
   
-    <li>
-      <a href="library">library</a>
-      <span>&#40;36&#41;</span>
-    </li>
   
-    <li>
-      <a href="gotips">gotips</a>
-      <span>&#40;24&#41;</span>
-    </li>
+
   
-    <li>
-      <a href="googleapitips">googleapitips</a>
-      <span>&#40;17&#41;</span>
-    </li>
   
-    <li>
-      <a href="report">report</a>
-      <span>&#40;17&#41;</span>
-    </li>
   
-    <li>
-      <a href="benchmark">benchmark</a>
-      <span>&#40;14&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/sidebar">sidebar</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/dialog">dialog</a>
+    
+  </div>
   
-    <li>
-      <a href="pythontips">pythontips</a>
-      <span>&#40;8&#41;</span>
-    </li>
   
-    <li>
-      <a href="etc">etc</a>
-      <span>&#40;7&#41;</span>
-    </li>
+
+</div>
+
   
-    <li>
-      <a href="jstips">jstips</a>
-      <span>&#40;7&#41;</span>
-    </li>
+
+<p><a href="https://gist.github.com/tanaikech/c1b5fb20342dae623139ca0f48c8c12c">Gists</a></p>
+
+<p>This is a sample script for closing the existing sidebar using Google Apps Script. When the sidebar is opened, in order to close the sidebar, the sidebar can be closed by running <code>google.script.host.close()</code> with the script of sidebar. This is the general case.</p>
+
+<p>If you want to close the opened sidebar, such functions are not prepared. So I thought this workaround. The flow of this workaround is as follows.</p>
+
+<h2 id="flow">Flow:</h2>
+
+<ol>
+<li>Open a sidebar. Run <code>run1_openSidebar()</code>.
+
+<ul>
+<li>At this time, an object <code>{&quot;sidebar&quot;: &quot;open&quot;}</code> is put using PropertiesService.</li>
+</ul></li>
+<li>Close the sidebar. Run <code>run2_closeSidebar()</code>.
+
+<ul>
+<li>When <code>sidebar</code> is <code>open</code>, this script is run.</li>
+<li>In this case, the existing sidebar is overwritten by a temporal sidebar. 2 sidebars cannot be opened, simultaneously. This is the important point. By this, the sidebar can be closed by GAS.</li>
+</ul></li>
+</ol>
+
+<h2 id="sample-script">Sample script:</h2>
+
+<p>In this script, the container-bound script of Spreadsheet is used as a sample.</p>
+
+<pre><code class="language-javascript">function run1_openSidebar() {
+  var p = PropertiesService.getScriptProperties();
+  p.setProperty(&quot;sidebar&quot;, &quot;open&quot;);
+  var html = HtmlService.createHtmlOutput(&quot;sample sidebar&quot;);
+  SpreadsheetApp.getUi().showSidebar(html);
+}
+
+function run2_closeSidebar() {
+  var p = PropertiesService.getScriptProperties();
+  if (p.getProperty(&quot;sidebar&quot;) == &quot;open&quot;) {
+    var html = HtmlService.createHtmlOutput(&quot;&lt;script&gt;google.script.host.close();&lt;/script&gt;&quot;);
+    SpreadsheetApp.getUi().showSidebar(html);
+    p.setProperty(&quot;sidebar&quot;, &quot;close&quot;);
+  }
+}
+</code></pre>
+
+<h2 id="note">Note:</h2>
+
+<ul>
+<li>This sample script uses Spreadsheet. So if you want to use other Google Docs, please modify it.</li>
+<li>This method can be also used for the custom dialog.</li>
+<li>This workaround was answered at <a href="https://stackoverflow.com/a/54082847">https://stackoverflow.com/a/54082847</a>.</li>
+</ul>
+
+<h2 id="references">References:</h2>
+
+<ul>
+<li><a href="https://developers.google.com/apps-script/guides/html/reference/host#close">google.script.host.close()</a></li>
+<li><a href="https://developers.google.com/apps-script/reference/base/ui#showsidebaruserinterface">showSidebar()</a></li>
+<li><a href="https://developers.google.com/apps-script/reference/properties/properties-service">PropertiesService</a></li>
+</ul>
+
+
   
-    <li>
-      <a href="nodetips">nodetips</a>
-      <span>&#40;7&#41;</span>
-    </li>
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2018/12/30/updated-ggsrun-to-v171/"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2018/12/30/updated-ggsrun-to-v171/">Updated ggsrun to v171</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
+</div>
+
+
+
   
-    <li>
-      <a href="add-on">add-on</a>
-      <span>&#40;6&#41;</span>
-    </li>
-  
-    <li>
-      <a href="virtual-currency">virtual-currency</a>
-      <span>&#40;5&#41;</span>
-    </li>
-  
-    <li>
-      <a href="googlecharttips">googlecharttips</a>
-      <span>&#40;4&#41;</span>
-    </li>
-  
-    <li>
-      <a href="coffeescripttips">coffeescripttips</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="shtips">shtips</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="spreadsheet">spreadsheet</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="driveapitips">driveapitips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="javascripttips">javascripttips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="module">module</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="netatmo">netatmo</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="slacktips">slacktips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="sublime">sublime</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="sublimetips">sublimetips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="batch-file-tips">batch-file-tips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="google-apps-script">google-apps-script</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="googleapi">googleapi</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="issuetracker">issuetracker</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="netatmotips">netatmotips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="onedrivetips">onedrivetips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="plugin">plugin</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="skillshare.com">skillshare.com</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="stackoverflow">stackoverflow</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-  </ul>
+
 </div>
 
 </div>
@@ -439,3 +396,4 @@
 
 </body>
 </html>
+
