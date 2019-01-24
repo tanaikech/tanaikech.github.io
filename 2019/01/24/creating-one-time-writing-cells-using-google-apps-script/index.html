@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.49.2" />
 
-  <title>Update: Taking advantage of Web Apps with Google Apps Script &middot; tanaike</title>
+  <title>Creating One-time Writing Cells using Google Apps Script &middot; tanaike</title>
 
   
   
@@ -222,7 +222,7 @@
 
 
 <div class="header">
-  <h1>Update: Taking advantage of Web Apps with Google Apps Script</h1>
+  <h1>Creating One-time Writing Cells using Google Apps Script</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -231,7 +231,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>16 Jan 2019, 10:42</time>
+    <time>24 Jan 2019, 11:37</time>
   </div>
 
   
@@ -241,8 +241,6 @@
   
   <div>
     <i class="fa fa-folder fa-fw"></i>
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/report">report</a>&nbsp;&#47;
     
       <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
     
@@ -258,7 +256,7 @@
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/webapps">WebApps</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">Spreadsheet</a>
     
   </div>
   
@@ -266,26 +264,128 @@
 
 </div>
 
-  <p>&ldquo;Taking advantage of Web Apps with Google Apps Script&rdquo; was updated. A section of <a href="https://github.com/tanaikech/taking-advantage-of-Web-Apps-with-google-apps-script#howtousedevmode">&ldquo;How to use dev mode from outside&rdquo;</a> was added.</p>
+  
+
+<p><a href="https://gist.github.com/tanaikech/4ba859167a84ed625fcbab392c8d34cd">Gists</a></p>
+
+<p>This sample script is for creating one-time writing cells using Google Apps Script. At first, it supposes the following situation.</p>
+
+<ol>
+<li>A Spreadsheet is shared with users. The owner of Spreadsheet is you.</li>
+<li>After users put a value to a cell, you don&rsquo;t want to make users edit the cell again.
 
 <ul>
-<li>When you deploy Web Apps, you can see the link labeled latest code. The link is like <code>https://script.google.com/macros/s/###/dev</code>. When you access to the link of latest code using your browser under you login to Google, you can access to Web Apps with the dev mode. But if you want to access to Web Apps with the dev mode from outside, there are no documents for the method. Here, it introduces such method.</li>
+<li>Namely, you want to protect the cell.</li>
+</ul></li>
+</ol>
+
+<p>This sample script achieves above situation.</p>
+
+<h2 id="preparation">Preparation</h2>
+
+<p>Before you use this script, please do the following flow.</p>
+
+<ol>
+<li>Prepare a Spreadsheet and open the script editor.</li>
+<li>Copy and paste the sample script to the script editor, ans save it.
+
+<ul>
+<li>Please set <code>ownerEmail</code>. In this sample, it&rsquo;s your email address.</li>
+</ul></li>
+<li>Enable Sheets API at Advanced Google Services and API console.
+
+<ul>
+<li>You can see about how to do those at <a href="https://stackoverflow.com/a/48756509/7108653">here</a>.</li>
+</ul></li>
+<li>Install a trigger. Please install <code>myFunction()</code> as the OnEdit trigger.
+
+<ol>
+<li>Open the script editor.</li>
+<li>Edit -&gt; Current project&rsquo;s triggers.</li>
+<li>Click &ldquo;Add Trigger&rdquo;.</li>
+<li>Set &ldquo;myFunction&rdquo; for &ldquo;Choose which function to run&rdquo;.</li>
+<li>Set &ldquo;From spreadsheet&rdquo; for &ldquo;Select event source&rdquo;.</li>
+<li>Set &ldquo;On edit&rdquo; for &ldquo;Select event type&rdquo;.</li>
+</ol></li>
+<li>Share the Spreadsheet with users.</li>
+</ol>
+
+<p>The preparation was done.</p>
+
+<h2 id="sample-script">Sample script</h2>
+
+<pre><code class="language-javascript">function myFunction(e) {
+  var ownerEmail = &quot;#####&quot;; // Please set owner's email.
+
+  // This method is from https://gist.github.com/tanaikech/95c7cd650837f33a564babcaf013cae0
+  var a1notation2gridrange1 = function (sheetid, a1notation) {
+    var data = a1notation.match(/(^.+)!(.+):(.+$)/);
+    var ss = SpreadsheetApp.openById(sheetid).getSheetByName(data[1]);
+    var range = ss.getRange(data[2] + &quot;:&quot; + data[3]);
+    var gridRange = {
+      sheetId: ss.getSheetId(),
+      startRowIndex: range.getRow() - 1,
+      endRowIndex: range.getRow() - 1 + range.getNumRows(),
+      startColumnIndex: range.getColumn() - 1,
+      endColumnIndex: range.getColumn() - 1 + range.getNumColumns(),
+    };
+    if (!data[2].match(/[0-9]/)) delete gridRange.startRowIndex;
+    if (!data[3].match(/[0-9]/)) delete gridRange.endRowIndex;
+    return gridRange;
+  };
+
+  var sheet = e.source;
+  var spreadsheetId = sheet.getId();
+  var sheetName = sheet.getSheetName();
+  var range = e.range.getA1Notation();
+  var rng = range.indexOf(&quot;:&quot;) &gt; -1 ? sheetName + &quot;!&quot; + range : sheetName + &quot;!&quot; + range + &quot;:&quot; + range;
+  var protectedRange = Sheets.Spreadsheets.get(spreadsheetId, {ranges: rng, fields: &quot;sheets/protectedRanges&quot;});
+  if (!protectedRange.sheets[0].protectedRanges) {
+    var resource = {&quot;requests&quot;: [{&quot;addProtectedRange&quot;: {&quot;protectedRange&quot;: {
+      &quot;range&quot;: a1notation2gridrange1(spreadsheetId, rng),
+      &quot;editors&quot;: {&quot;users&quot;: [ownerEmail]},
+    }}}]};
+    Sheets.Spreadsheets.batchUpdate(resource, spreadsheetId);
+  }
+}
+</code></pre>
+
+<h2 id="note">Note</h2>
+
+<ul>
+<li>In this sample, when users put a value of a cell in the shared Spreadsheet, the cell is automatically protected. By this, users cannot edit the cell again.</li>
+<li>Owner always can edit all cells.</li>
+<li><strong>This is a simple sample script. So please modify it to your situation.</strong></li>
 </ul>
 
-<p><font color="#3366CC"><strong>You can check this at <a href="https://github.com/tanaikech/taking-advantage-of-Web-Apps-with-google-apps-script">https://github.com/tanaikech/taking-advantage-of-Web-Apps-with-google-apps-script</a>.</strong></font></p>
+<p>For example, you can also achieve as following situations by modification.</p>
+
+<ul>
+<li>Select the ranges and sheets you want to protect.</li>
+<li>Select the editor users.</li>
+<li>Set the number of edit.</li>
+<li>etc..</li>
+</ul>
+
+<h2 id="references">References</h2>
+
+<ul>
+<li><a href="https://developers.google.com/sheets/api/reference/rest/">Google Sheets API</a></li>
+<li><a href="https://developers.google.com/apps-script/guides/triggers/installable">Installable Triggers</a></li>
+</ul>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2019/01/13/opening-dialog-box-during-calculation-and-retrieving-calculated-result-using-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2019/01/16/update-taking-advantage-of-web-apps-with-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2019/01/13/opening-dialog-box-during-calculation-and-retrieving-calculated-result-using-google-apps-script/">Opening Dialog Box during Calculation and Retrieving Calculated Result using Google Apps Script</a>
+      <a href="https://tanaikech.github.io/2019/01/16/update-taking-advantage-of-web-apps-with-google-apps-script/">Update: Taking advantage of Web Apps with Google Apps Script</a>
     </nav>
     
   </div>
@@ -294,14 +394,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2019/01/24/creating-one-time-writing-cells-using-google-apps-script/">Creating One-time Writing Cells using Google Apps Script</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2019/01/24/creating-one-time-writing-cells-using-google-apps-script/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
