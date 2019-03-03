@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.49.2" />
 
-  <title>tarUnarchiver for Google Apps Script &middot; tanaike</title>
+  <title>Workaround for Adding Title of vAxis to Embedded Chart on Spreadsheet using Google Apps Script &middot; tanaike</title>
 
   
   
@@ -222,7 +222,7 @@
 
 
 <div class="header">
-  <h1>tarUnarchiver for Google Apps Script</h1>
+  <h1>Workaround for Adding Title of vAxis to Embedded Chart on Spreadsheet using Google Apps Script</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -231,7 +231,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>27 Feb 2019, 13:45</time>
+    <time>04 Mar 2019, 08:18</time>
   </div>
 
   
@@ -242,7 +242,9 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/googlecharttips">GoogleChartTips</a>
     
   </div>
   
@@ -256,9 +258,9 @@
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/tar">tar</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/unarchiver">unarchiver</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/chart">chart</a>
     
   </div>
   
@@ -268,34 +270,99 @@
 
   
 
-<h1 id="overview">Overview</h1>
+<p>When a chart is created by using EmbeddedChartBuilder of Spreadsheet service, the title of vAxis which is put by <code>setOption('vAxis', {title: 'y axis'})</code> doesn&rsquo;t work. It is considered that this is a bug. Because I have confirmed that this had worked fine. <a href="https://tanaikech.github.io/2017/02/13/making-charts-at-spreadsheet/">Ref</a> So I reported this to <a href="https://issuetracker.google.com/issues/65781743">the issue tracker</a>. But unfortunately, this is still not resolved. So here, I would like to introduce a workaround for putting the title of vAxis when a chart is created using Google Apps Script. In this workaround, <a href="https://developers.google.com/sheets/api/samples/charts">the addChart method of Sheets API</a> is used.</p>
 
-<p><strong>This is a script for extracting files from a tar file using Google Apps Script.</strong> This script was created by native Google Apps Script.</p>
+<h2 id="sample-data">Sample data</h2>
 
-<p>The following 3 situations gave me the motivarion for creating this script.</p>
+<p><img src="https://tanaikech.github.io/img/20190304a-data.png" alt="" /></p>
 
-<ol>
-<li>Although I had been looking for the script for extracting files from a tar file from before, I have still not been able to find it.</li>
-<li>Unfortunately, there are no methods for extracting the files from the tar file in Google Apps Script. But fortunately, from <a href="https://en.wikipedia.org/wiki/Tar_(computing)">wiki of tar</a>, I could retrieve the structure information of the tar data. And I can also study by creating this script.</li>
-<li>I found <a href="https://stackoverflow.com/questions/54850028/how-to-extract-files-from-tar-archive-with-google-apps-script">this thread</a> at Stackoverflow. By this, I could understand that other users also want the script for extracting files from the tar file.</li>
-</ol>
+<h2 id="sample-script-1">Sample script 1</h2>
 
-<p>So I created this.</p>
+<p>This is a sample script using <a href="https://developers.google.com/apps-script/reference/spreadsheet/embedded-chart-builder">EmbeddedChartBuilder</a> of Spreadsheet service.</p>
 
-<p><strong>You can see the detail information here <a href="https://github.com/tanaikech/tarUnarchiver-for-Google-Apps-Script">https://github.com/tanaikech/tarUnarchiver-for-Google-Apps-Script</a></strong></p>
+<pre><code class="language-javascript">function chartSample1() {
+  var sheet = SpreadsheetApp.getActiveSheet();
+  var chart = sheet.newChart()
+    .setChartType(Charts.ChartType.LINE)
+    .asLineChart()
+    .setOption(&quot;useFirstColumnAsDomain&quot;, true)
+    .addRange(sheet.getRange(&quot;A1:A21&quot;))
+    .addRange(sheet.getRange(&quot;B1:B21&quot;))
+    .addRange(sheet.getRange(&quot;C1:C21&quot;))
+    .setNumHeaders(1)
+    .setPosition(5, 5, 0, 0)
+    .setOption(&quot;title&quot;, &quot;Sample chart 1&quot;)
+    .setOption(&quot;hAxis&quot;, {title: &quot;x axis&quot;})
+    .setOption(&quot;vAxis&quot;, {title: &quot;y axis&quot;})
+    .setOption(&quot;legend&quot;, {position: &quot;top&quot;})
+    .build();
+  sheet.insertChart(chart);
+}
+</code></pre>
+
+<h3 id="result">Result</h3>
+
+<p><img src="https://tanaikech.github.io/img/20190304b-chartsample1.png" alt="" /></p>
+
+<p>When this script is run, the above chart is created. You can see that the chart has no title at vAxis, although <code>setOption('vAxis', {title: 'y axis'})</code> is used. I think that this is a bug.</p>
+
+<h2 id="sample-script-2">Sample script 2</h2>
+
+<p>This is a sample script using the addChart method of Sheets API.</p>
+
+<p><strong>When you use this script, please enable Sheets API at Advanced Google Services and API console. You can see about how to enable Sheets API at <a href="https://stackoverflow.com/a/48756509">here</a>.</strong></p>
+
+<pre><code class="language-javascript">function chartSample2() {
+  var spec = {
+    &quot;title&quot;: &quot;Sample chart 2&quot;,
+    &quot;basicChart&quot;: {
+      &quot;chartType&quot;: &quot;LINE&quot;,
+      &quot;legendPosition&quot;: &quot;TOP_LEGEND&quot;,
+      &quot;axis&quot;: [
+        {&quot;position&quot;: &quot;BOTTOM_AXIS&quot;, &quot;title&quot;: &quot;x axis&quot;},
+        {&quot;position&quot;: &quot;LEFT_AXIS&quot;, &quot;title&quot;: &quot;y axis&quot;},
+      ],
+      &quot;domains&quot;: [{&quot;domain&quot;: {&quot;sourceRange&quot;: {&quot;sources&quot;: [{&quot;startRowIndex&quot;: 0, &quot;endRowIndex&quot;: 21, &quot;startColumnIndex&quot;: 0, &quot;endColumnIndex&quot;: 1}]}}}],
+      &quot;series&quot;: [
+        {
+          &quot;series&quot;: {&quot;sourceRange&quot;: {&quot;sources&quot;: [{&quot;startRowIndex&quot;: 0, &quot;endRowIndex&quot;: 21, &quot;startColumnIndex&quot;: 1, &quot;endColumnIndex&quot;: 2}]}},
+          &quot;targetAxis&quot;: &quot;LEFT_AXIS&quot;,
+        },
+       {
+          &quot;series&quot;: {&quot;sourceRange&quot;: {&quot;sources&quot;: [{&quot;startRowIndex&quot;: 0, &quot;endRowIndex&quot;: 21, &quot;startColumnIndex&quot;: 2, &quot;endColumnIndex&quot;: 3}]}},
+          &quot;targetAxis&quot;: &quot;LEFT_AXIS&quot;,
+        },
+      ],
+      &quot;headerCount&quot;: 1,
+    },
+    &quot;hiddenDimensionStrategy&quot;: &quot;SKIP_HIDDEN_ROWS&quot;,
+  };
+  var position = {&quot;overlayPosition&quot;: {&quot;anchorCell&quot;: {&quot;rowIndex&quot;: 4, &quot;columnIndex&quot;: 4}}};
+  var id = SpreadsheetApp.getActiveSpreadsheet().getId();
+  Sheets.Spreadsheets.batchUpdate({requests: [{addChart: {chart: {spec: spec, position: position}}}]}, id);
+}
+</code></pre>
+
+<h3 id="result-1">Result</h3>
+
+<p><img src="https://tanaikech.github.io/img/20190304b-chartsample2.png" alt="" /></p>
+
+<p>When this script is run, the above chart is created. You can see that the chart has a title at vAxis.</p>
+
+<p>If this was useful for your situation, I&rsquo;m glad.</p>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2019/02/12/sample-script-for-executing-with-synchronous-process-using-node.js/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2019/02/27/tarunarchiver-for-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2019/02/12/sample-script-for-executing-with-synchronous-process-using-node.js/">Sample Script for Executing with Synchronous Process using Node.js</a>
+      <a href="https://tanaikech.github.io/2019/02/27/tarunarchiver-for-google-apps-script/">tarUnarchiver for Google Apps Script</a>
     </nav>
     
   </div>
@@ -304,14 +371,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2019/03/04/workaround-for-adding-title-of-vaxis-to-embedded-chart-on-spreadsheet-using-google-apps-script/">Workaround for Adding Title of vAxis to Embedded Chart on Spreadsheet using Google Apps Script</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2019/03/04/workaround-for-adding-title-of-vaxis-to-embedded-chart-on-spreadsheet-using-google-apps-script/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
