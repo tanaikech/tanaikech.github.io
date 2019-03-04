@@ -231,7 +231,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>04 Mar 2019, 08:18</time>
+    <time>04 Mar 2019, 13:48</time>
   </div>
 
   
@@ -270,9 +270,9 @@
 
   
 
-<p><a href="https://gist.github.com/tanaikech/6b7b93959c1de635a1adbeee8db38d00">Gists</a></p>
+<p>[Gists]()</p>
 
-<p>When a chart is created by using EmbeddedChartBuilder of Spreadsheet service, the title of vAxis which is put by <code>setOption('vAxis', {title: 'y axis'})</code> doesn&rsquo;t work. It is considered that this is a bug. Because I have confirmed that this had worked fine. <a href="https://tanaikech.github.io/2017/02/13/making-charts-at-spreadsheet/">Ref</a> So I reported this to <a href="https://issuetracker.google.com/issues/65781743">the issue tracker</a>. But unfortunately, this is still not resolved. So here, I would like to introduce a workaround for putting the title of vAxis when a chart is created using Google Apps Script. In this workaround, <a href="https://developers.google.com/sheets/api/samples/charts">the addChart method of Sheets API</a> is used.</p>
+<p>When a chart is created by using EmbeddedChartBuilder of Spreadsheet service, the title of vAxis which is put by <code>setOption(&quot;vAxis&quot;, {title: &quot;y axis&quot;})</code> doesn&rsquo;t work. It is considered that this is a bug. Because I have confirmed that this had worked fine. <a href="https://tanaikech.github.io/2017/02/13/making-charts-at-spreadsheet/">Ref</a> But this specification had been changed. So I would like to introduce the method for adding the title of vAxis when a chart is created using Google Apps Script.</p>
 
 <h2 id="sample-data">Sample data</h2>
 
@@ -306,11 +306,55 @@
 
 <p><img src="https://tanaikech.github.io/img/20190304b-chartsample1.png" alt="" /></p>
 
-<p>When this script is run, the above chart is created. You can see that the chart has no title at vAxis, although <code>setOption('vAxis', {title: 'y axis'})</code> is used. I think that this is a bug.</p>
+<p>When this script is run, the above chart is created. You can see that the chart has no title at vAxis, although <code>setOption(&quot;vAxis&quot;, {title: &quot;y axis&quot;})</code> is used. I think that this is a bug.</p>
 
 <h2 id="sample-script-2">Sample script 2</h2>
 
-<p>This is a sample script using the addChart method of Sheets API.</p>
+<p>This is a sample script using <a href="https://developers.google.com/apps-script/reference/spreadsheet/embedded-chart-builder">EmbeddedChartBuilder</a> of Spreadsheet service. When I had tested various patterns, I noticed a solution. In this solution, it modifies the sample script 1 as follows.</p>
+
+<h3 id="from">From:</h3>
+
+<pre><code class="language-javascript">setOption(&quot;vAxis&quot;, {title: &quot;y axis&quot;})
+</code></pre>
+
+<h3 id="to">To:</h3>
+
+<pre><code class="language-javascript">setOption(&quot;vAxes&quot;, {0: {title: &quot;y axis&quot;}})
+</code></pre>
+
+<p>When <code>series</code> is set using <code>setOption()</code>, I used <code>setOption(&quot;series&quot;, {0: {type: &quot;line&quot;, color: &quot;red&quot;}, 0: {...}})</code>. From this, I could notice above modification. You can see the official document at <a href="https://developers.google.com/chart/interactive/docs/gallery/linechart#configuration-options">here</a>. Please check &ldquo;vAxes&rdquo; of &ldquo;Configuration Options&rdquo;.</p>
+
+<h3 id="modified-script">Modified script</h3>
+
+<pre><code class="language-javascript">function chartSample1() {
+  var sheet = SpreadsheetApp.getActiveSheet();
+  var chart = sheet.newChart()
+    .setChartType(Charts.ChartType.LINE)
+    .asLineChart()
+    .setOption(&quot;useFirstColumnAsDomain&quot;, true)
+    .addRange(sheet.getRange(&quot;A1:A21&quot;))
+    .addRange(sheet.getRange(&quot;B1:B21&quot;))
+    .addRange(sheet.getRange(&quot;C1:C21&quot;))
+    .setNumHeaders(1)
+    .setPosition(5, 5, 0, 0)
+    .setOption(&quot;title&quot;, &quot;Sample chart 1&quot;)
+    .setOption(&quot;hAxis&quot;, {title: &quot;x axis&quot;})
+    .setOption(&quot;vAxes&quot;, {0: {title: &quot;y axis&quot;}}) // Modified
+    .setOption(&quot;legend&quot;, {position: &quot;top&quot;})
+    .build();
+  sheet.insertChart(chart);
+}
+</code></pre>
+
+<h3 id="result-1">Result</h3>
+
+<p><img src="https://tanaikech.github.io/img/20190304b-chartsample2.png" alt="" /></p>
+
+<p>When this script is run, the above chart is created. You can see that the chart has a title at vAxis.</p>
+
+<h2 id="sample-script-3">Sample script 3</h2>
+
+<p>This is a sample script using <a href="https://developers.google.com/sheets/api/samples/charts">the addChart method of Sheets API</a> is used. Of course, you can create the same chart using Sheets API. When this is used, the process cost can be reduced from the above method.</p>
 
 <p><strong>When you use this script, please enable Sheets API at Advanced Google Services and API console. You can see about how to enable Sheets API at <a href="https://stackoverflow.com/a/48756509">here</a>.</strong></p>
 
@@ -345,49 +389,11 @@
 }
 </code></pre>
 
-<h3 id="result-1">Result</h3>
+<h3 id="result-2">Result</h3>
 
 <p><img src="https://tanaikech.github.io/img/20190304b-chartsample2.png" alt="" /></p>
 
 <p>When this script is run, the above chart is created. You can see that the chart has a title at vAxis.</p>
-
-<h2 id="added-sample-script-3">Added: Sample script 3</h2>
-
-<p>This is a sample script using <a href="https://developers.google.com/apps-script/reference/spreadsheet/embedded-chart-builder">EmbeddedChartBuilder</a> of Spreadsheet service. When I had tested various patterns, I got a solution. In this solution, it modifies the sample script 1 as follows.</p>
-
-<h3 id="from">From:</h3>
-
-<pre><code class="language-javascript">setOption(&quot;vAxis&quot;, {title: &quot;y axis&quot;})
-</code></pre>
-
-<h3 id="to">To:</h3>
-
-<pre><code class="language-javascript">setOption(&quot;vAxes&quot;, {0: {title: &quot;y Axis&quot;}})
-</code></pre>
-
-<p>When <code>series</code> is set using <code>setOption()</code>, I used <code>setOption(&quot;series&quot;, {0: {type: &quot;line&quot;, color: &quot;red&quot;}, 0: {...}})</code>. From this, I could notice above modification.</p>
-
-<h3 id="modified-script">Modified script</h3>
-
-<pre><code class="language-javascript">function chartSample1() {
-  var sheet = SpreadsheetApp.getActiveSheet();
-  var chart = sheet.newChart()
-    .setChartType(Charts.ChartType.LINE)
-    .asLineChart()
-    .setOption(&quot;useFirstColumnAsDomain&quot;, true)
-    .addRange(sheet.getRange(&quot;A1:A21&quot;))
-    .addRange(sheet.getRange(&quot;B1:B21&quot;))
-    .addRange(sheet.getRange(&quot;C1:C21&quot;))
-    .setNumHeaders(1)
-    .setPosition(5, 5, 0, 0)
-    .setOption(&quot;title&quot;, &quot;Sample chart 1&quot;)
-    .setOption(&quot;hAxis&quot;, {title: &quot;x axis&quot;})
-    .setOption(&quot;vAxes&quot;, {0: {title: &quot;y Axis&quot;}}) // Modified
-    .setOption(&quot;legend&quot;, {position: &quot;top&quot;})
-    .build();
-  sheet.insertChart(chart);
-}
-</code></pre>
 
 <p>If this was useful for your situation, I&rsquo;m glad.</p>
 
