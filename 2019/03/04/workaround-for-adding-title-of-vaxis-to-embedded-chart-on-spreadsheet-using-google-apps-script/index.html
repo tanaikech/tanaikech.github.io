@@ -351,6 +351,44 @@
 
 <p>When this script is run, the above chart is created. You can see that the chart has a title at vAxis.</p>
 
+<h2 id="added-sample-script-3">Added: Sample script 3</h2>
+
+<p>This is a sample script using <a href="https://developers.google.com/apps-script/reference/spreadsheet/embedded-chart-builder">EmbeddedChartBuilder</a> of Spreadsheet service. When I had tested various patterns, I got a solution. In this solution, it modifies the sample script 1 as follows.</p>
+
+<h3 id="from">From:</h3>
+
+<pre><code class="language-javascript">setOption(&quot;vAxis&quot;, {title: &quot;y axis&quot;})
+</code></pre>
+
+<h3 id="to">To:</h3>
+
+<pre><code class="language-javascript">setOption('vAxes', {0: {'title': 'Y Axis'}})
+</code></pre>
+
+<p>When <code>series</code> is set using <code>setOption()</code>, I used <code>setOption('series', {0: {type: 'line', color: 'red'}})</code>. From this, I could notice above modification.</p>
+
+<h3 id="modified-script">Modified script</h3>
+
+<pre><code class="language-javascript">function chartSample1() {
+  var sheet = SpreadsheetApp.getActiveSheet();
+  var chart = sheet.newChart()
+    .setChartType(Charts.ChartType.LINE)
+    .asLineChart()
+    .setOption(&quot;useFirstColumnAsDomain&quot;, true)
+    .addRange(sheet.getRange(&quot;A1:A21&quot;))
+    .addRange(sheet.getRange(&quot;B1:B21&quot;))
+    .addRange(sheet.getRange(&quot;C1:C21&quot;))
+    .setNumHeaders(1)
+    .setPosition(5, 5, 0, 0)
+    .setOption(&quot;title&quot;, &quot;Sample chart 1&quot;)
+    .setOption(&quot;hAxis&quot;, {title: &quot;x axis&quot;})
+    .setOption('vAxes', {0: {'title': 'Y Axis'}}) // Modified
+    .setOption(&quot;legend&quot;, {position: &quot;top&quot;})
+    .build();
+  sheet.insertChart(chart);
+}
+</code></pre>
+
 <p>If this was useful for your situation, I&rsquo;m glad.</p>
 
 
