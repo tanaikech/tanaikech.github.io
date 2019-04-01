@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.49.2" />
 
-  <title>Topics &middot; tanaike</title>
+  <title>Modify Searched Text to Small Capital Letters using Google Apps Script &middot; tanaike</title>
 
   
   
@@ -39,8 +39,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
  
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike" href="https://tanaikech.github.io/topics/index.xml" />
   
 
   
@@ -117,10 +115,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://tanaikech.github.io/topics/index.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
-    </li>
     
 
     
@@ -228,188 +222,144 @@
 
 
 <div class="header">
-  <h1>Topics</h1>
+  <h1>Modify Searched Text to Small Capital Letters using Google Apps Script</h1>
+  <h2></h2>
 </div>
 <div class="content">
-  <ul>
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>01 Apr 2019, 10:43</time>
+  </div>
+
+  
+
   
   
-    <li>
-      <a href="gastips">gastips</a>
-      <span>&#40;154&#41;</span>
-    </li>
   
-    <li>
-      <a href="clitool">clitool</a>
-      <span>&#40;40&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    
+  </div>
   
-    <li>
-      <a href="library">library</a>
-      <span>&#40;39&#41;</span>
-    </li>
   
-    <li>
-      <a href="gotips">gotips</a>
-      <span>&#40;24&#41;</span>
-    </li>
+
   
-    <li>
-      <a href="report">report</a>
-      <span>&#40;19&#41;</span>
-    </li>
   
-    <li>
-      <a href="googleapitips">googleapitips</a>
-      <span>&#40;17&#41;</span>
-    </li>
   
-    <li>
-      <a href="benchmark">benchmark</a>
-      <span>&#40;14&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/document">Document</a>
+    
+  </div>
   
-    <li>
-      <a href="nodetips">nodetips</a>
-      <span>&#40;8&#41;</span>
-    </li>
   
-    <li>
-      <a href="pythontips">pythontips</a>
-      <span>&#40;8&#41;</span>
-    </li>
+
+</div>
+
   
-    <li>
-      <a href="etc">etc</a>
-      <span>&#40;7&#41;</span>
-    </li>
+
+<p><a href="https://gist.github.com/tanaikech/30e8c778eb1102f651550b2345b6f3c0">Gists</a></p>
+
+<p>This is a sample script for modifying the searched text to the small capital letters using Google Apps Script. Unfortunately, in the current stage, there are no methods for modifying the part of texts to the small capital letters in Document Service, yet. But when Google Docs API is used, this can be achieved.</p>
+
+<p><strong>When you use this script, please enable Google Docs API at Advanced Google Services and API console. You can see how to enable them at <a href="https://stackoverflow.com/a/55438282">here</a></strong></p>
+
+<h3 id="sample-script">Sample script</h3>
+
+<pre><code class="language-javascript">function myFunction() {
+  var searchText = &quot;sample&quot;;
+
+  var doc = DocumentApp.getActiveDocument();
+  var body = doc.getBody();
+  var id = doc.getId();
+
+  // Retrieve all contents from Google Document.
+  var obj = Docs.Documents.get(id, {fields: &quot;*&quot;});
+
+  // In order to use at Google Docs API, create ranges of found texts.
+  var foundElement = body.findText(searchText);
+  var requests = [];
+  while (foundElement != null) {
+    var p = foundElement.getElement();
+    if (p.getType() == DocumentApp.ElementType.TEXT) p = p.getParent();
+    if (p.getType() == DocumentApp.ElementType.PARAGRAPH || p.getType() == DocumentApp.ElementType.LIST_ITEM) {
+      var content = obj.body.content[body.getChildIndex(p) + 1];
+      requests.push({
+      updateTextStyle: {
+        textStyle: {smallCaps: true},
+        range: {
+          startIndex: content.startIndex + foundElement.getStartOffset(),
+          endIndex: content.startIndex + foundElement.getEndOffsetInclusive(),
+        },
+        fields: &quot;smallCaps&quot;},
+      });
+    }
+    foundElement = body.findText(textToFind, foundElement);
+  }
+
+  // Modify textStyle of found texts.
+  if (requests.length &gt; 0) {
+    var resource = {requests: requests};
+    Docs.Documents.batchUpdate(resource, id);
+  }
+}
+</code></pre>
+
+<h3 id="reference">Reference</h3>
+
+<ul>
+<li><a href="https://developers.google.com/docs/api/reference/rest/">Google Docs API</a></li>
+<li><a href="https://developers.google.com/docs/api/reference/rest/v1/documents#TextStyle">TextStyle</a></li>
+
+<li><p><a href="https://developers.google.com/apps-script/reference/document/">Document Service</a></p></li>
+
+<li><p>This script was answered for <a href="https://stackoverflow.com/q/55190987">this Stackoverflow&rsquo;s question</a>.</p></li>
+</ul>
+
+
   
-    <li>
-      <a href="jstips">jstips</a>
-      <span>&#40;7&#41;</span>
-    </li>
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2019/04/01/gas-library---gistchecker/"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2019/04/01/gas-library---gistchecker/">GAS Library - GistChecker</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="next">
+      <a href="https://tanaikech.github.io/2019/04/01/deleting-positioned-images-on-google-document-using-google-apps-script/">Deleting Positioned Images on Google Document using Google Apps Script</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+    <a href="https://tanaikech.github.io/2019/04/01/deleting-positioned-images-on-google-document-using-google-apps-script/"><i class="fa fa-chevron-right"></i></a>
+    
+  </div>
+</div>
+
+
+
   
-    <li>
-      <a href="add-on">add-on</a>
-      <span>&#40;6&#41;</span>
-    </li>
-  
-    <li>
-      <a href="googlecharttips">googlecharttips</a>
-      <span>&#40;5&#41;</span>
-    </li>
-  
-    <li>
-      <a href="virtual-currency">virtual-currency</a>
-      <span>&#40;5&#41;</span>
-    </li>
-  
-    <li>
-      <a href="coffeescripttips">coffeescripttips</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="driveapitips">driveapitips</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="shtips">shtips</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="spreadsheet">spreadsheet</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="javascripttips">javascripttips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="module">module</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="netatmo">netatmo</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="slacktips">slacktips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="sublime">sublime</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="sublimetips">sublimetips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="batch-file-tips">batch-file-tips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="community">community</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="ggsrun">ggsrun</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="google-apps-script">google-apps-script</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="googleapi">googleapi</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="issuetracker">issuetracker</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="netatmotips">netatmotips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="onedrivetips">onedrivetips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="plugin">plugin</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="skillshare.com">skillshare.com</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="stackoverflow">stackoverflow</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-  </ul>
+
 </div>
 
 </div>
@@ -449,3 +399,4 @@
 
 </body>
 </html>
+
