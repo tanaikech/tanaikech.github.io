@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.49.2" />
 
-  <title>Updated: GAS Library - OnedriveApp &middot; tanaike</title>
+  <title>Processing Duplicated Rows of 2 Dimensional Arrays using Google Apps Script &middot; tanaike</title>
 
   
   
@@ -222,7 +222,7 @@
 
 
 <div class="header">
-  <h1>Updated: GAS Library - OnedriveApp</h1>
+  <h1>Processing Duplicated Rows of 2 Dimensional Arrays using Google Apps Script</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -231,7 +231,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>21 Aug 2017, 15:02</time>
+    <time>17 May 2019, 13:21</time>
   </div>
 
   
@@ -242,9 +242,7 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/etc">etc</a>
     
   </div>
   
@@ -256,11 +254,11 @@
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/"></a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/"></a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/onedrive">OneDrive</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/"></a>
     
   </div>
   
@@ -268,24 +266,134 @@
 
 </div>
 
-  <p>OnedriveApp was updated to v1.0.2.</p>
+  
 
-<p><a href="https://github.com/tanaikech/OnedriveApp#authprocess">Moved the instance of PropertiesService.getScriptProperties() to outside of this library. When there is the PropertiesService.getScriptProperties() inside the library, it was found that the parameters that users set was saved to the library. So this was modified. I&rsquo;m sorry that I couldn&rsquo;t notice this situation.</a></p>
+<p><a href="https://gist.github.com/tanaikech/5c2d6187c08b2d7b2f7a561de0c75c5e">Gists</a></p>
 
-<p><a href="https://github.com/tanaikech/OnedriveApp">GitHub of OnedriveApp</a></p>
+<h1 id="overview">Overview</h1>
+
+<p>These are sample scripts for processing the duplicated rows of 2 dimensional arrays using Google Apps Script.</p>
+
+<h1 id="description">Description</h1>
+
+<p>When I use Google Spreadsheet and/or see Stackoverflow, I sometimes see the situation which is required to process the duplicated rows of 2 dimensional arrays. I thought that when the sample scripts for it have already prepared, they will be useful for other users including me. So I published this post. This sample scripts can be also used for Javascript. If this post is useful for you, I&rsquo;m glad.</p>
+
+<h1 id="sample-situation">Sample situation</h1>
+
+<p>Sample situation for scripts is as follows.</p>
+
+<ol>
+<li><p>There is a Spreadsheet including values. The array retrieved by <code>SpreadsheetApp.getActiveSheet().getDataRange().getValues()</code> is as follows.</p>
+
+<pre><code>var ar1 = [
+    [&quot;a1&quot;, &quot;b1&quot;, &quot;c1&quot;],
+    [&quot;a2&quot;, &quot;b2&quot;, &quot;c2&quot;],
+    [&quot;a3&quot;, &quot;b3&quot;, &quot;c3&quot;],
+    [&quot;a4&quot;, &quot;b4&quot;, &quot;c4&quot;],
+    [&quot;a5&quot;, &quot;b5&quot;, &quot;c5&quot;],
+    [&quot;a6&quot;, &quot;b6&quot;, &quot;c6&quot;],
+    [&quot;a7&quot;, &quot;b7&quot;, &quot;c7&quot;],
+    [&quot;a8&quot;, &quot;b8&quot;, &quot;c8&quot;],
+    [&quot;a9&quot;, &quot;b9&quot;, &quot;c9&quot;],
+    [&quot;a10&quot;, &quot;b10&quot;, &quot;c10&quot;]
+];
+</code></pre></li>
+
+<li><p>There is one more Spreadsheet including values. The array retrieved by <code>SpreadsheetApp.getActiveSheet().getDataRange().getValues()</code> is as follows. This array is used for checking duplicated rows.</p>
+
+<pre><code>var ar2 = [
+    [&quot;a1&quot;,    &quot;dummy&quot;, &quot;dummy&quot;],
+    [&quot;a2&quot;,    &quot;b2&quot;,    &quot;dummy&quot;],
+    [&quot;a3&quot;,    &quot;b3&quot;,    &quot;c3&quot;],
+    [&quot;dummy&quot;, &quot;dummy&quot;, &quot;c4&quot;],
+    [&quot;dummy&quot;, &quot;b5&quot;,    &quot;c5&quot;]
+];
+</code></pre></li>
+</ol>
+
+<h1 id="sample-scripts">Sample scripts</h1>
+
+<p>Here, I would like to introduce 3 sample scripts. <code>ar1</code> and <code>ar2</code> mentioned above were used for the following sample scripts.</p>
+
+<h2 id="sample-1">Sample 1</h2>
+
+<p>In this sample script, the rows that the special column is duplicated are retrieved.</p>
+
+<pre><code class="language-javascript">var checkIndex = 0;
+var res = ar2.filter(function(e) {
+  return ar1.some(function(f) {
+    return f[checkIndex] == e[checkIndex];
+  });
+});
+
+// Result: [[&quot;a1&quot;,&quot;dummy&quot;,&quot;dummy&quot;],[&quot;a2&quot;,&quot;b2&quot;,&quot;dummy&quot;],[&quot;a3&quot;,&quot;b3&quot;,&quot;c3&quot;]]
+</code></pre>
+
+<ul>
+<li>In this sample, 1st column is compared and when the same value is found, the row is retrieved as the duplicated row.</li>
+<li>If <code>var checkIndex = 1</code> is used, the 2nd column is compared.</li>
+</ul>
+
+<h2 id="sample-2">Sample 2</h2>
+
+<p>In this sample script, the rows that all columns are duplicated are retrieved.</p>
+
+<pre><code class="language-javascript">var res = ar2.filter(function(e) {
+  return ar1.some(function(f) {
+    return e.every(function(g, k) {
+      return g == f[k];
+    });
+  });
+});
+
+// Result: [[&quot;a3&quot;,&quot;b3&quot;,&quot;c3&quot;]]
+</code></pre>
+
+<h2 id="sample-3">Sample 3</h2>
+
+<p>In this sample script, the rows that the special columns are duplicated are retrieved.</p>
+
+<pre><code class="language-javascript">var checkIndex = [0, 1];
+var res = ar2.filter(function(e) {
+  return ar1.some(function(f) {
+    return checkIndex.every(function(g) {
+      return f[g] == e[g];
+    });
+  });
+});
+
+// Result: [[&quot;a2&quot;,&quot;b2&quot;,&quot;dummy&quot;],[&quot;a3&quot;,&quot;b3&quot;,&quot;c3&quot;]]
+</code></pre>
+
+<ul>
+<li>In this sample, 1st and 2nd columns are compared and when the same values are found, the row is retrieved as the duplicated row.</li>
+<li>If <code>var checkIndex = [1, 2]</code> is used, the 2nd and 3rd columns are compared.</li>
+<li>Also when you use <code>var checkIndex = [0]</code>, the same result with &ldquo;Sample 1&rdquo; can be retrieved.</li>
+<li>Also when you use <code>var checkIndex = [0, 1, 2]</code>, the same result with &ldquo;Sample 2&rdquo; can be retrieved.</li>
+</ul>
+
+<h1 id="references">References</h1>
+
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter">Array​.prototype​.filter()</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some">Array​.prototype​.some()</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every">Array​.prototype​.every()</a></li>
+</ul>
+
+<p>These are sample scripts. So please modify them for your situation.</p>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2017/08/21/updated-gas-library---onedriveapp/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2019/05/16/cli-tool---gistwatcher/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2017/08/21/updated-gas-library---onedriveapp/">Updated: GAS Library - OnedriveApp</a>
+      <a href="https://tanaikech.github.io/2019/05/16/cli-tool---gistwatcher/">CLI Tool - gistwatcher</a>
     </nav>
     
   </div>
@@ -294,14 +402,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2017/08/27/exporting-project-on-google-drive-using-golang-quickstart/">Exporting Project on Google Drive using Golang Quickstart</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2017/08/27/exporting-project-on-google-drive-using-golang-quickstart/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
