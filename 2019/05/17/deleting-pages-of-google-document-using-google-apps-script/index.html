@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.49.2" />
 
-  <title>Retrieving Total Page of Google Document using Google Apps Script &middot; tanaike</title>
+  <title>Deleting Pages of Google Document using Google Apps Script &middot; tanaike</title>
 
   
   
@@ -222,7 +222,7 @@
 
 
 <div class="header">
-  <h1>Retrieving Total Page of Google Document using Google Apps Script</h1>
+  <h1>Deleting Pages of Google Document using Google Apps Script</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -231,7 +231,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>17 May 2019, 15:05</time>
+    <time>17 May 2019, 15:12</time>
   </div>
 
   
@@ -264,20 +264,59 @@
 
 </div>
 
-  <p><a href="https://gist.github.com/tanaikech/c78087c647dc9b5547b580ccd3629974">Gists</a></p>
+  
 
-<p>This is a sample script for retrieving total page of Google Document using Google Apps Script. There are no methods for directly retrieving the total page of Google Document. This is one of several workarounds. In this workaround, the total page is retrieved by converting to PDF format.</p>
+<p><a href="https://gist.github.com/tanaikech/6d33c3ce00cd46e45d3551a587b2ae17">Gists</a></p>
 
-<pre><code class="language-javascript">var n =
-  DriveApp.getFileById(id)
-    .getBlob()
-    .getDataAsString()
-    .split(&quot;/Contents&quot;).length - 1;
-Logger.log(&quot;totalPages: %s&quot;, n);
+<p>This is a sample script for deleting pages of Google Document from the last page using Google Apps Script. There are no methods for directly deleting pages of Google Document. This is one of several workarounds. In this workaround, the following flow is used.</p>
+
+<h2 id="flow">Flow</h2>
+
+<ol>
+<li>Retrieve paragraphs in the body of Document.</li>
+<li>Retrieve elements in each paragraph. The page break is included in the paragraph.</li>
+<li>Delete elements from last page in order.</li>
+<li>When the number of page breaks is the same with deletePages, the script is stopped.</li>
+</ol>
+
+<p>By this flow, several pages can be deleted from the last page in order.</p>
+
+<h3 id="important">IMPORTANT</h3>
+
+<p>This sample script deletes pages using the page break as mentioned above. So, for example, when this script is used for Document with total page of 10 pages without the page break, the pages cannot be deleted. Please be careful this.</p>
+
+<h2 id="sample-script">Sample script</h2>
+
+<pre><code class="language-javascript">var deletePages = 3;
+var id = &quot;### documentId ###&quot;;
+
+var paragraph = DocumentApp.openById(id)
+  .getBody()
+  .getParagraphs();
+var counter = 0;
+for (var i = paragraph.length - 1; i &gt;= 0; i--) {
+  for (var j = 0; j &lt; paragraph[i].getNumChildren(); j++)
+    if (
+      paragraph[i].getChild(j).getType() == DocumentApp.ElementType.PAGE_BREAK
+    )
+      counter++;
+  paragraph[i].clear();
+  if (counter == deletePages) break;
+}
 </code></pre>
 
 <ul>
-<li>When you use this, please set the Google Document ID as <code>id</code>.</li>
+<li>When you can delete the pages from the Document by changing the number of <code>var deletePages = 3</code>.</li>
+<li>The pages are deleted from the last page.</li>
+</ul>
+
+<h2 id="references">References</h2>
+
+<ul>
+<li><a href="https://developers.google.com/apps-script/reference/document/body#getparagraphs">getParagraphs()</a></li>
+<li><a href="https://developers.google.com/apps-script/reference/document/paragraph#getchildchildindex">getChild()</a></li>
+<li><a href="https://developers.google.com/apps-script/reference/document/paragraph#clear">clear()</a></li>
+<li><a href="https://stackoverflow.com/a/56177627">How to delete a page from a google doc using app script</a></li>
 </ul>
 
 
@@ -285,13 +324,13 @@ Logger.log(&quot;totalPages: %s&quot;, n);
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2019/05/17/processing-duplicated-rows-of-2-dimensional-arrays-using-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2019/05/17/retrieving-total-page-of-google-document-using-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2019/05/17/processing-duplicated-rows-of-2-dimensional-arrays-using-google-apps-script/">Processing Duplicated Rows of 2 Dimensional Arrays using Google Apps Script</a>
+      <a href="https://tanaikech.github.io/2019/05/17/retrieving-total-page-of-google-document-using-google-apps-script/">Retrieving Total Page of Google Document using Google Apps Script</a>
     </nav>
     
   </div>
@@ -300,14 +339,8 @@ Logger.log(&quot;totalPages: %s&quot;, n);
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2019/05/17/deleting-pages-of-google-document-using-google-apps-script/">Deleting Pages of Google Document using Google Apps Script</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2019/05/17/deleting-pages-of-google-document-using-google-apps-script/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
