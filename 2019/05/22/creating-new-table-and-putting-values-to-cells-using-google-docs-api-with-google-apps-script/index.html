@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.49.2" />
 
-  <title>Topics &middot; tanaike</title>
+  <title>Creating New Table and Putting Values to Cells using Google Docs API with Google Apps Script &middot; tanaike</title>
 
   
   
@@ -39,8 +39,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
  
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike" href="https://tanaikech.github.io/topics/index.xml" />
   
 
   
@@ -117,10 +115,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://tanaikech.github.io/topics/index.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
-    </li>
     
 
     
@@ -228,188 +222,158 @@
 
 
 <div class="header">
-  <h1>Topics</h1>
+  <h1>Creating New Table and Putting Values to Cells using Google Docs API with Google Apps Script</h1>
+  <h2></h2>
 </div>
 <div class="content">
-  <ul>
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>22 May 2019, 11:06</time>
+  </div>
+
+  
+
   
   
-    <li>
-      <a href="gastips">gastips</a>
-      <span>&#40;167&#41;</span>
-    </li>
   
-    <li>
-      <a href="library">library</a>
-      <span>&#40;42&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/etc">etc</a>
+    
+  </div>
   
-    <li>
-      <a href="clitool">clitool</a>
-      <span>&#40;41&#41;</span>
-    </li>
   
-    <li>
-      <a href="gotips">gotips</a>
-      <span>&#40;25&#41;</span>
-    </li>
+
   
-    <li>
-      <a href="report">report</a>
-      <span>&#40;19&#41;</span>
-    </li>
   
-    <li>
-      <a href="googleapitips">googleapitips</a>
-      <span>&#40;17&#41;</span>
-    </li>
   
-    <li>
-      <a href="benchmark">benchmark</a>
-      <span>&#40;14&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/"></a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/"></a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/"></a>
+    
+  </div>
   
-    <li>
-      <a href="nodetips">nodetips</a>
-      <span>&#40;10&#41;</span>
-    </li>
   
-    <li>
-      <a href="etc">etc</a>
-      <span>&#40;8&#41;</span>
-    </li>
+
+</div>
+
   
-    <li>
-      <a href="pythontips">pythontips</a>
-      <span>&#40;8&#41;</span>
-    </li>
+
+<p>[Gists]()</p>
+
+<p>This is a sample script for creating new table and putting values to cells using Google Docs API with Google Apps Script. Unfortunately, in the current stage, although I had been looking for the method for creating a table and putting the values in each cell at the official document, I couldn&rsquo;t find. Google Docs API is growing now. So such documents might be not prepared yet. By this situation, I investigated about the method for achieving this method.</p>
+
+<p>Here, I would like to introduce a sample script for creating a table and putting the values in each cell using Google Docs API.</p>
+
+<p>I think that this method can be also used for the case that the Docs API is used with other languages except for Google Apps Script.</p>
+
+<h2 id="flow">Flow:</h2>
+
+<p>The flow of this sample script is as follows.</p>
+
+<ol>
+<li>Create a table with 2 rows and 2 columns.</li>
+<li>Put a text of <code>A1</code>, <code>B1</code>, <code>A2</code> and <code>B2</code> to the cells &ldquo;A1:B2&rdquo; of the table.</li>
+</ol>
+
+<p>In this sample script, above flow can be achieved by one API call.</p>
+
+<h2 id="sample-script">Sample script:</h2>
+
+<p>When you use this script, please enable Google Docs API at <a href="https://developers.google.com/apps-script/guides/services/advanced">Advanced Google Services</a>.</p>
+
+<pre><code class="language-javascript">function myFunction() {
+  var doc = DocumentApp.getActiveDocument();
+  var resource = {
+    requests: [
+      { insertTable: { rows: 2, columns: 2, location: { index: 1 } } },
+      { insertText: { text: &quot;B2&quot;, location: { index: 12 } } },
+      { insertText: { text: &quot;A2&quot;, location: { index: 10 } } },
+      { insertText: { text: &quot;B1&quot;, location: { index: 7 } } },
+      { insertText: { text: &quot;A1&quot;, location: { index: 5 } } }
+    ]
+  };
+  Docs.Documents.batchUpdate(resource, doc.getId());
+}
+</code></pre>
+
+<h2 id="result">Result:</h2>
+
+<p><img src="https://tanaikech.github.io/img/20190522b.png" alt="" /></p>
+
+<p>This table including values could be created by one API call.</p>
+
+<h2 id="important">IMPORTANT:</h2>
+
+<ul>
+<li><p>From this investigation, the following results were obtained.</p>
+
+<ul>
+<li>For the row, the index is required to set every 5 index.</li>
+<li>For the column, the index is required to set every 2 index.</li>
+</ul></li>
+
+<li><p>As an important point, when the values are put in cells, please put in order of &ldquo;B2&rdquo;, &ldquo;A2&rdquo;, &ldquo;B1&rdquo; and &ldquo;A1&rdquo;. Because when &ldquo;A1&rdquo; is firstly put, the indexes for other cells are changed.</p></li>
+</ul>
+
+<h2 id="note">Note:</h2>
+
+<ul>
+<li>These sample scripts use the scope of <code>https://www.googleapis.com/auth/documents</code>.</li>
+<li>Google Docs API is growing now. So I think that in the future, more simple method for this situation might be added.</li>
+</ul>
+
+<h2 id="references">References:</h2>
+
+<ul>
+<li><a href="https://developers.google.com/apps-script/guides/services/advanced">Advanced Google Services</a></li>
+<li><a href="https://developers.google.com/docs/api/reference/rest/v1/documents/request#inserttablerequest">InsertTableRequest</a></li>
+<li><a href="https://stackoverflow.com/a/56247351">Insert table in Google Docs API Python</a>
+
+<ul>
+<li>This method was also used for this thread.</li>
+</ul></li>
+</ul>
+
+
   
-    <li>
-      <a href="jstips">jstips</a>
-      <span>&#40;7&#41;</span>
-    </li>
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2019/05/22/possibility-of-real-time-processes-in-a-cell-on-spreadsheet-using-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2019/05/22/possibility-of-real-time-processes-in-a-cell-on-spreadsheet-using-google-apps-script/">Possibility of Real Time Processes In a Cell on Spreadsheet using Google Apps Script</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
+</div>
+
+
+
   
-    <li>
-      <a href="add-on">add-on</a>
-      <span>&#40;6&#41;</span>
-    </li>
-  
-    <li>
-      <a href="googlecharttips">googlecharttips</a>
-      <span>&#40;5&#41;</span>
-    </li>
-  
-    <li>
-      <a href="virtual-currency">virtual-currency</a>
-      <span>&#40;5&#41;</span>
-    </li>
-  
-    <li>
-      <a href="coffeescripttips">coffeescripttips</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="driveapitips">driveapitips</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="javascripttips">javascripttips</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="shtips">shtips</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="spreadsheet">spreadsheet</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="module">module</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="netatmo">netatmo</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="slacktips">slacktips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="sublime">sublime</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="sublimetips">sublimetips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="batch-file-tips">batch-file-tips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="community">community</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="ggsrun">ggsrun</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="google-apps-script">google-apps-script</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="googleapi">googleapi</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="issuetracker">issuetracker</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="netatmotips">netatmotips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="onedrivetips">onedrivetips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="plugin">plugin</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="skillshare.com">skillshare.com</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="stackoverflow">stackoverflow</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-  </ul>
+
 </div>
 
 </div>
@@ -449,3 +413,4 @@
 
 </body>
 </html>
+
