@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.49.2" />
 
-  <title>Real Time &middot; tanaike</title>
+  <title>Possibility of Real Time Processes In a Cell on Spreadsheet using Google Apps Script &middot; tanaike</title>
 
   
   
@@ -39,8 +39,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
  
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike" href="https://tanaikech.github.io/tags/real-time/index.xml" />
   
 
   
@@ -117,10 +115,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://tanaikech.github.io/tags/real-time/index.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
-    </li>
     
 
     
@@ -228,16 +222,12 @@
 
 
 <div class="header">
-  <h1>Real Time</h1>
+  <h1>Possibility of Real Time Processes In a Cell on Spreadsheet using Google Apps Script</h1>
+  <h2></h2>
 </div>
-
 <div class="content">
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2019/05/22/possibility-of-real-time-processes-in-a-cell-on-spreadsheet-using-google-apps-script/">Possibility of Real Time Processes In a Cell on Spreadsheet using Google Apps Script</a></h2>
 
-    <div class="post-meta">
+  <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
@@ -276,23 +266,127 @@
 
 </div>
 
-  </header>
+  
 
-  <p>
-  Gists
-This is a sample script for investigating the possibility of the real time processes in a cell on Google Spreadsheet using Google Apps Script. As a sample situation, it tried the real time clock in a cell on Google Spreadsheet using Google Apps Script.
-Demo: Usage: When you use this script, please do the following flow.
- Copy and paste the following script to the script editor (the container-bound script of Spreadsheet).
-  </p>
+<p><a href="https://gist.github.com/tanaikech/52e7bbdabf8bfc34ac16d5f27fd8cb80">Gists</a></p>
+
+<p>This is a sample script for investigating the possibility of the real time processes in a cell on Google Spreadsheet using Google Apps Script. As a sample situation, it tried the real time clock in a cell on Google Spreadsheet using Google Apps Script.</p>
+
+<h2 id="demo">Demo:</h2>
+
+<p><img src="https://tanaikech.github.io/img/20190522a_demo.gif" alt="" /></p>
+
+<h2 id="usage">Usage:</h2>
+
+<p>When you use this script, please do the following flow.</p>
+
+<ol>
+<li>Copy and paste the following script to the script editor (the container-bound script of Spreadsheet).</li>
+<li>Run the function of <code>run()</code>.
+
+<ul>
+<li>By this, a sidebar is opened on the Spreadsheet.</li>
+</ul></li>
+<li>When you click a button of &ldquo;start&rdquo;, the clock is started at the cell &ldquo;A1&rdquo; of the active sheet.
+
+<ul>
+<li><strong>In this sample script, the value is updated every 0.2 seconds. But the process speed of Google Apps Script is often changed even if the same script is run. So when you see the demonstration, there are sometimes the cases of 2 second step.</strong></li>
+<li>If you want to stop the clock, please click &ldquo;stop&rdquo; button.</li>
+</ul></li>
+</ol>
+
+<h2 id="sample-script">Sample script:</h2>
+
+<pre><code class="language-javascript">function runCLock() {
+  Utilities.sleep(200);
+  var time = Utilities.formatDate(
+    new Date(),
+    Session.getScriptTimeZone(),
+    &quot;HH:mm:ss&quot;
+  );
+  SpreadsheetApp.getActiveSheet()
+    .getRange(&quot;A1&quot;)
+    .setValue(time);
+}
+
+function run() {
+  var str =
+    '&lt;input type=&quot;button&quot; value=&quot;start&quot; onclick=&quot;start()&quot;&gt;&lt;input type=&quot;button&quot; id=&quot;stop&quot; value=&quot;stop&quot; onclick=&quot;stop=true&quot;&gt;&lt;script&gt;var stop=false; function work(){return new Promise((resolve, reject)=&gt; google.script.run.withSuccessHandler(()=&gt; resolve()).runCLock());}async function start(){while(!stop) await work();}&lt;/script&gt;';
+  var html = HtmlService.createHtmlOutput(str);
+  SpreadsheetApp.getUi().showSidebar(html);
+}
+</code></pre>
+
+<h3 id="expanded-html">Expanded HTML:</h3>
+
+<p>At above sample script, HTML is minified. Below script is the expanded HTML.</p>
+
+<p><strong>This is only for confirming HTML. So you are not required to copy and paste this.</strong></p>
+
+<pre><code class="language-javascript">&lt;input type=&quot;button&quot; value=&quot;start&quot; onclick=&quot;start()&quot;&gt;
+&lt;input type=&quot;button&quot; id=&quot;stop&quot; value=&quot;stop&quot; onclick=&quot;stop=true&quot;&gt;
+
+&lt;script&gt;
+  var stop = false;
+
+  function work() {
+    return new Promise((resolve, reject) =&gt; google.script.run.withSuccessHandler(() =&gt; resolve()).runCLock());
+  }
+
+  async function start() {
+    while(!stop) await work();
+  }
+&lt;/script&gt;
+</code></pre>
+
+<h2 id="note">Note:</h2>
+
+<ul>
+<li>I think that when this method is used, also the real time process can be achieved at other Google Docs.</li>
+</ul>
+
+<h2 id="references">References:</h2>
+
+<ul>
+<li><a href="https://developers.google.com/apps-script/guides/html/reference/run">Class google.script.run</a></li>
+<li><a href="https://developers.google.com/apps-script/reference/base/ui">Class Ui</a></li>
+<li><a href="https://stackoverflow.com/a/56230117">Infinite-Loop GoogleAppScript</a>
+
+<ul>
+<li>This sample script was also used for this thread.</li>
+</ul></li>
+</ul>
+
 
   
-  <footer>
-    <a href="https://tanaikech.github.io/2019/05/22/possibility-of-real-time-processes-in-a-cell-on-spreadsheet-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
-  
-</article>
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2019/05/17/deleting-pages-of-google-document-using-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2019/05/17/deleting-pages-of-google-document-using-google-apps-script/">Deleting Pages of Google Document using Google Apps Script</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
+</div>
+
+
 
   
+
 </div>
 
 </div>
@@ -332,3 +426,4 @@ Demo: Usage: When you use this script, please do the following flow.
 
 </body>
 </html>
+
