@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.49.2" />
 
-  <title>Creating New Table and Putting Values to Cells using Google Docs API with Google Apps Script &middot; tanaike</title>
+  <title>Retrieving Values with and without Duplicating from JSON Object using Google Apps Script &middot; tanaike</title>
 
   
   
@@ -222,7 +222,7 @@
 
 
 <div class="header">
-  <h1>Creating New Table and Putting Values to Cells using Google Docs API with Google Apps Script</h1>
+  <h1>Retrieving Values with and without Duplicating from JSON Object using Google Apps Script</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -231,7 +231,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>22 May 2019, 11:06</time>
+    <time>30 May 2019, 14:14</time>
   </div>
 
   
@@ -256,11 +256,11 @@
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/document">Document</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/array">Array</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/docs-api">Docs API</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/object">Object</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/table">table</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/duplicate">Duplicate</a>
     
   </div>
   
@@ -270,80 +270,94 @@
 
   
 
-<p><a href="https://gist.github.com/tanaikech/3b5ac06747c8771f70afd3496278b04b">Gists</a></p>
+<p><a href="https://gist.github.com/tanaikech/16ba2c77cdc8caa6a02958c9a4006e8a">Gists</a></p>
 
-<p>This is a sample script for creating new table and putting values to cells using Google Docs API with Google Apps Script. Unfortunately, in the current stage, although I had been looking for the method for creating a table and putting the values in each cell at the official document, I couldn&rsquo;t find. Google Docs API is growing now. So such documents might be not prepared yet. By this situation, I investigated about the method for achieving this method.</p>
+<p>This is a sample script for retrieving the values with and without duplicating from JSON object using Google Apps Script. Also this can be used by Javascript.</p>
 
-<p>Here, I would like to introduce a sample script for creating a table and putting the values in each cell using Google Docs API.</p>
+<h2 id="sample-script">Sample script</h2>
 
-<p>I think that this method can be also used for the case that the Docs API is used with other languages except for Google Apps Script.</p>
+<pre><code class="language-javascript">var obj = [
+  { key1: &quot;value1a&quot;, key2: &quot;value1b&quot; },
+  { key1: &quot;value2a&quot;, key2: &quot;value2b&quot; },
+  { key1: &quot;value5a&quot;, key2: &quot;value5b&quot; },
+  { key1: &quot;value3a&quot;, key2: &quot;value3b&quot; },
+  { key1: &quot;value1a&quot;, key2: &quot;value1b&quot; },
+  { key1: &quot;value4a&quot;, key2: &quot;value4b&quot; },
+  { key1: &quot;value5a&quot;, key2: &quot;value5b&quot; },
+  { key1: &quot;value3a&quot;, key2: &quot;value3b&quot; }
+];
 
-<h2 id="flow">Flow:</h2>
+var res = obj.reduce(
+  function(obj, e) {
+    if (
+      obj.withoutDuplicating.some(function(f) {
+        return f.key1 === e.key1 &amp;&amp; f.key2 === e.key2;
+      })
+    ) {
+      obj.withDuplicating.push(e);
+    } else {
+      obj.withoutDuplicating.push(e);
+    }
+    return obj;
+  },
+  { withoutDuplicating: [], withDuplicating: [] }
+);
 
-<p>The flow of this sample script is as follows.</p>
+Logger.log(res);
+</code></pre>
 
-<ol>
-<li>Create a table with 2 rows and 2 columns.</li>
-<li>Put a text of <code>A1</code>, <code>B1</code>, <code>A2</code> and <code>B2</code> to the cells &ldquo;A1:B2&rdquo; of the table.</li>
-</ol>
+<h2 id="result">Result</h2>
 
-<p>In this sample script, above flow can be achieved by one API call.</p>
-
-<h2 id="sample-script">Sample script:</h2>
-
-<p>When you use this script, please enable Google Docs API at <a href="https://developers.google.com/apps-script/guides/services/advanced">Advanced Google Services</a>.</p>
-
-<pre><code class="language-javascript">function myFunction() {
-  var doc = DocumentApp.getActiveDocument();
-  var resource = {
-    requests: [
-      { insertTable: { rows: 2, columns: 2, location: { index: 1 } } },
-      { insertText: { text: &quot;B2&quot;, location: { index: 12 } } },
-      { insertText: { text: &quot;A2&quot;, location: { index: 10 } } },
-      { insertText: { text: &quot;B1&quot;, location: { index: 7 } } },
-      { insertText: { text: &quot;A1&quot;, location: { index: 5 } } }
-    ]
-  };
-  Docs.Documents.batchUpdate(resource, doc.getId());
+<pre><code class="language-json">{
+  &quot;withoutDuplicating&quot;: [
+    {
+      &quot;key1&quot;: &quot;value1a&quot;,
+      &quot;key2&quot;: &quot;value1b&quot;
+    },
+    {
+      &quot;key1&quot;: &quot;value2a&quot;,
+      &quot;key2&quot;: &quot;value2b&quot;
+    },
+    {
+      &quot;key1&quot;: &quot;value5a&quot;,
+      &quot;key2&quot;: &quot;value5b&quot;
+    },
+    {
+      &quot;key1&quot;: &quot;value3a&quot;,
+      &quot;key2&quot;: &quot;value3b&quot;
+    },
+    {
+      &quot;key1&quot;: &quot;value4a&quot;,
+      &quot;key2&quot;: &quot;value4b&quot;
+    }
+  ],
+  &quot;withDuplicating&quot;: [
+    {
+      &quot;key1&quot;: &quot;value1a&quot;,
+      &quot;key2&quot;: &quot;value1b&quot;
+    },
+    {
+      &quot;key1&quot;: &quot;value5a&quot;,
+      &quot;key2&quot;: &quot;value5b&quot;
+    },
+    {
+      &quot;key1&quot;: &quot;value3a&quot;,
+      &quot;key2&quot;: &quot;value3b&quot;
+    }
+  ]
 }
 </code></pre>
 
-<h2 id="result">Result:</h2>
-
-<p><img src="https://tanaikech.github.io/img/20190522b.png" alt="" /></p>
-
-<p>This table including values could be created by one API call.</p>
-
-<h2 id="important">IMPORTANT:</h2>
+<h2 id="note">Note</h2>
 
 <ul>
-<li><p>From this investigation, the following results were obtained.</p>
-
-<ul>
-<li>For the row, the index is required to set every 5 index.</li>
-<li>For the column, the index is required to set every 2 index.</li>
-</ul></li>
-
-<li><p>As an important point, when the values are put in cells, please put in order of &ldquo;B2&rdquo;, &ldquo;A2&rdquo;, &ldquo;B1&rdquo; and &ldquo;A1&rdquo;. Because when &ldquo;A1&rdquo; is firstly put, the indexes for other cells are changed.</p></li>
+<li>As other situation, when <code>f.key1 === e.key1 &amp;&amp; f.key2 === e.key2</code> is modified to <code>f.key1 === e.key1</code>, the duplication of <code>key1</code> can be retrieved.</li>
 </ul>
 
-<h2 id="note">Note:</h2>
+<h2 id="reference">Reference</h2>
 
 <ul>
-<li>These sample scripts use the scope of <code>https://www.googleapis.com/auth/documents</code>.</li>
-<li>Google Docs API is growing now. So I think that in the future, more simple method for this situation might be added.</li>
-</ul>
-
-<h2 id="references">References:</h2>
-
-<ul>
-<li><a href="https://developers.google.com/apps-script/guides/services/advanced">Advanced Google Services</a></li>
-<li><a href="https://developers.google.com/docs/api/reference/rest/v1/documents/request#inserttablerequest">InsertTableRequest</a></li>
-<li><a href="https://stackoverflow.com/a/56247351">Insert table in Google Docs API Python</a>
-
-<ul>
-<li>This method was also used for this thread.</li>
-</ul></li>
+<li><a href="https://gist.github.com/tanaikech/848aeafaac1ec676900bb78e3ce220b6">Benchmark: Loop for Array Processing using Google Apps Script</a></li>
 </ul>
 
 
@@ -351,13 +365,13 @@
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2019/05/22/possibility-of-real-time-processes-in-a-cell-on-spreadsheet-using-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2019/05/22/creating-new-table-and-putting-values-to-cells-using-google-docs-api-with-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2019/05/22/possibility-of-real-time-processes-in-a-cell-on-spreadsheet-using-google-apps-script/">Possibility of Real Time Processes In a Cell on Spreadsheet using Google Apps Script</a>
+      <a href="https://tanaikech.github.io/2019/05/22/creating-new-table-and-putting-values-to-cells-using-google-docs-api-with-google-apps-script/">Creating New Table and Putting Values to Cells using Google Docs API with Google Apps Script</a>
     </nav>
     
   </div>
@@ -366,14 +380,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2019/05/30/retrieving-values-with-and-without-duplicating-from-json-object-using-google-apps-script/">Retrieving Values with and without Duplicating from JSON Object using Google Apps Script</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2019/05/30/retrieving-values-with-and-without-duplicating-from-json-object-using-google-apps-script/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
