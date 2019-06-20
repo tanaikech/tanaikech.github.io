@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.49.2" />
 
-  <title>Topics &middot; tanaike</title>
+  <title>Sorting for Slice using Golang &middot; tanaike</title>
 
   
   
@@ -39,8 +39,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
  
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike" href="https://tanaikech.github.io/topics/index.xml" />
   
 
   
@@ -117,10 +115,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://tanaikech.github.io/topics/index.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
-    </li>
     
 
     
@@ -228,188 +222,234 @@
 
 
 <div class="header">
-  <h1>Topics</h1>
+  <h1>Sorting for Slice using Golang</h1>
+  <h2></h2>
 </div>
 <div class="content">
-  <ul>
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>20 Jun 2019, 12:19</time>
+  </div>
+
+  
+
   
   
-    <li>
-      <a href="gastips">gastips</a>
-      <span>&#40;171&#41;</span>
-    </li>
   
-    <li>
-      <a href="library">library</a>
-      <span>&#40;43&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gotips">GoTips</a>
+    
+  </div>
   
-    <li>
-      <a href="clitool">clitool</a>
-      <span>&#40;41&#41;</span>
-    </li>
   
-    <li>
-      <a href="gotips">gotips</a>
-      <span>&#40;26&#41;</span>
-    </li>
+
   
-    <li>
-      <a href="report">report</a>
-      <span>&#40;19&#41;</span>
-    </li>
   
-    <li>
-      <a href="googleapitips">googleapitips</a>
-      <span>&#40;17&#41;</span>
-    </li>
   
-    <li>
-      <a href="benchmark">benchmark</a>
-      <span>&#40;14&#41;</span>
-    </li>
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/sort">sort</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/slice">slice</a>
+    
+  </div>
   
-    <li>
-      <a href="nodetips">nodetips</a>
-      <span>&#40;10&#41;</span>
-    </li>
   
-    <li>
-      <a href="pythontips">pythontips</a>
-      <span>&#40;8&#41;</span>
-    </li>
+
+</div>
+
   
-    <li>
-      <a href="etc">etc</a>
-      <span>&#40;7&#41;</span>
-    </li>
+
+<p>[Gists]()</p>
+
+<p>This is a sample script for sorting a slice using Golang. Recently, I had a situation for sorting the coordinates of cells of Spreadsheet. As a test case, it thinks of the situation that the randomized cells are sorted. I think that this can be also used for a table except for Spreadsheet.</p>
+
+<p>The sample slice is as follows.</p>
+
+<pre><code>ar := []struct {
+    row   int
+    col   int
+    value string
+}{
+    {0, 0, &quot;A1&quot;},
+    {0, 1, &quot;B1&quot;},
+    {0, 2, &quot;C1&quot;},
+    {1, 0, &quot;A2&quot;},
+    {1, 1, &quot;B2&quot;},
+    {1, 3, &quot;D2&quot;},
+    {2, 0, &quot;A3&quot;},
+    {2, 2, &quot;C3&quot;},
+}
+</code></pre>
+
+<p>When each element of above slice is put to a Spreadsheet, it becomes as follows.</p>
+
+<p><img src="https://tanaikech.github.io/img/20190620a-img1.png" alt="" /></p>
+
+<p>At the following sample script, after above element is randomized, the original slice is retrieved.</p>
+
+<h2 id="sample-script-1">Sample script 1:</h2>
+
+<p><a href="https://play.golang.org/p/qlGxiwehRhE">Go Playground</a></p>
+
+<pre><code>package main
+
+import (
+    &quot;fmt&quot;
+    &quot;math/rand&quot;
+    &quot;sort&quot;
+)
+
+func main() {
+    // Original slice
+    ar := []struct {
+        row   int
+        col   int
+        value string
+    }{
+        {0, 0, &quot;A1&quot;},
+        {0, 1, &quot;B1&quot;},
+        {0, 2, &quot;C1&quot;},
+        {1, 0, &quot;A2&quot;},
+        {1, 1, &quot;B2&quot;},
+        {1, 3, &quot;D2&quot;},
+        {2, 0, &quot;A3&quot;},
+        {2, 2, &quot;C3&quot;},
+    }
+
+    fmt.Println(ar)
+
+    // Randomize slice
+    // https://stackoverflow.com/a/12267471
+    for i := range ar {
+        j := rand.Intn(i + 1)
+        ar[i], ar[j] = ar[j], ar[i]
+    }
+
+    fmt.Println(ar)
+
+    // Sort
+    sort.Slice(ar, func(i, j int) bool {
+        if ar[i].row &lt; ar[j].row {
+            return true
+        } else if (ar[i].col &lt; ar[j].col) &amp;&amp; (ar[i].row == ar[j].row) {
+            return true
+        }
+        return false
+    })
+
+    fmt.Println(ar)
+}
+</code></pre>
+
+<h3 id="result">Result:</h3>
+
+<pre><code>[{0 0 A1} {0 1 B1} {0 2 C1} {1 0 A2} {1 1 B2} {1 3 D2} {2 0 A3} {2 2 C3}]
+[{1 3 D2} {1 1 B2} {0 2 C1} {2 0 A3} {2 2 C3} {0 0 A1} {1 0 A2} {0 1 B1}]
+[{0 0 A1} {0 1 B1} {0 2 C1} {1 0 A2} {1 1 B2} {1 3 D2} {2 0 A3} {2 2 C3}]
+</code></pre>
+
+<h2 id="sample-script-2">Sample script 2:</h2>
+
+<p>When <code>row</code> and <code>col</code> are switched as follows, the following result is obtained.</p>
+
+<p><a href="https://play.golang.org/p/DDXloQWaEpc">Go Playground</a></p>
+
+<pre><code>package main
+
+import (
+    &quot;fmt&quot;
+    &quot;math/rand&quot;
+    &quot;sort&quot;
+)
+
+func main() {
+    // Original slice
+    ar := []struct {
+        row   int
+        col   int
+        value string
+    }{
+        {0, 0, &quot;A1&quot;},
+        {0, 1, &quot;B1&quot;},
+        {0, 2, &quot;C1&quot;},
+        {1, 0, &quot;A2&quot;},
+        {1, 1, &quot;B2&quot;},
+        {1, 3, &quot;D2&quot;},
+        {2, 0, &quot;A3&quot;},
+        {2, 2, &quot;C3&quot;},
+    }
+
+    fmt.Println(ar)
+
+    // Randomize slice
+    // https://stackoverflow.com/a/12267471
+    for i := range ar {
+        j := rand.Intn(i + 1)
+        ar[i], ar[j] = ar[j], ar[i]
+    }
+
+    fmt.Println(ar)
+
+    // Sort
+    sort.Slice(ar, func(i, j int) bool {
+        if ar[i].col &lt; ar[j].col {
+            return true
+        } else if (ar[i].row &lt; ar[j].row) &amp;&amp; (ar[i].col == ar[j].col) {
+            return true
+        }
+        return false
+    })
+
+    fmt.Println(ar)
+}
+</code></pre>
+
+<h3 id="result-1">Result:</h3>
+
+<pre><code>[{0 0 A1} {0 1 B1} {0 2 C1} {1 0 A2} {1 1 B2} {1 3 D2} {2 0 A3} {2 2 C3}]
+[{1 3 D2} {1 1 B2} {0 2 C1} {2 0 A3} {2 2 C3} {0 0 A1} {1 0 A2} {0 1 B1}]
+[{0 0 A1} {1 0 A2} {2 0 A3} {0 1 B1} {1 1 B2} {0 2 C1} {2 2 C3} {1 3 D2}]
+</code></pre>
+
+
   
-    <li>
-      <a href="jstips">jstips</a>
-      <span>&#40;7&#41;</span>
-    </li>
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2019/06/10/gas-library---getedittype/"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2019/06/10/gas-library---getedittype/">GAS Library - GetEditType</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
+</div>
+
+
+
   
-    <li>
-      <a href="add-on">add-on</a>
-      <span>&#40;6&#41;</span>
-    </li>
-  
-    <li>
-      <a href="googlecharttips">googlecharttips</a>
-      <span>&#40;5&#41;</span>
-    </li>
-  
-    <li>
-      <a href="virtual-currency">virtual-currency</a>
-      <span>&#40;5&#41;</span>
-    </li>
-  
-    <li>
-      <a href="coffeescripttips">coffeescripttips</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="driveapitips">driveapitips</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="javascripttips">javascripttips</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="shtips">shtips</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="spreadsheet">spreadsheet</a>
-      <span>&#40;3&#41;</span>
-    </li>
-  
-    <li>
-      <a href="module">module</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="netatmo">netatmo</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="slacktips">slacktips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="sublime">sublime</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="sublimetips">sublimetips</a>
-      <span>&#40;2&#41;</span>
-    </li>
-  
-    <li>
-      <a href="batch-file-tips">batch-file-tips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="community">community</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="ggsrun">ggsrun</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="google-apps-script">google-apps-script</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="googleapi">googleapi</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="issuetracker">issuetracker</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="netatmotips">netatmotips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="onedrivetips">onedrivetips</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="plugin">plugin</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="skillshare.com">skillshare.com</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-    <li>
-      <a href="stackoverflow">stackoverflow</a>
-      <span>&#40;1&#41;</span>
-    </li>
-  
-  </ul>
+
 </div>
 
 </div>
@@ -449,3 +489,4 @@
 
 </body>
 </html>
+
