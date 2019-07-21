@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.49.2" />
 
-  <title>Creating a Table to Google Document by Retrieving Values from Google Spreadsheet for Node.js &middot; tanaike</title>
+  <title>Creating a Table to Google Document by Retrieving Values from Google Spreadsheet for Python &middot; tanaike</title>
 
   
   
@@ -222,7 +222,7 @@
 
 
 <div class="header">
-  <h1>Creating a Table to Google Document by Retrieving Values from Google Spreadsheet for Node.js</h1>
+  <h1>Creating a Table to Google Document by Retrieving Values from Google Spreadsheet for Python</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -231,7 +231,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>21 Jul 2019, 11:25</time>
+    <time>21 Jul 2019, 14:27</time>
   </div>
 
   
@@ -242,11 +242,7 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/nodetips">NodeTips</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/module">module</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/googleapitips">googleapitips</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/pythontips">PythonTips</a>
     
   </div>
   
@@ -258,9 +254,7 @@
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/node.js">Node.js</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/module">module</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/python">python</a>&nbsp;&#47;
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/document">Document</a>&nbsp;&#47;
     
@@ -276,18 +270,13 @@
 
   
 
-<p><a href="https://gist.github.com/tanaikech/e64342de7011228f5fb639d7d1123ebb">Gists</a></p>
+<p><a href="https://gist.github.com/tanaikech/305e413696bcdf3a2ee3e86cebf3c7dc">Gists</a></p>
 
-<p>This is a sample script for creating a table to Google Document by retrieving values from Google Spreadsheet for Node.js.</p>
+<p>This is a sample script for creating a table to Google Document by retrieving values from Google Spreadsheet for Python.</p>
 
-<p>Before you use this script, please install Node.js module of <a href="https://github.com/tanaikech/node-gdoctableapp">node-gdoctableapp</a>.</p>
+<p>Before you use this script, please install python library of <a href="https://github.com/tanaikech/gdoctableapppy">gdoctableapppy</a>.</p>
 
-<pre><code class="language-bash">$ npm install --save-dev gdoctableapp
-</code></pre>
-
-<p>or</p>
-
-<pre><code class="language-bash">$ npm install --global gdoctableapp
+<pre><code class="language-bash">$ pip install gdoctableapppy
 </code></pre>
 
 <h2 id="sample-script">Sample script:</h2>
@@ -296,64 +285,41 @@
 
 <p>In this sample script, the values are retrieved from <code>Sheet1!A1:C5</code> of Spreadsheet, and new table is created to the Document using the values.</p>
 
-<pre><code class="language-javascript">const { google } = require(&quot;googleapis&quot;);
-const gdoctableapp = require(&quot;gdoctableapp&quot;);
-const key = require(&quot;credential.json&quot;); // Please set the json file of Service account.
+<pre><code class="language-python">from google.oauth2 import service_account
+from gdoctableapppy import gdoctableapp
+from googleapiclient.discovery import build
 
-const jwtClient = new google.auth.JWT(
-  key.client_email,
-  null,
-  key.private_key,
-  [
-    &quot;https://www.googleapis.com/auth/documents&quot;,
-    &quot;https://www.googleapis.com/auth/spreadsheets&quot;
-  ],
-  null
-);
+SCOPES = ['https://www.googleapis.com/auth/documents',
+          'https://www.googleapis.com/auth/spreadsheets']
+SERVICE_ACCOUNT_FILE = 'credential.json' # Please set the json file of Service account.
+creds = service_account.Credentials.from_service_account_file(
+    SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 
-const sheets = google.sheets({ version: &quot;v4&quot;, auth: jwtClient });
+service = build('sheets', 'v4', credentials=creds)
 
-const spreadsheetId = &quot;###&quot;; // Please set here
-const documentId = &quot;###&quot;; // Please set here
+spreadsheet_id = '###'  # Please set here
+document_id = '###'  # Please set here
 
-sheets.spreadsheets.values.get(
-  {
-    spreadsheetId: spreadsheetId,
-    range: &quot;Sheet1!A1:C5&quot;
-  },
-  (err, res) =&gt; {
-    if (err) {
-      console.log(err.errors);
-      return;
-    }
-    const values = res.data.values;
-    if (values.length) {
-      const resource = {
-        auth: jwtClient,
-        documentId: documentId,
-        rows: values.length,
-        columns: values[0].length,
-        append: true,
-        values: values
-      };
-      gdoctableapp.CreateTable(resource, function(er, re) {
-        if (er) {
-          console.log(er.errors);
-          return;
-        }
-        console.log(re);
-      });
-    } else {
-      console.log(&quot;No data was found.&quot;);
-    }
-  }
-);
+res = service.spreadsheets().values().get(
+    spreadsheetId=spreadsheet_id, range='Sheet1!A1:C5').execute()
+values = res['values']
+
+resource = {
+    &quot;service_account&quot;: creds,
+    &quot;documentId&quot;: document_id,
+    &quot;rows&quot;: len(values),
+    &quot;columns&quot;: len(values[0]),
+    &quot;append&quot;: True,
+    &quot;values&quot;: values
+}
+res = gdoctableapp.CreateTable(resource)
+print(res)
 </code></pre>
 
 <h2 id="references">References:</h2>
 
 <ul>
-<li><a href="https://github.com/tanaikech/node-gdoctableapp">node-gdoctableapp</a></li>
+<li><a href="https://github.com/tanaikech/gdoctableapppy">gdoctableapppy</a></li>
 <li><a href="https://developers.google.com/identity/protocols/OAuth2ServiceAccount">Service account</a></li>
 </ul>
 
@@ -362,13 +328,13 @@ sheets.spreadsheets.values.get(
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2019/07/18/creating-a-table-to-google-document-by-retrieving-values-from-google-spreadsheet-for-golang/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2019/07/21/creating-a-table-to-google-document-by-retrieving-values-from-google-spreadsheet-for-node.js/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2019/07/18/creating-a-table-to-google-document-by-retrieving-values-from-google-spreadsheet-for-golang/">Creating a Table to Google Document by Retrieving Values from Google Spreadsheet for Golang</a>
+      <a href="https://tanaikech.github.io/2019/07/21/creating-a-table-to-google-document-by-retrieving-values-from-google-spreadsheet-for-node.js/">Creating a Table to Google Document by Retrieving Values from Google Spreadsheet for Node.js</a>
     </nav>
     
   </div>
@@ -377,14 +343,8 @@ sheets.spreadsheets.values.get(
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2019/07/21/creating-a-table-to-google-document-by-retrieving-values-from-google-spreadsheet-for-python/">Creating a Table to Google Document by Retrieving Values from Google Spreadsheet for Python</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2019/07/21/creating-a-table-to-google-document-by-retrieving-values-from-google-spreadsheet-for-python/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
