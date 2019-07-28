@@ -271,31 +271,39 @@
 <p><code>onEdit(e)</code> which is used for the Edit event on Spreadsheet has the old value as <code>e.oldValue</code>. The specifications for this are as follows.</p>
 
 <ol>
-<li>When an user edited a &ldquo;A1&rdquo; cell from &ldquo;hoge&rdquo; to &ldquo;fuga&rdquo;, <code>e</code> of <code>onEdit(e)</code> shows <code>hoge</code> for <code>e.oldValue</code> and <code>fuga</code> for <code>e.value</code>.</li>
-<li>When an user edited &ldquo;A1:A2&rdquo; cell from &ldquo;hoge&rdquo; to &ldquo;fuga&rdquo;, <code>e.oldValue</code> and <code>e.value</code> of <code>onEdit(e)</code> are not shown anything.</li>
+<li>When an user edited a single &ldquo;A1&rdquo; cell, <code>e</code> of <code>onEdit(e)</code> shows <code>hoge</code> for <code>e.oldValue</code> and <code>fuga</code> for <code>e.value</code>.</li>
+<li>When an user edited the &ldquo;A1:A2&rdquo; multiple cells, <code>e.oldValue</code> and <code>e.value</code> of <code>onEdit(e)</code> are not shown anything.</li>
 <li>When an user copied and pasted from other cell, <code>e.oldValue</code> and <code>e.value</code> of <code>onEdit(e)</code> are not shown anything.</li>
 </ol>
 
 <p>This sample script was created to retrieve both the edited values and the old values for the range of edited cells. This is the modified <code>e.oldValue</code>.</p>
 
-<p>In order to use this sample script, please carry out as follows.</p>
+<h2 id="preparation">Preparation:</h2>
+
+<p>In order to use this sample script, please do the following flow.</p>
 
 <ol>
-<li>Please modify &ldquo;backupfile&rdquo; of <code>var backupfilename = &quot;backupfile&quot;;</code> to an unique name.</li>
-<li>At first, run a function of <code>init()</code>. By this, the backup file is created and the sheet that you want to retrieve <code>oldValue</code> is copied to it.</li>
-<li>Please enable Sheets API v4 at <a href="https://developers.google.com/apps-script/guides/services/advanced">Advanced Google Services</a> and <a href="https://console.developers.google.com/apis/dashboard">API console</a>.</li>
-<li>Install <code>onEdit(e)</code> as an installable trigger. The install method is below.
+<li>Please modify &ldquo;backupfile&rdquo; of <code>var backupfilename = &quot;backupfile&quot;;</code> to an unique name.
 
 <ul>
-<li>On script editor</li>
-<li>Edit -&gt; Current project&rsquo;s triggers</li>
-<li>Click here to add one now.</li>
-<li>Set &ldquo;Run&rdquo; to onEdit</li>
-<li>Set &ldquo;Events&rdquo; to From spreadsheet, On edit</li>
+<li>In this script, the backup file is created to the root folder. You can move this to the specific folder.</li>
 </ul></li>
+<li>Install <code>onEditByTrigger(e)</code> as an installable trigger. The install method is below.</li>
 </ol>
 
-<p>After these, when you edit the spreadsheet, <code>onEdit(e)</code> carries out retrieving data from both current spreadsheet and backup spreadsheet and then, the data of current spreadsheet is copied to the backup spreadsheet. So you can retrieve <code>oldValue</code> and <code>currentValue</code> for the edited range. Also users that the spreadsheet is shared can retrieve <code>oldValue</code> and <code>currentValue</code> through this sample script. <strong>Each value is retrieved not only the cell values, but also the formulas and cell format, simultaneously.</strong></p>
+<p>After these, when you edit the cells of the active Spreadsheet, <code>onEditByTrigger(e)</code> carries out retrieving data from both current spreadsheet and backup spreadsheet and then, the data of current spreadsheet is copied to the backup spreadsheet. So you can retrieve <code>oldValue</code> and <code>currentValue</code> for the edited range. Also users that the spreadsheet is shared can retrieve <code>oldValue</code> and <code>currentValue</code> through this sample script.</p>
+
+<h2 id="flow-of-this-script">Flow of this script:</h2>
+
+<ol>
+<li>Copy the active Spreadsheet.
+
+<ul>
+<li>This is run only one time.</li>
+</ul></li>
+<li>When the cells are edited, the old values are retrieved by comparing the active Spreadsheet and copied Spreadsheet.</li>
+<li>Update the copied Spreadsheet.</li>
+</ol>
 
 <h2 id="script">Script :</h2>
 
@@ -328,14 +336,22 @@ function init() {
 
   copyToo(srcrange, dstrange);
   PropertiesService.getScriptProperties().setProperty('backupfileid', dstid);
+  return dstid;
 }
 
-function onEdit(e) {
+function onEditByTrigger(e) {
+  var source = e.source;
+  var range = e.range;
   var dstid = PropertiesService.getScriptProperties().getProperty('backupfileid');
-  var range = e.source.getSheetName() + &quot;!&quot; + e.range.getA1Notation();
+  if (!dstid) {
+    dstid = init();
+  }
+  
+  var range = source.getSheetName() + &quot;!&quot; + range.getA1Notation();
+  
   var fields = &quot;sheets(data(rowData(values(formattedValue,userEnteredFormat,userEnteredValue))))&quot;;
-  var currentValue = Sheets.Spreadsheets.get(e.source.getId(), {ranges: range, fields: fields});
-  var oldValue = Sheets.Spreadsheets.get(dstid, {ranges: range, fields: fields});
+  var currentValue = source.getRange(range).getValues();
+  var oldValue = SpreadsheetApp.openById(dstid).getRange(range).getValues();
 
   Logger.log(&quot;currentValue %s&quot;, currentValue)
   Logger.log(&quot;oldValue %s&quot;, oldValue)
@@ -348,61 +364,20 @@ function onEdit(e) {
 }
 </code></pre>
 
-<h2 id="result">Result :</h2>
+<ul>
+<li>When <code>getValues()</code> is modified to <code>getFormulas()</code>, the formula can be retrieved.</li>
+</ul>
 
-<p>When &ldquo;hoge&rdquo; is changed to &ldquo;fuga&rdquo;, the result is as follows.</p>
+<h2 id="result">Result:</h2>
 
-<h3 id="oldvalue">oldValue</h3>
+<p>In above sample script, you can see <code>currentValue</code> and <code>oldValue</code> at the log.</p>
 
-<pre><code class="language-json">{
-  &quot;sheets&quot;: [
-    {
-      &quot;data&quot;: [
-        {
-          &quot;rowData&quot;: [
-            {
-              &quot;values&quot;: [
-                {
-                  &quot;userEnteredValue&quot;: {
-                    &quot;stringValue&quot;: &quot;hoge&quot;
-                  },
-                  &quot;formattedValue&quot;: &quot;hoge&quot;
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    }
-  ]
-}
-</code></pre>
+<h2 id="references">References:</h2>
 
-<h3 id="currentvalue">currentValue</h3>
-
-<pre><code class="language-json">{
-  &quot;sheets&quot;: [
-    {
-      &quot;data&quot;: [
-        {
-          &quot;rowData&quot;: [
-            {
-              &quot;values&quot;: [
-                {
-                  &quot;userEnteredValue&quot;: {
-                    &quot;stringValue&quot;: &quot;fuga&quot;
-                  },
-                  &quot;formattedValue&quot;: &quot;fuga&quot;
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    }
-  ]
-}
-</code></pre>
+<ul>
+<li><a href="https://developers.google.com/apps-script/guides/triggers/events">Event Objects</a></li>
+<li><a href="https://developers.google.com/apps-script/guides/triggers/installable">Installable Triggers</a></li>
+</ul>
 
 
   
