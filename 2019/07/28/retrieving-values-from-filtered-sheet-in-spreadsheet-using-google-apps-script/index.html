@@ -306,7 +306,8 @@
     &quot;&amp;access_token=&quot; +
     ScriptApp.getOAuthToken();
   var res = UrlFetchApp.fetch(url);
-  Logger.log(res);
+  var array = Utilities.parseCsv(res.getContentText());
+  Logger.log(array);
 
   // SpreadsheetApp.getActiveSpreadsheet(); // This comment line is put for automatically detecting the scopes.
 }
@@ -318,11 +319,39 @@
 
 <h3 id="result">Result</h3>
 
-<pre><code>&quot;1&quot;,&quot;1&quot;,&quot;1&quot;
-&quot;2&quot;,&quot;2&quot;,&quot;2&quot;
-&quot;3&quot;,&quot;3&quot;,&quot;3&quot;
-&quot;4&quot;,&quot;4&quot;,&quot;4&quot;
-&quot;5&quot;,&quot;5&quot;,&quot;5&quot;
+<pre><code>[
+  [1, 1, 1],
+  [2, 2, 2],
+  [3, 3, 3],
+  [4, 4, 4],
+  [5, 5, 5]
+]
+</code></pre>
+
+<h2 id="other-method">Other method</h2>
+
+<p>If Sheets API is used, the script is as follows. When you use this script, please enable Sheets API at Advanced Google services. When this script is used for above sample Spreadsheet, the same result with the above sample script can be retrieved.</p>
+
+<pre><code class="language-javascript">function myFunction() {
+  var spreadsheetId = &quot;###&quot;; // Please set Spreadsheet ID.
+  var sheetName = &quot;Sheet1&quot;; // Please set Sheet name.
+
+  var res = Sheets.Spreadsheets.get(spreadsheetId, {
+    ranges: [sheetName],
+    fields: &quot;sheets/data&quot;
+  });
+  var array = res.sheets[0].data[0].rowMetadata.reduce(function(ar, e, i) {
+    if (!e.hiddenByFilter &amp;&amp; res.sheets[0].data[0].rowData[i]) {
+      ar.push(
+        res.sheets[0].data[0].rowData[i].values.map(function(col) {
+          return col.userEnteredValue[Object.keys(col.userEnteredValue)[0]];
+        })
+      );
+    }
+    return ar;
+  }, []);
+  Logger.log(array);
+}
 </code></pre>
 
 <h2 id="note">Note</h2>
