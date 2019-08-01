@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.49.2" />
 
-  <title>Parse &middot; tanaike</title>
+  <title>Parsing HTML using Google Apps Script &middot; tanaike</title>
 
   
   
@@ -39,8 +39,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
  
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike" href="https://tanaikech.github.io/tags/parse/index.xml" />
   
 
   
@@ -117,10 +115,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://tanaikech.github.io/tags/parse/index.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
-    </li>
     
 
     
@@ -228,16 +222,12 @@
 
 
 <div class="header">
-  <h1>Parse</h1>
+  <h1>Parsing HTML using Google Apps Script</h1>
+  <h2></h2>
 </div>
-
 <div class="content">
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2019/08/01/parsing-html-using-google-apps-script/">Parsing HTML using Google Apps Script</a></h2>
 
-    <div class="post-meta">
+  <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
@@ -276,21 +266,129 @@
 
 </div>
 
-  </header>
+  
 
-  <p>
-  Gists
-This is a sample script for parsing HTML using Google Apps Script. When HTML data is converted to Google Document, the HTML data can be parsed and be converted to Google Document. In this case, the paragraphs, lists and tables are included. From this situation, I thought that this situation can be used for parsing HTML using Google Apps Script. So I could came up with this method.
-  </p>
+<p><a href="https://gist.github.com/tanaikech/e85193a89d041fed6122583739309786">Gists</a></p>
+
+<p>This is a sample script for parsing HTML using Google Apps Script. When HTML data is converted to Google Document, the HTML data can be parsed and be converted to Google Document. In this case, the paragraphs, lists and tables are included. From this situation, I thought that this situation can be used for parsing HTML using Google Apps Script. So I could came up with this method.</p>
+
+<p>In the Sheet API, the HTML data can be put to the Spreadsheet with the PasteDataRequest. But unfortunately, in this case, I couldn&rsquo;t distinguish between the body and tables.</p>
+
+<p>The flow of this method is as follows. In this sample script, the tables from HTML are retrieved.</p>
+
+<h2 id="flow">Flow</h2>
+
+<ol>
+<li>Retrieve HTML data using <code>UrlFetchApp.fetch()</code>.</li>
+<li>Create new Google Document by converting HTML data to Google Document using Drive API.
+
+<ul>
+<li>This is a temporal file.</li>
+</ul></li>
+<li>Retrieve all tables using Document service of Google Apps Script.</li>
+<li>Delete the temporal file.</li>
+</ol>
+
+<h2 id="sample-script">Sample script</h2>
+
+<p>Before you run this script, please enable Drive API at Advanced Google Services.</p>
+
+<pre><code class="language-javascript">function parseTablesFromHTML(url) {
+  var html = UrlFetchApp.fetch(url);
+  var docId = Drive.Files.insert(
+    { title: &quot;temporalDocument&quot;, mimeType: MimeType.GOOGLE_DOCS },
+    html.getBlob()
+  ).id;
+  var tables = DocumentApp.openById(docId)
+    .getBody()
+    .getTables();
+  var res = tables.map(function(table) {
+    var values = [];
+    for (var row = 0; row &lt; table.getNumRows(); row++) {
+      var temp = [];
+      var cols = table.getRow(row);
+      for (var col = 0; col &lt; cols.getNumCells(); col++) {
+        temp.push(cols.getCell(col).getText());
+      }
+      values.push(temp);
+    }
+    return values;
+  });
+  Drive.Files.remove(docId);
+  return res;
+}
+
+// Please run this function.
+function run() {
+  var url = &quot;###&quot;; // &lt;--- Please set URL that you want to retrieve table.
+  var res = parseTablesFromHTML(url);
+  Logger.log(res);
+}
+</code></pre>
+
+<h2 id="result">Result</h2>
+
+<p>As a test case, when you set <code>https://gist.github.com/tanaikech/f52e391b68473cbf6d4ab16108dcfbbb</code> to <code>url</code> and run the script, the following result can be retrieved.</p>
+
+<pre><code class="language-json">[
+  [
+    [&quot;head1_1&quot;, &quot;head1_2&quot;, &quot;head1_3\n&quot;],
+    [&quot;value1_a1&quot;, &quot;value1_b1&quot;, &quot;value1_c1&quot;],
+    [&quot;value1_a2&quot;, &quot;value1_b2&quot;, &quot;value1_c2&quot;]
+  ],
+  [
+    [&quot;head2_1&quot;, &quot;head2_2&quot;, &quot;head2_3\n&quot;],
+    [&quot;value2_a1&quot;, &quot;value2_b1&quot;, &quot;value2_c1&quot;],
+    [&quot;value2_a2&quot;, &quot;value2_b2&quot;, &quot;value2_c2&quot;]
+  ]
+]
+</code></pre>
+
+<h2 id="note">Note</h2>
+
+<ul>
+<li>Using this method, all paragraphs and lists can be also retrieved.</li>
+<li>This method can be also used with other languages.</li>
+</ul>
+
+<h2 id="references">References</h2>
+
+<ul>
+<li><a href="https://developers.google.com/drive/api/v2/reference/files/insert">Files: insert of Drive API v2</a></li>
+<li><a href="https://developers.google.com/apps-script/reference/document/">Document Service</a></li>
+<li><a href="https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/request#pastedatarequest">PasteDataRequest of Sheets API</a></li>
+</ul>
+
 
   
-  <footer>
-    <a href="https://tanaikech.github.io/2019/08/01/parsing-html-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
-  
-</article>
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2019/07/28/retrieving-values-from-filtered-sheet-in-spreadsheet-using-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2019/07/28/retrieving-values-from-filtered-sheet-in-spreadsheet-using-google-apps-script/">Retrieving Values from Filtered Sheet in Spreadsheet using Google Apps Script</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
+</div>
+
+
 
   
+
 </div>
 
 </div>
@@ -330,3 +428,4 @@ This is a sample script for parsing HTML using Google Apps Script. When HTML dat
 
 </body>
 </html>
+
