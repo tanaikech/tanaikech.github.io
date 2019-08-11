@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.49.2" />
 
-  <title>tanaike</title>
+  <title>Examples of How to Derive a Signing Key for Signature Version 4 for Google Apps Script &middot; tanaike</title>
 
   
   
@@ -39,8 +39,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
  
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike" href="https://tanaikech.github.io/index.xml" />
   
 
   
@@ -117,10 +115,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://tanaikech.github.io/index.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
-    </li>
     
 
     
@@ -228,21 +222,16 @@
 
 
 <div class="header">
-  <h1>tanaike</h1>
-  <h2>The Thinker</h2>
+  <h1>Examples of How to Derive a Signing Key for Signature Version 4 for Google Apps Script</h1>
+  <h2></h2>
 </div>
-
 <div class="content">
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2017/05/21/decoding-json-by-golang/">Decoding JSON by Golang</a></h2>
 
-    <div class="post-meta">
+  <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>21 May 2017, 11:55</time>
+    <time>11 Aug 2019, 16:15</time>
   </div>
 
   
@@ -253,7 +242,7 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gotips">GoTips</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
     
   </div>
   
@@ -265,7 +254,11 @@
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/aws">AWS</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/signature">signature</a>
     
   </div>
   
@@ -273,242 +266,119 @@
 
 </div>
 
-  </header>
+  
 
-  <p>
-  Decoding JSON by Golang
-func main() { data := `{ &quot;A_key1&quot;: { &quot;B_key1&quot;: { &quot;C_key&quot;: &quot;value&quot; } }, &quot;A_key2&quot;: { &quot;B_key2&quot;: { &quot;C_key&quot;: &quot;value&quot; } }, &quot;A_key3&quot;: { &quot;B_key3&quot;: { &quot;C_key&quot;: &quot;value&quot; } }, &quot;A_key4&quot;: { &quot;B_key4&quot;: { &quot;C_key&quot;: &quot;value&quot; } }, &quot;A_key5&quot;: { &quot;B_key5&quot;: { &quot;C_key&quot;: &quot;value&quot; } } }` var p interface{} json.NewDecoder(strings.NewReader(data)).Decode(&amp;p) fmt.Println(p) }  Go Playground
-  </p>
+<p>This is a sample script for &ldquo;<a href="https://docs.aws.amazon.com/general/latest/gr/signature-v4-examples.html">Examples of How to Derive a Signing Key for Signature Version 4</a>&rdquo; using Google Apps Script.</p>
+
+<p>In order to use <a href="https://aws.amazon.com/tools/#sdk">AWS SDKs</a>, there are the sample scripts for the languages of Java, .NET (C#), Python, Ruby, JavaScript (Node.js). But the sample script of Google Apps Script is not prepared. I saw <a href="https://stackoverflow.com/q/57439671">the question</a> related to this at Stackoverflow. So I would like to also introduce the sample script here.</p>
+
+<p>In <a href="https://docs.aws.amazon.com/general/latest/gr/signature-v4-examples.html">the sample scripts</a>, the input values are as follows.</p>
+
+<pre><code>key = 'wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY'
+dateStamp = '20120215'
+regionName = 'us-east-1'
+serviceName = 'iam'
+</code></pre>
+
+<p>From above values, the following value is required to be retrieved.</p>
+
+<pre><code>f4780e2d9f65fa895f9c67b32ce1baf0b0d8a43505a000a1a9e090d414db404d
+</code></pre>
+
+<p>In this report, above process is achieved with Google Apps Script.</p>
+
+<h3 id="important-points">Important points:</h3>
+
+<ul>
+<li><p>At Google Apps Script, the data which was encrypted by <code>Utilities.computeHmacSha256Signature()</code> is the bytes array of the signed hexadecimal. In <a href="https://docs.aws.amazon.com/general/latest/gr/signature-v4-examples.html">the sample scripts</a>, the bytes array is converted to the unsigned hexadecimal. So it is required to be converted.</p>
+
+<ul>
+<li>But, when the byte array is created by <code>Utilities.computeHmacSha256Signature()</code>, the created byte array can be used for <code>Utilities.computeHmacSha256Signature()</code> without converting.</li>
+</ul></li>
+</ul>
+
+<p>From above situation, the sample script for Google Apps Script can be made as follows.</p>
+
+<h3 id="sample-script">Sample script:</h3>
+
+<pre><code class="language-javascript">function myFunction() {
+  // These are the sample values of https://docs.aws.amazon.com/general/latest/gr/signature-v4-examples.html
+  var key = &quot;wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY&quot;;
+  var dateStamp = &quot;20120215&quot;;
+  var regionName = &quot;us-east-1&quot;;
+  var serviceName = &quot;iam&quot;;
+
+  // I prepared the following script.
+  var kDate = Utilities.computeHmacSha256Signature(dateStamp, &quot;AWS4&quot; + key);
+  var kRegion = Utilities.computeHmacSha256Signature(
+    Utilities.newBlob(regionName).getBytes(),
+    kDate
+  );
+  var kService = Utilities.computeHmacSha256Signature(
+    Utilities.newBlob(serviceName).getBytes(),
+    kRegion
+  );
+  var kSigning = Utilities.computeHmacSha256Signature(
+    Utilities.newBlob(&quot;aws4_request&quot;).getBytes(),
+    kService
+  );
+  kSigning = kSigning
+    .map(function(e) {
+      return (&quot;0&quot; + (e &lt; 0 ? e + 256 : e).toString(16)).slice(-2);
+    })
+    .join(&quot;&quot;);
+  Logger.log(kSigning); // Result
+}
+</code></pre>
+
+<ul>
+<li>About above script, for example, <code>kDate</code> is the byte array. So <code>regionName</code> is required to be converted to the byte array. Please be careful this.</li>
+</ul>
+
+<h3 id="result">Result:</h3>
+
+<p>When above script is run, the following value can be retrieved. This value is the same with the <a href="https://docs.aws.amazon.com/general/latest/gr/signature-v4-examples.html">sample value</a>.</p>
+
+<pre><code>f4780e2d9f65fa895f9c67b32ce1baf0b0d8a43505a000a1a9e090d414db404d
+</code></pre>
+
+<h3 id="references">References:</h3>
+
+<ul>
+<li><a href="https://developers.google.com/apps-script/reference/utilities/utilities#computehmacsha256signaturevalue-key_4">computeHmacSha256Signature(value, key)</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map">map()</a></li>
+<li><a href="https://stackoverflow.com/q/57439671">How to HMAC SHA256 sign a string with a double array key or an hex string key using google apps script?</a></li>
+</ul>
+
 
   
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2017/05/21/dynamically-creating-json-by-golang/">Dynamically Creating JSON by Golang</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>21 May 2017, 10:55</time>
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2019/08/02/updated-gonetatmo-to-v101/"><i class="fa fa-chevron-left"></i></a>
+    
   </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
+  <div class="pure-u-10-24">
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gotips">GoTips</a>
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2019/08/02/updated-gonetatmo-to-v101/">Updated gonetatmo to v101</a>
+    </nav>
     
   </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
     
   </div>
-  
-  
-
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
 </div>
 
-  </header>
-
-  <p>
-  Dynamically Creating JSON by Golang
-obj := map[string]interface{}{} obj[&quot;hoge&quot;] = &quot;huga&quot; fmt.Println(obj)  Go Playground
-  </p>
-
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2017/05/21/retrieving-response-headers-by-golang/">Retrieving Response Headers by Golang</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>21 May 2017, 10:43</time>
-  </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gotips">GoTips</a>
-    
-  </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>
-    
-  </div>
-  
-  
-
-</div>
-
-  </header>
-
-  <p>
-  Retrieving Response Headers by Golang
-res, _ := client.Do(req) contentType := res.Header.Get(&quot;Content-Type&quot;) contentLength := res.Header.Get(&quot;Content-Length&quot;)  
-  </p>
-
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2017/05/19/updated-ggsrun-to-v120/">Updated ggsrun to v120</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>19 May 2017, 08:49</time>
-  </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/clitool">CLITool</a>
-    
-  </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/ggsrun">ggsrun</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/cli">CLI</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>
-    
-  </div>
-  
-  
-
-</div>
-
-  </header>
-
-  <p>
-  ggsrun was updated to v.1.2.0  Added a command for retrieving revision files on Google Drive. Some modifications.  You can check this at here.
-  </p>
-
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2017/05/16/updated-cli-tool---goris/">Updated: CLI Tool - goris</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>16 May 2017, 12:56</time>
-  </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/clitool">CLITool</a>
-    
-  </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google">Google</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/cli">CLI</a>
-    
-  </div>
-  
-  
-
-</div>
-
-  </header>
-
-  <p>
-  goris is a CLI tool to search for images with Google Reverse Image Search.
-Today, it was updated to v1.0.1. Please check it out. https://github.com/tanaikech/goris
-When number of retrieved URLs is smaller than number of default output, an error had occurred. This was fixed.
-  </p>
-
-  
-</article>
-
-  
-
-  
 
 
-<nav class="pagination" role="pagination">
   
-  <a href="https://tanaikech.github.io/page/51/"><i class="fa fa-chevron-left"></i></a>
-  
-  <span>&nbsp;52 / 62&nbsp;</span>
-  
-  <a href="https://tanaikech.github.io/page/53/"><i class="fa fa-chevron-right"></i></a>
-  
-</nav>
-
-
 
 </div>
 
