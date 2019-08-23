@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.49.2" />
 
-  <title>Examples of How to Derive a Signing Key for Signature Version 4 for Google Apps Script &middot; tanaike</title>
+  <title>Updated: python library - getfilelistpy &middot; tanaike</title>
 
   
   
@@ -222,7 +222,7 @@
 
 
 <div class="header">
-  <h1>Examples of How to Derive a Signing Key for Signature Version 4 for Google Apps Script</h1>
+  <h1>Updated: python library - getfilelistpy</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -231,7 +231,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>11 Aug 2019, 16:15</time>
+    <time>23 Aug 2019, 15:20</time>
   </div>
 
   
@@ -242,7 +242,7 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/etc">etc</a>
     
   </div>
   
@@ -254,11 +254,11 @@
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/"></a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/aws">AWS</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/"></a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/signature">signature</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/"></a>
     
   </div>
   
@@ -268,102 +268,30 @@
 
   
 
-<p><a href="https://gist.github.com/tanaikech/97a2787db7be94180a64e1f4c194d415">Gists</a></p>
-
-<p>This is a sample script for &ldquo;<a href="https://docs.aws.amazon.com/general/latest/gr/signature-v4-examples.html">Examples of How to Derive a Signing Key for Signature Version 4</a>&rdquo; using Google Apps Script.</p>
-
-<p>In order to use <a href="https://aws.amazon.com/tools/#sdk">AWS SDKs</a>, there are the sample scripts for the languages of Java, .NET (C#), Python, Ruby, JavaScript (Node.js). But the sample script of Google Apps Script is not prepared. I saw <a href="https://stackoverflow.com/q/57439671">the question</a> related to this at Stackoverflow. So I would like to also introduce the sample script here.</p>
-
-<p>In <a href="https://docs.aws.amazon.com/general/latest/gr/signature-v4-examples.html">the sample scripts</a>, the input values are as follows.</p>
-
-<pre><code>key = 'wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY'
-dateStamp = '20120215'
-regionName = 'us-east-1'
-serviceName = 'iam'
-</code></pre>
-
-<p>From above values, the following value is required to be retrieved.</p>
-
-<pre><code>f4780e2d9f65fa895f9c67b32ce1baf0b0d8a43505a000a1a9e090d414db404d
-</code></pre>
-
-<p>In this report, above process is achieved with Google Apps Script.</p>
-
-<h3 id="important-points">Important points:</h3>
+<h2 id="python-library-getfilelistpy-was-updated-to-v1-0-4">python library - getfilelistpy was updated to v1.0.4.</h2>
 
 <ul>
-<li><p>At Google Apps Script, the data which was encrypted by <code>Utilities.computeHmacSha256Signature()</code> is the bytes array of the signed hexadecimal. In <a href="https://docs.aws.amazon.com/general/latest/gr/signature-v4-examples.html">the sample scripts</a>, the bytes array is converted to the unsigned hexadecimal. So it is required to be converted.</p>
+<li><p>v1.0.4 (August 23, 2019)</p>
 
-<ul>
-<li>But, when the byte array is created by <code>Utilities.computeHmacSha256Signature()</code>, the created byte array can be used for <code>Utilities.computeHmacSha256Signature()</code> without converting.</li>
-</ul></li>
+<ol>
+<li>For OAuth2, <code>oauth2client</code> and <code>google_auth_oauthlib</code> got to be able to be used. About the sample script for <code>google_auth_oauthlib</code>, please see <a href="https://github.com/tanaikech/getfilelistpy#googleauthoauthlibsample">this</a>.</li>
+</ol></li>
 </ul>
 
-<p>From above situation, the sample script for Google Apps Script can be made as follows.</p>
-
-<h3 id="sample-script">Sample script:</h3>
-
-<pre><code class="language-javascript">function myFunction() {
-  // These are the sample values of https://docs.aws.amazon.com/general/latest/gr/signature-v4-examples.html
-  var key = &quot;wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY&quot;;
-  var dateStamp = &quot;20120215&quot;;
-  var regionName = &quot;us-east-1&quot;;
-  var serviceName = &quot;iam&quot;;
-
-  // I prepared the following script.
-  var kDate = Utilities.computeHmacSha256Signature(dateStamp, &quot;AWS4&quot; + key);
-  var kRegion = Utilities.computeHmacSha256Signature(
-    Utilities.newBlob(regionName).getBytes(),
-    kDate
-  );
-  var kService = Utilities.computeHmacSha256Signature(
-    Utilities.newBlob(serviceName).getBytes(),
-    kRegion
-  );
-  var kSigning = Utilities.computeHmacSha256Signature(
-    Utilities.newBlob(&quot;aws4_request&quot;).getBytes(),
-    kService
-  );
-  kSigning = kSigning
-    .map(function(e) {
-      return (&quot;0&quot; + (e &lt; 0 ? e + 256 : e).toString(16)).slice(-2);
-    })
-    .join(&quot;&quot;);
-  Logger.log(kSigning); // Result
-}
-</code></pre>
-
-<ul>
-<li>About above script, for example, <code>kDate</code> is the byte array. So <code>regionName</code> is required to be converted to the byte array. Please be careful this.</li>
-</ul>
-
-<h3 id="result">Result:</h3>
-
-<p>When above script is run, the following value can be retrieved. This value is the same with the <a href="https://docs.aws.amazon.com/general/latest/gr/signature-v4-examples.html">sample value</a>.</p>
-
-<pre><code>f4780e2d9f65fa895f9c67b32ce1baf0b0d8a43505a000a1a9e090d414db404d
-</code></pre>
-
-<h3 id="references">References:</h3>
-
-<ul>
-<li><a href="https://developers.google.com/apps-script/reference/utilities/utilities#computehmacsha256signaturevalue-key_4">computeHmacSha256Signature(value, key)</a></li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map">map()</a></li>
-<li><a href="https://stackoverflow.com/q/57439671">How to HMAC SHA256 sign a string with a double array key or an hex string key using google apps script?</a></li>
-</ul>
+<p><strong>You can check gonetatmo at <a href="https://github.com/tanaikech/getfilelistpy">https://github.com/tanaikech/getfilelistpy</a>.</strong></p>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2019/08/02/updated-gonetatmo-to-v101/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2019/08/11/examples-of-how-to-derive-a-signing-key-for-signature-version-4-for-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2019/08/02/updated-gonetatmo-to-v101/">Updated gonetatmo to v101</a>
+      <a href="https://tanaikech.github.io/2019/08/11/examples-of-how-to-derive-a-signing-key-for-signature-version-4-for-google-apps-script/">Examples of How to Derive a Signing Key for Signature Version 4 for Google Apps Script</a>
     </nav>
     
   </div>
@@ -372,14 +300,8 @@ serviceName = 'iam'
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2019/08/23/updated-python-library---getfilelistpy/">Updated: python library - getfilelistpy</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2019/08/23/updated-python-library---getfilelistpy/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
