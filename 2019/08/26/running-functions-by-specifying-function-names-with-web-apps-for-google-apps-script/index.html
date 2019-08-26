@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.49.2" />
 
-  <title>Updated: GAS Library - RunAll &middot; tanaike</title>
+  <title>Running Functions by Specifying Function Names with Web Apps for Google Apps Script &middot; tanaike</title>
 
   
   
@@ -222,7 +222,7 @@
 
 
 <div class="header">
-  <h1>Updated: GAS Library - RunAll</h1>
+  <h1>Running Functions by Specifying Function Names with Web Apps for Google Apps Script</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -231,7 +231,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>26 Aug 2019, 17:40</time>
+    <time>26 Aug 2019, 17:55</time>
   </div>
 
   
@@ -242,9 +242,7 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
     
   </div>
   
@@ -258,13 +256,7 @@
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/concurrent-processes">concurrent-processes</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/parallel-process">parallel process</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/asynchronous-process">asynchronous process</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/web-apps">Web Apps</a>
     
   </div>
   
@@ -274,30 +266,122 @@
 
   
 
-<h2 id="runall-https-github-com-tanaikech-runall-was-updated-to-v1-1-0"><a href="https://github.com/tanaikech/RunAll">RunAll</a> was updated to v1.1.0.</h2>
+<p><a href="https://gist.github.com/tanaikech/b2e0325a28efe7c609e4688ec22ee22c">Gists</a></p>
+
+<p>In this report, I would like to introduce the method for running functions by directly specifying the function names with Web Apps for Google Apps Script.</p>
+
+<h2 id="description">Description</h2>
+
+<p>It has already been known that the directly specified functions in the project can be run from the outside by enabling &ldquo;API executable&rdquo; and using the method of <a href="https://developers.google.com/apps-script/api/reference/rest/v1/scripts">scripts.run</a> in Google Apps Script API. In this case, the installation for using Apps Script API is a bit complicate. I think that this is making users difficult to use Apps Script API, although the important settings are including in the installation when the importance of the security is considered. As one of workarounds for making easy to run the directly specified functions in the project, I would like to introduce the method using Web Apps. When Web Apps is accessed, the functions of <code>doGet()</code> and <code>doPost()</code> are used. These are the reserved function name. But, when this method is used, the functions in the project can be run by directly selecting from the outside.</p>
+
+<p>This method is also used at <a href="https://github.com/tanaikech/RunAll">RunAll</a> which is a library for running the concurrent processing using only native Google Apps Script.</p>
+
+<h2 id="usage">Usage</h2>
+
+<h3 id="1-create-new-project">1. Create new project</h3>
+
+<p>Please create new project. In this case, you can use both the standalone script type and the container-bound script type. Here, as a sample case, the standalone script type is used. In order to create new standalone project, please access to <a href="https://script.google.com">https://script.google.com</a>, and click &ldquo;New script&rdquo;. By this, the script editor is opened as new project. Then please give the project name. By this, new standalone project is created.</p>
+
+<h3 id="2-copy-and-paste-script-for-web-apps">2. Copy and paste script for Web Apps</h3>
+
+<p>Please copy and paste the script to the created project on the script editor for using with Web Apps. The script is as follows.</p>
+
+<h4 id="script">Script</h4>
+
+<pre><code class="language-javascript">// This function is used for running the script of Web Apps.
+function doGet(e) {
+  if (&quot;function&quot; in e.parameter) {
+    var f = e.parameter[&quot;function&quot;];
+    var a = e.parameter[&quot;arguments&quot;];
+    if (f in this &amp;&amp; typeof this[f] == &quot;function&quot;) {
+      return ContentService.createTextOutput(this[f](a));
+    }
+    throw new Error(f + &quot; was not found.&quot;);
+  }
+  throw new Error(&quot;Function name was not given.&quot;);
+}
+
+// Sample function that you want to run using Web Apps.
+function sample(s) {
+  return &quot;Received arguments are &quot; + s;
+}
+</code></pre>
 
 <ul>
-<li><p>v1.1.0 (August 26, 2018)</p>
-
-<ol>
-<li><a href="https://github.com/tanaikech/RunAll#2-parallel-processing-with-web-apps">New method for achieving the parallel processing with Web Apps was added.</a></li>
-</ol></li>
+<li><code>doGet(e)</code> is used for Web Apps.</li>
+<li><code>sample(s)</code> is a test function that you want to run using Web Apps. - You can add the other functions you want to run in the project.</li>
 </ul>
 
-<p><strong>You can see the detail information here <a href="https://github.com/tanaikech/RunAll">https://github.com/tanaikech/RunAll</a></strong></p>
+<h3 id="deploy-web-apps">Deploy Web Apps</h3>
+
+<p>Please deploy Web Apps as follow.</p>
+
+<ol>
+<li>On the script editor, Open a dialog box by &ldquo;Publish&rdquo; -&gt; &ldquo;Deploy as web app&rdquo;.</li>
+<li>Select <strong>&ldquo;User accessing the web app&rdquo;</strong> or <strong>&ldquo;Me&rdquo;</strong> for &ldquo;Execute the app as:&ldquo;.</li>
+<li>Select <strong>&ldquo;Anyone, even anonymous&rdquo;</strong> for &ldquo;Who has access to the app:&ldquo;.
+
+<ul>
+<li>This setting is used for testing this method. In this settings, all people who know the URL of Web Apps can be accessed. So please be careful.</li>
+<li>When you use at the actual situation, please select &ldquo;Only myself&rdquo;. By this, only you can access to Web Apps.</li>
+</ul></li>
+<li>Click &ldquo;Deploy&rdquo; button as new &ldquo;Project version&rdquo;.</li>
+<li>Automatically open a dialog box of &ldquo;Authorization required&rdquo;.
+
+<ol>
+<li>Click &ldquo;Review Permissions&rdquo;.</li>
+<li>Select own account.</li>
+<li>Click &ldquo;Advanced&rdquo; at &ldquo;This app isn&rsquo;t verified&rdquo;.</li>
+<li>Click &ldquo;Go to ### project name ###(unsafe)&rdquo;</li>
+<li>Click &ldquo;Allow&rdquo; button.</li>
+</ol></li>
+<li>Copy &ldquo;Current web app URL:&ldquo;.
+
+<ul>
+<li>It&rsquo;s like <code>https://script.google.com/macros/s/#####/exec</code>.</li>
+</ul></li>
+<li>Click &ldquo;OK&rdquo;.</li>
+</ol>
+
+<blockquote>
+<p>IMPORTANT: <strong>In above settings, when you modified the script, please redeploy Web Apps as new version. By this, the latest script is reflected. Please be careful this.</strong></p>
+</blockquote>
+
+<h3 id="run-function">Run function</h3>
+
+<p>After above settings were done, you can run the function of <code>sample(s)</code> as follows.</p>
+
+<h4 id="curl-sample">Curl sample</h4>
+
+<pre><code class="language-bash">$ curl -L &quot;https://script.google.com/macros/s/#####/exec?function=sample&amp;arguments=foo&quot;
+</code></pre>
+
+<h4 id="result">Result</h4>
+
+<pre><code>Received arguments are foo
+</code></pre>
+
+<p>From this result, you can see the function of <code>sample(s)</code> was run by accessing to Web Apps.</p>
+
+<h2 id="references">References</h2>
+
+<ul>
+<li><a href="https://github.com/tanaikech/taking-advantage-of-Web-Apps-with-google-apps-script">Taking advantage of Web Apps with Google Apps Script</a></li>
+<li><a href="https://github.com/tanaikech/RunAll">RunAll</a></li>
+</ul>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2019/08/23/updated-python-library---getfilelistpy/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2019/08/26/updated-gas-library---runall/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2019/08/23/updated-python-library---getfilelistpy/">Updated: python library - getfilelistpy</a>
+      <a href="https://tanaikech.github.io/2019/08/26/updated-gas-library---runall/">Updated: GAS Library - RunAll</a>
     </nav>
     
   </div>
@@ -306,14 +390,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2019/08/26/running-functions-by-specifying-function-names-with-web-apps-for-google-apps-script/">Running Functions by Specifying Function Names with Web Apps for Google Apps Script</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2019/08/26/running-functions-by-specifying-function-names-with-web-apps-for-google-apps-script/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
