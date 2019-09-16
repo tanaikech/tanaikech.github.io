@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.49.2" />
 
-  <title>Javascript library - syncGoogleScriptRun &middot; tanaike</title>
+  <title>Modifying Revisions of a File on Google Drive using Google Apps Script &middot; tanaike</title>
 
   
   
@@ -218,7 +218,7 @@
 
 
 <div class="header">
-  <h1>Javascript library - syncGoogleScriptRun</h1>
+  <h1>Modifying Revisions of a File on Google Drive using Google Apps Script</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -227,7 +227,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>13 Sep 2019, 14:54</time>
+    <time>16 Sep 2019, 15:50</time>
   </div>
 
   
@@ -238,9 +238,7 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/jstips">jstips</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">library</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
     
   </div>
   
@@ -252,13 +250,11 @@
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/javascript">Javascript</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/revision">revision</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google.script.run">google.script.run</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/synchronous">synchronous</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/drive-api">drive api</a>
     
   </div>
   
@@ -268,42 +264,102 @@
 
   
 
-<h1 id="overview">Overview</h1>
+<p><a href="https://gist.github.com/tanaikech/9508a9007c1a5196e4b234ea40528f96">Gists</a></p>
 
-<p>This is a Javascript library to use &ldquo;google.script.run&rdquo; with the synchronous process.</p>
+<p>This is a sample script for modifying the revisions of a file on Google Drive using Google Apps Script. This script can be used for not only Google Docs files, but also the files except for Google Docs.</p>
 
-<h1 id="description">Description</h1>
+<h2 id="issue-and-workaround">Issue and workaround:</h2>
 
-<p>When I create Web Apps, add-on using a side bar and dialog, there is the case that I want to use <code>google.script.run</code> with the synchronous process. As you know, <a href="https://developers.google.com/apps-script/guides/html/reference/run"><code>google.script.run</code> works with the asynchronous process</a>. So in order to use it as the synchronous process, the script is required to be prepared. I also saw several issues for such situation at Stackoverflow and other sites. I thought that when the script for achieving this was prepared as a library, it might be useful for users. So I created this.</p>
+<p>Unfortunately, in the current stage, at Google Docs files, the revision of Google Docs cannot be directly changed by APIs with a script. So as one of several workarounds, I would like to propose to overwrite the Google Docs file using the exported data. On the other hand, at the files except for Google Docs, the data can be directly retrieved with the revision ID. This can be used for overwriting the file. The flow of this script is as follows.</p>
 
-<h1 id="install">Install</h1>
+<h3 id="for-google-docs-files">For Google Docs files:</h3>
 
-<pre><code class="language-html">&lt;script src=&quot;syncGoogleScriptRun.min.js&quot;&gt;&lt;/script&gt;
-</code></pre>
-
-<p>Or, using jsdelivr cdn</p>
-
-<pre><code class="language-html">&lt;script src=&quot;https://cdn.jsdelivr.net/gh/tanaikech/syncGoogleScriptRun@master/syncGoogleScriptRun.min.js&quot;&gt;&lt;/script&gt;
-</code></pre>
+<ol>
+<li>Retrieve the exported endpoint from the Google Docs file with the revision ID.
 
 <ul>
-<li>Of course, you can use this by directly copying and paste the script of <a href="https://github.com/tanaikech/syncGoogleScriptRun/blob/master/syncGoogleScriptRun.js">syncGoogleScriptRun.js</a> to the script editor.</li>
+<li>In this case, the Google Docs file is exported as the Microsoft Docs file.</li>
+</ul></li>
+<li>Retrieve the blob from the exported endpoint.</li>
+<li>Overwrite the Google Docs with the retrieved blob.</li>
+</ol>
+
+<h3 id="for-files-except-for-google-docs">For files except for Google Docs:</h3>
+
+<ol>
+<li>Retrieve the blob with the file ID and revision ID.</li>
+<li>Overwrite the file with the retrieved blob.</li>
+</ol>
+
+<p>By this flow, all files can be reverted to the previous version.</p>
+
+<h2 id="important">IMPORTANT:</h2>
+
+<p>As an important point, when the Google Docs file is exported as the Microsoft Docs file, at the most cases, the overwritten Google Docs files are not changed from the original Google Docs for the version. But I&rsquo;m not sure that this workaround works perfectly for all cases. So please be careful this.</p>
+
+<h3 id="sample-script">Sample script:</h3>
+
+<p>The sample script is as follows. Before you run the script, <a href="https://developers.google.com/apps-script/guides/services/advanced#enabling_advanced_services">please enable Drive API at Advanced Google services</a>. And also, please set the variables of <code>revisionId</code> and <code>fileId</code>. <code>revisionId</code> can be retrieved by the method of <a href="https://developers.google.com/drive/api/v2/reference/revisions/list">Revisions: list of Drive API</a>.</p>
+
+<pre><code class="language-javascript">function revertRevision() {
+  var revisionId = &quot;###&quot;; // Please set the revision ID you want to revert.
+  var fileId = &quot;###&quot;; // Please set the Google Docs file ID.
+
+  var endpoint = &quot;&quot;;
+  var token = ScriptApp.getOAuthToken();
+  var res = Drive.Revisions.get(fileId, revisionId);
+  if (res.mimeType.indexOf(&quot;application/vnd.google-apps&quot;) &gt; -1) {
+    var endpoints = res.exportLinks;
+    var keys = Object.keys(endpoints);
+    for (var i = 0; i &lt; keys.length; i++) {
+      if (
+        keys[i].indexOf(&quot;application/vnd.openxmlformats-officedocument&quot;) &gt; -1
+      ) {
+        endpoint = endpoints[keys[i]] + &quot;&amp;access_token=&quot; + token;
+        break;
+      }
+    }
+  } else {
+    endpoint =
+      &quot;https://www.googleapis.com/drive/v3/files/&quot; +
+      fileId +
+      &quot;/revisions/&quot; +
+      revisionId +
+      &quot;?alt=media&amp;access_token=&quot; +
+      token;
+  }
+  var mediaData = UrlFetchApp.fetch(endpoint).getBlob();
+  Drive.Files.update({}, fileId, mediaData);
+}
+</code></pre>
+
+<h2 id="note">Note:</h2>
+
+<ul>
+<li>If you want to revert perfectly to the previous version for Google Docs file, in the current stage, I recommend to manually revert.</li>
 </ul>
 
-<p><strong>You can get this from <a href="https://github.com/tanaikech/syncGoogleScriptRun">https://github.com/tanaikech/syncGoogleScriptRun</a></strong></p>
+<h2 id="references">References:</h2>
+
+<ul>
+<li><a href="https://developers.google.com/apps-script/guides/services/advanced">Advanced Google services</a></li>
+<li><a href="https://developers.google.com/drive/api/v2/reference/revisions/get">Revisions: get</a></li>
+<li><a href="https://developers.google.com/drive/api/v2/reference/files/update">Files: update</a></li>
+<li><a href="https://stackoverflow.com/a/57898660">How to revert back document to a previous revision</a></li>
+</ul>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2019/09/12/javascript-library---getfilelist_js/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2019/09/13/javascript-library---syncgooglescriptrun/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2019/09/12/javascript-library---getfilelist_js/">Javascript library - GetFileList_js</a>
+      <a href="https://tanaikech.github.io/2019/09/13/javascript-library---syncgooglescriptrun/">Javascript library - syncGoogleScriptRun</a>
     </nav>
     
   </div>
@@ -312,14 +368,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2019/09/16/modifying-revisions-of-a-file-on-google-drive-using-google-apps-script/">Modifying Revisions of a File on Google Drive using Google Apps Script</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2019/09/16/modifying-revisions-of-a-file-on-google-drive-using-google-apps-script/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
