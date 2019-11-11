@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.49.2" />
 
-  <title>Updated: GAS Library - OnedriveApp &middot; tanaike</title>
+  <title>Figma to Google Slides using Google Apps Script &middot; tanaike</title>
 
   
   
@@ -218,7 +218,7 @@
 
 
 <div class="header">
-  <h1>Updated: GAS Library - OnedriveApp</h1>
+  <h1>Figma to Google Slides using Google Apps Script</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -227,7 +227,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>21 Aug 2017, 11:22</time>
+    <time>11 Nov 2019, 14:43</time>
   </div>
 
   
@@ -240,7 +240,7 @@
     
       <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/figma">Figma</a>
     
   </div>
   
@@ -254,9 +254,9 @@
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/figma">Figma</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/onedrive">OneDrive</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/slides">Slides</a>
     
   </div>
   
@@ -264,26 +264,119 @@
 
 </div>
 
-  <p>OnedriveApp was updated to v1.0.1.</p>
+  
 
-<p><a href="https://github.com/tanaikech/OnedriveApp#authprocess">Added a method for retrieving access token and refresh token using this library.</a></p>
+<p><a href="https://gist.github.com/tanaikech/6aeb3ff13765cfba465862e2e2c3dd3b">Gists</a></p>
 
-<p>By added this method, OneDrive APIs can be used by only this library.</p>
+<p>In this sample script, all pages in the Figma file are retrieved and the retrieved pages are put to new Google Slides as the image.</p>
 
-<p><a href="https://github.com/tanaikech/OnedriveApp">GitHub of OnedriveApp</a></p>
+<h2 id="usage">Usage</h2>
+
+<h3 id="1-retrieve-access-token">1. Retrieve access token</h3>
+
+<p>You can see the method for retrieving the access token at <a href="https://www.figma.com/developers/api#access-tokens">here</a>. Although there is also OAuth2 for retrieving the access token, in your situation, I thought that the method for directly generating the access token on the site might be suitable. So in this answer, the generated access token on the site is used. Please retrieve the access token as follows.</p>
+
+<blockquote>
+<p><strong>Generate a personal access token</strong></p>
+
+<ol>
+<li>Login to your Figma account.</li>
+<li>Head to the Account Settings from the top-left menu inside Figma.</li>
+<li>Find the Personal Access Tokens section.</li>
+<li>Click Create new token.</li>
+<li>A token will be generated. This will be your only chance to copy the token, so make sure you keep a copy of this in a secure place.</li>
+</ol>
+</blockquote>
+
+<p>The access token is like <code>#####-########-####-####-####-############</code>. At Google Apps Script, the authorization is done by <code>headers: {&quot;X-Figma-Token&quot;: accessToken}</code>.</p>
+
+<h3 id="2-retrieve-file-key">2. Retrieve file key</h3>
+
+<p>In order to retrieve the Figma file using Figma API, the file key is required. You can retrieve the file key from the URL of the file.</p>
+
+<p>The URL of the file is like <code>https://www.figma.com/file/###/sampleFilename</code>. In this case, <code>###</code> is the file key.</p>
+
+<h3 id="3-run-script">3. Run script</h3>
+
+<p>The sample script is as follows. Before you run the script, please set the variables of <code>accessToken</code> and <code>fileKey</code>.</p>
+
+<pre><code class="language-javascript">function myFunction() {
+  var accessToken = &quot;###&quot;; // Please set your access token.
+  var fileKey = &quot;###&quot;; // Please set the file key.
+
+  var baseUrl = &quot;https://api.figma.com/v1&quot;;
+  var params = {
+    method: &quot;get&quot;,
+    headers: { &quot;X-Figma-Token&quot;: accessToken },
+    muteHttpExceptions: true
+  };
+  var fileInfo = JSON.parse(
+    UrlFetchApp.fetch(baseUrl + &quot;/files/&quot; + fileKey, params)
+  );
+  var children = JSON.parse(
+    UrlFetchApp.fetch(
+      baseUrl +
+        &quot;/images/&quot; +
+        fileKey +
+        &quot;?format=jpg&amp;scale=3&amp;ids=&quot; +
+        fileInfo.document.children
+          .map(function(c) {
+            return c.id;
+          })
+          .join(&quot;,&quot;),
+      params
+    )
+  );
+  if (!children.err) {
+    var s = SlidesApp.create(&quot;sampleSlide&quot;);
+    var slide = s.getSlides()[0];
+    var keys = Object.keys(children.images);
+    keys.forEach(function(c, i) {
+      slide.insertImage(children.images[c]);
+      if (i != keys.length - 1) slide = s.insertSlide(i + 1);
+    });
+  } else {
+    throw new Error(children);
+  }
+}
+</code></pre>
+
+<ul>
+<li>When <code>myFunction()</code> is run, at first, the file information is retrieved with the file key <code>fileKey</code>. Then, all pages are retrieved from the retrieved file information, and the retrieved pages are put to each slide of new Google Slides.</li>
+<li>I think that the action of this script is similar to <a href="https://github.com/alyssaxuu/figma-to-google-slides/blob/master/Chrome%20Extension/background.js">the script</a> which is shown at the bottom of your question.</li>
+</ul>
+
+<h2 id="note">Note</h2>
+
+<ul>
+<li>This is a sample script. So please modify it for your actual situation.</li>
+</ul>
+
+<h2 id="references">References</h2>
+
+<ul>
+<li><a href="https://www.figma.com/developers/api">Figma API</a></li>
+<li><a href="https://developers.google.com/apps-script/reference/url-fetch/url-fetch-app">Class UrlFetchApp</a></li>
+<li><a href="https://developers.google.com/apps-script/reference/slides/slides-app">Class SlidesApp</a></li>
+<li><a href="https://stackoverflow.com/q/58792786">How do I get Figma API to work with the Google App-script API?</a>
+
+<ul>
+<li>I answered this script to the question.</li>
+</ul></li>
+</ul>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2017/08/21/changing-values-by-checking-duplicated-values-of-json-for-javascript/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2019/11/08/retrieving-values-from-sheet-filtered-by-slicer-in-spreadsheet-using-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2017/08/21/changing-values-by-checking-duplicated-values-of-json-for-javascript/">Changing Values by Checking Duplicated Values of JSON for Javascript</a>
+      <a href="https://tanaikech.github.io/2019/11/08/retrieving-values-from-sheet-filtered-by-slicer-in-spreadsheet-using-google-apps-script/">Retrieving Values from Sheet Filtered by Slicer in Spreadsheet using Google Apps Script</a>
     </nav>
     
   </div>
@@ -292,14 +385,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2017/08/21/updated-gas-library---onedriveapp/">Updated: GAS Library - OnedriveApp</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2017/08/21/updated-gas-library---onedriveapp/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
@@ -335,20 +422,6 @@
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
     })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-    ga('create', 'UA-84325623-1', 'auto');
-    ga('send', 'pageview');
-  }
-</script>
-
-
-
-
-
-</body>
-</html>
-
-com/analytics.js','ga');
 
     ga('create', 'UA-84325623-1', 'auto');
     ga('send', 'pageview');
