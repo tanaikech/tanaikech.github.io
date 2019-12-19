@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.49.2" />
 
-  <title>Updated: GAS Library - GmailToList &middot; tanaike</title>
+  <title>Dynamically Updating Custom Menu of Google Spreadsheet using Google Apps Script &middot; tanaike</title>
 
   
   
@@ -218,7 +218,7 @@
 
 
 <div class="header">
-  <h1>Updated: GAS Library - GmailToList</h1>
+  <h1>Dynamically Updating Custom Menu of Google Spreadsheet using Google Apps Script</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -227,7 +227,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>17 Dec 2019, 11:40</time>
+    <time>20 Dec 2019, 07:48</time>
   </div>
 
   
@@ -238,9 +238,7 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
     
   </div>
   
@@ -254,11 +252,9 @@
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">Spreadsheet</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/gmail">gmail</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/backup">backup</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/custom-menu">custom menu</a>
     
   </div>
   
@@ -268,30 +264,91 @@
 
   
 
-<h2 id="gmailtolist-https-github-com-tanaikech-gmailtolist-was-updated-to-v1-0-1"><a href="https://github.com/tanaikech/GmailToList">GmailToList</a> was updated to v1.0.1.</h2>
+<p>[Gists]()</p>
+
+<p>This is a sample script for dynamically updating the custom menu of Google Spreadsheet using Google Apps Script.</p>
+
+<h2 id="demo">Demo</h2>
+
+<p><img src="https://tanaikech.github.io/img/20191220a-fig1.gif" alt="" /></p>
+
+<p>In this demonstration, when the Spreadsheet is opened, 5 functions added to the custom menu. You can see that when a column is added and deleted, the custom menu is updated.</p>
+
+<h2 id="issue-and-workaround-for-this-goal">Issue and workaround for this goal:</h2>
+
+<p>Unfortunately, in the current stage, when a function is added to the custom menu with <code>addItem</code> method, the argument cannot been able to be used. And when one of functions in the custom menu is run, the information about the function name which was run cannot be retrieved. By this, the goal cannot be directly achieved. So it is required to use the workaround.</p>
+
+<p>When I thought this goal, I thought that <a href="https://stackoverflow.com/q/59386046/7108653">this thread</a> is useful. At <code>google.script.run</code>, it is required to be able to directly run the function at the script editor and the function is included in <code>this</code>. But at the custom menu, when the function is included in <code>this</code>, the function can be run even when the function cannot be directly run at the script editor. When the function is run in only GAS side, the function can be run even when the function cannot be directly run with the script editor. I thought that this situation can be used as the workaround.</p>
+
+<h2 id="sample-script">Sample script:</h2>
+
+<p>Please copy and paste it to the container-bound script of Spreadsheet which has the headers (&ldquo;Col1&rdquo;, &ldquo;Col2&rdquo;,,,) at the 1st row and the values from 2nd row like above demo video. And when you run the script, please open the Spreadsheet. By this, the custom menu is created. When new column is added by copying, the additional column is also added to the custom menu by the OnEdit event trigger as the simple trigger. When a column is deleted, the custom menu is also updated by the OnChange event trigger as the installable trigger. And when the function at the custom menu is run, the values corresponding to the column are activated. This can be seen at the demo video.</p>
+
+<pre><code class="language-javascript">function onOpen() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var headers = ss.getRange(1, 1, 1, ss.getLastColumn()).getValues()[0];
+  var ui = SpreadsheetApp.getUi();
+  var menu = ui
+    .createMenu(&quot;Custom Menu&quot;)
+    .addItem(&quot;First item&quot;, &quot;menuItem1&quot;)
+    .addSeparator();
+  var subMenu = ui.createMenu(&quot;Sub-menu&quot;);
+  for (var i = 0; i &lt; headers.length; i++) {
+    var dynamicMenu = headers[i];
+    this[dynamicMenu] = dynamicItem(i); // Added
+    subMenu.addItem(dynamicMenu, dynamicMenu); // Modified
+  }
+  menu.addSubMenu(subMenu).addToUi();
+}
+
+function onEdit() {} // Modified: This can be used as the simple trigger.
+
+function onChange() {} // Added: Please install OnChange event trigger to this function.
+
+onOpen(); // Added
+
+function dynamicItem(i) {
+  // Added
+  return function() {
+    var sheet = SpreadsheetApp.getActiveSheet();
+    sheet.getRange(2, i + 1, sheet.getLastRow() - 1, 1).activate();
+  };
+}
+</code></pre>
 
 <ul>
-<li><p>v1.0.1 (December 17, 2019)</p>
-
-<ol>
-<li><a href="https://github.com/tanaikech/GmailToList#3-method-getattachmentfiles">New method of <code>getAttachmentFiles()</code></a> was added. The attachment files can be retrieved as blob using this method.</li>
-</ol></li>
+<li>Before you use this script, please install the OnChange event trigger to the function of <code>onChange()</code>. By this, when the column is deleted, the custom menu is updated.</li>
+<li>The functions of <code>function onEdit() {}</code> and <code>function onChange() {}</code> are used for running <code>onOpen();</code>.</li>
 </ul>
 
-<p><strong>You can see the detail information here <a href="https://github.com/tanaikech/GmailToList">https://github.com/tanaikech/GmailToList</a></strong></p>
+<h2 id="note">Note:</h2>
+
+<ul>
+<li>In order to dynamically update the custom menu, this script is required to be run at initial stage when the function is run. So it is required to be put it as the global like <code>onOpen();</code>.</li>
+<li>In this workaround, when the function is run, <code>onOpen</code> is run every time. So when the number of columns are large, the process cost will be high. So please be careful this.</li>
+<li>This is a simple sample script for explaining one methodology of the workaround. So please modify this for your situation.</li>
+</ul>
+
+<h2 id="references">References:</h2>
+
+<ul>
+<li><a href="https://developers.google.com/apps-script/guides/menus">Custom Menus</a></li>
+<li><a href="https://stackoverflow.com/q/59386046/7108653">Different output in 3 anonymous function in GAS</a> - I think that this thread was useful for thinking OP&rsquo;s goal.</li>
+<li>This workaround has posted to <a href="https://stackoverflow.com/a/59417714/7108653">this thread</a>.</li>
+</ul>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2019/12/16/gas-library---gmailtolist/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2019/12/17/updated-gas-library---gmailtolist/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2019/12/16/gas-library---gmailtolist/">GAS Library - GmailToList</a>
+      <a href="https://tanaikech.github.io/2019/12/17/updated-gas-library---gmailtolist/">Updated: GAS Library - GmailToList</a>
     </nav>
     
   </div>
@@ -300,14 +357,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2019/12/20/dynamically-updating-custom-menu-of-google-spreadsheet-using-google-apps-script/">Dynamically Updating Custom Menu of Google Spreadsheet using Google Apps Script</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2019/12/20/dynamically-updating-custom-menu-of-google-spreadsheet-using-google-apps-script/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
