@@ -5,9 +5,11 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.49.2" />
+  <meta name="generator" content="Hugo 0.61.0" />
 
   <title>Summarizing Slides as Thumbnails &middot; tanaike</title>
+
+    
 
   
   
@@ -30,7 +32,7 @@
   <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
 
   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
@@ -105,6 +107,12 @@
       
       
         <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
           <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
       
         </li>
@@ -165,7 +173,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/tanaikech" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
     </li>
     
 
@@ -175,7 +183,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
     </li>
     
 
@@ -260,192 +268,211 @@
 
 </div>
 
-  
-
-<p><a href="https://gist.github.com/tanaikech/79749b9fc411da91f932608b5c01ea5b">Gists</a></p>
-
-<p>This is a sample script for summarizing Slides as thumbnails. For example, it supposes a Slides including 15 pages. When this script is run, it summarizes 6 pages to one page as images. I created this because there are no methods for directly achieving this. This is useful for myself. If this is also useful for you, I&rsquo;m glad.</p>
-
+  <p><a href="https://gist.github.com/tanaikech/79749b9fc411da91f932608b5c01ea5b">Gists</a></p>
+<p>This is a sample script for summarizing Slides as thumbnails. For example, it supposes a Slides including 15 pages. When this script is run, it summarizes 6 pages to one page as images. I created this because there are no methods for directly achieving this. This is useful for myself. If this is also useful for you, I'm glad.</p>
 <p>The flow of this workaround is as follows.</p>
-
 <h3 id="flow">Flow:</h3>
-
 <ol>
 <li>Copy the original Slides file as a temporary file.</li>
 <li>Retrieve images of all slides.
-
 <ul>
 <li>When the Slides file is exported to PNG file, the top page is exported as PNG file. I used this.</li>
-</ul></li>
+</ul>
+</li>
 <li>Put and arrange the retrieved images to the temporary file.
-
 <ul>
 <li>When the image is inserted to a slide, retrieve the size and change the size, then put the image to the calculated position.</li>
-</ul></li>
+</ul>
+</li>
 </ol>
-
 <h3 id="sample-script-1">Sample script 1:</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
+  <span style="color:#75715e">// Please set these parameters
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">id</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;### file ID ###&#34;</span>; <span style="color:#75715e">// file ID of original Slides
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">col</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span>; <span style="color:#75715e">// Number of columns
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">row</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>; <span style="color:#75715e">// Number of rows
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">wsize</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">200</span>; <span style="color:#75715e">// Size of width of each image (pixels)
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sep</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>; <span style="color:#75715e">// Space of each image (pexels)
+</span><span style="color:#75715e"></span>
 
-<pre><code class="language-javascript">function myFunction() {
-  // Please set these parameters
-  var id = &quot;### file ID ###&quot;; // file ID of original Slides
-  var col = 3; // Number of columns
-  var row = 2; // Number of rows
-  var wsize = 200; // Size of width of each image (pixels)
-  var sep = 5; // Space of each image (pexels)
-
-
-  // Create temporary file
-  var originalFile = DriveApp.getFileById(id);
-  var tempFile = originalFile.makeCopy();
-  var idt = tempFile.getId();
+  <span style="color:#75715e">// Create temporary file
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">originalFile</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">id</span>);
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">tempFile</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">originalFile</span>.<span style="color:#a6e22e">makeCopy</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">idt</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">tempFile</span>.<span style="color:#a6e22e">getId</span>();
   
-  // Retrieve slides as images
-  var s = SlidesApp.openById(idt);
-  var slides = s.getSlides();
-  var accessToken = ScriptApp.getOAuthToken();
-  var baseUrl = &quot;https://docs.google.com/presentation/d/&quot; + idt + &quot;/export/&quot;;
-  var url = baseUrl + &quot;png?access_token=&quot; + accessToken;
-  var blobs = slides.map(function(e) {
-    var blob = UrlFetchApp.fetch(url).getBlob();
-    slides[0].remove();
-    s.saveAndClose();
-    s = SlidesApp.openById(idt);
-    slides = s.getSlides();
-    return blob;
+  <span style="color:#75715e">// Retrieve slides as images
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">s</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SlidesApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">idt</span>);
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">slides</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getSlides</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">accessToken</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">baseUrl</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://docs.google.com/presentation/d/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">idt</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/export/&#34;</span>;
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">baseUrl</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;png?access_token=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">accessToken</span>;
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">blobs</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">slides</span>.<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">blob</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>).<span style="color:#a6e22e">getBlob</span>();
+    <span style="color:#a6e22e">slides</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">remove</span>();
+    <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">saveAndClose</span>();
+    <span style="color:#a6e22e">s</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SlidesApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">idt</span>);
+    <span style="color:#a6e22e">slides</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getSlides</span>();
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">blob</span>;
   });
 
-  // Put images 
-  var ph = s.getPageHeight();
-  var pw = s.getPageWidth();
-  var leftOffset = (pw - ((wsize * col) + (sep * (col - 1)))) / 2;
-  if (leftOffset &lt; 0) throw new Error(&quot;Images are sticking out from a slide.&quot;);
-  var len = col * row;
-  var loops = Math.ceil(blobs.length / (col * row));
-  for (var loop = 0; loop &lt; loops; loop++) {
-    var ns = s.insertSlide(loop);
-    var topOffset, top;
-    var left = leftOffset;
-    for (var i = len * loop; i &lt; len + (len * loop); i++) {
-      if (i === blobs.length) break;
-      var image = ns.insertImage(blobs[i]);
-      var w = image.getWidth();
-      var h = image.getHeight();
-      var hsize = h * wsize / w;
-      if (i === 0 || i % len === 0) {
-        topOffset = (ph - ((hsize * row) + sep)) / 2;
-        if (topOffset &lt; 0) throw new Error(&quot;Images are sticking out from a slide.&quot;);
-        top = topOffset;
+  <span style="color:#75715e">// Put images 
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ph</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getPageHeight</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">pw</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getPageWidth</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">leftOffset</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">pw</span> <span style="color:#f92672">-</span> ((<span style="color:#a6e22e">wsize</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">col</span>) <span style="color:#f92672">+</span> (<span style="color:#a6e22e">sep</span> <span style="color:#f92672">*</span> (<span style="color:#a6e22e">col</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>)))) <span style="color:#f92672">/</span> <span style="color:#ae81ff">2</span>;
+  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">leftOffset</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">&#34;Images are sticking out from a slide.&#34;</span>);
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">len</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">col</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">row</span>;
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">loops</span> <span style="color:#f92672">=</span> Math.<span style="color:#a6e22e">ceil</span>(<span style="color:#a6e22e">blobs</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">/</span> (<span style="color:#a6e22e">col</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">row</span>));
+  <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">loop</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">loop</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">loops</span>; <span style="color:#a6e22e">loop</span><span style="color:#f92672">++</span>) {
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ns</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">insertSlide</span>(<span style="color:#a6e22e">loop</span>);
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">topOffset</span>, <span style="color:#a6e22e">top</span>;
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">left</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">leftOffset</span>;
+    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">len</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">loop</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">len</span> <span style="color:#f92672">+</span> (<span style="color:#a6e22e">len</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">loop</span>); <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
+      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">i</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">blobs</span>.<span style="color:#a6e22e">length</span>) <span style="color:#66d9ef">break</span>;
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">image</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ns</span>.<span style="color:#a6e22e">insertImage</span>(<span style="color:#a6e22e">blobs</span>[<span style="color:#a6e22e">i</span>]);
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">w</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">image</span>.<span style="color:#a6e22e">getWidth</span>();
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">h</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">image</span>.<span style="color:#a6e22e">getHeight</span>();
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">hsize</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">h</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">wsize</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">w</span>;
+      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">i</span> <span style="color:#f92672">===</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">%</span> <span style="color:#a6e22e">len</span> <span style="color:#f92672">===</span> <span style="color:#ae81ff">0</span>) {
+        <span style="color:#a6e22e">topOffset</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">ph</span> <span style="color:#f92672">-</span> ((<span style="color:#a6e22e">hsize</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">row</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">sep</span>)) <span style="color:#f92672">/</span> <span style="color:#ae81ff">2</span>;
+        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">topOffset</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">&#34;Images are sticking out from a slide.&#34;</span>);
+        <span style="color:#a6e22e">top</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">topOffset</span>;
       }
-      image.setWidth(wsize).setHeight(hsize).setTop(top).setLeft(left).getObjectId();
-      if (i === col - 1 + (loop * len)) {
-        top = topOffset + hsize + sep;
-        left = leftOffset;
-      } else {
-        left += wsize + sep;
+      <span style="color:#a6e22e">image</span>.<span style="color:#a6e22e">setWidth</span>(<span style="color:#a6e22e">wsize</span>).<span style="color:#a6e22e">setHeight</span>(<span style="color:#a6e22e">hsize</span>).<span style="color:#a6e22e">setTop</span>(<span style="color:#a6e22e">top</span>).<span style="color:#a6e22e">setLeft</span>(<span style="color:#a6e22e">left</span>).<span style="color:#a6e22e">getObjectId</span>();
+      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">i</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">col</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">+</span> (<span style="color:#a6e22e">loop</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">len</span>)) {
+        <span style="color:#a6e22e">top</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">topOffset</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">hsize</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">sep</span>;
+        <span style="color:#a6e22e">left</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">leftOffset</span>;
+      } <span style="color:#66d9ef">else</span> {
+        <span style="color:#a6e22e">left</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">wsize</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">sep</span>;
       }
     }
   }
-  s.saveAndClose();
+  <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">saveAndClose</span>();
 }
-</code></pre>
-
-<h3 id="sample-script-2">Sample script 2:</h3>
-
+</code></pre></div><h3 id="sample-script-2">Sample script 2:</h3>
 <p><strong>When you use this script, please enable Slides API at API console.</strong></p>
-
-<pre><code class="language-javascript">function myFunction() {
-  // Please set these parameters
-  var id = &quot;### file ID ###&quot;; // file ID of original Slides
-  var col = 3; // Number of columns
-  var row = 2; // Number of rows
-  var wsize = 200; // Size of width of each image (pixels)
-  var sep = 5; // Space of each image (pexels)
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
+  <span style="color:#75715e">// Please set these parameters
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">id</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;### file ID ###&#34;</span>; <span style="color:#75715e">// file ID of original Slides
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">col</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span>; <span style="color:#75715e">// Number of columns
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">row</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>; <span style="color:#75715e">// Number of rows
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">wsize</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">200</span>; <span style="color:#75715e">// Size of width of each image (pixels)
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sep</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>; <span style="color:#75715e">// Space of each image (pexels)
+</span><span style="color:#75715e"></span>  
   
-  
-  // Retrieve slides as images
-  var originalFile = SlidesApp.openById(id);
-  var accessToken = ScriptApp.getOAuthToken();
-  var pageObjectIds = originalFile.getSlides().map(function(e) {return e.getObjectId()});
-  var reqUrls = pageObjectIds.map(function(pageObjectId) {
-    return {
-      method: &quot;get&quot;,
-      url: &quot;https://slides.googleapis.com/v1/presentations/&quot; + id + &quot;/pages/&quot; + pageObjectId + &quot;/thumbnail?access_token=&quot; + accessToken,
+  <span style="color:#75715e">// Retrieve slides as images
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">originalFile</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SlidesApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">id</span>);
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">accessToken</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">pageObjectIds</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">originalFile</span>.<span style="color:#a6e22e">getSlides</span>().<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getObjectId</span>()});
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">reqUrls</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">pageObjectIds</span>.<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">pageObjectId</span>) {
+    <span style="color:#66d9ef">return</span> {
+      <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;get&#34;</span>,
+      <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;https://slides.googleapis.com/v1/presentations/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">id</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/pages/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">pageObjectId</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/thumbnail?access_token=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">accessToken</span>,
     };
   });
-  var reqBlobs = UrlFetchApp.fetchAll(reqUrls).map(function(e) {
-    var r = JSON.parse(e);
-    return {
-      method: &quot;get&quot;,
-      url: r.contentUrl,
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">reqBlobs</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetchAll</span>(<span style="color:#a6e22e">reqUrls</span>).<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">e</span>);
+    <span style="color:#66d9ef">return</span> {
+      <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;get&#34;</span>,
+      <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">contentUrl</span>,
     };
   });
-  var blobs = UrlFetchApp.fetchAll(reqBlobs).map(function(e) {return e.getBlob()});
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">blobs</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetchAll</span>(<span style="color:#a6e22e">reqBlobs</span>).<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getBlob</span>()});
   
-  // Create a temporary Slides and put images 
-  var s = SlidesApp.create(&quot;temporarySlides&quot;);
-  s.getSlides()[0].remove();
-  var idt = s.getId();
-  var ph = s.getPageHeight();
-  var pw = s.getPageWidth();
-  var leftOffset = (pw - ((wsize * col) + (sep * (col - 1)))) / 2;
-  if (leftOffset &lt; 0) throw new Error(&quot;Images are sticking out from a slide.&quot;);
-  var len = col * row;
-  var loops = Math.ceil(blobs.length / (col * row));
-  for (var loop = 0; loop &lt; loops; loop++) {
-    var ns = s.insertSlide(loop);
-    var topOffset, top;
-    var left = leftOffset;
-    for (var i = len * loop; i &lt; len + (len * loop); i++) {
-      if (i === blobs.length) break;
-      var image = ns.insertImage(blobs[i]);
-      var w = image.getWidth();
-      var h = image.getHeight();
-      var hsize = h * wsize / w;
-      if (i === 0 || i % len === 0) {
-        topOffset = (ph - ((hsize * row) + sep)) / 2;
-        if (topOffset &lt; 0) throw new Error(&quot;Images are sticking out from a slide.&quot;);
-        top = topOffset;
+  <span style="color:#75715e">// Create a temporary Slides and put images 
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">s</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SlidesApp</span>.<span style="color:#a6e22e">create</span>(<span style="color:#e6db74">&#34;temporarySlides&#34;</span>);
+  <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getSlides</span>()[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">remove</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">idt</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getId</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ph</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getPageHeight</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">pw</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getPageWidth</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">leftOffset</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">pw</span> <span style="color:#f92672">-</span> ((<span style="color:#a6e22e">wsize</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">col</span>) <span style="color:#f92672">+</span> (<span style="color:#a6e22e">sep</span> <span style="color:#f92672">*</span> (<span style="color:#a6e22e">col</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>)))) <span style="color:#f92672">/</span> <span style="color:#ae81ff">2</span>;
+  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">leftOffset</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">&#34;Images are sticking out from a slide.&#34;</span>);
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">len</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">col</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">row</span>;
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">loops</span> <span style="color:#f92672">=</span> Math.<span style="color:#a6e22e">ceil</span>(<span style="color:#a6e22e">blobs</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">/</span> (<span style="color:#a6e22e">col</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">row</span>));
+  <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">loop</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">loop</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">loops</span>; <span style="color:#a6e22e">loop</span><span style="color:#f92672">++</span>) {
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ns</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">insertSlide</span>(<span style="color:#a6e22e">loop</span>);
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">topOffset</span>, <span style="color:#a6e22e">top</span>;
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">left</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">leftOffset</span>;
+    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">len</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">loop</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">len</span> <span style="color:#f92672">+</span> (<span style="color:#a6e22e">len</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">loop</span>); <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
+      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">i</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">blobs</span>.<span style="color:#a6e22e">length</span>) <span style="color:#66d9ef">break</span>;
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">image</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ns</span>.<span style="color:#a6e22e">insertImage</span>(<span style="color:#a6e22e">blobs</span>[<span style="color:#a6e22e">i</span>]);
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">w</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">image</span>.<span style="color:#a6e22e">getWidth</span>();
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">h</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">image</span>.<span style="color:#a6e22e">getHeight</span>();
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">hsize</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">h</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">wsize</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">w</span>;
+      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">i</span> <span style="color:#f92672">===</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">%</span> <span style="color:#a6e22e">len</span> <span style="color:#f92672">===</span> <span style="color:#ae81ff">0</span>) {
+        <span style="color:#a6e22e">topOffset</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">ph</span> <span style="color:#f92672">-</span> ((<span style="color:#a6e22e">hsize</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">row</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">sep</span>)) <span style="color:#f92672">/</span> <span style="color:#ae81ff">2</span>;
+        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">topOffset</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">&#34;Images are sticking out from a slide.&#34;</span>);
+        <span style="color:#a6e22e">top</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">topOffset</span>;
       }
-      image.setWidth(wsize).setHeight(hsize).setTop(top).setLeft(left).getObjectId();
-      if (i === col - 1 + (loop * len)) {
-        top = topOffset + hsize + sep;
-        left = leftOffset;
-      } else {
-        left += wsize + sep;
+      <span style="color:#a6e22e">image</span>.<span style="color:#a6e22e">setWidth</span>(<span style="color:#a6e22e">wsize</span>).<span style="color:#a6e22e">setHeight</span>(<span style="color:#a6e22e">hsize</span>).<span style="color:#a6e22e">setTop</span>(<span style="color:#a6e22e">top</span>).<span style="color:#a6e22e">setLeft</span>(<span style="color:#a6e22e">left</span>).<span style="color:#a6e22e">getObjectId</span>();
+      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">i</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">col</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">+</span> (<span style="color:#a6e22e">loop</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">len</span>)) {
+        <span style="color:#a6e22e">top</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">topOffset</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">hsize</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">sep</span>;
+        <span style="color:#a6e22e">left</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">leftOffset</span>;
+      } <span style="color:#66d9ef">else</span> {
+        <span style="color:#a6e22e">left</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">wsize</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">sep</span>;
       }
     }
   }
-  s.saveAndClose();
+  <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">saveAndClose</span>();
 
-  // Export PDF file
-  var urlPdf = &quot;https://docs.google.com/presentation/d/&quot; + idt + &quot;/export/&quot; + &quot;pdf?access_token=&quot; + accessToken;
-  var pdf = UrlFetchApp.fetch(urlPdf).getBlob();
-  DriveApp.createFile(pdf.setName(originalFile.getName() + &quot;.pdf&quot;));
-  DriveApp.getFileById(idt).setTrashed(true);
+  <span style="color:#75715e">// Export PDF file
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">urlPdf</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://docs.google.com/presentation/d/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">idt</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/export/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;pdf?access_token=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">accessToken</span>;
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">pdf</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">urlPdf</span>).<span style="color:#a6e22e">getBlob</span>();
+  <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">createFile</span>(<span style="color:#a6e22e">pdf</span>.<span style="color:#a6e22e">setName</span>(<span style="color:#a6e22e">originalFile</span>.<span style="color:#a6e22e">getName</span>() <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;.pdf&#34;</span>));
+  <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">idt</span>).<span style="color:#a6e22e">setTrashed</span>(<span style="color:#66d9ef">true</span>);
 }
-</code></pre>
-
-<h2 id="input">Input:</h2>
-
+</code></pre></div><h2 id="input">Input:</h2>
 <p>This is the original Slides.</p>
-
-<p><img src="https://tanaikech.github.io/img/20181214a-fig1.png" alt="" /></p>
-
+<p><img src="https://tanaikech.github.io/img/20181214a-fig1.png" alt=""></p>
 <h2 id="output">Output:</h2>
-
 <p>This is the exported PDF file.</p>
-
-<p><img src="https://tanaikech.github.io/img/20181214a-fig2.png" alt="" /></p>
-
+<p><img src="https://tanaikech.github.io/img/20181214a-fig2.png" alt=""></p>
 <h2 id="note">Note:</h2>
-
 <ul>
 <li>This script was posted to <a href="https://stackoverflow.com/a/53775150/7108653">https://stackoverflow.com/a/53775150/7108653</a>.</li>
 <li>Both samples can obtain the same result. So please select one of them.</li>
 <li>The process cost of &ldquo;Sample script 2&rdquo; is lower than that of &ldquo;Sample script 1&rdquo;, because at &ldquo;Sample script 2&rdquo;, all thumbnail images are retrieved using the fetchAll method.</li>
 <li>I think that when &ldquo;Sample script 1&rdquo; is used, the thumbnail list can be also created for other Google Docs (Spreadsheet and Document).</li>
 </ul>
+
+  
+  <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2018%2f12%2f14%2fsummarizing-slides-as-thumbnails%2f" target="_blank" title="Share on Facebook"><i class="fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2018%2f12%2f14%2fsummarizing-slides-as-thumbnails%2f&via=HorribleGeek" target="_blank" title="Tweet"><i class="fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2018%2f12%2f14%2fsummarizing-slides-as-thumbnails%2f" target="_blank" title="Share on Google+"><i class="fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2018%2f12%2f14%2fsummarizing-slides-as-thumbnails%2f" target="_blank" title="Post to Tumblr"><i class="fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2018%2f12%2f14%2fsummarizing-slides-as-thumbnails%2f" target="_blank" title="Pin it"><i class="fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2018%2f12%2f14%2fsummarizing-slides-as-thumbnails%2f" target="_blank" title="Submit to Reddit"><i class="fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
 
 
   
@@ -488,6 +515,7 @@
 </div>
 </div>
 <script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -497,10 +525,6 @@
     }
   });
 </script>
-<script type="text/javascript"
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-</script>
-<meta http-equiv="X-UA-Compatible" CONTENT="IE=EmulateIE7" />
 
 
 <script>
@@ -515,6 +539,8 @@
     ga('send', 'pageview');
   }
 </script>
+
+
 
 
 

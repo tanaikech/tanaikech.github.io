@@ -5,9 +5,11 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.49.2" />
+  <meta name="generator" content="Hugo 0.61.0" />
 
   <title>Pseudo Browser with Google Spreadsheet &middot; tanaike</title>
+
+    
 
   
   
@@ -30,7 +32,7 @@
   <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
 
   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
@@ -105,6 +107,12 @@
       
       
         <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
           <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
       
         </li>
@@ -165,7 +173,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/tanaikech" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
     </li>
     
 
@@ -175,7 +183,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
     </li>
     
 
@@ -260,92 +268,112 @@
 
 </div>
 
-  
-
-<p><a href="https://gist.github.com/tanaikech/a290509e3d3f6997d248b88763fc69b9">Gist</a></p>
-
+  <p><a href="https://gist.github.com/tanaikech/a290509e3d3f6997d248b88763fc69b9">Gist</a></p>
 <h2 id="overview">Overview</h2>
-
 <p>This is a sample script for creating the pseudo browser using Google Spreadsheet.</p>
-
 <h2 id="description">Description</h2>
-
 <p>I unexpectedly noticed this. I think that this is for off-line browsing using HTML data. So there are many limitations. At first, please confirm them.</p>
-
 <ul>
 <li><strong>Limitations</strong>
-
 <ul>
 <li>It cannot move from opened site to other outside site. If the outer site is opened as a new wind, your own browser is opened and move there.</li>
 <li>For URL, it can move directories which is one low. But it cannot move directories more than two deeper.
-
 <ul>
 <li><strong>Because it retrieves the HTML data from the inputted URL using <code>UrlFetchApp</code>. It cannot move to the out side of data retrieved by <code>UrlFetchApp</code>.</strong></li>
-</ul></li>
+</ul>
+</li>
 <li>The access to the site opened by inputting URL is run at Google side.</li>
 <li>Javascript on the opened site is run at your local PC side.</li>
 <li><code>User-Agent</code> cannot be changed from <code>Mozilla/5.0 (compatible; Google-Apps-Script)</code>.</li>
-</ul></li>
+</ul>
+</li>
+</ul>
+<p>What I thought the interesting is that the appearance of the site has been maintained at this pseudo browser. And, by using this, the sites which are slow speed at your environment might be able to be opened smoothly.</p>
+<h2 id="demo">Demo</h2>
+<p><img src="https://tanaikech.github.io/img/20170705a-demo.gif" alt=""></p>
+<h2 id="script">Script</h2>
+<p>Please copy and paste following respective HTML and GAS to your script editor. Please launch the script editor on container-bound script for spreadsheet.</p>
+<h3 id="1-html">1. HTML</h3>
+<p>Filename is <code>index.html</code>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#75715e">&lt;!DOCTYPE html&gt;</span>
+&lt;<span style="color:#f92672">html</span>&gt;
+  &lt;<span style="color:#f92672">head</span>&gt;
+    &lt;<span style="color:#f92672">style</span>&gt;
+      <span style="color:#f92672">input</span>.<span style="color:#a6e22e">in1</span> {
+        <span style="color:#66d9ef">width</span>: <span style="color:#ae81ff">90</span><span style="color:#66d9ef">%</span>;
+      }
+    &lt;/<span style="color:#f92672">style</span>&gt;
+  &lt;/<span style="color:#f92672">head</span>&gt;
+  &lt;<span style="color:#f92672">body</span>&gt;
+    &lt;<span style="color:#f92672">form</span>&gt;
+      &lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text&#34;</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;url&#34;</span> <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;in1&#34;</span>&gt;
+      &lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;button&#34;</span> <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Run&#34;</span> <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;in2&#34;</span>
+        <span style="color:#a6e22e">onclick</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;
+</span><span style="color:#e6db74">        google.script.run
+</span><span style="color:#e6db74">        .withSuccessHandler(google.script.host.close)
+</span><span style="color:#e6db74">        .launchbrowser(this.parentNode)
+</span><span style="color:#e6db74">      &#34;</span>&gt;
+    &lt;/<span style="color:#f92672">form</span>&gt;
+  &lt;/<span style="color:#f92672">body</span>&gt;
+&lt;/<span style="color:#f92672">html</span>&gt;
+</code></pre></div><h3 id="2-gas">2. GAS</h3>
+<p>Filename is <code>code.gs</code>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">inputurl</span>() {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">html</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">HtmlService</span>.<span style="color:#a6e22e">createHtmlOutputFromFile</span>(<span style="color:#e6db74">&#39;index&#39;</span>)
+    .<span style="color:#a6e22e">setSandboxMode</span>(<span style="color:#a6e22e">HtmlService</span>.<span style="color:#a6e22e">SandboxMode</span>.<span style="color:#a6e22e">IFRAME</span>)
+    .<span style="color:#a6e22e">setWidth</span>(<span style="color:#ae81ff">600</span>)
+    .<span style="color:#a6e22e">setHeight</span>(<span style="color:#ae81ff">80</span>);
+  <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getUi</span>().<span style="color:#a6e22e">showModalDialog</span>(<span style="color:#a6e22e">html</span>, <span style="color:#e6db74">&#39;URL?&#39;</span>);
+}
+
+<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">launchbrowser</span>(<span style="color:#a6e22e">p</span>) {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">html</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">url</span>);
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">blob</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">HtmlService</span>.<span style="color:#a6e22e">createHtmlOutput</span>(<span style="color:#a6e22e">html</span>)
+    .<span style="color:#a6e22e">setWidth</span>(<span style="color:#ae81ff">800</span>)
+    .<span style="color:#a6e22e">setHeight</span>(<span style="color:#ae81ff">500</span>)
+    .<span style="color:#a6e22e">setTitle</span>(<span style="color:#e6db74">&#34;Sample Browser&#34;</span>);
+  <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>().<span style="color:#a6e22e">show</span>(<span style="color:#a6e22e">blob</span>);
+}
+</code></pre></div>
+  
+  <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2017%2f07%2f05%2fpseudo-browser-with-google-spreadsheet%2f" target="_blank" title="Share on Facebook"><i class="fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2017%2f07%2f05%2fpseudo-browser-with-google-spreadsheet%2f&via=HorribleGeek" target="_blank" title="Tweet"><i class="fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2017%2f07%2f05%2fpseudo-browser-with-google-spreadsheet%2f" target="_blank" title="Share on Google+"><i class="fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2017%2f07%2f05%2fpseudo-browser-with-google-spreadsheet%2f" target="_blank" title="Post to Tumblr"><i class="fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2017%2f07%2f05%2fpseudo-browser-with-google-spreadsheet%2f" target="_blank" title="Pin it"><i class="fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2017%2f07%2f05%2fpseudo-browser-with-google-spreadsheet%2f" target="_blank" title="Submit to Reddit"><i class="fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
 </ul>
 
-<p>What I thought the interesting is that the appearance of the site has been maintained at this pseudo browser. And, by using this, the sites which are slow speed at your environment might be able to be opened smoothly.</p>
 
-<h2 id="demo">Demo</h2>
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
 
-<p><img src="https://tanaikech.github.io/img/20170705a-demo.gif" alt="" /></p>
+	ul.share-buttons li{
+	  display: inline;
+	}
 
-<h2 id="script">Script</h2>
-
-<p>Please copy and paste following respective HTML and GAS to your script editor. Please launch the script editor on container-bound script for spreadsheet.</p>
-
-<h3 id="1-html">1. HTML</h3>
-
-<p>Filename is <code>index.html</code>.</p>
-
-<pre><code class="language-html">&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-  &lt;head&gt;
-    &lt;style&gt;
-      input.in1 {
-        width: 90%;
-      }
-    &lt;/style&gt;
-  &lt;/head&gt;
-  &lt;body&gt;
-    &lt;form&gt;
-      &lt;input type=&quot;text&quot; name=&quot;url&quot; class=&quot;in1&quot;&gt;
-      &lt;input type=&quot;button&quot; value=&quot;Run&quot; class=&quot;in2&quot;
-        onclick=&quot;
-        google.script.run
-        .withSuccessHandler(google.script.host.close)
-        .launchbrowser(this.parentNode)
-      &quot;&gt;
-    &lt;/form&gt;
-  &lt;/body&gt;
-&lt;/html&gt;
-</code></pre>
-
-<h3 id="2-gas">2. GAS</h3>
-
-<p>Filename is <code>code.gs</code>.</p>
-
-<pre><code class="language-javascript">function inputurl() {
-  var html = HtmlService.createHtmlOutputFromFile('index')
-    .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-    .setWidth(600)
-    .setHeight(80);
-  SpreadsheetApp.getUi().showModalDialog(html, 'URL?');
-}
-
-function launchbrowser(p) {
-  var html = UrlFetchApp.fetch(p.url);
-  var blob = HtmlService.createHtmlOutput(html)
-    .setWidth(800)
-    .setHeight(500)
-    .setTitle(&quot;Sample Browser&quot;);
-  SpreadsheetApp.getActiveSpreadsheet().show(blob);
-}
-</code></pre>
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
 
 
   
@@ -388,6 +416,7 @@ function launchbrowser(p) {
 </div>
 </div>
 <script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -397,10 +426,6 @@ function launchbrowser(p) {
     }
   });
 </script>
-<script type="text/javascript"
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-</script>
-<meta http-equiv="X-UA-Compatible" CONTENT="IE=EmulateIE7" />
 
 
 <script>
@@ -415,6 +440,8 @@ function launchbrowser(p) {
     ga('send', 'pageview');
   }
 </script>
+
+
 
 
 

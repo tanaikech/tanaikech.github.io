@@ -5,9 +5,11 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.49.2" />
+  <meta name="generator" content="Hugo 0.61.0" />
 
   <title>Overwriting Several Google Documents by 2 Text Files using Google Apps Script &middot; tanaike</title>
+
+    
 
   
   
@@ -30,7 +32,7 @@
   <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
 
   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
@@ -105,6 +107,12 @@
       
       
         <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
           <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
       
         </li>
@@ -165,7 +173,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/tanaikech" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
     </li>
     
 
@@ -175,7 +183,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
     </li>
     
 
@@ -265,54 +273,88 @@
 </div>
 
   <p><a href="https://gist.github.com/tanaikech/55f0a57ed98ff11e7d8780cc773b6dce">Gists</a></p>
-
 <p>This is a sample script for overwriting several Google Documents by 2 text files using Google Apps Script.</p>
-
 <p><strong>Before you run this sample script, please install a GAS library of <a href="https://github.com/tanaikech/FetchApp">FetchApp</a>.</strong></p>
-
 <p>As a sample situation, it supposes to overwrite 2 existing Google Documents by 2 text files using the method of <a href="https://developers.google.com/drive/api/v3/reference/files/update">files.update</a> Drive API v3. In the current stage, <a href="https://developers.google.com/drive/api/v3/batch">the batch request of Drive API cannot use the file media.</a> This sample script might become a workaround for updating files by quasi batching request with the asynchronous process.</p>
-
 <p>This script can be also used for PDF and image files.</p>
-
-<pre><code class="language-javascript">function sample() {
-  var contents = [
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">sample</span>() {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">contents</span> <span style="color:#f92672">=</span> [
     {
-      fileName: &quot;newFilename1&quot;, // new filename
-      docs: &quot;### GoogleDocumentId1 ###&quot;, // Destination fileId of existing Google Document.
-      textFile: &quot;### fileId of PDF file and image files ###&quot; // Source fileId of text file.
-    },
+      <span style="color:#a6e22e">fileName</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;newFilename1&#34;</span>, <span style="color:#75715e">// new filename
+</span><span style="color:#75715e"></span>      <span style="color:#a6e22e">docs</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;### GoogleDocumentId1 ###&#34;</span>, <span style="color:#75715e">// Destination fileId of existing Google Document.
+</span><span style="color:#75715e"></span>      <span style="color:#a6e22e">textFile</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;### fileId of PDF file and image files ###&#34;</span> <span style="color:#75715e">// Source fileId of text file.
+</span><span style="color:#75715e"></span>    },
     {
-      fileName: &quot;newFilename2&quot;,
-      docs: &quot;### GoogleDocumentId2 ###&quot;,
-      textFile: &quot;### fileId of PDF file and image files ###&quot;
+      <span style="color:#a6e22e">fileName</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;newFilename2&#34;</span>,
+      <span style="color:#a6e22e">docs</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;### GoogleDocumentId2 ###&#34;</span>,
+      <span style="color:#a6e22e">textFile</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;### fileId of PDF file and image files ###&#34;</span>
     }
   ];
-  var accessToken = ScriptApp.getOAuthToken();
-  var requests = contents.map(function(e) {
-    var metadata = { name: e.fileName };
-    var form = FetchApp.createFormData(); // Create form data
-    form.append(
-      &quot;metadata&quot;,
-      Utilities.newBlob(JSON.stringify(metadata), &quot;application/json&quot;)
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">accessToken</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">requests</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">contents</span>.<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">metadata</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">fileName</span> };
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">form</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">FetchApp</span>.<span style="color:#a6e22e">createFormData</span>(); <span style="color:#75715e">// Create form data
+</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">form</span>.<span style="color:#a6e22e">append</span>(
+      <span style="color:#e6db74">&#34;metadata&#34;</span>,
+      <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">newBlob</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">metadata</span>), <span style="color:#e6db74">&#34;application/json&#34;</span>)
     );
-    form.append(&quot;file&quot;, DriveApp.getFileById(e.textFile).getBlob());
-    var url =
-      &quot;https://www.googleapis.com/upload/drive/v3/files/&quot; +
-      e.docs +
-      &quot;?uploadType=multipart&quot;;
-    params = {
-      url: url,
-      method: &quot;PATCH&quot;,
-      headers: { Authorization: &quot;Bearer &quot; + accessToken },
-      body: form
+    <span style="color:#a6e22e">form</span>.<span style="color:#a6e22e">append</span>(<span style="color:#e6db74">&#34;file&#34;</span>, <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">textFile</span>).<span style="color:#a6e22e">getBlob</span>());
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span>
+      <span style="color:#e6db74">&#34;https://www.googleapis.com/upload/drive/v3/files/&#34;</span> <span style="color:#f92672">+</span>
+      <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">docs</span> <span style="color:#f92672">+</span>
+      <span style="color:#e6db74">&#34;?uploadType=multipart&#34;</span>;
+    <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> {
+      <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">url</span>,
+      <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;PATCH&#34;</span>,
+      <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">Authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">accessToken</span> },
+      <span style="color:#a6e22e">body</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">form</span>
     };
-    return params;
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">params</span>;
   });
-  var res = FetchApp.fetchAll(requests);
-  Logger.log(res);
-  // DriveApp.createFile(blob) // This comment line is used for automatically detecting scope for running this sample script.
-}
-</code></pre>
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">FetchApp</span>.<span style="color:#a6e22e">fetchAll</span>(<span style="color:#a6e22e">requests</span>);
+  <span style="color:#a6e22e">Logger</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>);
+  <span style="color:#75715e">// DriveApp.createFile(blob) // This comment line is used for automatically detecting scope for running this sample script.
+</span><span style="color:#75715e"></span>}
+</code></pre></div>
+  
+  <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2019%2f04%2f20%2foverwriting-several-google-documents-by-2-text-files-using-google-apps-script%2f" target="_blank" title="Share on Facebook"><i class="fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2019%2f04%2f20%2foverwriting-several-google-documents-by-2-text-files-using-google-apps-script%2f&via=HorribleGeek" target="_blank" title="Tweet"><i class="fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f04%2f20%2foverwriting-several-google-documents-by-2-text-files-using-google-apps-script%2f" target="_blank" title="Share on Google+"><i class="fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2019%2f04%2f20%2foverwriting-several-google-documents-by-2-text-files-using-google-apps-script%2f" target="_blank" title="Post to Tumblr"><i class="fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f04%2f20%2foverwriting-several-google-documents-by-2-text-files-using-google-apps-script%2f" target="_blank" title="Pin it"><i class="fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f04%2f20%2foverwriting-several-google-documents-by-2-text-files-using-google-apps-script%2f" target="_blank" title="Submit to Reddit"><i class="fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
 
 
   
@@ -355,6 +397,7 @@
 </div>
 </div>
 <script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -364,10 +407,6 @@
     }
   });
 </script>
-<script type="text/javascript"
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-</script>
-<meta http-equiv="X-UA-Compatible" CONTENT="IE=EmulateIE7" />
 
 
 <script>
@@ -382,6 +421,8 @@
     ga('send', 'pageview');
   }
 </script>
+
+
 
 
 

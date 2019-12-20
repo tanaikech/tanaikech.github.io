@@ -5,9 +5,11 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.49.2" />
+  <meta name="generator" content="Hugo 0.61.0" />
 
   <title>Creating a Table to Google Document by Retrieving Values from Google Spreadsheet for Python &middot; tanaike</title>
+
+    
 
   
   
@@ -30,7 +32,7 @@
   <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
 
   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
@@ -105,6 +107,12 @@
       
       
         <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
           <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
       
         </li>
@@ -165,7 +173,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/tanaikech" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
     </li>
     
 
@@ -175,7 +183,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
     </li>
     
 
@@ -264,60 +272,87 @@
 
 </div>
 
-  
-
-<p><a href="https://gist.github.com/tanaikech/305e413696bcdf3a2ee3e86cebf3c7dc">Gists</a></p>
-
+  <p><a href="https://gist.github.com/tanaikech/305e413696bcdf3a2ee3e86cebf3c7dc">Gists</a></p>
 <p>This is a sample script for creating a table to Google Document by retrieving values from Google Spreadsheet for Python.</p>
-
 <p>Before you use this script, please install python library of <a href="https://github.com/tanaikech/gdoctableapppy">gdoctableapppy</a>.</p>
-
-<pre><code class="language-bash">$ pip install gdoctableapppy
-</code></pre>
-
-<h2 id="sample-script">Sample script:</h2>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ pip install gdoctableapppy
+</code></pre></div><h2 id="sample-script">Sample script:</h2>
 <p>This sample script uses Service Account.</p>
-
 <p>In this sample script, the values are retrieved from <code>Sheet1!A1:C5</code> of Spreadsheet, and new table is created to the Document using the values.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> google.oauth2 <span style="color:#f92672">import</span> service_account
+<span style="color:#f92672">from</span> gdoctableapppy <span style="color:#f92672">import</span> gdoctableapp
+<span style="color:#f92672">from</span> googleapiclient.discovery <span style="color:#f92672">import</span> build
 
-<pre><code class="language-python">from google.oauth2 import service_account
-from gdoctableapppy import gdoctableapp
-from googleapiclient.discovery import build
+SCOPES <span style="color:#f92672">=</span> [<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">https://www.googleapis.com/auth/documents</span><span style="color:#e6db74">&#39;</span>,
+          <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">https://www.googleapis.com/auth/spreadsheets</span><span style="color:#e6db74">&#39;</span>]
+SERVICE_ACCOUNT_FILE <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">credential.json</span><span style="color:#e6db74">&#39;</span> <span style="color:#75715e"># Please set the json file of Service account.</span>
+creds <span style="color:#f92672">=</span> service_account<span style="color:#f92672">.</span>Credentials<span style="color:#f92672">.</span>from_service_account_file(
+    SERVICE_ACCOUNT_FILE, scopes<span style="color:#f92672">=</span>SCOPES)
 
-SCOPES = ['https://www.googleapis.com/auth/documents',
-          'https://www.googleapis.com/auth/spreadsheets']
-SERVICE_ACCOUNT_FILE = 'credential.json' # Please set the json file of Service account.
-creds = service_account.Credentials.from_service_account_file(
-    SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+service <span style="color:#f92672">=</span> build(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">sheets</span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">v4</span><span style="color:#e6db74">&#39;</span>, credentials<span style="color:#f92672">=</span>creds)
 
-service = build('sheets', 'v4', credentials=creds)
+spreadsheet_id <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">###</span><span style="color:#e6db74">&#39;</span>  <span style="color:#75715e"># Please set here</span>
+document_id <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">###</span><span style="color:#e6db74">&#39;</span>  <span style="color:#75715e"># Please set here</span>
 
-spreadsheet_id = '###'  # Please set here
-document_id = '###'  # Please set here
+res <span style="color:#f92672">=</span> service<span style="color:#f92672">.</span>spreadsheets()<span style="color:#f92672">.</span>values()<span style="color:#f92672">.</span>get(
+    spreadsheetId<span style="color:#f92672">=</span>spreadsheet_id, range<span style="color:#f92672">=</span><span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">Sheet1!A1:C5</span><span style="color:#e6db74">&#39;</span>)<span style="color:#f92672">.</span>execute()
+values <span style="color:#f92672">=</span> res[<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">values</span><span style="color:#e6db74">&#39;</span>]
 
-res = service.spreadsheets().values().get(
-    spreadsheetId=spreadsheet_id, range='Sheet1!A1:C5').execute()
-values = res['values']
-
-resource = {
-    &quot;service_account&quot;: creds,
-    &quot;documentId&quot;: document_id,
-    &quot;rows&quot;: len(values),
-    &quot;columns&quot;: len(values[0]),
-    &quot;append&quot;: True,
-    &quot;values&quot;: values
+resource <span style="color:#f92672">=</span> {
+    <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">service_account</span><span style="color:#e6db74">&#34;</span>: creds,
+    <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">documentId</span><span style="color:#e6db74">&#34;</span>: document_id,
+    <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">rows</span><span style="color:#e6db74">&#34;</span>: len(values),
+    <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">columns</span><span style="color:#e6db74">&#34;</span>: len(values[<span style="color:#ae81ff">0</span>]),
+    <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">append</span><span style="color:#e6db74">&#34;</span>: True,
+    <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">values</span><span style="color:#e6db74">&#34;</span>: values
 }
-res = gdoctableapp.CreateTable(resource)
-print(res)
-</code></pre>
-
-<h2 id="references">References:</h2>
-
+res <span style="color:#f92672">=</span> gdoctableapp<span style="color:#f92672">.</span>CreateTable(resource)
+<span style="color:#66d9ef">print</span>(res)
+</code></pre></div><h2 id="references">References:</h2>
 <ul>
 <li><a href="https://github.com/tanaikech/gdoctableapppy">gdoctableapppy</a></li>
 <li><a href="https://developers.google.com/identity/protocols/OAuth2ServiceAccount">Service account</a></li>
 </ul>
+
+  
+  <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2019%2f07%2f21%2fcreating-a-table-to-google-document-by-retrieving-values-from-google-spreadsheet-for-python%2f" target="_blank" title="Share on Facebook"><i class="fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2019%2f07%2f21%2fcreating-a-table-to-google-document-by-retrieving-values-from-google-spreadsheet-for-python%2f&via=HorribleGeek" target="_blank" title="Tweet"><i class="fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f07%2f21%2fcreating-a-table-to-google-document-by-retrieving-values-from-google-spreadsheet-for-python%2f" target="_blank" title="Share on Google+"><i class="fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2019%2f07%2f21%2fcreating-a-table-to-google-document-by-retrieving-values-from-google-spreadsheet-for-python%2f" target="_blank" title="Post to Tumblr"><i class="fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f07%2f21%2fcreating-a-table-to-google-document-by-retrieving-values-from-google-spreadsheet-for-python%2f" target="_blank" title="Pin it"><i class="fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f07%2f21%2fcreating-a-table-to-google-document-by-retrieving-values-from-google-spreadsheet-for-python%2f" target="_blank" title="Submit to Reddit"><i class="fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
 
 
   
@@ -360,6 +395,7 @@ print(res)
 </div>
 </div>
 <script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -369,10 +405,6 @@ print(res)
     }
   });
 </script>
-<script type="text/javascript"
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-</script>
-<meta http-equiv="X-UA-Compatible" CONTENT="IE=EmulateIE7" />
 
 
 <script>
@@ -390,6 +422,11 @@ print(res)
 
 
 
+
+
+<script src="https://tanaikech.github.io/js/math-code.js"></script>
+  <script async src="//cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  
 
 
 </body>

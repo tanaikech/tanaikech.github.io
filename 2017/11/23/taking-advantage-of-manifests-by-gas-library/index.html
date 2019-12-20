@@ -5,9 +5,11 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.49.2" />
+  <meta name="generator" content="Hugo 0.61.0" />
 
   <title>Taking Advantage of Manifests by GAS Library &middot; tanaike</title>
+
+    
 
   
   
@@ -30,7 +32,7 @@
   <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
 
   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
@@ -105,6 +107,12 @@
       
       
         <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
           <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
       
         </li>
@@ -165,7 +173,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/tanaikech" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
     </li>
     
 
@@ -175,7 +183,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
     </li>
     
 
@@ -262,85 +270,103 @@
 
 </div>
 
-  
-
-<p><a href="https://gist.github.com/tanaikech/23ddf599a4155b66f1029978bba8153b">Gists</a></p>
-
+  <p><a href="https://gist.github.com/tanaikech/23ddf599a4155b66f1029978bba8153b">Gists</a></p>
 <h2 id="introduction">Introduction</h2>
-
 <p>By recent Google update (<a href="https://developers.google.com/apps-script/">Google update at October 24, 2017</a>), various new winds to GAS developers were blown. There is &ldquo;<a href="https://developers.google.com/apps-script/concepts/manifests">Manifests</a>&rdquo; as one of the new winds. &ldquo;Manifests&rdquo; makes us manage the project using JSON. Especially, the special scopes which have to use OAuth2 process can be used by only setting them to the Manifests. I think that this is the largest modification. However, when scopes are added to a project using Manifests, users who use the project can use only added scopes. This means that when users create scripts in the project, if there are some scopes which is required to be added, such scopes cannot be automatically added. So the error of &ldquo;Insufficient Permission&rdquo; occurs.</p>
-
 <p>In this report, I would like to introduce the workaround for avoiding this problem.</p>
-
 <h2 id="workaround">Workaround</h2>
-
 <p>I found the workaround for avoiding the problem by using a library as follows.</p>
-
 <ul>
 <li><strong>By installing the library which was given &ldquo;oauthScopes&rdquo; of Manifests, the new project can automatically have those scopes as the default scopes.</strong>
-
 <ul>
 <li>This can be seen at <code>On script editor -&gt; File -&gt; Project properties -&gt; Scopes</code>.</li>
-</ul></li>
+</ul>
+</li>
 <li><strong>When users develop scripts in the project which installed the library, the scopes depended on the scripts are automatically installed to the project as the additional scopes.</strong>
-
 <ul>
 <li>This means that the above problem is avoided.</li>
-</ul></li>
 </ul>
-
-<p>By this workaround, users can use various scopes by only installing a library. Furthermore, also users can develop scripts in the project which installed the library, while they don&rsquo;t worry about the permission error by scopes.</p>
-
+</li>
+</ul>
+<p>By this workaround, users can use various scopes by only installing a library. Furthermore, also users can develop scripts in the project which installed the library, while they don't worry about the permission error by scopes.</p>
 <p>I think that this workaround can be applied to various applications. I have already applied this to my applications (<a href="https://github.com/tanaikech/ProjectApp">ProjectApp</a>, <a href="https://github.com/tanaikech/ManifestsApp">ManifestsApp</a>, <a href="https://github.com/tanaikech/RearrangeScripts">RearrangeScripts</a>).</p>
-
 <h2 id="sample">Sample</h2>
-
 <p>Here, I prepared a sample library for demonstrating the install of scopes using a library. The library has no script. But there are the following scopes in the Manifests.</p>
-
-<pre><code class="language-json">&quot;oauthScopes&quot;: [
-  &quot;https://www.googleapis.com/auth/analytics.readonly&quot;,
-  &quot;https://www.googleapis.com/auth/blogger.readonly&quot;,
-  &quot;https://www.googleapis.com/auth/calendar.readonly&quot;,
-  &quot;https://www.googleapis.com/auth/drive.readonly&quot;,
-  &quot;https://www.googleapis.com/auth/gmail.readonly&quot;,
-  &quot;https://www.googleapis.com/auth/presentations.readonly&quot;,
-  &quot;https://www.googleapis.com/auth/spreadsheets.readonly&quot;,
-  &quot;https://www.googleapis.com/auth/youtube.readonly&quot;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#e6db74">&#34;oauthScopes&#34;</span><span style="color:#960050;background-color:#1e0010">:</span> [
+  <span style="color:#e6db74">&#34;https://www.googleapis.com/auth/analytics.readonly&#34;</span>,
+  <span style="color:#e6db74">&#34;https://www.googleapis.com/auth/blogger.readonly&#34;</span>,
+  <span style="color:#e6db74">&#34;https://www.googleapis.com/auth/calendar.readonly&#34;</span>,
+  <span style="color:#e6db74">&#34;https://www.googleapis.com/auth/drive.readonly&#34;</span>,
+  <span style="color:#e6db74">&#34;https://www.googleapis.com/auth/gmail.readonly&#34;</span>,
+  <span style="color:#e6db74">&#34;https://www.googleapis.com/auth/presentations.readonly&#34;</span>,
+  <span style="color:#e6db74">&#34;https://www.googleapis.com/auth/spreadsheets.readonly&#34;</span>,
+  <span style="color:#e6db74">&#34;https://www.googleapis.com/auth/youtube.readonly&#34;</span>
 ]
-</code></pre>
-
-<p>As a demonstration, you can experience the workaround of this report. Please try as follows.</p>
-
+</code></pre></div><p>As a demonstration, you can experience the workaround of this report. Please try as follows.</p>
 <ol>
 <li>Create a new project on your Google Drive.</li>
 <li>Confirm that there are no scopes on the new project at <code>On script editor -&gt; File -&gt; Project properties -&gt; Scopes</code>.</li>
 <li>Install a sample library.
-
 <ul>
-<li>library&rsquo;s project key is <code>1TYEitZm7SsAGPDI1PMfeZhIDqRrpLF8a5H9AlhGddCjJMOyHS4EBRH1c</code></li>
-</ul></li>
+<li>library's project key is <code>1TYEitZm7SsAGPDI1PMfeZhIDqRrpLF8a5H9AlhGddCjJMOyHS4EBRH1c</code></li>
+</ul>
+</li>
 <li>Confirm that there are 8 scopes on the new project at <code>On script editor -&gt; File -&gt; Project properties -&gt; Scopes</code>. You can see like the below demonstration.
-
 <ul>
 <li>This means that you can use the access token which included these scopes using <code>ScriptApp.getOAuthToken()</code>.</li>
-</ul></li>
+</ul>
+</li>
 </ol>
-
 <p><strong>By this workaround, the other scopes depended on the developed scripts can be automatically added.</strong></p>
-
-<p><img src="https://tanaikech.github.io/img/20171123-demo.gif" alt="" /></p>
-
+<p><img src="https://tanaikech.github.io/img/20171123-demo.gif" alt=""></p>
 <h1 id="references">References</h1>
-
 <ul>
 <li><a href="https://developers.google.com/apps-script/concepts/manifests">Manifests</a></li>
 </ul>
-
 <h1 id="acknowledgements">Acknowledgements</h1>
-
 <ul>
 <li><a href="https://github.com/mhawksey">mhawksey</a></li>
 </ul>
+
+  
+  <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2017%2f11%2f23%2ftaking-advantage-of-manifests-by-gas-library%2f" target="_blank" title="Share on Facebook"><i class="fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2017%2f11%2f23%2ftaking-advantage-of-manifests-by-gas-library%2f&via=HorribleGeek" target="_blank" title="Tweet"><i class="fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2017%2f11%2f23%2ftaking-advantage-of-manifests-by-gas-library%2f" target="_blank" title="Share on Google+"><i class="fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2017%2f11%2f23%2ftaking-advantage-of-manifests-by-gas-library%2f" target="_blank" title="Post to Tumblr"><i class="fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2017%2f11%2f23%2ftaking-advantage-of-manifests-by-gas-library%2f" target="_blank" title="Pin it"><i class="fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2017%2f11%2f23%2ftaking-advantage-of-manifests-by-gas-library%2f" target="_blank" title="Submit to Reddit"><i class="fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
 
 
   
@@ -383,6 +409,7 @@
 </div>
 </div>
 <script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -392,10 +419,6 @@
     }
   });
 </script>
-<script type="text/javascript"
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-</script>
-<meta http-equiv="X-UA-Compatible" CONTENT="IE=EmulateIE7" />
 
 
 <script>
@@ -410,6 +433,8 @@
     ga('send', 'pageview');
   }
 </script>
+
+
 
 
 

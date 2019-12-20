@@ -5,9 +5,11 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.49.2" />
+  <meta name="generator" content="Hugo 0.61.0" />
 
   <title>Creating One-time Writing Cells using Google Apps Script &middot; tanaike</title>
+
+    
 
   
   
@@ -30,7 +32,7 @@
   <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
 
   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
@@ -105,6 +107,12 @@
       
       
         <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
           <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
       
         </li>
@@ -165,7 +173,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/tanaikech" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
     </li>
     
 
@@ -175,7 +183,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
     </li>
     
 
@@ -260,115 +268,137 @@
 
 </div>
 
-  
-
-<p><a href="https://gist.github.com/tanaikech/4ba859167a84ed625fcbab392c8d34cd">Gists</a></p>
-
+  <p><a href="https://gist.github.com/tanaikech/4ba859167a84ed625fcbab392c8d34cd">Gists</a></p>
 <p>This sample script is for creating one-time writing cells using Google Apps Script. At first, it supposes the following situation.</p>
-
 <ol>
 <li>A Spreadsheet is shared with users. The owner of Spreadsheet is you.</li>
-<li>After users put a value to a cell, you don&rsquo;t want to make users edit the cell again.
-
+<li>After users put a value to a cell, you don't want to make users edit the cell again.
 <ul>
 <li>Namely, you want to protect the cell.</li>
-</ul></li>
+</ul>
+</li>
 </ol>
-
 <p>This sample script achieves above situation.</p>
-
 <h2 id="preparation">Preparation</h2>
-
 <p>Before you use this script, please do the following flow.</p>
-
 <ol>
 <li>Prepare a Spreadsheet and open the script editor.</li>
 <li>Copy and paste the sample script to the script editor, ans save it.
-
 <ul>
-<li>Please set <code>ownerEmail</code>. In this sample, it&rsquo;s your email address.</li>
-</ul></li>
+<li>Please set <code>ownerEmail</code>. In this sample, it's your email address.</li>
+</ul>
+</li>
 <li>Enable Sheets API at Advanced Google Services and API console.
-
 <ul>
 <li>You can see about how to do those at <a href="https://stackoverflow.com/a/48756509/7108653">here</a>.</li>
-</ul></li>
+</ul>
+</li>
 <li>Install a trigger. Please install <code>myFunction()</code> as the OnEdit trigger.
-
 <ol>
 <li>Open the script editor.</li>
-<li>Edit -&gt; Current project&rsquo;s triggers.</li>
+<li>Edit -&gt; Current project's triggers.</li>
 <li>Click &ldquo;Add Trigger&rdquo;.</li>
 <li>Set &ldquo;myFunction&rdquo; for &ldquo;Choose which function to run&rdquo;.</li>
 <li>Set &ldquo;From spreadsheet&rdquo; for &ldquo;Select event source&rdquo;.</li>
 <li>Set &ldquo;On edit&rdquo; for &ldquo;Select event type&rdquo;.</li>
-</ol></li>
+</ol>
+</li>
 <li>Share the Spreadsheet with users.</li>
 </ol>
-
 <p>The preparation was done.</p>
-
 <h2 id="sample-script">Sample script</h2>
-
-<pre><code class="language-javascript">function myFunction(e) {
-  var ownerEmail = &quot;#####&quot;; // Please set owner's email.
-
-  // This method is from https://gist.github.com/tanaikech/95c7cd650837f33a564babcaf013cae0
-  var a1notation2gridrange1 = function (sheetid, a1notation) {
-    var data = a1notation.match(/(^.+)!(.+):(.+$)/);
-    var ss = SpreadsheetApp.openById(sheetid).getSheetByName(data[1]);
-    var range = ss.getRange(data[2] + &quot;:&quot; + data[3]);
-    var gridRange = {
-      sheetId: ss.getSheetId(),
-      startRowIndex: range.getRow() - 1,
-      endRowIndex: range.getRow() - 1 + range.getNumRows(),
-      startColumnIndex: range.getColumn() - 1,
-      endColumnIndex: range.getColumn() - 1 + range.getNumColumns(),
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>(<span style="color:#a6e22e">e</span>) {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ownerEmail</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#####&#34;</span>; <span style="color:#75715e">// Please set owner&#39;s email.
+</span><span style="color:#75715e"></span>
+  <span style="color:#75715e">// This method is from https://gist.github.com/tanaikech/95c7cd650837f33a564babcaf013cae0
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">a1notation2gridrange1</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span> (<span style="color:#a6e22e">sheetid</span>, <span style="color:#a6e22e">a1notation</span>) {
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">a1notation</span>.<span style="color:#a6e22e">match</span>(<span style="color:#e6db74">/(^.+)!(.+):(.+$)/</span>);
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">sheetid</span>).<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#a6e22e">data</span>[<span style="color:#ae81ff">1</span>]);
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">data</span>[<span style="color:#ae81ff">2</span>] <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;:&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">data</span>[<span style="color:#ae81ff">3</span>]);
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">gridRange</span> <span style="color:#f92672">=</span> {
+      <span style="color:#a6e22e">sheetId</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getSheetId</span>(),
+      <span style="color:#a6e22e">startRowIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getRow</span>() <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>,
+      <span style="color:#a6e22e">endRowIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getRow</span>() <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getNumRows</span>(),
+      <span style="color:#a6e22e">startColumnIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getColumn</span>() <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>,
+      <span style="color:#a6e22e">endColumnIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getColumn</span>() <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getNumColumns</span>(),
     };
-    if (!data[2].match(/[0-9]/)) delete gridRange.startRowIndex;
-    if (!data[3].match(/[0-9]/)) delete gridRange.endRowIndex;
-    return gridRange;
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">data</span>[<span style="color:#ae81ff">2</span>].<span style="color:#a6e22e">match</span>(<span style="color:#e6db74">/[0-9]/</span>)) <span style="color:#66d9ef">delete</span> <span style="color:#a6e22e">gridRange</span>.<span style="color:#a6e22e">startRowIndex</span>;
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">data</span>[<span style="color:#ae81ff">3</span>].<span style="color:#a6e22e">match</span>(<span style="color:#e6db74">/[0-9]/</span>)) <span style="color:#66d9ef">delete</span> <span style="color:#a6e22e">gridRange</span>.<span style="color:#a6e22e">endRowIndex</span>;
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">gridRange</span>;
   };
 
-  var sheet = e.source;
-  var spreadsheetId = sheet.getId();
-  var sheetName = sheet.getSheetName();
-  var range = e.range.getA1Notation();
-  var rng = range.indexOf(&quot;:&quot;) &gt; -1 ? sheetName + &quot;!&quot; + range : sheetName + &quot;!&quot; + range + &quot;:&quot; + range;
-  var protectedRange = Sheets.Spreadsheets.get(spreadsheetId, {ranges: rng, fields: &quot;sheets/protectedRanges&quot;});
-  if (!protectedRange.sheets[0].protectedRanges) {
-    var resource = {&quot;requests&quot;: [{&quot;addProtectedRange&quot;: {&quot;protectedRange&quot;: {
-      &quot;range&quot;: a1notation2gridrange1(spreadsheetId, rng),
-      &quot;editors&quot;: {&quot;users&quot;: [ownerEmail]},
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">source</span>;
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">spreadsheetId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getId</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sheetName</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getSheetName</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getA1Notation</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">rng</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">indexOf</span>(<span style="color:#e6db74">&#34;:&#34;</span>) <span style="color:#f92672">&gt;</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">sheetName</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;!&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">sheetName</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;!&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;:&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">range</span>;
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">protectedRange</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">spreadsheetId</span>, {<span style="color:#a6e22e">ranges</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">rng</span>, <span style="color:#a6e22e">fields</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sheets/protectedRanges&#34;</span>});
+  <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">protectedRange</span>.<span style="color:#a6e22e">sheets</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">protectedRanges</span>) {
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">resource</span> <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;requests&#34;</span><span style="color:#f92672">:</span> [{<span style="color:#e6db74">&#34;addProtectedRange&#34;</span><span style="color:#f92672">:</span> {<span style="color:#e6db74">&#34;protectedRange&#34;</span><span style="color:#f92672">:</span> {
+      <span style="color:#e6db74">&#34;range&#34;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">a1notation2gridrange1</span>(<span style="color:#a6e22e">spreadsheetId</span>, <span style="color:#a6e22e">rng</span>),
+      <span style="color:#e6db74">&#34;editors&#34;</span><span style="color:#f92672">:</span> {<span style="color:#e6db74">&#34;users&#34;</span><span style="color:#f92672">:</span> [<span style="color:#a6e22e">ownerEmail</span>]},
     }}}]};
-    Sheets.Spreadsheets.batchUpdate(resource, spreadsheetId);
+    <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">batchUpdate</span>(<span style="color:#a6e22e">resource</span>, <span style="color:#a6e22e">spreadsheetId</span>);
   }
 }
-</code></pre>
-
-<h2 id="note">Note</h2>
-
+</code></pre></div><h2 id="note">Note</h2>
 <ul>
 <li>In this sample, when users put a value of a cell in the shared Spreadsheet, the cell is automatically protected. By this, users cannot edit the cell again.</li>
 <li>Owner always can edit all cells.</li>
 <li><strong>This is a simple sample script. So please modify it to your situation.</strong></li>
 </ul>
-
 <p>For example, you can also achieve as following situations by modification.</p>
-
 <ul>
 <li>Select the ranges and sheets you want to protect.</li>
 <li>Select the editor users.</li>
 <li>Set the number of edit.</li>
 <li>etc..</li>
 </ul>
-
 <h2 id="references">References</h2>
-
 <ul>
 <li><a href="https://developers.google.com/sheets/api/reference/rest/">Google Sheets API</a></li>
 <li><a href="https://developers.google.com/apps-script/guides/triggers/installable">Installable Triggers</a></li>
 </ul>
+
+  
+  <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2019%2f01%2f24%2fcreating-one-time-writing-cells-using-google-apps-script%2f" target="_blank" title="Share on Facebook"><i class="fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2019%2f01%2f24%2fcreating-one-time-writing-cells-using-google-apps-script%2f&via=HorribleGeek" target="_blank" title="Tweet"><i class="fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f01%2f24%2fcreating-one-time-writing-cells-using-google-apps-script%2f" target="_blank" title="Share on Google+"><i class="fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2019%2f01%2f24%2fcreating-one-time-writing-cells-using-google-apps-script%2f" target="_blank" title="Post to Tumblr"><i class="fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f01%2f24%2fcreating-one-time-writing-cells-using-google-apps-script%2f" target="_blank" title="Pin it"><i class="fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f01%2f24%2fcreating-one-time-writing-cells-using-google-apps-script%2f" target="_blank" title="Submit to Reddit"><i class="fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
 
 
   
@@ -391,13 +421,13 @@
   <div class="pure-u-10-24">
     
     <nav class="next">
-      <a href="https://tanaikech.github.io/2019/02/09/gas-library---processapp/">GAS Library - ProcessApp</a>
+      <a href="https://tanaikech.github.io/2019/02/09/gas-library-processapp/">GAS Library - ProcessApp</a>
     </nav>
     
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
     
-    <a href="https://tanaikech.github.io/2019/02/09/gas-library---processapp/"><i class="fa fa-chevron-right"></i></a>
+    <a href="https://tanaikech.github.io/2019/02/09/gas-library-processapp/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
@@ -411,6 +441,7 @@
 </div>
 </div>
 <script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -420,10 +451,6 @@
     }
   });
 </script>
-<script type="text/javascript"
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-</script>
-<meta http-equiv="X-UA-Compatible" CONTENT="IE=EmulateIE7" />
 
 
 <script>
@@ -441,6 +468,11 @@
 
 
 
+
+
+<script src="https://tanaikech.github.io/js/math-code.js"></script>
+  <script async src="//cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  
 
 
 </body>

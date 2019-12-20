@@ -5,9 +5,11 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.49.2" />
+  <meta name="generator" content="Hugo 0.61.0" />
 
   <title>Creating a Table to Google Document by Retrieving Values from Google Spreadsheet for Node.js &middot; tanaike</title>
+
+    
 
   
   
@@ -30,7 +32,7 @@
   <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
 
   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
@@ -105,6 +107,12 @@
       
       
         <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
           <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
       
         </li>
@@ -165,7 +173,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/tanaikech" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
     </li>
     
 
@@ -175,7 +183,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
     </li>
     
 
@@ -270,88 +278,112 @@
 
 </div>
 
-  
-
-<p><a href="https://gist.github.com/tanaikech/e64342de7011228f5fb639d7d1123ebb">Gists</a></p>
-
+  <p><a href="https://gist.github.com/tanaikech/e64342de7011228f5fb639d7d1123ebb">Gists</a></p>
 <p>This is a sample script for creating a table to Google Document by retrieving values from Google Spreadsheet for Node.js.</p>
-
 <p>Before you use this script, please install Node.js module of <a href="https://github.com/tanaikech/node-gdoctableapp">node-gdoctableapp</a>.</p>
-
-<pre><code class="language-bash">$ npm install --save-dev gdoctableapp
-</code></pre>
-
-<p>or</p>
-
-<pre><code class="language-bash">$ npm install --global gdoctableapp
-</code></pre>
-
-<h2 id="sample-script">Sample script:</h2>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ npm install --save-dev gdoctableapp
+</code></pre></div><p>or</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ npm install --global gdoctableapp
+</code></pre></div><h2 id="sample-script">Sample script:</h2>
 <p>This sample script uses Service Account.</p>
-
 <p>In this sample script, the values are retrieved from <code>Sheet1!A1:C5</code> of Spreadsheet, and new table is created to the Document using the values.</p>
-
-<pre><code class="language-javascript">const { google } = require(&quot;googleapis&quot;);
-const gdoctableapp = require(&quot;gdoctableapp&quot;);
-const key = require(&quot;credential.json&quot;); // Please set the json file of Service account.
-
-const jwtClient = new google.auth.JWT(
-  key.client_email,
-  null,
-  key.private_key,
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">google</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;googleapis&#34;</span>);
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">gdoctableapp</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;gdoctableapp&#34;</span>);
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">key</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;credential.json&#34;</span>); <span style="color:#75715e">// Please set the json file of Service account.
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">jwtClient</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">auth</span>.<span style="color:#a6e22e">JWT</span>(
+  <span style="color:#a6e22e">key</span>.<span style="color:#a6e22e">client_email</span>,
+  <span style="color:#66d9ef">null</span>,
+  <span style="color:#a6e22e">key</span>.<span style="color:#a6e22e">private_key</span>,
   [
-    &quot;https://www.googleapis.com/auth/documents&quot;,
-    &quot;https://www.googleapis.com/auth/spreadsheets&quot;
+    <span style="color:#e6db74">&#34;https://www.googleapis.com/auth/documents&#34;</span>,
+    <span style="color:#e6db74">&#34;https://www.googleapis.com/auth/spreadsheets&#34;</span>
   ],
-  null
+  <span style="color:#66d9ef">null</span>
 );
 
-const sheets = google.sheets({ version: &quot;v4&quot;, auth: jwtClient });
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheets</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">sheets</span>({ <span style="color:#a6e22e">version</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;v4&#34;</span>, <span style="color:#a6e22e">auth</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">jwtClient</span> });
 
-const spreadsheetId = &quot;###&quot;; // Please set here
-const documentId = &quot;###&quot;; // Please set here
-
-sheets.spreadsheets.values.get(
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">spreadsheetId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set here
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">documentId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set here
+</span><span style="color:#75715e"></span>
+<span style="color:#a6e22e">sheets</span>.<span style="color:#a6e22e">spreadsheets</span>.<span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">get</span>(
   {
-    spreadsheetId: spreadsheetId,
-    range: &quot;Sheet1!A1:C5&quot;
+    <span style="color:#a6e22e">spreadsheetId</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">spreadsheetId</span>,
+    <span style="color:#a6e22e">range</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Sheet1!A1:C5&#34;</span>
   },
-  (err, res) =&gt; {
-    if (err) {
-      console.log(err.errors);
-      return;
+  (<span style="color:#a6e22e">err</span>, <span style="color:#a6e22e">res</span>) =&gt; {
+    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">err</span>) {
+      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">err</span>.<span style="color:#a6e22e">errors</span>);
+      <span style="color:#66d9ef">return</span>;
     }
-    const values = res.data.values;
-    if (values.length) {
-      const resource = {
-        auth: jwtClient,
-        documentId: documentId,
-        rows: values.length,
-        columns: values[0].length,
-        append: true,
-        values: values
+    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">values</span>;
+    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">length</span>) {
+      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">resource</span> <span style="color:#f92672">=</span> {
+        <span style="color:#a6e22e">auth</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">jwtClient</span>,
+        <span style="color:#a6e22e">documentId</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">documentId</span>,
+        <span style="color:#a6e22e">rows</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">length</span>,
+        <span style="color:#a6e22e">columns</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">values</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">length</span>,
+        <span style="color:#a6e22e">append</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>,
+        <span style="color:#a6e22e">values</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">values</span>
       };
-      gdoctableapp.CreateTable(resource, function(er, re) {
-        if (er) {
-          console.log(er.errors);
-          return;
+      <span style="color:#a6e22e">gdoctableapp</span>.<span style="color:#a6e22e">CreateTable</span>(<span style="color:#a6e22e">resource</span>, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">er</span>, <span style="color:#a6e22e">re</span>) {
+        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">er</span>) {
+          <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">er</span>.<span style="color:#a6e22e">errors</span>);
+          <span style="color:#66d9ef">return</span>;
         }
-        console.log(re);
+        <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">re</span>);
       });
-    } else {
-      console.log(&quot;No data was found.&quot;);
+    } <span style="color:#66d9ef">else</span> {
+      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;No data was found.&#34;</span>);
     }
   }
 );
-</code></pre>
-
-<h2 id="references">References:</h2>
-
+</code></pre></div><h2 id="references">References:</h2>
 <ul>
 <li><a href="https://github.com/tanaikech/node-gdoctableapp">node-gdoctableapp</a></li>
 <li><a href="https://developers.google.com/identity/protocols/OAuth2ServiceAccount">Service account</a></li>
 </ul>
+
+  
+  <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2019%2f07%2f21%2fcreating-a-table-to-google-document-by-retrieving-values-from-google-spreadsheet-for-node.js%2f" target="_blank" title="Share on Facebook"><i class="fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2019%2f07%2f21%2fcreating-a-table-to-google-document-by-retrieving-values-from-google-spreadsheet-for-node.js%2f&via=HorribleGeek" target="_blank" title="Tweet"><i class="fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f07%2f21%2fcreating-a-table-to-google-document-by-retrieving-values-from-google-spreadsheet-for-node.js%2f" target="_blank" title="Share on Google+"><i class="fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2019%2f07%2f21%2fcreating-a-table-to-google-document-by-retrieving-values-from-google-spreadsheet-for-node.js%2f" target="_blank" title="Post to Tumblr"><i class="fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f07%2f21%2fcreating-a-table-to-google-document-by-retrieving-values-from-google-spreadsheet-for-node.js%2f" target="_blank" title="Pin it"><i class="fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f07%2f21%2fcreating-a-table-to-google-document-by-retrieving-values-from-google-spreadsheet-for-node.js%2f" target="_blank" title="Submit to Reddit"><i class="fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
 
 
   
@@ -394,6 +426,7 @@ sheets.spreadsheets.values.get(
 </div>
 </div>
 <script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -403,10 +436,6 @@ sheets.spreadsheets.values.get(
     }
   });
 </script>
-<script type="text/javascript"
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-</script>
-<meta http-equiv="X-UA-Compatible" CONTENT="IE=EmulateIE7" />
 
 
 <script>
@@ -424,6 +453,11 @@ sheets.spreadsheets.values.get(
 
 
 
+
+
+<script src="https://tanaikech.github.io/js/math-code.js"></script>
+  <script async src="//cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  
 
 
 </body>

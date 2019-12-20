@@ -5,9 +5,11 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.49.2" />
+  <meta name="generator" content="Hugo 0.61.0" />
 
   <title>Modify Searched Text to Small Capital Letters using Google Apps Script &middot; tanaike</title>
+
+    
 
   
   
@@ -30,7 +32,7 @@
   <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
 
   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
@@ -105,6 +107,12 @@
       
       
         <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
           <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
       
         </li>
@@ -165,7 +173,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/tanaikech" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
     </li>
     
 
@@ -175,7 +183,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
     </li>
     
 
@@ -260,78 +268,115 @@
 
 </div>
 
-  
-
-<p><a href="https://gist.github.com/tanaikech/30e8c778eb1102f651550b2345b6f3c0">Gists</a></p>
-
+  <p><a href="https://gist.github.com/tanaikech/30e8c778eb1102f651550b2345b6f3c0">Gists</a></p>
 <p>This is a sample script for modifying the searched text to the small capital letters using Google Apps Script. Unfortunately, in the current stage, there are no methods for modifying the part of texts to the small capital letters in Document Service, yet. But when Google Docs API is used, this can be achieved.</p>
-
 <p><strong>When you use this script, please enable Google Docs API at Advanced Google Services and API console. You can see how to enable them at <a href="https://stackoverflow.com/a/55438282">here</a></strong></p>
-
 <h3 id="sample-script">Sample script</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">searchText</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;sample&#34;</span>;
 
-<pre><code class="language-javascript">function myFunction() {
-  var searchText = &quot;sample&quot;;
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">doc</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DocumentApp</span>.<span style="color:#a6e22e">getActiveDocument</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">body</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">doc</span>.<span style="color:#a6e22e">getBody</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">id</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">doc</span>.<span style="color:#a6e22e">getId</span>();
 
-  var doc = DocumentApp.getActiveDocument();
-  var body = doc.getBody();
-  var id = doc.getId();
+  <span style="color:#75715e">// Retrieve all contents from Google Document.
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Docs</span>.<span style="color:#a6e22e">Documents</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">id</span>, {<span style="color:#a6e22e">fields</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;*&#34;</span>});
 
-  // Retrieve all contents from Google Document.
-  var obj = Docs.Documents.get(id, {fields: &quot;*&quot;});
-
-  // In order to use at Google Docs API, create ranges of found texts.
-  var foundElement = body.findText(searchText);
-  var requests = [];
-  while (foundElement != null) {
-    var p = foundElement.getElement();
-    if (p.getType() == DocumentApp.ElementType.TEXT) p = p.getParent();
-    if (p.getType() == DocumentApp.ElementType.PARAGRAPH || p.getType() == DocumentApp.ElementType.LIST_ITEM) {
-      var content = obj.body.content[body.getChildIndex(p) + 1];
-      requests.push({
-      updateTextStyle: {
-        textStyle: {smallCaps: true},
-        range: {
-          startIndex: content.startIndex + foundElement.getStartOffset(),
-          endIndex: content.startIndex + foundElement.getEndOffsetInclusive(),
+  <span style="color:#75715e">// In order to use at Google Docs API, create ranges of found texts.
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">foundElement</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">findText</span>(<span style="color:#a6e22e">searchText</span>);
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">requests</span> <span style="color:#f92672">=</span> [];
+  <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">foundElement</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">null</span>) {
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">p</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">foundElement</span>.<span style="color:#a6e22e">getElement</span>();
+    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">getType</span>() <span style="color:#f92672">==</span> <span style="color:#a6e22e">DocumentApp</span>.<span style="color:#a6e22e">ElementType</span>.<span style="color:#a6e22e">TEXT</span>) <span style="color:#a6e22e">p</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">getParent</span>();
+    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">getType</span>() <span style="color:#f92672">==</span> <span style="color:#a6e22e">DocumentApp</span>.<span style="color:#a6e22e">ElementType</span>.<span style="color:#a6e22e">PARAGRAPH</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">getType</span>() <span style="color:#f92672">==</span> <span style="color:#a6e22e">DocumentApp</span>.<span style="color:#a6e22e">ElementType</span>.<span style="color:#a6e22e">LIST_ITEM</span>) {
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">content</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">content</span>[<span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">getChildIndex</span>(<span style="color:#a6e22e">p</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>];
+      <span style="color:#a6e22e">requests</span>.<span style="color:#a6e22e">push</span>({
+      <span style="color:#a6e22e">updateTextStyle</span><span style="color:#f92672">:</span> {
+        <span style="color:#a6e22e">textStyle</span><span style="color:#f92672">:</span> {<span style="color:#a6e22e">smallCaps</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>},
+        <span style="color:#a6e22e">range</span><span style="color:#f92672">:</span> {
+          <span style="color:#a6e22e">startIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">content</span>.<span style="color:#a6e22e">startIndex</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">foundElement</span>.<span style="color:#a6e22e">getStartOffset</span>(),
+          <span style="color:#a6e22e">endIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">content</span>.<span style="color:#a6e22e">startIndex</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">foundElement</span>.<span style="color:#a6e22e">getEndOffsetInclusive</span>(),
         },
-        fields: &quot;smallCaps&quot;},
+        <span style="color:#a6e22e">fields</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;smallCaps&#34;</span>},
       });
     }
-    foundElement = body.findText(textToFind, foundElement);
+    <span style="color:#a6e22e">foundElement</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">findText</span>(<span style="color:#a6e22e">textToFind</span>, <span style="color:#a6e22e">foundElement</span>);
   }
 
-  // Modify textStyle of found texts.
-  if (requests.length &gt; 0) {
-    var resource = {requests: requests};
-    Docs.Documents.batchUpdate(resource, id);
+  <span style="color:#75715e">// Modify textStyle of found texts.
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">requests</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">resource</span> <span style="color:#f92672">=</span> {<span style="color:#a6e22e">requests</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">requests</span>};
+    <span style="color:#a6e22e">Docs</span>.<span style="color:#a6e22e">Documents</span>.<span style="color:#a6e22e">batchUpdate</span>(<span style="color:#a6e22e">resource</span>, <span style="color:#a6e22e">id</span>);
   }
 }
-</code></pre>
-
-<h3 id="reference">Reference</h3>
-
+</code></pre></div><h3 id="reference">Reference</h3>
 <ul>
-<li><a href="https://developers.google.com/docs/api/reference/rest/">Google Docs API</a></li>
-<li><a href="https://developers.google.com/docs/api/reference/rest/v1/documents#TextStyle">TextStyle</a></li>
-
-<li><p><a href="https://developers.google.com/apps-script/reference/document/">Document Service</a></p></li>
-
-<li><p>This script was answered for <a href="https://stackoverflow.com/q/55190987">this Stackoverflow&rsquo;s question</a>.</p></li>
+<li>
+<p><a href="https://developers.google.com/docs/api/reference/rest/">Google Docs API</a></p>
+</li>
+<li>
+<p><a href="https://developers.google.com/docs/api/reference/rest/v1/documents#TextStyle">TextStyle</a></p>
+</li>
+<li>
+<p><a href="https://developers.google.com/apps-script/reference/document/">Document Service</a></p>
+</li>
+<li>
+<p>This script was answered for <a href="https://stackoverflow.com/q/55190987">this Stackoverflow's question</a>.</p>
+</li>
 </ul>
+
+  
+  <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2019%2f04%2f01%2fmodify-searched-text-to-small-capital-letters-using-google-apps-script%2f" target="_blank" title="Share on Facebook"><i class="fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2019%2f04%2f01%2fmodify-searched-text-to-small-capital-letters-using-google-apps-script%2f&via=HorribleGeek" target="_blank" title="Tweet"><i class="fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f04%2f01%2fmodify-searched-text-to-small-capital-letters-using-google-apps-script%2f" target="_blank" title="Share on Google+"><i class="fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2019%2f04%2f01%2fmodify-searched-text-to-small-capital-letters-using-google-apps-script%2f" target="_blank" title="Post to Tumblr"><i class="fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f04%2f01%2fmodify-searched-text-to-small-capital-letters-using-google-apps-script%2f" target="_blank" title="Pin it"><i class="fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f04%2f01%2fmodify-searched-text-to-small-capital-letters-using-google-apps-script%2f" target="_blank" title="Submit to Reddit"><i class="fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2019/04/01/gas-library---gistchecker/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2019/04/01/gas-library-gistchecker/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2019/04/01/gas-library---gistchecker/">GAS Library - GistChecker</a>
+      <a href="https://tanaikech.github.io/2019/04/01/gas-library-gistchecker/">GAS Library - GistChecker</a>
     </nav>
     
   </div>
@@ -361,6 +406,7 @@
 </div>
 </div>
 <script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -370,10 +416,6 @@
     }
   });
 </script>
-<script type="text/javascript"
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-</script>
-<meta http-equiv="X-UA-Compatible" CONTENT="IE=EmulateIE7" />
 
 
 <script>
@@ -388,6 +430,8 @@
     ga('send', 'pageview');
   }
 </script>
+
+
 
 
 

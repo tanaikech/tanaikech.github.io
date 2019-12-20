@@ -5,9 +5,11 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.49.2" />
+  <meta name="generator" content="Hugo 0.61.0" />
 
   <title>Benchmark: Conditional Branch using Google Apps Script &middot; tanaike</title>
+
+    
 
   
   
@@ -30,7 +32,7 @@
   <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
 
   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
@@ -105,6 +107,12 @@
       
       
         <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
           <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
       
         </li>
@@ -165,7 +173,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/tanaikech" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
     </li>
     
 
@@ -175,7 +183,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
     </li>
     
 
@@ -264,100 +272,62 @@
 
 </div>
 
-  
-
-<p><a href="https://gist.github.com/tanaikech/cef47530a58f2d8692cdb1a9d257907b">Gists</a></p>
-
-<p><a name="TOP"></a></p>
-
+  <p><a href="https://gist.github.com/tanaikech/cef47530a58f2d8692cdb1a9d257907b">Gists</a></p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
 <h1 id="benchmark-conditional-branch-using-google-apps-script">Benchmark: Conditional Branch using Google Apps Script</h1>
-
-<p><center>
-July 11, 2018</p>
-
-<p>Kanshi Tanaike
-</center></p>
-
+<!-- raw HTML omitted -->
+<p>Kanshi Tanaike</p>
+<!-- raw HTML omitted -->
 <h1 id="introduction">Introduction</h1>
-
 <p><strong>Please be careful! This result can be only used for Google Apps Script.</strong></p>
-
-<p>There are a limit executing time for Google Apps Script (GAS). That is 6 minutes.<a href="#References"><sup>1</sup></a> So users always have to pay attention to reducing the process cost of the scripts. Especially, it is very important to know the process cost for the array processing, because the array processing is often used for spreadsheet and Google APIs. Recently, I have already published some reports about the process cost using GAS.<a href="#References"><sup>2-6</sup></a> From these reports, it has found that GAS shows much different process cost from other languages. So it is important to investigate the process cost for various scenes. In this report, the process cost of &ldquo;conditional branch&rdquo; using GAS has been investigated.</p>
-
+<p>There are a limit executing time for Google Apps Script (GAS). That is 6 minutes.<a href="#References"><!-- raw HTML omitted -->1<!-- raw HTML omitted --></a> So users always have to pay attention to reducing the process cost of the scripts. Especially, it is very important to know the process cost for the array processing, because the array processing is often used for spreadsheet and Google APIs. Recently, I have already published some reports about the process cost using GAS.<a href="#References"><!-- raw HTML omitted -->2-6<!-- raw HTML omitted --></a> From these reports, it has found that GAS shows much different process cost from other languages. So it is important to investigate the process cost for various scenes. In this report, the process cost of &ldquo;conditional branch&rdquo; using GAS has been investigated.</p>
 <p>Here, the following 4 methods for the conditional branch were used. And as the sample situation, a single condition branch and multiple condition branches (10 branches) are used for measuring the process cost. In this report, for example, a single conditional branch is <code>if (value === &quot;value&quot;) {r = &quot;true&quot;} else {r = &quot;false&quot;}</code>.</p>
-
 <ol>
 <li>If</li>
 <li>Switch</li>
 <li>Ternary operator</li>
 <li>Logical operator</li>
 </ol>
-
 <p>As the result, it was found that the cost of &ldquo;Ternary operator&rdquo; was the lowest of all methods and conditions. Namely, it was the fastest of all. About 2nd rank, the interesting results were obtained. For the single conditional branch, 2nd one was &ldquo;If&rdquo;. But for the multiple conditional branches, &ldquo;Switch&rdquo; was the 2nd one. This indicates that &ldquo;If&rdquo; and &ldquo;Switch&rdquo; are suitable for the single and multiple conditional branches, respectively. &ldquo;Logical operator&rdquo; was the lowest rank for the single and multiple conditional branches.</p>
-
 <h1 id="experimental-procedure">Experimental procedure</h1>
-
-<p>In the experiment, the sample scripts for GAS were used.<a href="#Appendix"><sup>Appendix</sup></a> For 4 methods of &ldquo;If&rdquo;, &ldquo;Switch&rdquo;, &ldquo;Ternary operator&rdquo; and &ldquo;Logical operator&rdquo;, 2 conditions were used for measuring the process cost. Namely, the process times of them were measured. Those were the single conditional branch and the multiple conditional branches (10 branches). By the way, at GAS, the processing time is not stable as you know. So for each method, the average values which measured 1,000,000 times were used as the process time (process cost). Furthermore, the average value for more than 100 times measurements was used for each data point which is shown by figures. At this time, the fluctuation of the average values was less than 1 %. I worry that each detailed-data point at my environment might be different from that at other user’s environment. But I think that the trend of this result can be used.</p>
-
+<p>In the experiment, the sample scripts for GAS were used.<a href="#Appendix"><!-- raw HTML omitted -->Appendix<!-- raw HTML omitted --></a> For 4 methods of &ldquo;If&rdquo;, &ldquo;Switch&rdquo;, &ldquo;Ternary operator&rdquo; and &ldquo;Logical operator&rdquo;, 2 conditions were used for measuring the process cost. Namely, the process times of them were measured. Those were the single conditional branch and the multiple conditional branches (10 branches). By the way, at GAS, the processing time is not stable as you know. So for each method, the average values which measured 1,000,000 times were used as the process time (process cost). Furthermore, the average value for more than 100 times measurements was used for each data point which is shown by figures. At this time, the fluctuation of the average values was less than 1 %. I worry that each detailed-data point at my environment might be different from that at other user’s environment. But I think that the trend of this result can be used.</p>
 <h1 id="results">Results</h1>
-
-<p><img src="https://tanaikech.github.io/img/20180711a-fig1.png" alt="" /></p>
-
+<p><img src="https://tanaikech.github.io/img/20180711a-fig1.png" alt=""></p>
 <p>Fig 1. Processing time (process cost) for single conditional branch.</p>
-
-<p><br></p>
-
+<!-- raw HTML omitted -->
 <p>Figure 1 shows the processing time (process cost) for single conditional branch. Since the absolute process time is microsecond order, it is considered that the differences of each method is a little. But when such conditional branch is used for many places in the script, the process cost will get to be able to be ignored. From Fig. 1, in the case of the single conditional branch, the process cost becomes higher in order of &ldquo;Ternary operator&rdquo;, &ldquo;If&rdquo;, &ldquo;Switch&rdquo; and &ldquo;Logical operator&rdquo;. For the single conditional branch, using Fig. 1, the quantitative differences of these methods are as follows.</p>
-
 <ul>
 <li>Cost of &ldquo;If&rdquo; is 8 % larger than that of &ldquo;Ternary operator&rdquo;.</li>
 <li>Cost of &ldquo;Switch&rdquo; is 15 % larger than that of &ldquo;Ternary operator&rdquo;.</li>
 <li>Cost of &ldquo;Logical operator&rdquo; is 16 % larger than that of &ldquo;Ternary operator&rdquo;.</li>
 <li>When &ldquo;If&rdquo; is used for the single conditional branches, it can reduce the cost of 6 % for &ldquo;Switch&rdquo;.</li>
 </ul>
-
-<p><img src="https://tanaikech.github.io/img/20180711a-fig2.png" alt="" /></p>
-
+<p><img src="https://tanaikech.github.io/img/20180711a-fig2.png" alt=""></p>
 <p>Fig 2. Processing time (process cost) for multiple conditional branches (10 branches). The solid lines with the color of blue, red, orange and green mean the result from &ldquo;If&rdquo;, &ldquo;Switch&rdquo;, &ldquo;Ternary operator&rdquo; and &ldquo;Logical operator&rdquo;, respectively. Horizontal axis means the process time of the position of branch when true is obtained. For example, when the condition is true at 7th branch, the position is 7.</p>
-
-<p><br></p>
-
+<!-- raw HTML omitted -->
 <p>Figure 2 shows the processing time (process cost) for multiple conditional branches (10 branches). The solid lines with the color of blue, red, orange and green mean the result from &ldquo;If&rdquo;, &ldquo;Switch&rdquo;, &ldquo;Ternary operator&rdquo; and &ldquo;Logical operator&rdquo;, respectively. Horizontal axis means the process time of the position of branch when true is obtained. For example, when the condition is true at 7th branch, the position is 7. From Fig. 2, the process cost linearly increases with the increase in the position of condition. For one method, it is found that the comparison of the variable is carried out every branch and each cost is the same. This means that the cost can be reduced by put the condition with the high possibility of &ldquo;true&rdquo; to the fore. In the case of multiple conditional branches (more than 2 branches), the process cost becomes higher in order of &ldquo;Ternary operator&rdquo;, &ldquo;Switch&rdquo;, &ldquo;If&rdquo; and &ldquo;Logical operator&rdquo;. For the multiple conditional branches, using Fig. 2, the quantitative differences of these methods are as follows.</p>
-
 <ul>
 <li>Cost of &ldquo;If&rdquo; is 25 % larger than that of &ldquo;Ternary operator&rdquo;.</li>
 <li>Cost of &ldquo;Switch&rdquo; is 2 % larger than that of &ldquo;Ternary operator&rdquo;.</li>
 <li>Cost of &ldquo;Logical operator&rdquo; is 96 % larger than that of &ldquo;Ternary operator&rdquo;.</li>
 <li>When &ldquo;Switch&rdquo; is used for the multiple conditional branches, it can reduce the cost of 25 % for &ldquo;If&rdquo;.</li>
 </ul>
-
 <p>When it looks carefully at Figs. 1 and Fig. 2, it is found that the process costs of &ldquo;If&rdquo; and &ldquo;Switch&rdquo; invert between Fig. 1 and Fig. 2. When the slope of Fig. 2 is calculated, the difference can be found well.</p>
-
-<p><img src="https://tanaikech.github.io/img/20180711a-fig3.png" alt="" /></p>
-
+<p><img src="https://tanaikech.github.io/img/20180711a-fig3.png" alt=""></p>
 <p>Fig 3. Slope for each method calculated from Fig. 2.</p>
-
-<p><br></p>
-
+<!-- raw HTML omitted -->
 <p>Figure 3 shows the the slope for each method calculated from Fig. 2. So the unit is microseconds/position. From Fig. 3, it is found that at the case of multiple conditional branches, &ldquo;Switch&rdquo; is more suitable than &ldquo;If&rdquo;. So from Figs. 1, 2 and 3, It is considered that this indicates that &ldquo;If&rdquo; and &ldquo;Switch&rdquo; are suitable for the single conditional branch and the multiple conditional branches, respectively. And it is found that &ldquo;Ternary operator&rdquo; can be used for both conditional branches with the low cost. On the other hand, it is considered that &ldquo;Logical operator&rdquo; is not suitable for the general use, because of the high cost and low readability.</p>
-
 <h1 id="summary">Summary</h1>
-
 <p>In this report, the process cost of &ldquo;conditional branch&rdquo; using GAS has been investigated. 4 methods of &ldquo;If&rdquo;, &ldquo;Switch&rdquo;, &ldquo;Ternary operator&rdquo; and &ldquo;Logical operator&rdquo; were used for this report. The following results were obtained.</p>
-
 <ol>
 <li>It was found that the cost of &ldquo;Ternary operator&rdquo; was the lowest of all methods and conditions.</li>
 <li>For the single conditional branch, 2nd one was &ldquo;If&rdquo;. But for the multiple conditional branches, &ldquo;Switch&rdquo; was the 2nd one. This indicates that &ldquo;If&rdquo; and &ldquo;Switch&rdquo; are suitable for the single and multiple conditional branches (more than 2 branches), respectively.</li>
 <li>In the case of the multiple conditional branches, the process cost can be reduced by put the condition with the high possibility of &ldquo;true&rdquo; to the fore.</li>
 <li>&ldquo;Logical operator&rdquo; was the lowest rank for the single and multiple conditional branches. It is considered that &ldquo;Logical operator&rdquo; is not suitable for the general use, because of the high cost and low readability.</li>
 </ol>
-
 <p>As a note, I have to describe that this is the result for Google Apps Script. For other languages, this result might be difference. And also, the process cost of this report might be modified by future update of Google.</p>
-
-<p><a name="References"></a></p>
-
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
 <h1 id="references">References</h1>
-
 <ol>
 <li><a href="https://developers.google.com/apps-script/guides/services/quotas#current_limitations">Current limitations at Quotas for Google Services</a></li>
 <li><a href="https://gist.github.com/tanaikech/eda9234822b5dec80549216a43c52652">Benchmark: Search for Array Processing using Google Apps Script</a></li>
@@ -366,148 +336,179 @@ July 11, 2018</p>
 <li><a href="https://gist.github.com/tanaikech/c0f383034045ab63c19604139ecb0728">Benchmark: fetchAll method in UrlFetch service for Google Apps Script</a></li>
 <li><a href="https://tanaikech.github.io/2016/10/13/improved-algorithms-for-summation-of-array-elements/">Improved Algorithms for Summation of Array Elements</a></li>
 </ol>
-
-<p><a name="Appendix"></a></p>
-
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
 <h2 id="appendix">Appendix</h2>
-
 <h3 id="scripts">Scripts</h3>
-
 <h4 id="sample-scripts-for-a-single-conditional-branch">Sample scripts for a single conditional branch.</h4>
-
-<pre><code class="language-javascript">// If
-if (value === &quot;value&quot;) {
-  r = &quot;true&quot;;
-} else {
-  r = &quot;false&quot;;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// If
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value&#34;</span>) {
+  <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;true&#34;</span>;
+} <span style="color:#66d9ef">else</span> {
+  <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;false&#34;</span>;
 }
 
 
-// Switch
-switch (value) {
-  case &quot;value&quot;:
-    r = &quot;true&quot;;
-    break;
-  default:
-    r = &quot;false&quot;;
-    break;
+<span style="color:#75715e">// Switch
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">switch</span> (<span style="color:#a6e22e">value</span>) {
+  <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;value&#34;</span><span style="color:#f92672">:</span>
+    <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;true&#34;</span>;
+    <span style="color:#66d9ef">break</span>;
+  <span style="color:#66d9ef">default</span><span style="color:#f92672">:</span>
+    <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;false&#34;</span>;
+    <span style="color:#66d9ef">break</span>;
 }
 
 
-// Ternary operator
-r = value === &quot;value&quot; ? &quot;true&quot; : &quot;false&quot;;
+<span style="color:#75715e">// Ternary operator
+</span><span style="color:#75715e"></span><span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value&#34;</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#34;true&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;false&#34;</span>;
 
 
-// Logical operator
-r = value === &quot;value&quot; &amp;&amp; &quot;true&quot; || &quot;false&quot;;
-</code></pre>
-
-<h4 id="sample-scripts-for-the-multiple-conditional-branches-10-branches">Sample scripts for the multiple conditional branches (10 branches).</h4>
-
-<pre><code class="language-javascript">// If
-if (value === &quot;value1&quot;) {
-  r = &quot;value1&quot;;
-} else if (value === &quot;value2&quot;) {
-  r = &quot;value2&quot;;
-} else if (value === &quot;value3&quot;) {
-  r = &quot;value3&quot;;
-} else if (value === &quot;value4&quot;) {
-  r = &quot;value4&quot;;
-} else if (value === &quot;value5&quot;) {
-  r = &quot;value5&quot;;
-} else if (value === &quot;value6&quot;) {
-  r = &quot;value6&quot;;
-} else if (value === &quot;value7&quot;) {
-  r = &quot;value7&quot;;
-} else if (value === &quot;value8&quot;) {
-  r = &quot;value8&quot;;
-} else if (value === &quot;value9&quot;) {
-  r = &quot;value9&quot;;
-} else if (value === &quot;value10&quot;) {
-  r = &quot;value10&quot;;
-} else {
-  r = &quot;false&quot;;
+<span style="color:#75715e">// Logical operator
+</span><span style="color:#75715e"></span><span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value&#34;</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#e6db74">&#34;true&#34;</span> <span style="color:#f92672">||</span> <span style="color:#e6db74">&#34;false&#34;</span>;
+</code></pre></div><h4 id="sample-scripts-for-the-multiple-conditional-branches-10-branches">Sample scripts for the multiple conditional branches (10 branches).</h4>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// If
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value1&#34;</span>) {
+  <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;value1&#34;</span>;
+} <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value2&#34;</span>) {
+  <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;value2&#34;</span>;
+} <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value3&#34;</span>) {
+  <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;value3&#34;</span>;
+} <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value4&#34;</span>) {
+  <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;value4&#34;</span>;
+} <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value5&#34;</span>) {
+  <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;value5&#34;</span>;
+} <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value6&#34;</span>) {
+  <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;value6&#34;</span>;
+} <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value7&#34;</span>) {
+  <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;value7&#34;</span>;
+} <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value8&#34;</span>) {
+  <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;value8&#34;</span>;
+} <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value9&#34;</span>) {
+  <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;value9&#34;</span>;
+} <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value10&#34;</span>) {
+  <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;value10&#34;</span>;
+} <span style="color:#66d9ef">else</span> {
+  <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;false&#34;</span>;
 }
 
 
-// Switch
-switch (value) {
-  case &quot;value1&quot;:
-    r = &quot;value1&quot;;
-    break;
-  case &quot;value2&quot;:
-    r = &quot;value2&quot;;
-    break;
-  case &quot;value3&quot;:
-    r = &quot;value3&quot;;
-    break;
-  case &quot;value4&quot;:
-    r = &quot;value4&quot;;
-    break;
-  case &quot;value5&quot;:
-    r = &quot;value5&quot;;
-    break;
-  case &quot;value6&quot;:
-    r = &quot;value6&quot;;
-    break;
-  case &quot;value7&quot;:
-    r = &quot;value7&quot;;
-    break;
-  case &quot;value8&quot;:
-    r = &quot;value8&quot;;
-    break;
-  case &quot;value9&quot;:
-    r = &quot;value9&quot;;
-    break;
-  case &quot;value10&quot;:
-    r = &quot;value10&quot;;
-    break;
-  default:
-    r = &quot;false&quot;;
-    break;
+<span style="color:#75715e">// Switch
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">switch</span> (<span style="color:#a6e22e">value</span>) {
+  <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;value1&#34;</span><span style="color:#f92672">:</span>
+    <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;value1&#34;</span>;
+    <span style="color:#66d9ef">break</span>;
+  <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;value2&#34;</span><span style="color:#f92672">:</span>
+    <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;value2&#34;</span>;
+    <span style="color:#66d9ef">break</span>;
+  <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;value3&#34;</span><span style="color:#f92672">:</span>
+    <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;value3&#34;</span>;
+    <span style="color:#66d9ef">break</span>;
+  <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;value4&#34;</span><span style="color:#f92672">:</span>
+    <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;value4&#34;</span>;
+    <span style="color:#66d9ef">break</span>;
+  <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;value5&#34;</span><span style="color:#f92672">:</span>
+    <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;value5&#34;</span>;
+    <span style="color:#66d9ef">break</span>;
+  <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;value6&#34;</span><span style="color:#f92672">:</span>
+    <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;value6&#34;</span>;
+    <span style="color:#66d9ef">break</span>;
+  <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;value7&#34;</span><span style="color:#f92672">:</span>
+    <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;value7&#34;</span>;
+    <span style="color:#66d9ef">break</span>;
+  <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;value8&#34;</span><span style="color:#f92672">:</span>
+    <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;value8&#34;</span>;
+    <span style="color:#66d9ef">break</span>;
+  <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;value9&#34;</span><span style="color:#f92672">:</span>
+    <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;value9&#34;</span>;
+    <span style="color:#66d9ef">break</span>;
+  <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;value10&#34;</span><span style="color:#f92672">:</span>
+    <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;value10&#34;</span>;
+    <span style="color:#66d9ef">break</span>;
+  <span style="color:#66d9ef">default</span><span style="color:#f92672">:</span>
+    <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;false&#34;</span>;
+    <span style="color:#66d9ef">break</span>;
 }
 
 
-// Ternary operator
-r = value === &quot;value1&quot; ? &quot;value1&quot;
-  : value === &quot;value2&quot; ? &quot;value2&quot;
-  : value === &quot;value3&quot; ? &quot;value3&quot;
-  : value === &quot;value4&quot; ? &quot;value4&quot;
-  : value === &quot;value5&quot; ? &quot;value5&quot;
-  : value === &quot;value6&quot; ? &quot;value6&quot;
-  : value === &quot;value7&quot; ? &quot;value7&quot;
-  : value === &quot;value8&quot; ? &quot;value8&quot;
-  : value === &quot;value9&quot; ? &quot;value9&quot;
-  : value === &quot;value10&quot; ? &quot;value10&quot;
-  : &quot;false&quot;;
+<span style="color:#75715e">// Ternary operator
+</span><span style="color:#75715e"></span><span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value1&#34;</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#34;value1&#34;</span>
+  <span style="color:#f92672">:</span> <span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value2&#34;</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#34;value2&#34;</span>
+  <span style="color:#f92672">:</span> <span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value3&#34;</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#34;value3&#34;</span>
+  <span style="color:#f92672">:</span> <span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value4&#34;</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#34;value4&#34;</span>
+  <span style="color:#f92672">:</span> <span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value5&#34;</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#34;value5&#34;</span>
+  <span style="color:#f92672">:</span> <span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value6&#34;</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#34;value6&#34;</span>
+  <span style="color:#f92672">:</span> <span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value7&#34;</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#34;value7&#34;</span>
+  <span style="color:#f92672">:</span> <span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value8&#34;</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#34;value8&#34;</span>
+  <span style="color:#f92672">:</span> <span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value9&#34;</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#34;value9&#34;</span>
+  <span style="color:#f92672">:</span> <span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value10&#34;</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#34;value10&#34;</span>
+  <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;false&#34;</span>;
 
 
-// Logical operator
-r = value === &quot;value1&quot; &amp;&amp; &quot;value1&quot;
-  || value === &quot;value2&quot; &amp;&amp; &quot;value2&quot;
-  || value === &quot;value3&quot; &amp;&amp; &quot;value3&quot;
-  || value === &quot;value4&quot; &amp;&amp; &quot;value4&quot;
-  || value === &quot;value5&quot; &amp;&amp; &quot;value5&quot;
-  || value === &quot;value6&quot; &amp;&amp; &quot;value6&quot;
-  || value === &quot;value7&quot; &amp;&amp; &quot;value7&quot;
-  || value === &quot;value8&quot; &amp;&amp; &quot;value8&quot;
-  || value === &quot;value9&quot; &amp;&amp; &quot;value9&quot;
-  || value === &quot;value10&quot; &amp;&amp; &quot;value10&quot;
-  || &quot;false&quot;;
-</code></pre>
+<span style="color:#75715e">// Logical operator
+</span><span style="color:#75715e"></span><span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value1&#34;</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#e6db74">&#34;value1&#34;</span>
+  <span style="color:#f92672">||</span> <span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value2&#34;</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#e6db74">&#34;value2&#34;</span>
+  <span style="color:#f92672">||</span> <span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value3&#34;</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#e6db74">&#34;value3&#34;</span>
+  <span style="color:#f92672">||</span> <span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value4&#34;</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#e6db74">&#34;value4&#34;</span>
+  <span style="color:#f92672">||</span> <span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value5&#34;</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#e6db74">&#34;value5&#34;</span>
+  <span style="color:#f92672">||</span> <span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value6&#34;</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#e6db74">&#34;value6&#34;</span>
+  <span style="color:#f92672">||</span> <span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value7&#34;</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#e6db74">&#34;value7&#34;</span>
+  <span style="color:#f92672">||</span> <span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value8&#34;</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#e6db74">&#34;value8&#34;</span>
+  <span style="color:#f92672">||</span> <span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value9&#34;</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#e6db74">&#34;value9&#34;</span>
+  <span style="color:#f92672">||</span> <span style="color:#a6e22e">value</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;value10&#34;</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#e6db74">&#34;value10&#34;</span>
+  <span style="color:#f92672">||</span> <span style="color:#e6db74">&#34;false&#34;</span>;
+</code></pre></div>
+  
+  <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2018%2f07%2f11%2fbenchmark-conditional-branch-using-google-apps-script%2f" target="_blank" title="Share on Facebook"><i class="fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2018%2f07%2f11%2fbenchmark-conditional-branch-using-google-apps-script%2f&via=HorribleGeek" target="_blank" title="Tweet"><i class="fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2018%2f07%2f11%2fbenchmark-conditional-branch-using-google-apps-script%2f" target="_blank" title="Share on Google+"><i class="fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2018%2f07%2f11%2fbenchmark-conditional-branch-using-google-apps-script%2f" target="_blank" title="Post to Tumblr"><i class="fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2018%2f07%2f11%2fbenchmark-conditional-branch-using-google-apps-script%2f" target="_blank" title="Pin it"><i class="fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2018%2f07%2f11%2fbenchmark-conditional-branch-using-google-apps-script%2f" target="_blank" title="Submit to Reddit"><i class="fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2018/07/11/updated-gas-library---manifestsapp/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2018/07/11/updated-gas-library-manifestsapp/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2018/07/11/updated-gas-library---manifestsapp/">Updated: GAS Library - ManifestsApp</a>
+      <a href="https://tanaikech.github.io/2018/07/11/updated-gas-library-manifestsapp/">Updated: GAS Library - ManifestsApp</a>
     </nav>
     
   </div>
@@ -537,6 +538,7 @@ r = value === &quot;value1&quot; &amp;&amp; &quot;value1&quot;
 </div>
 </div>
 <script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -546,10 +548,6 @@ r = value === &quot;value1&quot; &amp;&amp; &quot;value1&quot;
     }
   });
 </script>
-<script type="text/javascript"
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-</script>
-<meta http-equiv="X-UA-Compatible" CONTENT="IE=EmulateIE7" />
 
 
 <script>
@@ -564,6 +562,8 @@ r = value === &quot;value1&quot; &amp;&amp; &quot;value1&quot;
     ga('send', 'pageview');
   }
 </script>
+
+
 
 
 

@@ -5,9 +5,11 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.49.2" />
+  <meta name="generator" content="Hugo 0.61.0" />
 
   <title>Bitfinex API for Google Apps Script &middot; tanaike</title>
+
+    
 
   
   
@@ -30,7 +32,7 @@
   <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
 
   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
@@ -105,6 +107,12 @@
       
       
         <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
           <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
       
         </li>
@@ -165,7 +173,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/tanaikech" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
     </li>
     
 
@@ -175,7 +183,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
     </li>
     
 
@@ -265,54 +273,89 @@
 </div>
 
   <p><a href="https://gist.github.com/tanaikech/1104d039341f198f95eee66af57c0abf">Gists</a></p>
-
 <p>This sample script is converted <a href="https://docs.bitfinex.com/v2/docs/rest-auth">this sample script (javascript)</a> to Google Apps Script. The point for converting is <code>signature</code> as shown in the following sample script.</p>
-
 <ul>
 <li>At Bitfinex API, after <code>&quot;/api/&quot; + apiPath + nonce + rawBody</code> is encrypted using HMAC SHA-384, the data of byte array is converted to HEX.
-
 <ul>
 <li>In Google Apps Script, there is no the method for this.</li>
 <li>The data which was encrypted by <code>Utilities.computeHmacSignature()</code> is the bytes array of the signed hexadecimal.</li>
 <li>On the other hand, at <a href="https://docs.bitfinex.com/v2/docs/rest-auth">this sample script</a> for javascript, the data which was encrypted by <code>crypto.createHmac('sha384', apiSecret).update(signature).digest('hex')</code> is the string of the unsigned hexadecimal.</li>
-</ul></li>
+</ul>
+</li>
+</ul>
+<p>In order to achieve above, I made the method of <code>bytesToHex()</code>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">bytesToHex</span>(<span style="color:#a6e22e">data</span>) {
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
+        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">v</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">e</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">e</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">256</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>).<span style="color:#a6e22e">toString</span>(<span style="color:#ae81ff">16</span>);
+        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">v</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#34;0&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">v</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">v</span>;
+    }).<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;&#34;</span>);
+}
+
+<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">apiKey</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&lt;Your API key here&gt;&#39;</span>;
+    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">apiSecret</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&lt;Your API secret here&gt;&#39;</span>;
+
+    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">apiPath</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;v2/auth/r/alerts&#34;</span>;
+    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">nonce</span> <span style="color:#f92672">=</span> Date.<span style="color:#a6e22e">now</span>().<span style="color:#a6e22e">toString</span>();
+    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">body</span> <span style="color:#f92672">=</span> { <span style="color:#e6db74">&#34;type&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;price&#34;</span> };
+    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">rawBody</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">body</span>);
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">signature</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;/api/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">apiPath</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">nonce</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">rawBody</span>;
+    <span style="color:#a6e22e">signature</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">computeHmacSignature</span>(<span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">MacAlgorithm</span>.<span style="color:#a6e22e">HMAC_SHA_384</span>, <span style="color:#a6e22e">signature</span>, <span style="color:#a6e22e">apiSecret</span>);
+    <span style="color:#a6e22e">signature</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">bytesToHex</span>(<span style="color:#a6e22e">signature</span>);
+    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://api.bitfinex.com/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">apiPath</span>;
+    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">options</span> <span style="color:#f92672">=</span> {
+        <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;POST&#39;</span>,
+        <span style="color:#a6e22e">contentType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/json&#34;</span>,
+        <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {
+            <span style="color:#e6db74">&#39;bfx-nonce&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">nonce</span>,
+            <span style="color:#e6db74">&#39;bfx-apikey&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">apiKey</span>,
+            <span style="color:#e6db74">&#39;bfx-signature&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">signature</span>
+        },
+        <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">rawBody</span>
+    };
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">options</span>);
+    <span style="color:#a6e22e">Logger</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getContentText</span>())
+}
+</code></pre></div>
+  
+  <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2017%2f12%2f31%2fbitfinex-api-for-google-apps-script%2f" target="_blank" title="Share on Facebook"><i class="fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2017%2f12%2f31%2fbitfinex-api-for-google-apps-script%2f&via=HorribleGeek" target="_blank" title="Tweet"><i class="fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2017%2f12%2f31%2fbitfinex-api-for-google-apps-script%2f" target="_blank" title="Share on Google+"><i class="fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2017%2f12%2f31%2fbitfinex-api-for-google-apps-script%2f" target="_blank" title="Post to Tumblr"><i class="fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2017%2f12%2f31%2fbitfinex-api-for-google-apps-script%2f" target="_blank" title="Pin it"><i class="fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2017%2f12%2f31%2fbitfinex-api-for-google-apps-script%2f" target="_blank" title="Submit to Reddit"><i class="fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
 </ul>
 
-<p>In order to achieve above, I made the method of <code>bytesToHex()</code>.</p>
 
-<pre><code class="language-javascript">function bytesToHex(data) {
-    return data.map(function(e) {
-        var v = (e &lt; 0 ? e + 256 : e).toString(16);
-        return v.length == 1 ? &quot;0&quot; + v : v;
-    }).join(&quot;&quot;);
-}
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
 
-function main() {
-    const apiKey = '&lt;Your API key here&gt;';
-    const apiSecret = '&lt;Your API secret here&gt;';
+	ul.share-buttons li{
+	  display: inline;
+	}
 
-    const apiPath = &quot;v2/auth/r/alerts&quot;;
-    const nonce = Date.now().toString();
-    const body = { &quot;type&quot;: &quot;price&quot; };
-    const rawBody = JSON.stringify(body);
-    var signature = &quot;/api/&quot; + apiPath + nonce + rawBody;
-    signature = Utilities.computeHmacSignature(Utilities.MacAlgorithm.HMAC_SHA_384, signature, apiSecret);
-    signature = bytesToHex(signature);
-    const url = &quot;https://api.bitfinex.com/&quot; + apiPath;
-    const options = {
-        method: 'POST',
-        contentType: &quot;application/json&quot;,
-        headers: {
-            'bfx-nonce': nonce,
-            'bfx-apikey': apiKey,
-            'bfx-signature': signature
-        },
-        payload: rawBody
-    };
-    var res = UrlFetchApp.fetch(url, options);
-    Logger.log(res.getContentText())
-}
-</code></pre>
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
 
 
   
@@ -355,6 +398,7 @@ function main() {
 </div>
 </div>
 <script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -364,10 +408,6 @@ function main() {
     }
   });
 </script>
-<script type="text/javascript"
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-</script>
-<meta http-equiv="X-UA-Compatible" CONTENT="IE=EmulateIE7" />
 
 
 <script>
@@ -382,6 +422,8 @@ function main() {
     ga('send', 'pageview');
   }
 </script>
+
+
 
 
 

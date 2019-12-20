@@ -5,9 +5,11 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.49.2" />
+  <meta name="generator" content="Hugo 0.61.0" />
 
   <title>Exporting Project on Google Drive using Golang Quickstart &middot; tanaike</title>
+
+    
 
   
   
@@ -30,7 +32,7 @@
   <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
 
   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
@@ -105,6 +107,12 @@
       
       
         <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
           <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
       
         </li>
@@ -165,7 +173,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/tanaikech" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
     </li>
     
 
@@ -175,7 +183,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
     </li>
     
 
@@ -264,129 +272,160 @@
 
 </div>
 
-  
-
-<p><a href="https://gist.github.com/tanaikech/29d2d31cbe6e0d9bd662aedb121384f0">Gists</a></p>
-
+  <p><a href="https://gist.github.com/tanaikech/29d2d31cbe6e0d9bd662aedb121384f0">Gists</a></p>
 <p>This is a sample script for exporting a project on Google Drive to local PC using Golang Quickstart. A file with refresh token is saved to the same directory with this script as <code>go-quickstart.json</code>. Before you run this script, please enable Drive API on your Google API console.</p>
-
 <h2 id="points-for-exporting-project">Points for exporting project</h2>
-
 <ol>
 <li>In order to export project, both <code>drive.DriveScriptsScope</code> and <code>drive.DriveScope</code> have to be included in the scope.</li>
 <li>The mimeType for exporting has to be &ldquo;application/vnd.google-apps.script+json&rdquo;.</li>
 </ol>
-
 <p><strong>If you already have the file with refresh token, at first, please delete it and run this script. By this, the scopes of refresh token and access token are updated.</strong></p>
+<h2 id="script-">Script :</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-golang" data-lang="golang"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
 
-<h2 id="script">Script :</h2>
+<span style="color:#f92672">import</span> (
+    <span style="color:#e6db74">&#34;encoding/json&#34;</span>
+    <span style="color:#e6db74">&#34;fmt&#34;</span>
+    <span style="color:#e6db74">&#34;io/ioutil&#34;</span>
+    <span style="color:#e6db74">&#34;log&#34;</span>
+    <span style="color:#e6db74">&#34;net/http&#34;</span>
+    <span style="color:#e6db74">&#34;os&#34;</span>
 
-<pre><code class="language-golang">package main
-
-import (
-    &quot;encoding/json&quot;
-    &quot;fmt&quot;
-    &quot;io/ioutil&quot;
-    &quot;log&quot;
-    &quot;net/http&quot;
-    &quot;os&quot;
-
-    &quot;golang.org/x/net/context&quot;
-    &quot;golang.org/x/oauth2&quot;
-    &quot;golang.org/x/oauth2/google&quot;
-    &quot;google.golang.org/api/drive/v3&quot;
+    <span style="color:#e6db74">&#34;golang.org/x/net/context&#34;</span>
+    <span style="color:#e6db74">&#34;golang.org/x/oauth2&#34;</span>
+    <span style="color:#e6db74">&#34;golang.org/x/oauth2/google&#34;</span>
+    <span style="color:#e6db74">&#34;google.golang.org/api/drive/v3&#34;</span>
 )
 
-func getClient(ctx context.Context, config *oauth2.Config) *http.Client {
-    cacheFile := &quot;./go-quickstart.json&quot;
-    tok, err := tokenFromFile(cacheFile)
-    if err != nil {
-        tok = getTokenFromWeb(config)
-        saveToken(cacheFile, tok)
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">getClient</span>(<span style="color:#a6e22e">ctx</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Context</span>, <span style="color:#a6e22e">config</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">oauth2</span>.<span style="color:#a6e22e">Config</span>) <span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Client</span> {
+    <span style="color:#a6e22e">cacheFile</span> <span style="color:#f92672">:=</span> <span style="color:#e6db74">&#34;./go-quickstart.json&#34;</span>
+    <span style="color:#a6e22e">tok</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">tokenFromFile</span>(<span style="color:#a6e22e">cacheFile</span>)
+    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+        <span style="color:#a6e22e">tok</span> = <span style="color:#a6e22e">getTokenFromWeb</span>(<span style="color:#a6e22e">config</span>)
+        <span style="color:#a6e22e">saveToken</span>(<span style="color:#a6e22e">cacheFile</span>, <span style="color:#a6e22e">tok</span>)
     }
-    return config.Client(ctx, tok)
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">config</span>.<span style="color:#a6e22e">Client</span>(<span style="color:#a6e22e">ctx</span>, <span style="color:#a6e22e">tok</span>)
 }
 
-func getTokenFromWeb(config *oauth2.Config) *oauth2.Token {
-    authURL := config.AuthCodeURL(&quot;state-token&quot;, oauth2.AccessTypeOffline)
-    fmt.Printf(&quot;Go to the following link in your browser then type the &quot;+
-        &quot;authorization code: \n%v\n&quot;, authURL)
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">getTokenFromWeb</span>(<span style="color:#a6e22e">config</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">oauth2</span>.<span style="color:#a6e22e">Config</span>) <span style="color:#f92672">*</span><span style="color:#a6e22e">oauth2</span>.<span style="color:#a6e22e">Token</span> {
+    <span style="color:#a6e22e">authURL</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">config</span>.<span style="color:#a6e22e">AuthCodeURL</span>(<span style="color:#e6db74">&#34;state-token&#34;</span>, <span style="color:#a6e22e">oauth2</span>.<span style="color:#a6e22e">AccessTypeOffline</span>)
+    <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Go to the following link in your browser then type the &#34;</span><span style="color:#f92672">+</span>
+        <span style="color:#e6db74">&#34;authorization code: \n%v\n&#34;</span>, <span style="color:#a6e22e">authURL</span>)
 
-    var code string
-    if _, err := fmt.Scan(&amp;code); err != nil {
-        log.Fatalf(&quot;Unable to read authorization code %v&quot;, err)
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">code</span> <span style="color:#66d9ef">string</span>
+    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Scan</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">code</span>); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+        <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatalf</span>(<span style="color:#e6db74">&#34;Unable to read authorization code %v&#34;</span>, <span style="color:#a6e22e">err</span>)
     }
 
-    tok, err := config.Exchange(oauth2.NoContext, code)
-    if err != nil {
-        log.Fatalf(&quot;Unable to retrieve token from web %v&quot;, err)
+    <span style="color:#a6e22e">tok</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">config</span>.<span style="color:#a6e22e">Exchange</span>(<span style="color:#a6e22e">oauth2</span>.<span style="color:#a6e22e">NoContext</span>, <span style="color:#a6e22e">code</span>)
+    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+        <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatalf</span>(<span style="color:#e6db74">&#34;Unable to retrieve token from web %v&#34;</span>, <span style="color:#a6e22e">err</span>)
     }
-    return tok
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">tok</span>
 }
 
-func tokenFromFile(file string) (*oauth2.Token, error) {
-    f, err := os.Open(file)
-    if err != nil {
-        return nil, err
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">tokenFromFile</span>(<span style="color:#a6e22e">file</span> <span style="color:#66d9ef">string</span>) (<span style="color:#f92672">*</span><span style="color:#a6e22e">oauth2</span>.<span style="color:#a6e22e">Token</span>, <span style="color:#66d9ef">error</span>) {
+    <span style="color:#a6e22e">f</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Open</span>(<span style="color:#a6e22e">file</span>)
+    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">nil</span>, <span style="color:#a6e22e">err</span>
     }
-    t := &amp;oauth2.Token{}
-    err = json.NewDecoder(f).Decode(t)
-    defer f.Close()
-    return t, err
+    <span style="color:#a6e22e">t</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">oauth2</span>.<span style="color:#a6e22e">Token</span>{}
+    <span style="color:#a6e22e">err</span> = <span style="color:#a6e22e">json</span>.<span style="color:#a6e22e">NewDecoder</span>(<span style="color:#a6e22e">f</span>).<span style="color:#a6e22e">Decode</span>(<span style="color:#a6e22e">t</span>)
+    <span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">Close</span>()
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">err</span>
 }
 
-func saveToken(file string, token *oauth2.Token) {
-    fmt.Printf(&quot;Saving credential file to: %s\n&quot;, file)
-    f, err := os.Create(file)
-    if err != nil {
-        log.Fatalf(&quot;Unable to cache oauth token: %v&quot;, err)
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">saveToken</span>(<span style="color:#a6e22e">file</span> <span style="color:#66d9ef">string</span>, <span style="color:#a6e22e">token</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">oauth2</span>.<span style="color:#a6e22e">Token</span>) {
+    <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Saving credential file to: %s\n&#34;</span>, <span style="color:#a6e22e">file</span>)
+    <span style="color:#a6e22e">f</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Create</span>(<span style="color:#a6e22e">file</span>)
+    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+        <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatalf</span>(<span style="color:#e6db74">&#34;Unable to cache oauth token: %v&#34;</span>, <span style="color:#a6e22e">err</span>)
     }
-    defer f.Close()
-    json.NewEncoder(f).Encode(token)
+    <span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">Close</span>()
+    <span style="color:#a6e22e">json</span>.<span style="color:#a6e22e">NewEncoder</span>(<span style="color:#a6e22e">f</span>).<span style="color:#a6e22e">Encode</span>(<span style="color:#a6e22e">token</span>)
 }
 
-func main() {
-    ctx := context.Background()
-    b, err := ioutil.ReadFile(&quot;client_secret.json&quot;)
-    if err != nil {
-        log.Fatalf(&quot;Unable to read client secret file: %v&quot;, err)
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+    <span style="color:#a6e22e">ctx</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Background</span>()
+    <span style="color:#a6e22e">b</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">ioutil</span>.<span style="color:#a6e22e">ReadFile</span>(<span style="color:#e6db74">&#34;client_secret.json&#34;</span>)
+    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+        <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatalf</span>(<span style="color:#e6db74">&#34;Unable to read client secret file: %v&#34;</span>, <span style="color:#a6e22e">err</span>)
     }
-    // Here, in order to export project, drive.DriveScriptsScope, drive.DriveScope have to be included in the scope.
-    config, err := google.ConfigFromJSON(b, drive.DriveScriptsScope, drive.DriveScope)
-    if err != nil {
-        log.Fatalf(&quot;Unable to parse client secret file to config: %v&quot;, err)
+    <span style="color:#75715e">// Here, in order to export project, drive.DriveScriptsScope, drive.DriveScope have to be included in the scope.
+</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">config</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">ConfigFromJSON</span>(<span style="color:#a6e22e">b</span>, <span style="color:#a6e22e">drive</span>.<span style="color:#a6e22e">DriveScriptsScope</span>, <span style="color:#a6e22e">drive</span>.<span style="color:#a6e22e">DriveScope</span>)
+    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+        <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatalf</span>(<span style="color:#e6db74">&#34;Unable to parse client secret file to config: %v&#34;</span>, <span style="color:#a6e22e">err</span>)
     }
-    client := getClient(ctx, config)
-    srv, err := drive.New(client)
-    if err != nil {
-        log.Fatalf(&quot;Unable to retrieve drive Client %v&quot;, err)
+    <span style="color:#a6e22e">client</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">getClient</span>(<span style="color:#a6e22e">ctx</span>, <span style="color:#a6e22e">config</span>)
+    <span style="color:#a6e22e">srv</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">drive</span>.<span style="color:#a6e22e">New</span>(<span style="color:#a6e22e">client</span>)
+    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+        <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatalf</span>(<span style="color:#e6db74">&#34;Unable to retrieve drive Client %v&#34;</span>, <span style="color:#a6e22e">err</span>)
     }
 
-    // Export project
-    res, err := srv.Files.Export(
-        &quot;### Script ID of project ###&quot;,
-        &quot;application/vnd.google-apps.script+json&quot;, // mimeType is this.
-    ).Download()
-    if err != nil {
-        log.Fatalf(&quot;Error: %v&quot;, err)
+    <span style="color:#75715e">// Export project
+</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">res</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">srv</span>.<span style="color:#a6e22e">Files</span>.<span style="color:#a6e22e">Export</span>(
+        <span style="color:#e6db74">&#34;### Script ID of project ###&#34;</span>,
+        <span style="color:#e6db74">&#34;application/vnd.google-apps.script+json&#34;</span>, <span style="color:#75715e">// mimeType is this.
+</span><span style="color:#75715e"></span>    ).<span style="color:#a6e22e">Download</span>()
+    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+        <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatalf</span>(<span style="color:#e6db74">&#34;Error: %v&#34;</span>, <span style="color:#a6e22e">err</span>)
     }
-    result, _ := ioutil.ReadAll(res.Body)
-    fmt.Println(string(result))
+    <span style="color:#a6e22e">result</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">ioutil</span>.<span style="color:#a6e22e">ReadAll</span>(<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">Body</span>)
+    <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(string(<span style="color:#a6e22e">result</span>))
 }
-</code></pre>
+</code></pre></div>
+  
+  <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2017%2f08%2f27%2fexporting-project-on-google-drive-using-golang-quickstart%2f" target="_blank" title="Share on Facebook"><i class="fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2017%2f08%2f27%2fexporting-project-on-google-drive-using-golang-quickstart%2f&via=HorribleGeek" target="_blank" title="Tweet"><i class="fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2017%2f08%2f27%2fexporting-project-on-google-drive-using-golang-quickstart%2f" target="_blank" title="Share on Google+"><i class="fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2017%2f08%2f27%2fexporting-project-on-google-drive-using-golang-quickstart%2f" target="_blank" title="Post to Tumblr"><i class="fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2017%2f08%2f27%2fexporting-project-on-google-drive-using-golang-quickstart%2f" target="_blank" title="Pin it"><i class="fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2017%2f08%2f27%2fexporting-project-on-google-drive-using-golang-quickstart%2f" target="_blank" title="Submit to Reddit"><i class="fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2017/08/21/updated-gas-library---onedriveapp/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2017/08/21/updated-gas-library-onedriveapp/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2017/08/21/updated-gas-library---onedriveapp/">Updated: GAS Library - OnedriveApp</a>
+      <a href="https://tanaikech.github.io/2017/08/21/updated-gas-library-onedriveapp/">Updated: GAS Library - OnedriveApp</a>
     </nav>
     
   </div>
@@ -416,6 +455,7 @@ func main() {
 </div>
 </div>
 <script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -425,10 +465,6 @@ func main() {
     }
   });
 </script>
-<script type="text/javascript"
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-</script>
-<meta http-equiv="X-UA-Compatible" CONTENT="IE=EmulateIE7" />
 
 
 <script>
@@ -446,6 +482,11 @@ func main() {
 
 
 
+
+
+<script src="https://tanaikech.github.io/js/math-code.js"></script>
+  <script async src="//cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  
 
 
 </body>

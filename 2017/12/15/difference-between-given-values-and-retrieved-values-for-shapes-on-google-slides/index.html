@@ -5,9 +5,11 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.49.2" />
+  <meta name="generator" content="Hugo 0.61.0" />
 
   <title>Difference Between Given Values and Retrieved Values for Shapes on Google Slides &middot; tanaike</title>
+
+    
 
   
   
@@ -30,7 +32,7 @@
   <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
 
   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
@@ -105,6 +107,12 @@
       
       
         <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
           <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
       
         </li>
@@ -165,7 +173,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/tanaikech" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
     </li>
     
 
@@ -175,7 +183,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
     </li>
     
 
@@ -260,73 +268,96 @@
 
 </div>
 
-  
-
-<p><a href="https://gist.github.com/tanaikech/953e630855e65de55d8e5bd448ad764f">Gists</a></p>
-
+  <p><a href="https://gist.github.com/tanaikech/953e630855e65de55d8e5bd448ad764f">Gists</a></p>
 <p>This is a document for explaining the difference between given values and retrieved values for shapes on Google Slides. When a shape is created to a slide using Slides API, most users give the size of height and width as <code>pt</code>. When the size is retrieved from the created shape as <code>pt</code>, the size is often difference from the given size.</p>
-
 <p>For example, when a square shape is created by giving the height and width of 100 pt, the size which is retrieved from the created square becomes 99.99212598425197 pt for the height and width.</p>
-
 <p>In this document, this will be explained.</p>
-
 <p>At Slides, EMU is used as the default base unit. Slides manages all objects in the Slides using EMU. When the square with 100 pt in size is created, Slides processes as follows.</p>
-
 <ol>
 <li><code>100 pt</code> is converted to EMU. <a href="https://developers.google.com/slides/reference/rest/v1/Unit">1 pt is 12,700 EMUs</a>.
-
 <ul>
 <li><code>100 pt x 12700 EMU/pt = 1270000 EMUs</code></li>
-</ul></li>
+</ul>
+</li>
 <li>EMUs for <code>100 pt</code> is converted to <code>scaleX</code> and <code>scaleY</code> which are are unitless multiplying factors. <code>3000000</code> is the base value. You can see it using <code>slides.presentations.get</code>.
-
 <ul>
 <li><code>1270000 EMUs / 3000000 EMUs = 0.4233</code></li>
 <li>At Slides API, I seemed that this calculation is often rounded. I thought that this was strange.</li>
-</ul></li>
+</ul>
+</li>
 <li>When users retrieve the size of width and height, using <code>scaleX</code> and <code>scaleY</code> EMU is converted to pt.
-
 <ul>
 <li><code>0.4233 x 3000000 EMUs / 12700 EMU/pt = 99.99212598425197 pt</code></li>
 <li>This was calculated by the default calculator of windows.</li>
-</ul></li>
+</ul>
+</li>
 </ol>
-
 <p>By these flow, the square which was created by giving 100 pt in size has 99.99212598425197 pt in size.</p>
-
-<h2 id="references">References :</h2>
-
+<h2 id="references-">References :</h2>
 <ul>
 <li><a href="https://developers.google.com/slides/reference/rest/v1/Unit">Unit</a></li>
 </ul>
-
-<h2 id="appendix">Appendix :</h2>
-
+<h2 id="appendix-">Appendix :</h2>
 <h3 id="create-a-square-with-100-pt-in-size">Create a square with 100 pt in size</h3>
-
-<pre><code class="language-javascript">var presentationId = &quot;### presentationId ###&quot;;
-var pageObjectId = &quot;### pageObjectId ###&quot;;
-var resource = {&quot;requests&quot;:[{
-    &quot;createShape&quot;:{
-        &quot;shapeType&quot;:&quot;RECTANGLE&quot;,
-        &quot;elementProperties&quot;:{
-            &quot;size&quot;:{
-                &quot;height&quot;:{&quot;magnitude&quot;:100,&quot;unit&quot;:&quot;pt&quot;},
-                &quot;width&quot;:{&quot;magnitude&quot;:100,&quot;unit&quot;:&quot;pt&quot;}},
-            &quot;pageObjectId&quot;:pageObjectId
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">presentationId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;### presentationId ###&#34;</span>;
+<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">pageObjectId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;### pageObjectId ###&#34;</span>;
+<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">resource</span> <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;requests&#34;</span><span style="color:#f92672">:</span>[{
+    <span style="color:#e6db74">&#34;createShape&#34;</span><span style="color:#f92672">:</span>{
+        <span style="color:#e6db74">&#34;shapeType&#34;</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;RECTANGLE&#34;</span>,
+        <span style="color:#e6db74">&#34;elementProperties&#34;</span><span style="color:#f92672">:</span>{
+            <span style="color:#e6db74">&#34;size&#34;</span><span style="color:#f92672">:</span>{
+                <span style="color:#e6db74">&#34;height&#34;</span><span style="color:#f92672">:</span>{<span style="color:#e6db74">&#34;magnitude&#34;</span><span style="color:#f92672">:</span><span style="color:#ae81ff">100</span>,<span style="color:#e6db74">&#34;unit&#34;</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;pt&#34;</span>},
+                <span style="color:#e6db74">&#34;width&#34;</span><span style="color:#f92672">:</span>{<span style="color:#e6db74">&#34;magnitude&#34;</span><span style="color:#f92672">:</span><span style="color:#ae81ff">100</span>,<span style="color:#e6db74">&#34;unit&#34;</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;pt&#34;</span>}},
+            <span style="color:#e6db74">&#34;pageObjectId&#34;</span><span style="color:#f92672">:</span><span style="color:#a6e22e">pageObjectId</span>
         }
     }
 }]};
-Slides.Presentations.batchUpdate(resource, presentationId);
-</code></pre>
+<span style="color:#a6e22e">Slides</span>.<span style="color:#a6e22e">Presentations</span>.<span style="color:#a6e22e">batchUpdate</span>(<span style="color:#a6e22e">resource</span>, <span style="color:#a6e22e">presentationId</span>);
+</code></pre></div><h3 id="retrieve-the-size-of-created-square">Retrieve the size of created square</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">presentationId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;### presentationId ###&#34;</span>;
+<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">pageObjectId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;### pageObjectId ###&#34;</span>;
+<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Slides</span>.<span style="color:#a6e22e">Presentations</span>.<span style="color:#a6e22e">Pages</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">presentationId</span>, <span style="color:#a6e22e">pageObjectId</span>);
+<span style="color:#a6e22e">Logger</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;size: %s, transform: %s&#34;</span>, <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">pageElements</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">size</span>, <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">pageElements</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">transform</span>)
+</code></pre></div>
+  
+  <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2017%2f12%2f15%2fdifference-between-given-values-and-retrieved-values-for-shapes-on-google-slides%2f" target="_blank" title="Share on Facebook"><i class="fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2017%2f12%2f15%2fdifference-between-given-values-and-retrieved-values-for-shapes-on-google-slides%2f&via=HorribleGeek" target="_blank" title="Tweet"><i class="fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2017%2f12%2f15%2fdifference-between-given-values-and-retrieved-values-for-shapes-on-google-slides%2f" target="_blank" title="Share on Google+"><i class="fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2017%2f12%2f15%2fdifference-between-given-values-and-retrieved-values-for-shapes-on-google-slides%2f" target="_blank" title="Post to Tumblr"><i class="fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2017%2f12%2f15%2fdifference-between-given-values-and-retrieved-values-for-shapes-on-google-slides%2f" target="_blank" title="Pin it"><i class="fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2017%2f12%2f15%2fdifference-between-given-values-and-retrieved-values-for-shapes-on-google-slides%2f" target="_blank" title="Submit to Reddit"><i class="fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
 
-<h3 id="retrieve-the-size-of-created-square">Retrieve the size of created square</h3>
 
-<pre><code class="language-javascript">var presentationId = &quot;### presentationId ###&quot;;
-var pageObjectId = &quot;### pageObjectId ###&quot;;
-var res = Slides.Presentations.Pages.get(presentationId, pageObjectId);
-Logger.log(&quot;size: %s, transform: %s&quot;, res.pageElements[0].size, res.pageElements[0].transform)
-</code></pre>
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
 
 
   
@@ -369,6 +400,7 @@ Logger.log(&quot;size: %s, transform: %s&quot;, res.pageElements[0].size, res.pa
 </div>
 </div>
 <script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -378,10 +410,6 @@ Logger.log(&quot;size: %s, transform: %s&quot;, res.pageElements[0].size, res.pa
     }
   });
 </script>
-<script type="text/javascript"
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-</script>
-<meta http-equiv="X-UA-Compatible" CONTENT="IE=EmulateIE7" />
 
 
 <script>
@@ -396,6 +424,8 @@ Logger.log(&quot;size: %s, transform: %s&quot;, res.pageElements[0].size, res.pa
     ga('send', 'pageview');
   }
 </script>
+
+
 
 
 

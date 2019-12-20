@@ -5,9 +5,11 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.49.2" />
+  <meta name="generator" content="Hugo 0.61.0" />
 
   <title>Retrieving Size of Tables in Google Slides using Google Apps Script &middot; tanaike</title>
+
+    
 
   
   
@@ -30,7 +32,7 @@
   <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
 
   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
@@ -105,6 +107,12 @@
       
       
         <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
           <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
       
         </li>
@@ -165,7 +173,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/tanaikech" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
     </li>
     
 
@@ -175,7 +183,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
     </li>
     
 
@@ -260,68 +268,92 @@
 
 </div>
 
-  
-
-<p><a href="https://gist.github.com/tanaikech/3143be7e7df8cc595d73427d22ae2e0e">Gists</a></p>
-
+  <p><a href="https://gist.github.com/tanaikech/3143be7e7df8cc595d73427d22ae2e0e">Gists</a></p>
 <p>This sample script is for retrieving the size (width and height) of a table in Google Slides using Google Apps Script.</p>
-
 <p>There are no methods for directly retrieving the table size using SlidesApp yet. So I thought of a workaround using Slides API.</p>
-
 <ul>
 <li>When the slide information is retrieved using <code>Slides.Presentations.Pages.get()</code> of Slides API, the information of tables is also included. In the information, the height and width of table are also included.</li>
 <li>But the unit is EMU (English Metric Unit), and the height and width is separated by each cell. So it is required to sum each height and width while modifying the unit.</li>
 </ul>
-
 <p>The modified script reflected this is as follows.</p>
-
 <p>In order to use this script, please enable Slides API at <a href="https://developers.google.com/apps-script/guides/services/advanced#enabling_advanced_services">Advanced Google Services</a> and <a href="https://console.cloud.google.com/apis/library/slides.googleapis.com/?q=slides">API console</a>.</p>
-
-<pre><code class="language-javascript">var s = SlidesApp.getActivePresentation();
-var presentationId = s.getId();
-var pageObjectId = s.getSlides()[0].getObjectId(); // In this sample, I use 1st page. But if you want to use other page, please get the &quot;getObjectId&quot;.
-
-var pageElements = Slides.Presentations.Pages.get(presentationId, pageObjectId).pageElements;
-var result = [];
-for (var i in pageElements) {
-  var rowHeight = 0;
-  var rowWidth = 0;
-  if (pageElements[i].table) {
-    for (var j in pageElements[i].table.tableRows) {
-      rowHeight += pageElements[i].table.tableRows[j].rowHeight.magnitude / 12700;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">s</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SlidesApp</span>.<span style="color:#a6e22e">getActivePresentation</span>();
+<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">presentationId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getId</span>();
+<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">pageObjectId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getSlides</span>()[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">getObjectId</span>(); <span style="color:#75715e">// In this sample, I use 1st page. But if you want to use other page, please get the &#34;getObjectId&#34;.
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">pageElements</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Slides</span>.<span style="color:#a6e22e">Presentations</span>.<span style="color:#a6e22e">Pages</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">presentationId</span>, <span style="color:#a6e22e">pageObjectId</span>).<span style="color:#a6e22e">pageElements</span>;
+<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> [];
+<span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">pageElements</span>) {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">rowHeight</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">rowWidth</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">pageElements</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">table</span>) {
+    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">j</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">pageElements</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">table</span>.<span style="color:#a6e22e">tableRows</span>) {
+      <span style="color:#a6e22e">rowHeight</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">pageElements</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">table</span>.<span style="color:#a6e22e">tableRows</span>[<span style="color:#a6e22e">j</span>].<span style="color:#a6e22e">rowHeight</span>.<span style="color:#a6e22e">magnitude</span> <span style="color:#f92672">/</span> <span style="color:#ae81ff">12700</span>;
     }
-    for (var k in pageElements[i].table.tableColumns) {
-      rowWidth += pageElements[i].table.tableColumns[k].columnWidth.magnitude / 12700;
+    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">k</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">pageElements</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">table</span>.<span style="color:#a6e22e">tableColumns</span>) {
+      <span style="color:#a6e22e">rowWidth</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">pageElements</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">table</span>.<span style="color:#a6e22e">tableColumns</span>[<span style="color:#a6e22e">k</span>].<span style="color:#a6e22e">columnWidth</span>.<span style="color:#a6e22e">magnitude</span> <span style="color:#f92672">/</span> <span style="color:#ae81ff">12700</span>;
     }
-    result.push({Height: rowHeight, Width: rowWidth});
+    <span style="color:#a6e22e">result</span>.<span style="color:#a6e22e">push</span>({<span style="color:#a6e22e">Height</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">rowHeight</span>, <span style="color:#a6e22e">Width</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">rowWidth</span>});
   }
 }
-Logger.log(result)
-</code></pre>
-
-<h2 id="result">Result :</h2>
-
-<pre><code class="language-json">[
+<span style="color:#a6e22e">Logger</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">result</span>)
+</code></pre></div><h2 id="result-">Result :</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">[
     {
-        &quot;Height&quot;: 200,
-        &quot;Width&quot;: 300
+        <span style="color:#f92672">&#34;Height&#34;</span>: <span style="color:#ae81ff">200</span>,
+        <span style="color:#f92672">&#34;Width&#34;</span>: <span style="color:#ae81ff">300</span>
     }
 ]
-</code></pre>
-
-<h2 id="note">Note :</h2>
-
+</code></pre></div><h2 id="note-">Note :</h2>
 <ul>
 <li>Unit of output values is point.</li>
 <li>Because 12,700 EMUs per point, each values retrieved by <code>pageElements[i].table.tableRows[j].rowHeight.magnitude</code> and <code>pageElements[i].table.tableColumns[k].columnWidth.magnitude</code> are required to be divided by 12,700.</li>
 <li>When there are several tables in the slide, this sample script retrieves the width and height for each table.</li>
 </ul>
-
-<h2 id="reference">Reference :</h2>
-
+<h2 id="reference-">Reference :</h2>
 <ul>
 <li><a href="https://developers.google.com/slides/reference/rest/v1/Unit">About the unit of EMU</a></li>
 </ul>
+
+  
+  <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2017%2f11%2f21%2fretrieving-size-of-tables-in-google-slides-using-google-apps-script%2f" target="_blank" title="Share on Facebook"><i class="fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2017%2f11%2f21%2fretrieving-size-of-tables-in-google-slides-using-google-apps-script%2f&via=HorribleGeek" target="_blank" title="Tweet"><i class="fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2017%2f11%2f21%2fretrieving-size-of-tables-in-google-slides-using-google-apps-script%2f" target="_blank" title="Share on Google+"><i class="fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2017%2f11%2f21%2fretrieving-size-of-tables-in-google-slides-using-google-apps-script%2f" target="_blank" title="Post to Tumblr"><i class="fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2017%2f11%2f21%2fretrieving-size-of-tables-in-google-slides-using-google-apps-script%2f" target="_blank" title="Pin it"><i class="fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2017%2f11%2f21%2fretrieving-size-of-tables-in-google-slides-using-google-apps-script%2f" target="_blank" title="Submit to Reddit"><i class="fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
 
 
   
@@ -364,6 +396,7 @@ Logger.log(result)
 </div>
 </div>
 <script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -373,10 +406,6 @@ Logger.log(result)
     }
   });
 </script>
-<script type="text/javascript"
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-</script>
-<meta http-equiv="X-UA-Compatible" CONTENT="IE=EmulateIE7" />
 
 
 <script>
@@ -391,6 +420,8 @@ Logger.log(result)
     ga('send', 'pageview');
   }
 </script>
+
+
 
 
 

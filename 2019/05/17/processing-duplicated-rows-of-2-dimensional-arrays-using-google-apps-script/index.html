@@ -5,9 +5,11 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.49.2" />
+  <meta name="generator" content="Hugo 0.61.0" />
 
   <title>Processing Duplicated Rows of 2 Dimensional Arrays using Google Apps Script &middot; tanaike</title>
+
+    
 
   
   
@@ -30,7 +32,7 @@
   <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
 
   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
@@ -105,6 +107,12 @@
       
       
         <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
           <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
       
         </li>
@@ -165,7 +173,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/tanaikech" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
     </li>
     
 
@@ -175,7 +183,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
     </li>
     
 
@@ -266,25 +274,16 @@
 
 </div>
 
-  
-
-<p><a href="https://gist.github.com/tanaikech/5c2d6187c08b2d7b2f7a561de0c75c5e">Gists</a></p>
-
+  <p><a href="https://gist.github.com/tanaikech/5c2d6187c08b2d7b2f7a561de0c75c5e">Gists</a></p>
 <h1 id="overview">Overview</h1>
-
 <p>These are sample scripts for processing the duplicated rows of 2 dimensional arrays using Google Apps Script.</p>
-
 <h1 id="description">Description</h1>
-
-<p>When I use Google Spreadsheet and/or see Stackoverflow, I sometimes see the situation which is required to process the duplicated rows of 2 dimensional arrays. I thought that when the sample scripts for it have already prepared, they will be useful for other users including me. So I published this post. This sample scripts can be also used for Javascript. If this post is useful for you, I&rsquo;m glad.</p>
-
+<p>When I use Google Spreadsheet and/or see Stackoverflow, I sometimes see the situation which is required to process the duplicated rows of 2 dimensional arrays. I thought that when the sample scripts for it have already prepared, they will be useful for other users including me. So I published this post. This sample scripts can be also used for Javascript. If this post is useful for you, I'm glad.</p>
 <h1 id="sample-situation">Sample situation</h1>
-
 <p>Sample situation for scripts is as follows.</p>
-
 <ol>
-<li><p>There is a Spreadsheet including values. The array retrieved by <code>SpreadsheetApp.getActiveSheet().getDataRange().getValues()</code> is as follows.</p>
-
+<li>
+<p>There is a Spreadsheet including values. The array retrieved by <code>SpreadsheetApp.getActiveSheet().getDataRange().getValues()</code> is as follows.</p>
 <pre><code>var ar1 = [
     [&quot;a1&quot;, &quot;b1&quot;, &quot;c1&quot;],
     [&quot;a2&quot;, &quot;b2&quot;, &quot;c2&quot;],
@@ -297,10 +296,10 @@
     [&quot;a9&quot;, &quot;b9&quot;, &quot;c9&quot;],
     [&quot;a10&quot;, &quot;b10&quot;, &quot;c10&quot;]
 ];
-</code></pre></li>
-
-<li><p>There is one more Spreadsheet including values. The array retrieved by <code>SpreadsheetApp.getActiveSheet().getDataRange().getValues()</code> is as follows. This array is used for checking duplicated rows.</p>
-
+</code></pre>
+</li>
+<li>
+<p>There is one more Spreadsheet including values. The array retrieved by <code>SpreadsheetApp.getActiveSheet().getDataRange().getValues()</code> is as follows. This array is used for checking duplicated rows.</p>
 <pre><code>var ar2 = [
     [&quot;a1&quot;,    &quot;dummy&quot;, &quot;dummy&quot;],
     [&quot;a2&quot;,    &quot;b2&quot;,    &quot;dummy&quot;],
@@ -308,72 +307,55 @@
     [&quot;dummy&quot;, &quot;dummy&quot;, &quot;c4&quot;],
     [&quot;dummy&quot;, &quot;b5&quot;,    &quot;c5&quot;]
 ];
-</code></pre></li>
+</code></pre>
+</li>
 </ol>
-
 <h1 id="sample-scripts">Sample scripts</h1>
-
 <p>Here, I would like to introduce 3 sample scripts. <code>ar1</code> and <code>ar2</code> mentioned above were used for the following sample scripts.</p>
-
 <h2 id="sample-1">Sample 1</h2>
-
 <p>In this sample script, the rows that the special column is duplicated are retrieved.</p>
-
-<pre><code class="language-javascript">var checkIndex = 0;
-var res = ar2.filter(function(e) {
-  return ar1.some(function(f) {
-    return f[checkIndex] == e[checkIndex];
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">checkIndex</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar2</span>.<span style="color:#a6e22e">filter</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
+  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ar1</span>.<span style="color:#a6e22e">some</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">f</span>) {
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">f</span>[<span style="color:#a6e22e">checkIndex</span>] <span style="color:#f92672">==</span> <span style="color:#a6e22e">e</span>[<span style="color:#a6e22e">checkIndex</span>];
   });
 });
 
-// Result: [[&quot;a1&quot;,&quot;dummy&quot;,&quot;dummy&quot;],[&quot;a2&quot;,&quot;b2&quot;,&quot;dummy&quot;],[&quot;a3&quot;,&quot;b3&quot;,&quot;c3&quot;]]
-</code></pre>
-
-<ul>
+<span style="color:#75715e">// Result: [[&#34;a1&#34;,&#34;dummy&#34;,&#34;dummy&#34;],[&#34;a2&#34;,&#34;b2&#34;,&#34;dummy&#34;],[&#34;a3&#34;,&#34;b3&#34;,&#34;c3&#34;]]
+</span></code></pre></div><ul>
 <li>In this sample, 1st column is compared and when the same value is found, the row is retrieved as the duplicated row.</li>
 <li>If <code>var checkIndex = 1</code> is used, the 2nd column is compared.</li>
 </ul>
-
 <h2 id="sample-2">Sample 2</h2>
-
 <p>In this sample script, the rows that all columns are duplicated are retrieved.</p>
-
-<pre><code class="language-javascript">var res = ar2.filter(function(e) {
-  return ar1.some(function(f) {
-    return e.every(function(g, k) {
-      return g == f[k];
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar2</span>.<span style="color:#a6e22e">filter</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
+  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ar1</span>.<span style="color:#a6e22e">some</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">f</span>) {
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">every</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">g</span>, <span style="color:#a6e22e">k</span>) {
+      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">g</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">f</span>[<span style="color:#a6e22e">k</span>];
     });
   });
 });
 
-// Result: [[&quot;a3&quot;,&quot;b3&quot;,&quot;c3&quot;]]
-</code></pre>
-
-<h2 id="sample-3">Sample 3</h2>
-
+<span style="color:#75715e">// Result: [[&#34;a3&#34;,&#34;b3&#34;,&#34;c3&#34;]]
+</span></code></pre></div><h2 id="sample-3">Sample 3</h2>
 <p>In this sample script, the rows that the special columns are duplicated are retrieved.</p>
-
-<pre><code class="language-javascript">var checkIndex = [0, 1];
-var res = ar2.filter(function(e) {
-  return ar1.some(function(f) {
-    return checkIndex.every(function(g) {
-      return f[g] == e[g];
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">checkIndex</span> <span style="color:#f92672">=</span> [<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>];
+<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar2</span>.<span style="color:#a6e22e">filter</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
+  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ar1</span>.<span style="color:#a6e22e">some</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">f</span>) {
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">checkIndex</span>.<span style="color:#a6e22e">every</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">g</span>) {
+      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">f</span>[<span style="color:#a6e22e">g</span>] <span style="color:#f92672">==</span> <span style="color:#a6e22e">e</span>[<span style="color:#a6e22e">g</span>];
     });
   });
 });
 
-// Result: [[&quot;a2&quot;,&quot;b2&quot;,&quot;dummy&quot;],[&quot;a3&quot;,&quot;b3&quot;,&quot;c3&quot;]]
-</code></pre>
-
-<ul>
+<span style="color:#75715e">// Result: [[&#34;a2&#34;,&#34;b2&#34;,&#34;dummy&#34;],[&#34;a3&#34;,&#34;b3&#34;,&#34;c3&#34;]]
+</span></code></pre></div><ul>
 <li>In this sample, 1st and 2nd columns are compared and when the same values are found, the row is retrieved as the duplicated row.</li>
 <li>If <code>var checkIndex = [1, 2]</code> is used, the 2nd and 3rd columns are compared.</li>
 <li>Also when you use <code>var checkIndex = [0]</code>, the same result with &ldquo;Sample 1&rdquo; can be retrieved.</li>
 <li>Also when you use <code>var checkIndex = [0, 1, 2]</code>, the same result with &ldquo;Sample 2&rdquo; can be retrieved.</li>
 </ul>
-
 <h1 id="references">References</h1>
-
 <ul>
 <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter">Array​.prototype​.filter()</a></li>
 <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some">Array​.prototype​.some()</a></li>
@@ -381,21 +363,60 @@ var res = ar2.filter(function(e) {
 <li><a href="https://gist.github.com/tanaikech/848aeafaac1ec676900bb78e3ce220b6">Benchmark: Loop for Array Processing using Google Apps Script</a></li>
 <li><a href="https://github.com/tanaikech/taking-advantage-of-google-apps-script">Taking Advantage of Google Apps Script</a></li>
 </ul>
-
 <p>These are sample scripts. So please modify them for your situation.</p>
+
+  
+  <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2019%2f05%2f17%2fprocessing-duplicated-rows-of-2-dimensional-arrays-using-google-apps-script%2f" target="_blank" title="Share on Facebook"><i class="fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2019%2f05%2f17%2fprocessing-duplicated-rows-of-2-dimensional-arrays-using-google-apps-script%2f&via=HorribleGeek" target="_blank" title="Tweet"><i class="fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f05%2f17%2fprocessing-duplicated-rows-of-2-dimensional-arrays-using-google-apps-script%2f" target="_blank" title="Share on Google+"><i class="fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2019%2f05%2f17%2fprocessing-duplicated-rows-of-2-dimensional-arrays-using-google-apps-script%2f" target="_blank" title="Post to Tumblr"><i class="fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f05%2f17%2fprocessing-duplicated-rows-of-2-dimensional-arrays-using-google-apps-script%2f" target="_blank" title="Pin it"><i class="fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f05%2f17%2fprocessing-duplicated-rows-of-2-dimensional-arrays-using-google-apps-script%2f" target="_blank" title="Submit to Reddit"><i class="fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2019/05/16/cli-tool---gistwatcher/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2019/05/16/cli-tool-gistwatcher/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2019/05/16/cli-tool---gistwatcher/">CLI Tool - gistwatcher</a>
+      <a href="https://tanaikech.github.io/2019/05/16/cli-tool-gistwatcher/">CLI Tool - gistwatcher</a>
     </nav>
     
   </div>
@@ -425,6 +446,7 @@ var res = ar2.filter(function(e) {
 </div>
 </div>
 <script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -434,10 +456,6 @@ var res = ar2.filter(function(e) {
     }
   });
 </script>
-<script type="text/javascript"
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-</script>
-<meta http-equiv="X-UA-Compatible" CONTENT="IE=EmulateIE7" />
 
 
 <script>
@@ -452,6 +470,8 @@ var res = ar2.filter(function(e) {
     ga('send', 'pageview');
   }
 </script>
+
+
 
 
 

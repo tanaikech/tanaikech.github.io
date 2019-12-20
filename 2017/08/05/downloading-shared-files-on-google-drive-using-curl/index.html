@@ -5,9 +5,11 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.49.2" />
+  <meta name="generator" content="Hugo 0.61.0" />
 
   <title>Downloading Shared Files on Google Drive Using Curl &middot; tanaike</title>
+
+    
 
   
   
@@ -30,7 +32,7 @@
   <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
 
   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
@@ -105,6 +107,12 @@
       
       
         <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
           <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
       
         </li>
@@ -165,7 +173,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/tanaikech" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
     </li>
     
 
@@ -175,7 +183,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
     </li>
     
 
@@ -262,51 +270,68 @@
 
 </div>
 
-  
-
-<p><a href="https://gist.github.com/tanaikech/f0f2d122e05bf5f971611258c22c110f">Gists</a></p>
-
+  <p><a href="https://gist.github.com/tanaikech/f0f2d122e05bf5f971611258c22c110f">Gists</a></p>
 <p>When the shared files on Google Drive is downloaded, it is necessary to change the download method by the file size. The boundary of file size when the method is changed is about <strong>40MB</strong>.</p>
-
-<h3 id="file-size-40mb">File size &lt; 40MB</h3>
-
+<h3 id="file-size--40mb">File size &lt; 40MB</h3>
 <h4 id="curl">CURL</h4>
-
-<pre><code class="language-bash">filename=&quot;### filename ###&quot;
-fileid=&quot;### file ID ###&quot;
-curl -L -o ${filename} &quot;https://drive.google.com/uc?export=download&amp;id=${fileid}&quot;
-</code></pre>
-
-<h3 id="file-size-40mb-1">File size &gt; 40MB</h3>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">filename<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;### filename ###&#34;</span>
+fileid<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;### file ID ###&#34;</span>
+curl -L -o <span style="color:#e6db74">${</span>filename<span style="color:#e6db74">}</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">https://drive.google.com/uc?export=download&amp;id=</span><span style="color:#e6db74">${</span>fileid<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</code></pre></div><h3 id="file-size--40mb-1">File size &gt; 40MB</h3>
 <p>When it tries to download the file with more than 40MB, Google says to download from following URL.</p>
-
-<pre><code class="language-html">&lt;a id=&quot;uc-download-link&quot; class=&quot;goog-inline-block jfk-button jfk-button-action&quot; href=&quot;/uc?export=download&amp;amp;confirm=####&amp;amp;id=### file ID ###&quot;&gt;download&lt;/a&gt;
-</code></pre>
-
-<p>Query included <code>confirm=####</code> is important for downloading the files with large size. In order to retrieve the query from the HTML, it uses <a href="https://github.com/EricChiang/pup"><code>pup</code></a>.</p>
-
-<pre><code class="language-bash">pup 'a#uc-download-link attr{href}'
-</code></pre>
-
-<p>And <code>sed</code> is used to remove <code>amp;</code>.</p>
-
-<pre><code class="language-bash">sed -e 's/amp;//g'`
-</code></pre>
-
-<p>So curl command is as follows.</p>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;uc-download-link&#34;</span> <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;goog-inline-block jfk-button jfk-button-action&#34;</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/uc?export=download&amp;amp;confirm=####&amp;amp;id=### file ID ###&#34;</span>&gt;download&lt;/<span style="color:#f92672">a</span>&gt;
+</code></pre></div><p>Query included <code>confirm=####</code> is important for downloading the files with large size. In order to retrieve the query from the HTML, it uses <a href="https://github.com/EricChiang/pup"><code>pup</code></a>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">pup <span style="color:#e6db74">&#39;a#uc-download-link attr{href}&#39;</span>
+</code></pre></div><p>And <code>sed</code> is used to remove <code>amp;</code>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sed -e <span style="color:#e6db74">&#39;s/amp;//g&#39;</span><span style="color:#e6db74">`</span>
+</code></pre></div><p>So curl command is as follows.</p>
 <h4 id="curl-1">CURL</h4>
-
-<pre><code class="language-bash">filename=&quot;### filename ###&quot;
-fileid=&quot;### file ID ###&quot;
-query=`curl -c ./cookie.txt -s -L &quot;https://drive.google.com/uc?export=download&amp;id=${fileid}&quot; | pup 'a#uc-download-link attr{href}' | sed -e 's/amp;//g'`
-curl -b ./cookie.txt -L -o ${filename} &quot;https://drive.google.com${query}&quot;
-</code></pre>
-
-<p>The value of <code>confirm</code> is changed every time. So when the value of <code>confirm</code> is retrieved, the cookie is saved using <code>-c ./cookie.txt</code>, and when the file is downloaded, the cookie has to be read using <code>-b ./cookie.txt</code>.</p>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">filename<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;### filename ###&#34;</span>
+fileid<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;### file ID ###&#34;</span>
+query<span style="color:#f92672">=</span><span style="color:#e6db74">`</span>curl -c ./cookie.txt -s -L <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">https://drive.google.com/uc?export=download&amp;id=</span><span style="color:#e6db74">${</span>fileid<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> | pup <span style="color:#e6db74">&#39;a#uc-download-link attr{href}&#39;</span> | sed -e <span style="color:#e6db74">&#39;s/amp;//g&#39;</span><span style="color:#e6db74">`</span>
+curl -b ./cookie.txt -L -o <span style="color:#e6db74">${</span>filename<span style="color:#e6db74">}</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">https://drive.google.com</span><span style="color:#e6db74">${</span>query<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</code></pre></div><p>The value of <code>confirm</code> is changed every time. So when the value of <code>confirm</code> is retrieved, the cookie is saved using <code>-c ./cookie.txt</code>, and when the file is downloaded, the cookie has to be read using <code>-b ./cookie.txt</code>.</p>
 <p>Reference: <a href="http://qiita.com/netwing/items/f2a595389f39206235e8">http://qiita.com/netwing/items/f2a595389f39206235e8</a></p>
+
+  
+  <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2017%2f08%2f05%2fdownloading-shared-files-on-google-drive-using-curl%2f" target="_blank" title="Share on Facebook"><i class="fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2017%2f08%2f05%2fdownloading-shared-files-on-google-drive-using-curl%2f&via=HorribleGeek" target="_blank" title="Tweet"><i class="fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2017%2f08%2f05%2fdownloading-shared-files-on-google-drive-using-curl%2f" target="_blank" title="Share on Google+"><i class="fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2017%2f08%2f05%2fdownloading-shared-files-on-google-drive-using-curl%2f" target="_blank" title="Post to Tumblr"><i class="fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2017%2f08%2f05%2fdownloading-shared-files-on-google-drive-using-curl%2f" target="_blank" title="Pin it"><i class="fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2017%2f08%2f05%2fdownloading-shared-files-on-google-drive-using-curl%2f" target="_blank" title="Submit to Reddit"><i class="fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
 
 
   
@@ -349,6 +374,7 @@ curl -b ./cookie.txt -L -o ${filename} &quot;https://drive.google.com${query}&qu
 </div>
 </div>
 <script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -358,10 +384,6 @@ curl -b ./cookie.txt -L -o ${filename} &quot;https://drive.google.com${query}&qu
     }
   });
 </script>
-<script type="text/javascript"
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-</script>
-<meta http-equiv="X-UA-Compatible" CONTENT="IE=EmulateIE7" />
 
 
 <script>
@@ -379,6 +401,11 @@ curl -b ./cookie.txt -L -o ${filename} &quot;https://drive.google.com${query}&qu
 
 
 
+
+
+<script src="https://tanaikech.github.io/js/math-code.js"></script>
+  <script async src="//cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  
 
 
 </body>

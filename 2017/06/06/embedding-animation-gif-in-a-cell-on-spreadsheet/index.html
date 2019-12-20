@@ -5,9 +5,11 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.49.2" />
+  <meta name="generator" content="Hugo 0.61.0" />
 
   <title>Embedding Animation GIF in A Cell on Spreadsheet &middot; tanaike</title>
+
+    
 
   
   
@@ -30,7 +32,7 @@
   <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
 
   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
@@ -105,6 +107,12 @@
       
       
         <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
           <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
       
         </li>
@@ -165,7 +173,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/tanaikech" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
     </li>
     
 
@@ -175,7 +183,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
     </li>
     
 
@@ -260,44 +268,30 @@
 
 </div>
 
-  
-
-<p>This sample script is for embedding animation GIF in a cell using custom function on Spreadsheet.</p>
-
+  <p>This sample script is for embedding animation GIF in a cell using custom function on Spreadsheet.</p>
 <p>I think that this method is one of various ideas.</p>
-
 <h2 id="problem">Problem</h2>
-
 <p>There are some limitations.</p>
-
 <ol>
 <li>Images of jpeg and png can be embedded in a cell using <code>=IMAGE()</code>. But when animation GIF is embedded using it, GIF is not played.</li>
 <li><code>insertImage()</code> can insert the animation GIF to sheet. But it is not imported to one cell. It floats on several cells.</li>
 <li>In order to float the animation GIF on one cell, the size of GIF has to be retrieved. But the size of image cannot be retrieved at spreadsheet APIs.</li>
 <li><code>=IMAGE()</code> and <code>insertImage()</code> cannot be used by custom functions.</li>
 </ol>
-
 <h2 id="solution">Solution</h2>
-
 <p>I thought a method to floating an animation GIF on one cell using <code>insertImage()</code>. By this, I thought that it will be easy to use as a sheet with GIF images.</p>
-
 <p>In order to retrieve the size of image, it uses Google Document APIs. Class InlineImage of Document APIs has <code>getHeight()</code> and <code>getWidth()</code>. By this, the image size can be retrieved, and the size of cell can be changed using this. Although I have tried to resize image using <code>setHeight()</code> and <code>setWidth()</code>, when the image resized using them is retrieved, the size was original one.</p>
-
 <p><code>insertImage()</code> can be used by Web Apps <a href="https://developers.google.com/apps-script/guides/web">Web Apps</a>. From previous research, it has been found that Web Apps can avoid various limitations. Also in the case of this situation, Web Apps could avoid the above limitations.</p>
-
 <p>To use this sample script, please deploy Web Apps as follows.</p>
-
 <p>On the Script Editor,</p>
-
 <ul>
 <li>File
-
 <ul>
 <li>-&gt; Manage Versions</li>
 <li>-&gt; Save New Version</li>
-</ul></li>
+</ul>
+</li>
 <li>Publish
-
 <ul>
 <li>-&gt; Deploy as Web App</li>
 <li>-&gt; At Execute the app as, select <strong>&ldquo;your account&rdquo;</strong></li>
@@ -305,60 +299,51 @@
 <li>-&gt; Click <strong>&ldquo;Deploy&rdquo;</strong></li>
 <li>-&gt; Copy <strong>&ldquo;Current web app URL&rdquo;</strong></li>
 <li>-&gt; Click <strong>&ldquo;OK&rdquo;</strong></li>
-</ul></li>
 </ul>
-
+</li>
+</ul>
 <p>When it deploys Web Apps, the approval required authorization can be done, simultaneously.</p>
-
-<h2 id="sample-script">Sample Script :</h2>
-
+<h2 id="sample-script-">Sample Script :</h2>
 <p>Please copy and paste this script to a bound script of spreadsheet.</p>
-
-<pre><code class="language-javascript">function gif(filename) {
-  var ac = SpreadsheetApp.getActiveSheet().getActiveCell();
-  var q1 = &quot;?file=&quot; + filename;
-  var q2 = &quot;&amp;row=&quot; + ac.getRow();
-  var q3 = &quot;&amp;col=&quot; + ac.getColumn();
-  var url = ScriptApp.getService().getUrl() + q1 + q2 + q3;
-  UrlFetchApp.fetch(url);
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">gif</span>(<span style="color:#a6e22e">filename</span>) {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ac</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSheet</span>().<span style="color:#a6e22e">getActiveCell</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">q1</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;?file=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">filename</span>;
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">q2</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&amp;row=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">ac</span>.<span style="color:#a6e22e">getRow</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">q3</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&amp;col=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">ac</span>.<span style="color:#a6e22e">getColumn</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getService</span>().<span style="color:#a6e22e">getUrl</span>() <span style="color:#f92672">+</span> <span style="color:#a6e22e">q1</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">q2</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">q3</span>;
+  <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>);
 }
 
-function doGet(e) {
-  var srcfile = DriveApp.getFilesByName(e.parameters.file).next();
-  srcfile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-  var fileid = Drive.Files.insert({
-      title: &quot;temp&quot;,
-      mimeType: &quot;application/vnd.google-apps.document&quot;,
-      parents:  [{&quot;id&quot;: srcfile.getParents().next().getId()}]
-  }).getId();
-  var img = DocumentApp.openById(fileid)
-            .insertImage(
-              0,
-              UrlFetchApp.fetch(Drive.Files.get(srcfile.getId())
-              .webContentLink)
-              .getBlob()
+<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">doGet</span>(<span style="color:#a6e22e">e</span>) {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">srcfile</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFilesByName</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameters</span>.<span style="color:#a6e22e">file</span>).<span style="color:#a6e22e">next</span>();
+  <span style="color:#a6e22e">srcfile</span>.<span style="color:#a6e22e">setSharing</span>(<span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">Access</span>.<span style="color:#a6e22e">ANYONE_WITH_LINK</span>, <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">Permission</span>.<span style="color:#a6e22e">VIEW</span>);
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">fileid</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Drive</span>.<span style="color:#a6e22e">Files</span>.<span style="color:#a6e22e">insert</span>({
+      <span style="color:#a6e22e">title</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;temp&#34;</span>,
+      <span style="color:#a6e22e">mimeType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/vnd.google-apps.document&#34;</span>,
+      <span style="color:#a6e22e">parents</span><span style="color:#f92672">:</span>  [{<span style="color:#e6db74">&#34;id&#34;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">srcfile</span>.<span style="color:#a6e22e">getParents</span>().<span style="color:#a6e22e">next</span>().<span style="color:#a6e22e">getId</span>()}]
+  }).<span style="color:#a6e22e">getId</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">img</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DocumentApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">fileid</span>)
+            .<span style="color:#a6e22e">insertImage</span>(
+              <span style="color:#ae81ff">0</span>,
+              <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">Drive</span>.<span style="color:#a6e22e">Files</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">srcfile</span>.<span style="color:#a6e22e">getId</span>())
+              .<span style="color:#a6e22e">webContentLink</span>)
+              .<span style="color:#a6e22e">getBlob</span>()
             );
-  var sheet = SpreadsheetApp.getActiveSheet();
-  sheet.setRowHeight(e.parameters.row, img.getHeight() + 4);
-  sheet.setColumnWidth(e.parameters.col, img.getWidth() + 3);
-  sheet.getRange(e.parameters.row, e.parameters.col).setFormula(&quot;&quot;);
-  sheet.insertImage(Drive.Files.get(srcfile.getId()).webContentLink, e.parameters.row, e.parameters.col);
-  Utilities.sleep(1000);
-  Drive.Files.remove(fileid);
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSheet</span>();
+  <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">setRowHeight</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameters</span>.<span style="color:#a6e22e">row</span>, <span style="color:#a6e22e">img</span>.<span style="color:#a6e22e">getHeight</span>() <span style="color:#f92672">+</span> <span style="color:#ae81ff">4</span>);
+  <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">setColumnWidth</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameters</span>.<span style="color:#a6e22e">col</span>, <span style="color:#a6e22e">img</span>.<span style="color:#a6e22e">getWidth</span>() <span style="color:#f92672">+</span> <span style="color:#ae81ff">3</span>);
+  <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameters</span>.<span style="color:#a6e22e">row</span>, <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameters</span>.<span style="color:#a6e22e">col</span>).<span style="color:#a6e22e">setFormula</span>(<span style="color:#e6db74">&#34;&#34;</span>);
+  <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">insertImage</span>(<span style="color:#a6e22e">Drive</span>.<span style="color:#a6e22e">Files</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">srcfile</span>.<span style="color:#a6e22e">getId</span>()).<span style="color:#a6e22e">webContentLink</span>, <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameters</span>.<span style="color:#a6e22e">row</span>, <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameters</span>.<span style="color:#a6e22e">col</span>);
+  <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">sleep</span>(<span style="color:#ae81ff">1000</span>);
+  <span style="color:#a6e22e">Drive</span>.<span style="color:#a6e22e">Files</span>.<span style="color:#a6e22e">remove</span>(<span style="color:#a6e22e">fileid</span>);
 }
-</code></pre>
-
-<h3 id="flow-of-script">Flow of Script :</h3>
-
+</code></pre></div><h3 id="flow-of-script-">Flow of Script :</h3>
 <p><strong>gif()</strong></p>
-
 <ol>
 <li>Input <code>=gif(&quot;sample.gif&quot;)</code> in cell <code>B2</code>. <code>&quot;sample.gif&quot;</code> is an animation GIF.</li>
 <li>Using <code>fetch()</code>, sends data of <code>&quot;sample.gif&quot;</code> and the inputted coordinate to <code>doGet()</code>.</li>
 </ol>
-
 <p><strong>doGet()</strong></p>
-
 <ol>
 <li>Using <code>doGet()</code>, get the data.</li>
 <li>Update the permission of GIF.</li>
@@ -368,29 +353,61 @@ function doGet(e) {
 <li>Import GIF to the cell.</li>
 <li>Delete Document file.</li>
 </ol>
-
-<h2 id="result">Result :</h2>
-
+<h2 id="result-">Result :</h2>
 <p>By inputting <code>=gif(&quot;sample.png&quot;)</code> in cell <code>B2</code> as a custom function, following result can be obtained.</p>
-
 <p><strong>Although this demo movie seems short loading time, this loading time is edited. Actual loading time is about 40 seconds.</strong></p>
-
-<p><img src="https://tanaikech.github.io/img/20170606c_demo.gif" alt="" /></p>
-
-<h2 id="note">Note :</h2>
-
+<p><img src="https://tanaikech.github.io/img/20170606c_demo.gif" alt=""></p>
+<h2 id="note-">Note :</h2>
 <ol>
-<li>When the custom function <code>gif()</code> is used, loading time is about 40 seconds. (I don&rsquo;t know whether this occurs only my environment.)</li>
+<li>When the custom function <code>gif()</code> is used, loading time is about 40 seconds. (I don't know whether this occurs only my environment.)</li>
 <li>Permissions of GIF are <a href="https://developers.google.com/apps-script/reference/drive/access">ANYONE_WITH_LINK</a>, <a href="https://developers.google.com/apps-script/reference/drive/permission">VIEW</a>.</li>
 </ol>
-
 <h2 id="related-tips">Related Tips</h2>
-
 <ul>
 <li><a href="https://tanaikech.github.io/2017/06/06/ocr-using-custom-function-on-spreadsheet/">OCR using Custom Function on Spreadsheet</a></li>
 <li><a href="https://tanaikech.github.io/2017/05/26/embedding-a-chart-to-a-cell-using-custom-function-on-spreadsheet/">Embedding a Chart to a Cell using Custom Function on Spreadsheet</a></li>
 <li><a href="https://tanaikech.github.io/2017/06/04/embedding-a-map-to-a-cell-using-custom-function-on-spreadsheet/">Embedding a Map to a Cell using Custom Function on Spreadsheet</a></li>
 </ul>
+
+  
+  <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2017%2f06%2f06%2fembedding-animation-gif-in-a-cell-on-spreadsheet%2f" target="_blank" title="Share on Facebook"><i class="fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2017%2f06%2f06%2fembedding-animation-gif-in-a-cell-on-spreadsheet%2f&via=HorribleGeek" target="_blank" title="Tweet"><i class="fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2017%2f06%2f06%2fembedding-animation-gif-in-a-cell-on-spreadsheet%2f" target="_blank" title="Share on Google+"><i class="fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2017%2f06%2f06%2fembedding-animation-gif-in-a-cell-on-spreadsheet%2f" target="_blank" title="Post to Tumblr"><i class="fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2017%2f06%2f06%2fembedding-animation-gif-in-a-cell-on-spreadsheet%2f" target="_blank" title="Pin it"><i class="fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2017%2f06%2f06%2fembedding-animation-gif-in-a-cell-on-spreadsheet%2f" target="_blank" title="Submit to Reddit"><i class="fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
 
 
   
@@ -433,6 +450,7 @@ function doGet(e) {
 </div>
 </div>
 <script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -442,10 +460,6 @@ function doGet(e) {
     }
   });
 </script>
-<script type="text/javascript"
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-</script>
-<meta http-equiv="X-UA-Compatible" CONTENT="IE=EmulateIE7" />
 
 
 <script>
@@ -460,6 +474,8 @@ function doGet(e) {
     ga('send', 'pageview');
   }
 </script>
+
+
 
 
 

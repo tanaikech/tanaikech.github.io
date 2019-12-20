@@ -5,9 +5,11 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.49.2" />
+  <meta name="generator" content="Hugo 0.61.0" />
 
   <title>Automatic Recalculation of Custom Function on Spreadsheet Part 1 &middot; tanaike</title>
+
+    
 
   
   
@@ -30,7 +32,7 @@
   <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
 
   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
@@ -105,6 +107,12 @@
       
       
         <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
           <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
       
         </li>
@@ -165,7 +173,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/tanaikech" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
     </li>
     
 
@@ -175,7 +183,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
     </li>
     
 
@@ -264,90 +272,110 @@
 
 </div>
 
-  
-
-<p><a href="https://gist.github.com/tanaikech/b8ea7bd7fd87bcd7bb28ddede1781889">Gists</a></p>
-
+  <p><a href="https://gist.github.com/tanaikech/b8ea7bd7fd87bcd7bb28ddede1781889">Gists</a></p>
 <p>In this report, I would like to introduce a workaround for automatically recalculating custom functions on Spreadsheet.</p>
-
 <h2 id="1-situation">1. Situation</h2>
-
 <p>The sample situation is below. <strong>This is a sample situation for this document.</strong></p>
-
 <ul>
 <li>There are 3 sheets with &ldquo;sheet1&rdquo;, &ldquo;sheet2&rdquo; and &ldquo;sheet3&rdquo; of sheet name in a Spreadsheet.</li>
 <li>Calculate the summation of values of &ldquo;A1&rdquo; of each sheet using a custom function.</li>
 <li>Sample script of the custom function is as follows.</li>
 </ul>
-
-<pre><code class="language-javascript">function myFunction(e) {
-    var r = 0;
-    var sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
-    for (var i in sheets) {
-        r += sheets[i].getRange(e).getValue();
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>(<span style="color:#a6e22e">e</span>) {
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sheets</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>().<span style="color:#a6e22e">getSheets</span>();
+    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">sheets</span>) {
+        <span style="color:#a6e22e">r</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">sheets</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">e</span>).<span style="color:#a6e22e">getValue</span>();
     }
-    return r;
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">r</span>;
 }
-</code></pre>
-
-<h2 id="2-workaround-for-recalculating">2. Workaround for recalculating</h2>
-
+</code></pre></div><h2 id="2-workaround-for-recalculating">2. Workaround for recalculating</h2>
 <p>When <code>=myFunction(&quot;A1&quot;)</code> is put in a cell, the custom function sums each &ldquo;A1&rdquo; of &ldquo;sheet1&rdquo;, &ldquo;sheet2&rdquo; and &ldquo;sheet3&rdquo;. But in this case, when &ldquo;A1&rdquo; of one of 3 sheets is changed, the custom function is not recalculated.</p>
-
 <p><strong>In order to make spreadsheet recalculate, it is required to make spreadsheet know that the cell value which is used for the custom function was changed.</strong></p>
-
 <p>So, I thought of a workaround. I think that this is one of several workarounds. In order to make spreadsheet know the change of the cell value, it added the information of cell value to <code>=myFunction(&quot;A1&quot;)</code> as follows.</p>
-
 <ul>
 <li>When <code>=myFunction(&quot;A1&quot;)</code> is used to sum each &ldquo;A1&rdquo; of &ldquo;sheet1&rdquo;, &ldquo;sheet2&rdquo; and &ldquo;sheet3&rdquo;, it uses <code>=myFunction(&quot;A1&quot;, sheet1!A1, sheet2!A1, sheet3!A1)</code> instead of <code>=myFunction(&quot;A1&quot;)</code>.</li>
 </ul>
-
 <p>By giving <code>sheet1!A1, sheet2!A1, sheet3!A1</code>, when one of each &ldquo;A1&rdquo; is changed, spreadsheet can know the change and recalculates the custom function.</p>
-
-<h3 id="note">Note :</h3>
-
+<h3 id="note-">Note :</h3>
 <ul>
 <li>The sample script is not required to modify.
-
 <ul>
 <li><code>sheet1!A1, sheet2!A1, sheet3!A1</code> is not used for the custom function. This is used only to make spreadsheet know the change of cell value.</li>
 <li>You can see a following sample script for this situation.</li>
-</ul></li>
 </ul>
-
-<pre><code class="language-javascript">function foo(e) {
-    return e;
+</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">foo</span>(<span style="color:#a6e22e">e</span>) {
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">e</span>;
 }
 
-function bar() {
-    var r = foo(1, 2, 3);
-    console.log(r); // &gt;&gt;&gt; 1
-}
-</code></pre>
-
-<h2 id="3-references">3. References:</h2>
-
+<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">bar</span>() {
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">foo</span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>);
+    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">r</span>); <span style="color:#75715e">// &gt;&gt;&gt; 1
+</span><span style="color:#75715e"></span>}
+</code></pre></div><h2 id="3-references">3. References:</h2>
 <ul>
 <li><a href="https://developers.google.com/apps-script/guides/sheets/functions">Custom Functions in Google Sheets</a></li>
 <li><a href="https://gist.github.com/tanaikech/cb5447616bfc6a01de8a49131c0d2db0">Automatic Recalculation of Custom Function on Spreadsheet Part 2</a>
-
 <ul>
 <li>This is other workaround for forcibly recalculating the cunstom functions and built-in functions using Class TextFinder.</li>
-</ul></li>
 </ul>
+</li>
+</ul>
+
+  
+  <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2017%2f12%2f23%2fautomatic-recalculation-of-custom-function-on-spreadsheet-part-1%2f" target="_blank" title="Share on Facebook"><i class="fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2017%2f12%2f23%2fautomatic-recalculation-of-custom-function-on-spreadsheet-part-1%2f&via=HorribleGeek" target="_blank" title="Tweet"><i class="fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2017%2f12%2f23%2fautomatic-recalculation-of-custom-function-on-spreadsheet-part-1%2f" target="_blank" title="Share on Google+"><i class="fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2017%2f12%2f23%2fautomatic-recalculation-of-custom-function-on-spreadsheet-part-1%2f" target="_blank" title="Post to Tumblr"><i class="fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2017%2f12%2f23%2fautomatic-recalculation-of-custom-function-on-spreadsheet-part-1%2f" target="_blank" title="Pin it"><i class="fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2017%2f12%2f23%2fautomatic-recalculation-of-custom-function-on-spreadsheet-part-1%2f" target="_blank" title="Submit to Reddit"><i class="fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2017/12/20/add-on---rearrangescripts/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2017/12/20/add-on-rearrangescripts/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2017/12/20/add-on---rearrangescripts/">Add-on - RearrangeScripts</a>
+      <a href="https://tanaikech.github.io/2017/12/20/add-on-rearrangescripts/">Add-on - RearrangeScripts</a>
     </nav>
     
   </div>
@@ -357,13 +385,13 @@ function bar() {
   <div class="pure-u-10-24">
     
     <nav class="next">
-      <a href="https://tanaikech.github.io/2017/12/28/updated-add-on---rearrangescripts-to-v201/">Updated Add-on - RearrangeScripts to v201</a>
+      <a href="https://tanaikech.github.io/2017/12/28/updated-add-on-rearrangescripts-to-v201/">Updated Add-on - RearrangeScripts to v201</a>
     </nav>
     
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
     
-    <a href="https://tanaikech.github.io/2017/12/28/updated-add-on---rearrangescripts-to-v201/"><i class="fa fa-chevron-right"></i></a>
+    <a href="https://tanaikech.github.io/2017/12/28/updated-add-on-rearrangescripts-to-v201/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
@@ -377,6 +405,7 @@ function bar() {
 </div>
 </div>
 <script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -386,10 +415,6 @@ function bar() {
     }
   });
 </script>
-<script type="text/javascript"
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-</script>
-<meta http-equiv="X-UA-Compatible" CONTENT="IE=EmulateIE7" />
 
 
 <script>
@@ -404,6 +429,8 @@ function bar() {
     ga('send', 'pageview');
   }
 </script>
+
+
 
 
 

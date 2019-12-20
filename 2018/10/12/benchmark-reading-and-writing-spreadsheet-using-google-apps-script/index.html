@@ -5,9 +5,11 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.49.2" />
+  <meta name="generator" content="Hugo 0.61.0" />
 
   <title>Benchmark: Reading and Writing Spreadsheet using Google Apps Script &middot; tanaike</title>
+
+    
 
   
   
@@ -30,7 +32,7 @@
   <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
 
   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
@@ -105,6 +107,12 @@
       
       
         <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
           <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
       
         </li>
@@ -165,7 +173,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/tanaikech" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
     </li>
     
 
@@ -175,7 +183,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
     </li>
     
 
@@ -264,37 +272,21 @@
 
 </div>
 
-  
-
-<p><a href="https://gist.github.com/tanaikech/d102c9600ba12a162c667287d2f20fe4">Gists</a></p>
-
-<p><a name="TOP"></a></p>
-
+  <p><a href="https://gist.github.com/tanaikech/d102c9600ba12a162c667287d2f20fe4">Gists</a></p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
 <h1 id="benchmark-reading-and-writing-spreadsheet-using-google-apps-script">Benchmark: Reading and Writing Spreadsheet using Google Apps Script</h1>
-
-<p><center>
-October 12, 2018
-    Published.</p>
-
+<!-- raw HTML omitted -->
 <p>October 18, 2018
-    Updated.
-        In order to compare with Advanced Google Service, a result of Sheets API by UrlFetchApp was added to <a href="#Appendix">Appendix</a>.</p>
-
-<p>Kanshi Tanaike
-</center></p>
-
+Updated.
+In order to compare with Advanced Google Service, a result of Sheets API by UrlFetchApp was added to <a href="#Appendix">Appendix</a>.</p>
+<p>Kanshi Tanaike</p>
+<!-- raw HTML omitted -->
 <h1 id="introduction">Introduction</h1>
-
 <p><strong>Please be careful! This result can be only used for Google Apps Script.</strong></p>
-
-<p>There are a limit executing time for Google Apps Script (GAS). That is 6 minutes for Consumer and Google Apps free edition, and 30 minutes for G Suite and Early Access. <a href="#References"><sup>1</sup></a> So many users always have to pay attention to reducing the process cost of scripts. So it is very important to know the process cost of various situations. I have already reported the costs for various processes as the reports. <a href="#References"><sup>2</sup></a> In this report, the process cost for reading and writing values for Spreadsheet using GAS has been investigated.</p>
-
+<p>There are a limit executing time for Google Apps Script (GAS). That is 6 minutes for Consumer and Google Apps free edition, and 30 minutes for G Suite and Early Access. <a href="#References"><!-- raw HTML omitted -->1<!-- raw HTML omitted --></a> So many users always have to pay attention to reducing the process cost of scripts. So it is very important to know the process cost of various situations. I have already reported the costs for various processes as the reports. <a href="#References"><!-- raw HTML omitted -->2<!-- raw HTML omitted --></a> In this report, the process cost for reading and writing values for Spreadsheet using GAS has been investigated.</p>
 <p>As the result, the conclusion that the methods for reading and writing Spreadsheet of Sheets API are using the different algorithm and/or process from those of Spreadsheet service were derived.</p>
-
 <h1 id="experimental-procedure">Experimental procedure</h1>
-
 <p>In order to measure the process cost for reading and writing spreadsheet, the size of values for reading and writing were variously changed. For measuring the reading cost, Spreadsheet which had the values for reading was used. For measuring the writing cost, Spreadsheet that all values were cleared was used. The methods for reading and writing which were used this report are as follows.</p>
-
 <table>
 <thead>
 <tr>
@@ -302,282 +294,256 @@ October 12, 2018
 <th align="left">Methods used for measuring process cost</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td align="left">Reading (Spreadsheet Service)</td>
 <td align="left">getValues(), getSheetValues()</td>
 </tr>
-
 <tr>
 <td align="left">Reading (Sheets API)</td>
 <td align="left">values.get, values.batchGet</td>
 </tr>
-
 <tr>
 <td align="left">Writing (Spreadsheet Service)</td>
 <td align="left">setValue(), appendRow(), setValues()</td>
 </tr>
-
 <tr>
 <td align="left">Writing (Sheets API)</td>
 <td align="left">values.update, values.batchUpdate, values.append</td>
 </tr>
 </tbody>
 </table>
-
-<p>For the methods of Sheets API, the reason these methods are chosen is because 2 dimensional array can be used as the values. At the flow of each method, the spreadsheet is opened and is read or written. From the preparation experiment, it was found that the process costs of <code>SpreadsheetApp.getActiveSheet()</code> and <code>SpreadsheetApp.openById(ID)</code> are the almost the same. So the methods of SpreadsheetApp class used <code>SpreadsheetApp.openById(ID)</code>. <a href="#References"><sup>3</sup></a> The methods of Sheets API used Advanced Google Services. <a href="#References"><sup>4</sup></a> The sample scripts of GAS which were used for this report are here. <a href="#SampleScripts"><sup>a</sup></a> For measuring the process cost, the cost for creating values for writing is not included. By the way, at GAS, the processing time is not stable as you know. So the average value for more than 100 times measurements was used for each data point which is shown by figures. At this time, the fluctuation of the average values was less than 1 %. I worry that each detailed-data point at my environment might be different from that at other user&rsquo;s environment. But I think that the trend of this result can be used.</p>
-
+<p>For the methods of Sheets API, the reason these methods are chosen is because 2 dimensional array can be used as the values. At the flow of each method, the spreadsheet is opened and is read or written. From the preparation experiment, it was found that the process costs of <code>SpreadsheetApp.getActiveSheet()</code> and <code>SpreadsheetApp.openById(ID)</code> are the almost the same. So the methods of SpreadsheetApp class used <code>SpreadsheetApp.openById(ID)</code>. <a href="#References"><!-- raw HTML omitted -->3<!-- raw HTML omitted --></a> The methods of Sheets API used Advanced Google Services. <a href="#References"><!-- raw HTML omitted -->4<!-- raw HTML omitted --></a> The sample scripts of GAS which were used for this report are here. <a href="#SampleScripts"><!-- raw HTML omitted -->a<!-- raw HTML omitted --></a> For measuring the process cost, the cost for creating values for writing is not included. By the way, at GAS, the processing time is not stable as you know. So the average value for more than 100 times measurements was used for each data point which is shown by figures. At this time, the fluctuation of the average values was less than 1 %. I worry that each detailed-data point at my environment might be different from that at other user's environment. But I think that the trend of this result can be used.</p>
 <h1 id="results">Results</h1>
-
-<p><img src="https://tanaikech.github.io/img/20181012a-fig1.png" alt="" /></p>
-
+<p><img src="https://tanaikech.github.io/img/20181012a-fig1.png" alt=""></p>
 <p>Fig. 1. Number of rows for reading vs. process time. About the values for reading from Spreadsheet, the rows are changed under the constant columns. Numbers of columns of Figs. (a) - (h) are 2, 10, 25, 50, 100, 200, 300 and 400, respectively. All figures are the double-logarithmic scales.</p>
-
-<p><br></p>
-
+<!-- raw HTML omitted -->
 <p>Figure 1 shows the process time for reading the values from Spreadsheet. For each figure in Fig. 1, the process time was measured by changing the number of rows for reading, while the columns are constant. At Figs. 1 (a) - (h), the columns are changed as 2, 10, 25, 50, 100, 200, 300 and 400, respectively. All figures are the double-logarithmic scales. From Figs. 1 (a) - (h), it was found that the process cost of the methods of Sheets API was lower than that of the methods of Spreadsheet Service. And, it was found that the cost of <code>getValues()</code> and <code>getSheetValues()</code> was almost the same. It was found that the cost of <code>values.get</code> and <code>values.batchGet</code> was also almost the same. For all methods, the costs increase with the increase in the columns of values for reading.</p>
-
-<p><img src="https://tanaikech.github.io/img/20181012a-fig2.png" alt="" /></p>
-
+<p><img src="https://tanaikech.github.io/img/20181012a-fig2.png" alt=""></p>
 <p>Fig. 2. Number of rows for writing vs. process time. About the values for writing to Spreadsheet, the rows are changed under the constant columns. Numbers of columns of Figs. (a) - (h) are 2, 10, 25, 50, 100, 200, 300 and 400, respectively. All figures are the double-logarithmic scales.</p>
-
-<p><br></p>
-
+<!-- raw HTML omitted -->
 <p>Figure 2 shows the process time for writing the values to Spreadsheet. For each figure in Fig. 2, the process time was measured by changing the number of rows for writing, while the columns are constant. At Figs. 1 (a) - (h), the columns are changed as 2, 10, 25, 50, 100, 200, 300 and 400, respectively. All figures are the double-logarithmic scales. From Figs. 2 (a) - (h), it was found that the process cost of the methods of Sheets API was lower than that of the methods of Spreadsheet Service. And, it was found that the cost of <code>values.update</code>, <code>values.batchUpdate</code> and <code>values.append</code> was almost the same. For all methods, the costs increase with the increase in the columns of values for reading.</p>
-
 <p>Here, from Fig. 1 and Fig. 2, the process costs for reading and writing Spreadsheet under the constant rows were retrieved.</p>
-
-<p><img src="https://tanaikech.github.io/img/20181012a-fig3.png" alt="" /></p>
-
+<p><img src="https://tanaikech.github.io/img/20181012a-fig3.png" alt=""></p>
 <p>Fig. 3. Process costs for reading (a) and writing (b) data with 1000 rows. This figure is the linear scale.</p>
-
-<p><br></p>
-
+<!-- raw HTML omitted -->
 <p>Figure 3 shows the process costs for reading (a) and writing (b) data with 1000 rows. This figure was obtained by retrieving the values at 1000 rows from Figs. 1 and 2. From Fig. 3 a and b, it was found that the difference of costs for Spreadsheet Service and Sheets API increased with the increase in the number of columns. And also, it was found that from the slopes of these figures, the methods of Sheets API can reduce the process costs rather than those of Spreadsheet Service. For reading values, Sheets API can reduce the process cost from Spreadsheet Service by about 35 %. For writing values, Sheets API can reduce the process cost from Spreadsheet Service by about 19 %. These results can be obtained from Fig. 3.</p>
-
 <p>By the way, when it shows Fig. 2, it notices an interesting trend. From the results mentioned above, it was found that Sheets API can basically can reduce the process costs larger than Spreadsheet Service. But when the number of rows for writing is is small in Fig. 2, it is found that the process cost between Spreadsheet Service and Sheets API inverses. So the inversion points were retrieved from each figure in Fig. 2.</p>
-
-<p><img src="https://tanaikech.github.io/img/20181012a-fig4.png" alt="" /></p>
-
+<p><img src="https://tanaikech.github.io/img/20181012a-fig4.png" alt=""></p>
 <p>Fig. 4. Inversion points of process cost of Spreadsheet Service and Sheets API. This figure is the double-logarithmic scales.</p>
-
-<p><br></p>
-
+<!-- raw HTML omitted -->
 <p>Figure 4 shows the inversion points of process cost of Spreadsheet Service and Sheets API. This figure is the double-logarithmic scales. This figure was obtained from Fig. 2. When it sees this figure, it is found that the number of rows decreases with increasing the number of columns. This means that in the case of the range from 2 columns to 400 columns, the upper area and the lower area of the blue line indicate the range which is suitable for using Sheets API and the range which is suitable for using Spreadsheet Service (setValues()), respectively. Namely, it indicates that the blue line is the boundary to effectively use Spreadsheet Service and Sheets API.</p>
-
 <p>From this result, it is required to investigate the process costs of Spreadsheet Service at the small number of rows.</p>
-
-<p><img src="https://tanaikech.github.io/img/20181012a-fig5.png" alt="" /></p>
-
-<p>Fig. 5. Process costs for setValue() (a) appendRow() (b) and setValues() &copy; of Spreadsheet Service. This figure is the linear scale.</p>
-
-<p><br></p>
-
-<p>Figure 5 shows the process costs for setValue(), appendRow() and setValues() of Spreadsheet Service. (a) - &copy; in Fig. 5 are the cost of setValue(), appendRow() and setValues() of Spreadsheet Service, respectively. For (a) - &copy;, the process costs were measured by increasing the number of columns under the constant number of rows. This figure is the linear scale, and all y-axes are the same. From these figures, the process cost of setValue() increases with the increase in the number of columns. The cost of appendRow() is constant for increasing the number of columns. At setValues(), the process cost is not changed and very low for (a) - &copy;. The inversion point between setValue() and appendRow() is constant which is about 75 columns. From these results, it was found that setValues() is suitable for this situation. But if setValue() and appendRow() are used, when the number of columns of values is less than 75, setValue() is suitable. When it is more than 75, appendRow() is suitable.</p>
-
+<p><img src="https://tanaikech.github.io/img/20181012a-fig5.png" alt=""></p>
+<p>Fig. 5. Process costs for setValue() (a) appendRow() (b) and setValues() (c) of Spreadsheet Service. This figure is the linear scale.</p>
+<!-- raw HTML omitted -->
+<p>Figure 5 shows the process costs for setValue(), appendRow() and setValues() of Spreadsheet Service. (a) - (c) in Fig. 5 are the cost of setValue(), appendRow() and setValues() of Spreadsheet Service, respectively. For (a) - (c), the process costs were measured by increasing the number of columns under the constant number of rows. This figure is the linear scale, and all y-axes are the same. From these figures, the process cost of setValue() increases with the increase in the number of columns. The cost of appendRow() is constant for increasing the number of columns. At setValues(), the process cost is not changed and very low for (a) - (c). The inversion point between setValue() and appendRow() is constant which is about 75 columns. From these results, it was found that setValues() is suitable for this situation. But if setValue() and appendRow() are used, when the number of columns of values is less than 75, setValue() is suitable. When it is more than 75, appendRow() is suitable.</p>
 <h1 id="summary">Summary</h1>
-
 <p>In this report, the process cost for reading and writing Spreadsheet has been investigated. From this investigation, the following results were obtained.</p>
-
 <ul>
-<li><p>For the process costs for reading values from Spreadsheet</p>
-
+<li>
+<p>For the process costs for reading values from Spreadsheet</p>
 <ol>
 <li>Process costs of getValues() and getSheetValues() of Spreadsheet Service are almost the same.</li>
 <li>Process costs of values.get and values.batchGet of Sheets API are almost the same.</li>
 <li>Methods of Sheets API can reduce the process costs from those of Spreadsheet Service by about 35 %.</li>
-</ol></li>
-
-<li><p>For the process costs for writing values from Spreadsheet</p>
-
+</ol>
+</li>
+<li>
+<p>For the process costs for writing values from Spreadsheet</p>
 <ol>
 <li>Process costs of values.update, values.batchUpdate and values.append of Sheets API are almost the same.</li>
 <li>Methods of Sheets API can reduce the process costs from those of Spreadsheet Service by about 19 %.</li>
 <li>There is the inversion point between setValues() of Spreadsheet Service and the methods of Sheets API.
-
 <ul>
 <li>When the data size is small, setValues() is suitable for writing values.</li>
 <li>When the data size becomes large, the methods of Sheets API are suitable for writing values.</li>
-</ul></li>
-</ol></li>
 </ul>
-
+</li>
+</ol>
+</li>
+</ul>
 <p>From these results, it is considered that the methods for reading and writing Spreadsheet of Sheets API are using the different algorithm and/or process from those of Spreadsheet service.</p>
-
 <p>As a note, I have to describe that this is the result for Google Apps Script. For other languages, this result might be difference. And also, the process cost of this report might be modified by future update of Google.</p>
-
-<p><a name="References"></a></p>
-
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
 <h1 id="references">References</h1>
-
 <ol>
 <li><a href="https://developers.google.com/apps-script/guides/services/quotas#current_limitations">Current limitations at Quotas for Google Services</a></li>
 <li><a href="https://github.com/tanaikech/taking-advantage-of-google-apps-script#Benchmarks">Benchmarks for Google Apps Script</a></li>
 <li><a href="https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet-app">Class SpreadsheetApp</a></li>
 <li><a href="https://developers.google.com/sheets/api/reference/rest/">Google Sheets API</a></li>
 </ol>
-
-<p><a name="Appendix"></a></p>
-
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
 <h1 id="appendix">Appendix</h1>
-
 <h2 id="comparing-advanced-google-service-and-urlfetchapp">Comparing Advanced Google Service and UrlFetchApp</h2>
-
 <p>When Sheets API is used, there are 2 patterns.</p>
-
 <ol>
 <li>Use <a href="https://developers.google.com/apps-script/guides/services/advanced">Advanced Google Service</a>
-
 <ul>
 <li>All methods are prepared by a library.</li>
-</ul></li>
+</ul>
+</li>
 <li>Use <a href="https://developers.google.com/apps-script/reference/url-fetch/url-fetch-app">UrlFetchApp</a>
-
 <ul>
 <li>In this case, all methods are required to directly call each endpoint with GET, POST and PUT methods.</li>
-</ul></li>
+</ul>
+</li>
 </ol>
-
 <p>Here, as an appendix, when Sheets API was used by Advanced Google Service and UrlFetchApp, the process costs were compared. As a sample, the results of UrlFetchApp were put to Figs. 1(a), 1(h) and Figs. 2(b), 2(h). The conditions except for using UrlFetchApp are the same with Figs. 1(a), 1(h) and Figs. 2(b), 2(h).</p>
-
-<p><img src="https://tanaikech.github.io/img/20181018a-A_fig1.png" alt="" /></p>
-
+<p><img src="https://tanaikech.github.io/img/20181018a-A_fig1.png" alt=""></p>
 <p>A-Fig. 1. Results of UrlFetchApp were put to Figs. 1(a), 1(h) and Figs. 2(b), 2(h). About the detail explanation of these figures, please check those of Figs. 1 and 2.</p>
-
-<p><br></p>
-
+<!-- raw HTML omitted -->
 <p>From A-Fig. 1(a) - 1(d), it was found that when Sheets API is used, the process costs of Advanced Google Service and UrlFetchApp are a little difference.</p>
-
 <ul>
 <li>For reading, the cost of case using UrlFetchApp can be reduced from that of Advanced Google Service by about 6 % in the average.</li>
 <li>For writing, the cost of case using UrlFetchApp can be reduced from that of Advanced Google Service by about 4 % in the average.</li>
 </ul>
-
-<p><a name="SampleScripts"></a></p>
-
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
 <h2 id="scripts">Scripts</h2>
-
 <p>In this measurements, for example, <code>range</code> and <code>val</code> were declared like <code>var range = &quot;Sheet1!A1:B3&quot;</code> and <code>var val = [[&quot;a1&quot;, &quot;b1&quot;], [&quot;a2&quot;, &quot;b2&quot;], [&quot;a3&quot;, &quot;b3&quot;]]</code>, respectively.</p>
-
 <h3 id="for-reading-values">For reading values</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// getValues()
+</span><span style="color:#75715e"></span><span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">spreadsheetId</span>).<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">range</span>).<span style="color:#a6e22e">getValues</span>();
 
-<pre><code class="language-javascript">// getValues()
-SpreadsheetApp.openById(spreadsheetId).getRange(range).getValues();
+<span style="color:#75715e">// getSheetValues()
+</span><span style="color:#75715e"></span><span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">spreadsheetId</span>).<span style="color:#a6e22e">getSheetValues</span>(<span style="color:#a6e22e">startRow</span>, <span style="color:#a6e22e">startColumn</span>, <span style="color:#a6e22e">numRows</span>, <span style="color:#a6e22e">numColumns</span>);
 
-// getSheetValues()
-SpreadsheetApp.openById(spreadsheetId).getSheetValues(startRow, startColumn, numRows, numColumns);
+<span style="color:#75715e">// Values.get()
+</span><span style="color:#75715e"></span><span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">Values</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">spreadsheetId</span>, <span style="color:#a6e22e">range</span>).<span style="color:#a6e22e">values</span>;
 
-// Values.get()
-Sheets.Spreadsheets.Values.get(spreadsheetId, range).values;
-
-// Values.batchGet()
-Sheets.Spreadsheets.Values.batchGet(spreadsheetId, {ranges: range}).valueRanges[0].values;
-</code></pre>
-
-<h4 id="using-urlfetchapp">Using UrlFetchApp</h4>
-
-<pre><code class="language-javascript">// Values.get()
-var url = &quot;https://sheets.googleapis.com/v4/spreadsheets/&quot; + spreadsheetId + &quot;/values/&quot; + range + &quot;?fields=values&quot;;
-var params = {
-  method: &quot;get&quot;,
-  headers: {Authorization: &quot;Bearer &quot; + token},
+<span style="color:#75715e">// Values.batchGet()
+</span><span style="color:#75715e"></span><span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">Values</span>.<span style="color:#a6e22e">batchGet</span>(<span style="color:#a6e22e">spreadsheetId</span>, {<span style="color:#a6e22e">ranges</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">range</span>}).<span style="color:#a6e22e">valueRanges</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">values</span>;
+</code></pre></div><h4 id="using-urlfetchapp">Using UrlFetchApp</h4>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// Values.get()
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://sheets.googleapis.com/v4/spreadsheets/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">spreadsheetId</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/values/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;?fields=values&#34;</span>;
+<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> {
+  <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;get&#34;</span>,
+  <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {<span style="color:#a6e22e">Authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">token</span>},
 };
-UrlFetchApp.fetch(url, params);
+<span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">params</span>);
 
-// Values.batchGet()
-var url = &quot;https://sheets.googleapis.com/v4/spreadsheets/&quot; + spreadsheetId + &quot;/values:batchGet?ranges=&quot; + range + &quot;&amp;fields=valueRanges%2Fvalues&quot;;
-var params = {
-  method: &quot;get&quot;,
-  headers: {Authorization: &quot;Bearer &quot; + token},
+<span style="color:#75715e">// Values.batchGet()
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://sheets.googleapis.com/v4/spreadsheets/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">spreadsheetId</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/values:batchGet?ranges=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&amp;fields=valueRanges%2Fvalues&#34;</span>;
+<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> {
+  <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;get&#34;</span>,
+  <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {<span style="color:#a6e22e">Authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">token</span>},
 };
-UrlFetchApp.fetch(url, params);
-</code></pre>
-
-<h3 id="for-writing-values">For writing values</h3>
-
-<pre><code class="language-javascript">// setValue()
-var ss = SpreadsheetApp.openById(spreadsheetId).getSheetByName(&quot;Sheet1&quot;);
-for (var i = 0; i &lt; val.length; i++) {
-  for (var j = 0; j &lt; val[i].length; j++) {
-    ss.getRange(i + 1, j + 1, 1, 1).setValue(val[i][j]);
+<span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">params</span>);
+</code></pre></div><h3 id="for-writing-values">For writing values</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// setValue()
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">spreadsheetId</span>).<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>);
+<span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">val</span>.<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
+  <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">j</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">j</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">val</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">j</span><span style="color:#f92672">++</span>) {
+    <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">j</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>).<span style="color:#a6e22e">setValue</span>(<span style="color:#a6e22e">val</span>[<span style="color:#a6e22e">i</span>][<span style="color:#a6e22e">j</span>]);
   }
 }
 
-// appendRow()
-var ss = SpreadsheetApp.openById(spreadsheetId).getSheetByName(&quot;Sheet1&quot;);
-for (var i = 0; i &lt; val.length; i++) {
-  ss.appendRow(val[i]);
+<span style="color:#75715e">// appendRow()
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">spreadsheetId</span>).<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>);
+<span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">val</span>.<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
+  <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">appendRow</span>(<span style="color:#a6e22e">val</span>[<span style="color:#a6e22e">i</span>]);
 }
 
-// setValues()
-SpreadsheetApp.openById(spreadsheetId).getRange(range).setValues(val);
+<span style="color:#75715e">// setValues()
+</span><span style="color:#75715e"></span><span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">spreadsheetId</span>).<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">range</span>).<span style="color:#a6e22e">setValues</span>(<span style="color:#a6e22e">val</span>);
 
-// Values.update()
-Sheets.Spreadsheets.Values.update({values: val}, spreadsheetId, range, {valueInputOption: &quot;USER_ENTERED&quot;});
+<span style="color:#75715e">// Values.update()
+</span><span style="color:#75715e"></span><span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">Values</span>.<span style="color:#a6e22e">update</span>({<span style="color:#a6e22e">values</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">val</span>}, <span style="color:#a6e22e">spreadsheetId</span>, <span style="color:#a6e22e">range</span>, {<span style="color:#a6e22e">valueInputOption</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;USER_ENTERED&#34;</span>});
 
-// Values.batchUpdate()
-Sheets.Spreadsheets.Values.batchUpdate({valueInputOption: &quot;USER_ENTERED&quot;, data: [{range: range, values: val}]}, spreadsheetId);
+<span style="color:#75715e">// Values.batchUpdate()
+</span><span style="color:#75715e"></span><span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">Values</span>.<span style="color:#a6e22e">batchUpdate</span>({<span style="color:#a6e22e">valueInputOption</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;USER_ENTERED&#34;</span>, <span style="color:#a6e22e">data</span><span style="color:#f92672">:</span> [{<span style="color:#a6e22e">range</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">range</span>, <span style="color:#a6e22e">values</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">val</span>}]}, <span style="color:#a6e22e">spreadsheetId</span>);
 
-// Values.append()
-Sheets.Spreadsheets.Values.append({values: val}, spreadsheetId, range, {valueInputOption: &quot;USER_ENTERED&quot;});
-</code></pre>
-
-<h4 id="using-urlfetchapp-1">Using UrlFetchApp</h4>
-
-<pre><code class="language-javascript">// Values.update()
-var url = &quot;https://sheets.googleapis.com/v4/spreadsheets/&quot; + spreadsheetId + &quot;/values/&quot; + range + &quot;?valueInputOption=USER_ENTERED&quot;;
-var params = {
-  method: &quot;put&quot;,
-  headers: {Authorization: &quot;Bearer &quot; + token},
-  contentType: &quot;application/json&quot;,
-  payload: values,
+<span style="color:#75715e">// Values.append()
+</span><span style="color:#75715e"></span><span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">Values</span>.<span style="color:#a6e22e">append</span>({<span style="color:#a6e22e">values</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">val</span>}, <span style="color:#a6e22e">spreadsheetId</span>, <span style="color:#a6e22e">range</span>, {<span style="color:#a6e22e">valueInputOption</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;USER_ENTERED&#34;</span>});
+</code></pre></div><h4 id="using-urlfetchapp-1">Using UrlFetchApp</h4>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// Values.update()
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://sheets.googleapis.com/v4/spreadsheets/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">spreadsheetId</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/values/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;?valueInputOption=USER_ENTERED&#34;</span>;
+<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> {
+  <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;put&#34;</span>,
+  <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {<span style="color:#a6e22e">Authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">token</span>},
+  <span style="color:#a6e22e">contentType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/json&#34;</span>,
+  <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">values</span>,
 };
-UrlFetchApp.fetch(url, params);
+<span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">params</span>);
 
-// Values.batchUpdate()
-var url = &quot;https://sheets.googleapis.com/v4/spreadsheets/&quot; + spreadsheetId + &quot;/values:batchUpdate&quot;;
-var params = {
-  method: &quot;post&quot;,
-  headers: {Authorization: &quot;Bearer &quot; + token},
-  contentType: &quot;application/json&quot;,
-  payload: values,
+<span style="color:#75715e">// Values.batchUpdate()
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://sheets.googleapis.com/v4/spreadsheets/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">spreadsheetId</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/values:batchUpdate&#34;</span>;
+<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> {
+  <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;post&#34;</span>,
+  <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {<span style="color:#a6e22e">Authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">token</span>},
+  <span style="color:#a6e22e">contentType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/json&#34;</span>,
+  <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">values</span>,
 };
-UrlFetchApp.fetch(url, params);
+<span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">params</span>);
 
-// Values.append()
-var url = &quot;https://sheets.googleapis.com/v4/spreadsheets/&quot; + spreadsheetId + &quot;/values/&quot; + range + &quot;:append?valueInputOption=USER_ENTERED&quot;;
-var params = {
-  method: &quot;post&quot;,
-  headers: {Authorization: &quot;Bearer &quot; + token},
-  contentType: &quot;application/json&quot;,
-  payload: values,
+<span style="color:#75715e">// Values.append()
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://sheets.googleapis.com/v4/spreadsheets/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">spreadsheetId</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/values/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;:append?valueInputOption=USER_ENTERED&#34;</span>;
+<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> {
+  <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;post&#34;</span>,
+  <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {<span style="color:#a6e22e">Authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">token</span>},
+  <span style="color:#a6e22e">contentType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/json&#34;</span>,
+  <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">values</span>,
 };
-UrlFetchApp.fetch(url, params);
-</code></pre>
-
-<h3 id="note">Note:</h3>
-
+<span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">params</span>);
+</code></pre></div><h3 id="note">Note:</h3>
 <p>When you measure the process cost for Spreadsheet service, please be careful the following point.</p>
-
 <ul>
 <li>If the process cost is continuously measured in a for loop, it was found that the 1st of the for loop and others show the difference costs. I think that when the spreadsheet is opened using <code>SpreadsheetApp.getActiveSheet()</code> and <code>SpreadsheetApp.openById(ID)</code> for the first time, this might be cached. By this, it becomes the difference costs. In order to avoid this, please run Spreadsheet service for measuring under the isolate execution.</li>
 </ul>
-
 <p><a href="#TOP">TOP</a></p>
+
+  
+  <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2018%2f10%2f12%2fbenchmark-reading-and-writing-spreadsheet-using-google-apps-script%2f" target="_blank" title="Share on Facebook"><i class="fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2018%2f10%2f12%2fbenchmark-reading-and-writing-spreadsheet-using-google-apps-script%2f&via=HorribleGeek" target="_blank" title="Tweet"><i class="fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2018%2f10%2f12%2fbenchmark-reading-and-writing-spreadsheet-using-google-apps-script%2f" target="_blank" title="Share on Google+"><i class="fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2018%2f10%2f12%2fbenchmark-reading-and-writing-spreadsheet-using-google-apps-script%2f" target="_blank" title="Post to Tumblr"><i class="fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2018%2f10%2f12%2fbenchmark-reading-and-writing-spreadsheet-using-google-apps-script%2f" target="_blank" title="Pin it"><i class="fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2018%2f10%2f12%2fbenchmark-reading-and-writing-spreadsheet-using-google-apps-script%2f" target="_blank" title="Submit to Reddit"><i class="fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2018/10/10/gas-library---arrangestackingorder/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2018/10/10/gas-library-arrangestackingorder/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2018/10/10/gas-library---arrangestackingorder/">GAS Library - ArrangeStackingOrder</a>
+      <a href="https://tanaikech.github.io/2018/10/10/gas-library-arrangestackingorder/">GAS Library - ArrangeStackingOrder</a>
     </nav>
     
   </div>
@@ -607,6 +573,7 @@ UrlFetchApp.fetch(url, params);
 </div>
 </div>
 <script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -616,10 +583,6 @@ UrlFetchApp.fetch(url, params);
     }
   });
 </script>
-<script type="text/javascript"
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-</script>
-<meta http-equiv="X-UA-Compatible" CONTENT="IE=EmulateIE7" />
 
 
 <script>
@@ -634,6 +597,8 @@ UrlFetchApp.fetch(url, params);
     ga('send', 'pageview');
   }
 </script>
+
+
 
 
 

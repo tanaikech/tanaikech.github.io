@@ -5,9 +5,11 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.49.2" />
+  <meta name="generator" content="Hugo 0.61.0" />
 
   <title>Automatic Recalculation of Custom Function on Spreadsheet Part 2 &middot; tanaike</title>
+
+    
 
   
   
@@ -30,7 +32,7 @@
   <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
 
   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
@@ -105,6 +107,12 @@
       
       
         <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
           <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
       
         </li>
@@ -165,7 +173,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/tanaikech" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
     </li>
     
 
@@ -175,7 +183,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
     </li>
     
 
@@ -264,98 +272,118 @@
 
 </div>
 
-  
-
-<p><a href="https://gist.github.com/tanaikech/cb5447616bfc6a01de8a49131c0d2db0">Gists</a></p>
-
+  <p><a href="https://gist.github.com/tanaikech/cb5447616bfc6a01de8a49131c0d2db0">Gists</a></p>
 <h2 id="description">Description</h2>
-
 <p>I have already reported about &ldquo;Automatic Recalculation of Custom Function on Spreadsheet Part 1&rdquo; at <a href="https://gist.github.com/tanaikech/b8ea7bd7fd87bcd7bb28ddede1781889">here</a>. Here, I would like to introduce other workaround for forcibly recalculating the custom functions and built-in functions using Class TextFinder. <a href="https://developers.google.com/apps-script/releases/#april_5_2019">Class TextFinder has added at April 5, 2019.</a> By this, this workaround can be proposed.</p>
-
 <h2 id="sample-scripts">Sample scripts</h2>
-
 <h3 id="pattern-1">Pattern 1</h3>
-
 <p>If you want to refresh all functions of all sheets in a Spreadsheet, you can use the following script. In this script, when the script is run, all built-in functions and custom functions in the Spreadsheet are refreshed.</p>
-
-<pre><code class="language-javascript">function myFunction() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var temp = Utilities.getUuid();
-  ss.createTextFinder(&quot;=&quot;)
-    .matchFormulaText(true)
-    .replaceAllWith(temp);
-  ss.createTextFinder(temp)
-    .matchFormulaText(true)
-    .replaceAllWith(&quot;=&quot;);
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">getUuid</span>();
+  <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">createTextFinder</span>(<span style="color:#e6db74">&#34;=&#34;</span>)
+    .<span style="color:#a6e22e">matchFormulaText</span>(<span style="color:#66d9ef">true</span>)
+    .<span style="color:#a6e22e">replaceAllWith</span>(<span style="color:#a6e22e">temp</span>);
+  <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">createTextFinder</span>(<span style="color:#a6e22e">temp</span>)
+    .<span style="color:#a6e22e">matchFormulaText</span>(<span style="color:#66d9ef">true</span>)
+    .<span style="color:#a6e22e">replaceAllWith</span>(<span style="color:#e6db74">&#34;=&#34;</span>);
 }
-</code></pre>
-
-<p>If you want to run the script when the Spreadsheet is opened, you can use the following script. <code>onOpen</code> is fired as the simple trigger when the Spreadsheet is opened. Class TextFinder can be used with the simple trigger. I think that this is very useful.</p>
-
-<pre><code class="language-javascript">function onOpen(e) {
-  var temp = Utilities.getUuid();
-  e.source
-    .createTextFinder(&quot;=&quot;)
-    .matchFormulaText(true)
-    .replaceAllWith(temp);
-  e.source
-    .createTextFinder(temp)
-    .matchFormulaText(true)
-    .replaceAllWith(&quot;=&quot;);
+</code></pre></div><p>If you want to run the script when the Spreadsheet is opened, you can use the following script. <code>onOpen</code> is fired as the simple trigger when the Spreadsheet is opened. Class TextFinder can be used with the simple trigger. I think that this is very useful.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">onOpen</span>(<span style="color:#a6e22e">e</span>) {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">getUuid</span>();
+  <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">source</span>
+    .<span style="color:#a6e22e">createTextFinder</span>(<span style="color:#e6db74">&#34;=&#34;</span>)
+    .<span style="color:#a6e22e">matchFormulaText</span>(<span style="color:#66d9ef">true</span>)
+    .<span style="color:#a6e22e">replaceAllWith</span>(<span style="color:#a6e22e">temp</span>);
+  <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">source</span>
+    .<span style="color:#a6e22e">createTextFinder</span>(<span style="color:#a6e22e">temp</span>)
+    .<span style="color:#a6e22e">matchFormulaText</span>(<span style="color:#66d9ef">true</span>)
+    .<span style="color:#a6e22e">replaceAllWith</span>(<span style="color:#e6db74">&#34;=&#34;</span>);
 }
-</code></pre>
-
-<h3 id="pattern-2">Pattern 2</h3>
-
+</code></pre></div><h3 id="pattern-2">Pattern 2</h3>
 <p>When you want to refresh only the specific functions, you can use the following script.</p>
-
-<pre><code class="language-javascript">function myFunction() {
-  var customFunctions = [&quot;CUSTOM1&quot;, &quot;CUSTOM2&quot;]; // Please set the function names here.
-
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var temp = Utilities.getUuid();
-  customFunctions.forEach(function(e) {
-    ss.createTextFinder(&quot;=&quot; + e)
-      .matchFormulaText(true)
-      .replaceAllWith(temp);
-    ss.createTextFinder(temp)
-      .matchFormulaText(true)
-      .replaceAllWith(&quot;=&quot; + e);
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">customFunctions</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;CUSTOM1&#34;</span>, <span style="color:#e6db74">&#34;CUSTOM2&#34;</span>]; <span style="color:#75715e">// Please set the function names here.
+</span><span style="color:#75715e"></span>
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">getUuid</span>();
+  <span style="color:#a6e22e">customFunctions</span>.<span style="color:#a6e22e">forEach</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
+    <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">createTextFinder</span>(<span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">e</span>)
+      .<span style="color:#a6e22e">matchFormulaText</span>(<span style="color:#66d9ef">true</span>)
+      .<span style="color:#a6e22e">replaceAllWith</span>(<span style="color:#a6e22e">temp</span>);
+    <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">createTextFinder</span>(<span style="color:#a6e22e">temp</span>)
+      .<span style="color:#a6e22e">matchFormulaText</span>(<span style="color:#66d9ef">true</span>)
+      .<span style="color:#a6e22e">replaceAllWith</span>(<span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">e</span>);
   });
 }
-</code></pre>
-
-<h2 id="note">Note:</h2>
-
+</code></pre></div><h2 id="note">Note:</h2>
 <ul>
 <li>TextFinder can be also used for searching for the specific range and sheet. So when you modify to like this, please modify above script. At that time, <a href="https://developers.google.com/apps-script/reference/spreadsheet/text-finder">the official document</a> will be useful.</li>
 </ul>
-
 <h2 id="references">References:</h2>
-
 <ul>
 <li><a href="https://developers.google.com/apps-script/guides/sheets/functions">Custom Functions in Google Sheets</a></li>
 <li><a href="https://developers.google.com/apps-script/reference/spreadsheet/text-finder">Class TextFinder</a></li>
 <li><a href="https://gist.github.com/tanaikech/b8ea7bd7fd87bcd7bb28ddede1781889">Automatic Recalculation of Custom Function on Spreadsheet Part 1</a></li>
 <li><a href="https://stackoverflow.com/q/58579114/7108653">Function NOW() + Setting Timezone (Google Sheets)</a>
-
 <ul>
 <li>I think that this can be seen as one of sample situations.</li>
-</ul></li>
 </ul>
+</li>
+</ul>
+
+  
+  <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2019%2f10%2f28%2fautomatic-recalculation-of-custom-function-on-spreadsheet-part-2%2f" target="_blank" title="Share on Facebook"><i class="fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2019%2f10%2f28%2fautomatic-recalculation-of-custom-function-on-spreadsheet-part-2%2f&via=HorribleGeek" target="_blank" title="Tweet"><i class="fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f10%2f28%2fautomatic-recalculation-of-custom-function-on-spreadsheet-part-2%2f" target="_blank" title="Share on Google+"><i class="fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2019%2f10%2f28%2fautomatic-recalculation-of-custom-function-on-spreadsheet-part-2%2f" target="_blank" title="Post to Tumblr"><i class="fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f10%2f28%2fautomatic-recalculation-of-custom-function-on-spreadsheet-part-2%2f" target="_blank" title="Pin it"><i class="fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f10%2f28%2fautomatic-recalculation-of-custom-function-on-spreadsheet-part-2%2f" target="_blank" title="Submit to Reddit"><i class="fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2019/10/25/updated-gas-library---getedittype/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2019/10/25/updated-gas-library-getedittype/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2019/10/25/updated-gas-library---getedittype/">Updated: GAS Library - GetEditType</a>
+      <a href="https://tanaikech.github.io/2019/10/25/updated-gas-library-getedittype/">Updated: GAS Library - GetEditType</a>
     </nav>
     
   </div>
@@ -385,6 +413,7 @@
 </div>
 </div>
 <script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -394,10 +423,6 @@
     }
   });
 </script>
-<script type="text/javascript"
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-</script>
-<meta http-equiv="X-UA-Compatible" CONTENT="IE=EmulateIE7" />
 
 
 <script>
@@ -412,6 +437,8 @@
     ga('send', 'pageview');
   }
 </script>
+
+
 
 
 

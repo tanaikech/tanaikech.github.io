@@ -5,9 +5,11 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.49.2" />
+  <meta name="generator" content="Hugo 0.61.0" />
 
   <title>Retrieving Values from Sheet Filtered by Slicer in Spreadsheet using Google Apps Script &middot; tanaike</title>
+
+    
 
   
   
@@ -30,7 +32,7 @@
   <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
 
   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
@@ -105,6 +107,12 @@
       
       
         <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
           <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
       
         </li>
@@ -165,7 +173,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/tanaikech" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
     </li>
     
 
@@ -175,7 +183,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
     </li>
     
 
@@ -266,127 +274,136 @@
 
 </div>
 
-  
-
-<p><a href="https://gist.github.com/tanaikech/7cc9efb29ba6063da04f81e50d858f52">Gists</a></p>
-
+  <p><a href="https://gist.github.com/tanaikech/7cc9efb29ba6063da04f81e50d858f52">Gists</a></p>
 <h2 id="overview">Overview</h2>
-
 <p>This is a sample script for retrieving values from a sheet filtered by Slicer in Spreadsheet using Google Apps Script.</p>
-
 <h2 id="description">Description</h2>
-
 <p>By <a href="https://developers.google.com/apps-script/releases/#november_6_2019">the update of Google side at November 6, 2019</a>, <a href="https://developers.google.com/apps-script/reference/spreadsheet/slicer">Class Slicer</a> was added. And also, for Sheets API, <a href="https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/request#addslicerrequest">AddSlicerRequest</a> and <a href="https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/request#updateslicerspecrequest">UpdateSlicerSpecRequest</a> were added. By this, Slicer of Spreadsheet got to be able to be managed with Google Apps Script and other languages.</p>
-
 <p>Here, I would like to introduce the method for retrieving values from a sheet filtered by Slicer in Spreadsheet using Google Apps Script.</p>
-
 <h2 id="principle">Principle</h2>
-
 <p>Here, I would like to show the principle of this method. Unfortunately, even when Class Slicer was added, the filtered values of Slicer cannot be directly retrieved. So as a workaround, I used the following flow.</p>
-
 <ol>
 <li>Retrieve the current Slicer.</li>
 <li>Retrieve the range, column position and the filter criteria from the Slicer.</li>
 <li>Create new basic filter using the retrieved range, column position and the filter criteria.
-
 <ul>
 <li>This is used for only retrieving the filtered values.</li>
-</ul></li>
+</ul>
+</li>
 <li>Retrieve the filtered values from the basic filter.
-
 <ul>
 <li>About the method for retrieving the filtered values from the basic filter, you can see it at <a href="https://gist.github.com/tanaikech/053d3ebbe76fa7c0b5e80ea9d6396011">here</a>.</li>
-</ul></li>
+</ul>
+</li>
 <li>Delete the basic filter.</li>
 </ol>
-
 <h2 id="usage">Usage</h2>
-
 <h3 id="1-create-slicer-on-spreadsheet">1. Create Slicer on Spreadsheet</h3>
-
 <p>Here, as a test case, please manually create new Slicer on a sheet in the Spreadsheet. The script retrieves the values filtered by the created Slicer. This sample script supposes that only one Slicer is put in the active sheet.</p>
-
 <h3 id="2-important-save-setting-of-slicer">2. IMPORTANT: Save Setting of Slicer</h3>
-
 <p>When <strong>Set current filters as default</strong> is selected (clicked), the setting of Slicer is saved. Please save the setting of current Slicer by selecting <strong>Set current filters as default</strong>. You can see <strong>Set current filters as default</strong> at the following figure.</p>
-
-<p><img src="https://tanaikech.github.io/img/20191108a-fig1.png" alt="" /></p>
-
+<p><img src="https://tanaikech.github.io/img/20191108a-fig1.png" alt=""></p>
 <p>If <strong>Set current filters as default</strong> is not selected, the setting of the current Slicer is not saved. By this, the filtered values also cannot be retrieved. Please be careful this. The official document can be seen at <a href="https://support.google.com/docs/answer/9245556#Setasdefault">here</a>.</p>
-
 <h3 id="3-run-sample-script">3. Run sample script</h3>
-
 <p>There are 2 sample scripts for this situation. Both sample scripts retrieve the same result. When the function of <code>myFunction()</code> is run, the filtered values of Slicer on the active sheet can be retrieved.</p>
-
 <h4 id="sample-script-1">Sample script 1</h4>
-
 <p>In this sample script, only Spreadsheet Service is used.</p>
-
-<pre><code class="language-javascript">function myFunction() {
-  var sheet = SpreadsheetApp.getActiveSheet();
-  var slicer = sheet.getSlicers()[0];
-  var range = slicer.getRange();
-  var filter = range
-    .createFilter()
-    .setColumnFilterCriteria(
-      slicer.getColumnPosition(),
-      slicer.getFilterCriteria()
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSheet</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">slicer</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getSlicers</span>()[<span style="color:#ae81ff">0</span>];
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">slicer</span>.<span style="color:#a6e22e">getRange</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">filter</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">range</span>
+    .<span style="color:#a6e22e">createFilter</span>()
+    .<span style="color:#a6e22e">setColumnFilterCriteria</span>(
+      <span style="color:#a6e22e">slicer</span>.<span style="color:#a6e22e">getColumnPosition</span>(),
+      <span style="color:#a6e22e">slicer</span>.<span style="color:#a6e22e">getFilterCriteria</span>()
     );
-  var result = range.getValues().filter(function(_, i) {
-    return !sheet.isRowHiddenByFilter(i + 1);
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getValues</span>().<span style="color:#a6e22e">filter</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">i</span>) {
+    <span style="color:#66d9ef">return</span> <span style="color:#f92672">!</span><span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">isRowHiddenByFilter</span>(<span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>);
   });
-  filter.remove();
-  Logger.log(result);
+  <span style="color:#a6e22e">filter</span>.<span style="color:#a6e22e">remove</span>();
+  <span style="color:#a6e22e">Logger</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">result</span>);
 }
-</code></pre>
-
-<ul>
+</code></pre></div><ul>
 <li>In this case, when <code>return !sheet.isRowHiddenByFilter(i + 1);</code> is modified to <code>return sheet.isRowHiddenByFilter(i + 1);</code>, the hidden rows can be retrieved.</li>
 </ul>
-
 <h4 id="sample-script-2">Sample script 2</h4>
-
 <p>In this sample script, Spreadsheet Service and Sheets API are used. If there are a lot of rows in the sheet, the process cost of this sample script will be lower than that of above script.</p>
-
 <p>Before you run the script, <a href="https://developers.google.com/apps-script/guides/services/advanced#enabling_advanced_services">please enable Sheets API at Advanced Google services</a>.</p>
-
-<pre><code class="language-javascript">function myFunction() {
-  var sheet = SpreadsheetApp.getActiveSheet();
-  var slicer = sheet.getSlicers()[0];
-  var range = slicer.getRange();
-  var filter = range
-    .createFilter()
-    .setColumnFilterCriteria(
-      slicer.getColumnPosition(),
-      slicer.getFilterCriteria()
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSheet</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">slicer</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getSlicers</span>()[<span style="color:#ae81ff">0</span>];
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">slicer</span>.<span style="color:#a6e22e">getRange</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">filter</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">range</span>
+    .<span style="color:#a6e22e">createFilter</span>()
+    .<span style="color:#a6e22e">setColumnFilterCriteria</span>(
+      <span style="color:#a6e22e">slicer</span>.<span style="color:#a6e22e">getColumnPosition</span>(),
+      <span style="color:#a6e22e">slicer</span>.<span style="color:#a6e22e">getFilterCriteria</span>()
     );
-  var values = Sheets.Spreadsheets.get(sheet.getParent().getId(), {
-    ranges: [sheet.getSheetName()],
-    fields: &quot;sheets/data&quot;
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getParent</span>().<span style="color:#a6e22e">getId</span>(), {
+    <span style="color:#a6e22e">ranges</span><span style="color:#f92672">:</span> [<span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getSheetName</span>()],
+    <span style="color:#a6e22e">fields</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sheets/data&#34;</span>
   });
-  filter.remove();
-  var result = values.sheets[0].data[0].rowMetadata.reduce(function(ar, e, i) {
-    if (!e.hiddenByFilter &amp;&amp; values.sheets[0].data[0].rowData[i]) {
-      ar.push(
-        values.sheets[0].data[0].rowData[i].values.map(function(col) {
-          return col.userEnteredValue[Object.keys(col.userEnteredValue)[0]];
+  <span style="color:#a6e22e">filter</span>.<span style="color:#a6e22e">remove</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">sheets</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">data</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">rowMetadata</span>.<span style="color:#a6e22e">reduce</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">ar</span>, <span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">i</span>) {
+    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">hiddenByFilter</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">sheets</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">data</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">rowData</span>[<span style="color:#a6e22e">i</span>]) {
+      <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">push</span>(
+        <span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">sheets</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">data</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">rowData</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">col</span>) {
+          <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">col</span>.<span style="color:#a6e22e">userEnteredValue</span>[Object.<span style="color:#a6e22e">keys</span>(<span style="color:#a6e22e">col</span>.<span style="color:#a6e22e">userEnteredValue</span>)[<span style="color:#ae81ff">0</span>]];
         })
       );
     }
-    return ar;
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ar</span>;
   }, []);
-  Logger.log(result);
+  <span style="color:#a6e22e">Logger</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">result</span>);
 }
-</code></pre>
-
-<h2 id="references">References</h2>
-
+</code></pre></div><h2 id="references">References</h2>
 <ul>
 <li><a href="https://developers.google.com/apps-script/reference/spreadsheet/slicer">Class Slicer</a></li>
 <li><a href="https://support.google.com/docs/answer/9245556#Setasdefault">Save your slicer filtering selections</a></li>
 <li><a href="https://gist.github.com/tanaikech/053d3ebbe76fa7c0b5e80ea9d6396011">Retrieving Values from Filtered Sheet in Spreadsheet using Google Apps Script</a></li>
 <li><a href="https://developers.google.com/apps-script/guides/services/advanced">Advanced Google services</a></li>
 </ul>
+
+  
+  <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2019%2f11%2f08%2fretrieving-values-from-sheet-filtered-by-slicer-in-spreadsheet-using-google-apps-script%2f" target="_blank" title="Share on Facebook"><i class="fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2019%2f11%2f08%2fretrieving-values-from-sheet-filtered-by-slicer-in-spreadsheet-using-google-apps-script%2f&via=HorribleGeek" target="_blank" title="Tweet"><i class="fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f11%2f08%2fretrieving-values-from-sheet-filtered-by-slicer-in-spreadsheet-using-google-apps-script%2f" target="_blank" title="Share on Google+"><i class="fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2019%2f11%2f08%2fretrieving-values-from-sheet-filtered-by-slicer-in-spreadsheet-using-google-apps-script%2f" target="_blank" title="Post to Tumblr"><i class="fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f11%2f08%2fretrieving-values-from-sheet-filtered-by-slicer-in-spreadsheet-using-google-apps-script%2f" target="_blank" title="Pin it"><i class="fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f11%2f08%2fretrieving-values-from-sheet-filtered-by-slicer-in-spreadsheet-using-google-apps-script%2f" target="_blank" title="Submit to Reddit"><i class="fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
 
 
   
@@ -429,6 +446,7 @@
 </div>
 </div>
 <script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -438,10 +456,6 @@
     }
   });
 </script>
-<script type="text/javascript"
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-</script>
-<meta http-equiv="X-UA-Compatible" CONTENT="IE=EmulateIE7" />
 
 
 <script>
@@ -456,6 +470,8 @@
     ga('send', 'pageview');
   }
 </script>
+
+
 
 
 

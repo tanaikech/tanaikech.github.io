@@ -5,9 +5,11 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.49.2" />
+  <meta name="generator" content="Hugo 0.61.0" />
 
   <title>Benchmark: fetchAll method in UrlFetch service for Google Apps Script &middot; tanaike</title>
+
+    
 
   
   
@@ -30,7 +32,7 @@
   <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
 
   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
@@ -105,6 +107,12 @@
       
       
         <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
           <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
       
         </li>
@@ -165,7 +173,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/tanaikech" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
     </li>
     
 
@@ -175,7 +183,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
     </li>
     
 
@@ -264,118 +272,95 @@
 
 </div>
 
-  
-
-<p><a href="https://gist.github.com/tanaikech/c0f383034045ab63c19604139ecb0728">Gists</a></p>
-
-<p>By Google&rsquo;s update at January 19, 2018, <a href="https://developers.google.com/apps-script/reference/url-fetch/url-fetch-app#fetchAll(Object)">fetchAll method</a> was added to the UrlFetch service. When I saw the usage, I couldn&rsquo;t find the detail information about the actual running state. So I investigated about it.</p>
-
+  <p><a href="https://gist.github.com/tanaikech/c0f383034045ab63c19604139ecb0728">Gists</a></p>
+<p>By Google's update at January 19, 2018, <a href="https://developers.google.com/apps-script/reference/url-fetch/url-fetch-app#fetchAll(Object)">fetchAll method</a> was added to the UrlFetch service. When I saw the usage, I couldn't find the detail information about the actual running state. So I investigated about it.</p>
 <p>As the result, it was found that the fetchAll method is worked by the asynchronous processing. The returned data is reordered by the order of requests. By this, it was also found that if you want to retrieve the data from the several URL, the process cost of <code>UrlFetchApp.fetchAll()</code> is much lower than that of <code>UrlFetchApp.fetch()</code> using for loop.</p>
-
 <p>The sample scripts for server side and client side are as follows.</p>
-
 <h1 id="sample-script-for-server-side">Sample script for server side</h1>
-
 <p>In this report, 5 Web Apps were used as the servers. At first, 5 standalone projects were created and the following server script was put to each project. Then, Web Apps was deployed for each project. These deployed Web Apps were accessed from the script of client side. When the client accesses to the server, the server returns unix time (milliseconds) and server ID. From unix time, the order of actual fetch can be obtained.</p>
-
-<pre><code class="language-javascript">function doGet(e) {
-    var url = ScriptApp.getService().getUrl().split(&quot;/&quot;);
-    var val = JSON.stringify({
-        date: new Date().getTime().toString(),
-        serverId: url[url.length - 2],
-        key: e.parameter.key,
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">doGet</span>(<span style="color:#a6e22e">e</span>) {
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getService</span>().<span style="color:#a6e22e">getUrl</span>().<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;/&#34;</span>);
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">val</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>({
+        <span style="color:#a6e22e">date</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>().<span style="color:#a6e22e">toString</span>(),
+        <span style="color:#a6e22e">serverId</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">url</span>[<span style="color:#a6e22e">url</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">2</span>],
+        <span style="color:#a6e22e">key</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameter</span>.<span style="color:#a6e22e">key</span>,
     });
 
-    Utilities.sleep(5000); // Waiting for 5 seconds
-
-    return ContentService.createTextOutput(val).setMimeType(ContentService.MimeType.JSON);
+    <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">sleep</span>(<span style="color:#ae81ff">5000</span>); <span style="color:#75715e">// Waiting for 5 seconds
+</span><span style="color:#75715e"></span>
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ContentService</span>.<span style="color:#a6e22e">createTextOutput</span>(<span style="color:#a6e22e">val</span>).<span style="color:#a6e22e">setMimeType</span>(<span style="color:#a6e22e">ContentService</span>.<span style="color:#a6e22e">MimeType</span>.<span style="color:#a6e22e">JSON</span>);
 }
-</code></pre>
-
-<h1 id="sample-script-for-client-side">Sample script for client side</h1>
-
+</code></pre></div><h1 id="sample-script-for-client-side">Sample script for client side</h1>
 <p>When you use this script, after you deployed Web Apps, please run a function of <code>main()</code>. The reason that I often use <code>map()</code> is <a href="https://gist.github.com/tanaikech/848aeafaac1ec676900bb78e3ce220b6">here</a>.</p>
-
-<pre><code class="language-javascript">// As a sample, 5 URLs were used.
-var actions = {
-  &quot;### ID for Web Apps URL ###&quot;: &quot;action1&quot;, // https://script.google.com/macros/s/### ID for Web Apps URL ###/exec
-  &quot;### ID for Web Apps URL ###&quot;: &quot;action2&quot;,
-  &quot;### ID for Web Apps URL ###&quot;: &quot;action3&quot;,
-  &quot;### ID for Web Apps URL ###&quot;: &quot;action4&quot;,
-  &quot;### ID for Web Apps URL ###&quot;: &quot;action5&quot;,
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// As a sample, 5 URLs were used.
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">actions</span> <span style="color:#f92672">=</span> {
+  <span style="color:#e6db74">&#34;### ID for Web Apps URL ###&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;action1&#34;</span>, <span style="color:#75715e">// https://script.google.com/macros/s/### ID for Web Apps URL ###/exec
+</span><span style="color:#75715e"></span>  <span style="color:#e6db74">&#34;### ID for Web Apps URL ###&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;action2&#34;</span>,
+  <span style="color:#e6db74">&#34;### ID for Web Apps URL ###&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;action3&#34;</span>,
+  <span style="color:#e6db74">&#34;### ID for Web Apps URL ###&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;action4&#34;</span>,
+  <span style="color:#e6db74">&#34;### ID for Web Apps URL ###&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;action5&#34;</span>,
 };
 
-function createReq() {
-  return Object.keys(actions).map(function(e, i) {
-    return {
-      &quot;url&quot;: &quot;https://script.google.com/macros/s/&quot; + e + &quot;/exec?key=&quot; + actions[e],
-      &quot;method&quot;: &quot;get&quot;,
+<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">createReq</span>() {
+  <span style="color:#66d9ef">return</span> Object.<span style="color:#a6e22e">keys</span>(<span style="color:#a6e22e">actions</span>).<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">i</span>) {
+    <span style="color:#66d9ef">return</span> {
+      <span style="color:#e6db74">&#34;url&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;https://script.google.com/macros/s/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">e</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/exec?key=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">actions</span>[<span style="color:#a6e22e">e</span>],
+      <span style="color:#e6db74">&#34;method&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;get&#34;</span>,
     };
   });
 }
 
-function dispResults(response, elapsedTime) {
-  var res = response.map(function(e) {return JSON.parse(e)});
-  var responsedOrder = res.map(function(e) {return actions[e.serverId]});
-  var actualOrder = res.sort(function(x, y) {return x.date &gt; y.date ? 1 : -1})
-                       .map(function(e) {return actions[e.serverId]});
-  return {
-    elapsedTime: elapsedTime,
-    responsedOrder: responsedOrder,
-    actualOrder: actualOrder,
+<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">dispResults</span>(<span style="color:#a6e22e">response</span>, <span style="color:#a6e22e">elapsedTime</span>) {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">response</span>.<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">e</span>)});
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">responsedOrder</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">actions</span>[<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">serverId</span>]});
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">actualOrder</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">sort</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">x</span>, <span style="color:#a6e22e">y</span>) {<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">x</span>.<span style="color:#a6e22e">date</span> <span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">y</span>.<span style="color:#a6e22e">date</span> <span style="color:#f92672">?</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">:</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>})
+                       .<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">actions</span>[<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">serverId</span>]});
+  <span style="color:#66d9ef">return</span> {
+    <span style="color:#a6e22e">elapsedTime</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">elapsedTime</span>,
+    <span style="color:#a6e22e">responsedOrder</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">responsedOrder</span>,
+    <span style="color:#a6e22e">actualOrder</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">actualOrder</span>,
   };
 }
 
-// Using UrlFetchApp.fetchAll()
-function useFetchAll(req) {
-  var startTime = Date.now();
-  var response = UrlFetchApp.fetchAll(req);
-  var endTime = Date.now();
-//  Logger.log(response);
-  return dispResults(response, (endTime - startTime) / 1000);
+<span style="color:#75715e">// Using UrlFetchApp.fetchAll()
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">useFetchAll</span>(<span style="color:#a6e22e">req</span>) {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">startTime</span> <span style="color:#f92672">=</span> Date.<span style="color:#a6e22e">now</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">response</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetchAll</span>(<span style="color:#a6e22e">req</span>);
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">endTime</span> <span style="color:#f92672">=</span> Date.<span style="color:#a6e22e">now</span>();
+<span style="color:#75715e">//  Logger.log(response);
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">dispResults</span>(<span style="color:#a6e22e">response</span>, (<span style="color:#a6e22e">endTime</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">startTime</span>) <span style="color:#f92672">/</span> <span style="color:#ae81ff">1000</span>);
 }
 
-// Using UrlFetchApp.fetch()
-function useFetch(req) {
-  var startTime = Date.now();
-  var response = req.map(function(e) {return UrlFetchApp.fetch(e.url).getContentText()});
-  var endTime = Date.now();
-//  Logger.log(response);
-  return dispResults(response, (endTime - startTime) / 1000);
+<span style="color:#75715e">// Using UrlFetchApp.fetch()
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">useFetch</span>(<span style="color:#a6e22e">req</span>) {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">startTime</span> <span style="color:#f92672">=</span> Date.<span style="color:#a6e22e">now</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">response</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">url</span>).<span style="color:#a6e22e">getContentText</span>()});
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">endTime</span> <span style="color:#f92672">=</span> Date.<span style="color:#a6e22e">now</span>();
+<span style="color:#75715e">//  Logger.log(response);
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">dispResults</span>(<span style="color:#a6e22e">response</span>, (<span style="color:#a6e22e">endTime</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">startTime</span>) <span style="color:#f92672">/</span> <span style="color:#ae81ff">1000</span>);
 }
 
-// Run
-function main() {
-  var req = createReq();
-  var results = [useFetchAll(req), useFetch(req)];
-  Logger.log(JSON.stringify(results));
+<span style="color:#75715e">// Run
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">req</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">createReq</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">results</span> <span style="color:#f92672">=</span> [<span style="color:#a6e22e">useFetchAll</span>(<span style="color:#a6e22e">req</span>), <span style="color:#a6e22e">useFetch</span>(<span style="color:#a6e22e">req</span>)];
+  <span style="color:#a6e22e">Logger</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">results</span>));
 }
-</code></pre>
-
-<h1 id="result">Result</h1>
-
+</code></pre></div><h1 id="result">Result</h1>
 <p>For the results, elapsedTime, responsedOrder and actualOrder mean the elapsed time of 5 requests, the order of returned data and the order of actual fetching, respectively.</p>
-
-<h4 id="urlfetchapp-fetchall">UrlFetchApp.fetchAll()</h4>
-
-<pre><code class="language-json">{
-    &quot;elapsedTime&quot;    : 5.502,
-    &quot;responsedOrder&quot; : [&quot;action1&quot;,&quot;action2&quot;,&quot;action3&quot;,&quot;action4&quot;,&quot;action5&quot;],
-    &quot;actualOrder&quot;    : [&quot;action5&quot;,&quot;action1&quot;,&quot;action3&quot;,&quot;action2&quot;,&quot;action4&quot;]
+<h4 id="urlfetchappfetchall">UrlFetchApp.fetchAll()</h4>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+    <span style="color:#f92672">&#34;elapsedTime&#34;</span>    : <span style="color:#ae81ff">5.502</span>,
+    <span style="color:#f92672">&#34;responsedOrder&#34;</span> : [<span style="color:#e6db74">&#34;action1&#34;</span>,<span style="color:#e6db74">&#34;action2&#34;</span>,<span style="color:#e6db74">&#34;action3&#34;</span>,<span style="color:#e6db74">&#34;action4&#34;</span>,<span style="color:#e6db74">&#34;action5&#34;</span>],
+    <span style="color:#f92672">&#34;actualOrder&#34;</span>    : [<span style="color:#e6db74">&#34;action5&#34;</span>,<span style="color:#e6db74">&#34;action1&#34;</span>,<span style="color:#e6db74">&#34;action3&#34;</span>,<span style="color:#e6db74">&#34;action2&#34;</span>,<span style="color:#e6db74">&#34;action4&#34;</span>]
 }
-</code></pre>
-
-<h4 id="urlfetchapp-fetch">UrlFetchApp.fetch()</h4>
-
-<pre><code class="language-json">{
-    &quot;elapsedTime&quot;    : 27.011,
-    &quot;responsedOrder&quot; : [&quot;action1&quot;,&quot;action2&quot;,&quot;action3&quot;,&quot;action4&quot;,&quot;action5&quot;],
-    &quot;actualOrder&quot;    : [&quot;action1&quot;,&quot;action2&quot;,&quot;action3&quot;,&quot;action4&quot;,&quot;action5&quot;]
+</code></pre></div><h4 id="urlfetchappfetch">UrlFetchApp.fetch()</h4>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+    <span style="color:#f92672">&#34;elapsedTime&#34;</span>    : <span style="color:#ae81ff">27.011</span>,
+    <span style="color:#f92672">&#34;responsedOrder&#34;</span> : [<span style="color:#e6db74">&#34;action1&#34;</span>,<span style="color:#e6db74">&#34;action2&#34;</span>,<span style="color:#e6db74">&#34;action3&#34;</span>,<span style="color:#e6db74">&#34;action4&#34;</span>,<span style="color:#e6db74">&#34;action5&#34;</span>],
+    <span style="color:#f92672">&#34;actualOrder&#34;</span>    : [<span style="color:#e6db74">&#34;action1&#34;</span>,<span style="color:#e6db74">&#34;action2&#34;</span>,<span style="color:#e6db74">&#34;action3&#34;</span>,<span style="color:#e6db74">&#34;action4&#34;</span>,<span style="color:#e6db74">&#34;action5&#34;</span>]
 }
-</code></pre>
-
-<p>These 2 results are two of results in several working. These can be said that it is an average result. From these results, the following points can be seen.</p>
-
+</code></pre></div><p>These 2 results are two of results in several working. These can be said that it is an average result. From these results, the following points can be seen.</p>
 <ul>
 <li>In the server script, the sleep for 5 seconds is set. For fetchAll(), the total elapsed time is 5.5 s.</li>
 <li>For fetchAll(), responsedOrder is the same to the order of requests. The order of requests is &ldquo;action1&rdquo;, &ldquo;action2&rdquo;, &ldquo;action3&rdquo;, &ldquo;action4&rdquo; and &ldquo;action5&rdquo;.</li>
@@ -384,20 +369,55 @@ function main() {
 <li>For fetch(), responsedOrder is the same to the order of requests.</li>
 <li>For fetch(), actualOrder is the same to the order of requests.</li>
 </ul>
-
 <h1 id="summary">Summary</h1>
-
 <ul>
 <li>It was found that the fetchAll method is worked by the asynchronous processing.</li>
 <li>After it worked by the asynchronous processing, the returned values is reordered by the order of requests.</li>
 <li>It was also found that if you want to retrieve the data from the several URL, the process cost of <code>UrlFetchApp.fetchAll()</code> is much lower than that of <code>UrlFetchApp.fetch()</code> using for loop.</li>
 </ul>
-
-<p>In this report, I could confirm 30 requests could be worked for the fetchAll method. But I couldn&rsquo;t find the limitation of the number of requests.</p>
-
+<p>In this report, I could confirm 30 requests could be worked for the fetchAll method. But I couldn't find the limitation of the number of requests.</p>
 <h1 id="limitation-of-number-of-requests">Limitation of number of requests</h1>
+<p>I could confirm that 1000 requests work fine. But I couldn't find the limitation.</p>
 
-<p>I could confirm that 1000 requests work fine. But I couldn&rsquo;t find the limitation.</p>
+  
+  <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2018%2f04%2f19%2fbenchmark-fetchall-method-in-urlfetch-service-for-google-apps-script%2f" target="_blank" title="Share on Facebook"><i class="fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2018%2f04%2f19%2fbenchmark-fetchall-method-in-urlfetch-service-for-google-apps-script%2f&via=HorribleGeek" target="_blank" title="Tweet"><i class="fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2018%2f04%2f19%2fbenchmark-fetchall-method-in-urlfetch-service-for-google-apps-script%2f" target="_blank" title="Share on Google+"><i class="fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2018%2f04%2f19%2fbenchmark-fetchall-method-in-urlfetch-service-for-google-apps-script%2f" target="_blank" title="Post to Tumblr"><i class="fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2018%2f04%2f19%2fbenchmark-fetchall-method-in-urlfetch-service-for-google-apps-script%2f" target="_blank" title="Pin it"><i class="fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2018%2f04%2f19%2fbenchmark-fetchall-method-in-urlfetch-service-for-google-apps-script%2f" target="_blank" title="Submit to Reddit"><i class="fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
 
 
   
@@ -420,13 +440,13 @@ function main() {
   <div class="pure-u-10-24">
     
     <nav class="next">
-      <a href="https://tanaikech.github.io/2018/04/24/gas-library---runall/">GAS Library - RunAll</a>
+      <a href="https://tanaikech.github.io/2018/04/24/gas-library-runall/">GAS Library - RunAll</a>
     </nav>
     
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
     
-    <a href="https://tanaikech.github.io/2018/04/24/gas-library---runall/"><i class="fa fa-chevron-right"></i></a>
+    <a href="https://tanaikech.github.io/2018/04/24/gas-library-runall/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
@@ -440,6 +460,7 @@ function main() {
 </div>
 </div>
 <script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -449,10 +470,6 @@ function main() {
     }
   });
 </script>
-<script type="text/javascript"
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-</script>
-<meta http-equiv="X-UA-Compatible" CONTENT="IE=EmulateIE7" />
 
 
 <script>
@@ -467,6 +484,8 @@ function main() {
     ga('send', 'pageview');
   }
 </script>
+
+
 
 
 

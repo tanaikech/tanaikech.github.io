@@ -5,9 +5,11 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.49.2" />
+  <meta name="generator" content="Hugo 0.61.0" />
 
   <title>Converting PDF to TXT &middot; tanaike</title>
+
+    
 
   
   
@@ -30,7 +32,7 @@
   <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
 
   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
@@ -105,6 +107,12 @@
       
       
         <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
           <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
       
         </li>
@@ -165,7 +173,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/tanaikech" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
     </li>
     
 
@@ -175,7 +183,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
     </li>
     
 
@@ -263,81 +271,117 @@
 </div>
 
   <p>This is a sample script for converting a PDF file to a TXT file. 2 steps are required for this.</p>
-
 <ol>
 <li>Upload a PDF file as a Google Document</li>
 <li>Download a Google Document as a TXT file</li>
 </ol>
-
 <p>In this sample, Python Quickstart is used. The detail information is <a href="https://developers.google.com/drive/v3/web/quickstart/python">https://developers.google.com/drive/v3/web/quickstart/python</a>. Please read &ldquo;Step 1: Turn on the Drive API&rdquo; and &ldquo;Step 2: Install the Google Client Library&rdquo;.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> __future__ <span style="color:#f92672">import</span> print_function
+<span style="color:#f92672">import</span> httplib2
+<span style="color:#f92672">import</span> os
+<span style="color:#f92672">import</span> io
 
-<pre><code class="language-python">from __future__ import print_function
-import httplib2
-import os
-import io
+<span style="color:#f92672">from</span> apiclient <span style="color:#f92672">import</span> discovery
+<span style="color:#f92672">from</span> oauth2client <span style="color:#f92672">import</span> client
+<span style="color:#f92672">from</span> oauth2client <span style="color:#f92672">import</span> tools
+<span style="color:#f92672">from</span> oauth2client.file <span style="color:#f92672">import</span> Storage
+<span style="color:#f92672">from</span> apiclient.http <span style="color:#f92672">import</span> MediaFileUpload, MediaIoBaseDownload
 
-from apiclient import discovery
-from oauth2client import client
-from oauth2client import tools
-from oauth2client.file import Storage
-from apiclient.http import MediaFileUpload, MediaIoBaseDownload
+<span style="color:#66d9ef">try</span>:
+    <span style="color:#f92672">import</span> argparse
+    flags <span style="color:#f92672">=</span> argparse<span style="color:#f92672">.</span>ArgumentParser(parents<span style="color:#f92672">=</span>[tools<span style="color:#f92672">.</span>argparser])<span style="color:#f92672">.</span>parse_args()
+<span style="color:#66d9ef">except</span> <span style="color:#a6e22e">ImportError</span>:
+    flags <span style="color:#f92672">=</span> None
 
-try:
-    import argparse
-    flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
-except ImportError:
-    flags = None
-
-SCOPES = 'https://www.googleapis.com/auth/drive'
-CLIENT_SECRET_FILE = 'client_secret.json'
-APPLICATION_NAME = 'Drive API Python Quickstart'
-
-
-def get_credentials():
-    credential_path = os.path.join(&quot;./&quot;, 'drive-python-quickstart.json')
-    store = Storage(credential_path)
-    credentials = store.get()
-    if not credentials or credentials.invalid:
-        flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
-        flow.user_agent = APPLICATION_NAME
-        if flags:
-            credentials = tools.run_flow(flow, store, flags)
-        else:  # Needed only for compatibility with Python 2.6
-            credentials = tools.run(flow, store)
-        print('Storing credentials to ' + credential_path)
-    return credentials
+SCOPES <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">https://www.googleapis.com/auth/drive</span><span style="color:#e6db74">&#39;</span>
+CLIENT_SECRET_FILE <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">client_secret.json</span><span style="color:#e6db74">&#39;</span>
+APPLICATION_NAME <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">Drive API Python Quickstart</span><span style="color:#e6db74">&#39;</span>
 
 
-def main():
-    credentials = get_credentials()
-    http = credentials.authorize(httplib2.Http())
-    service = discovery.build('drive', 'v3', http=http)
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_credentials</span>():
+    credential_path <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">./</span><span style="color:#e6db74">&#34;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">drive-python-quickstart.json</span><span style="color:#e6db74">&#39;</span>)
+    store <span style="color:#f92672">=</span> Storage(credential_path)
+    credentials <span style="color:#f92672">=</span> store<span style="color:#f92672">.</span>get()
+    <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> credentials <span style="color:#f92672">or</span> credentials<span style="color:#f92672">.</span>invalid:
+        flow <span style="color:#f92672">=</span> client<span style="color:#f92672">.</span>flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
+        flow<span style="color:#f92672">.</span>user_agent <span style="color:#f92672">=</span> APPLICATION_NAME
+        <span style="color:#66d9ef">if</span> flags:
+            credentials <span style="color:#f92672">=</span> tools<span style="color:#f92672">.</span>run_flow(flow, store, flags)
+        <span style="color:#66d9ef">else</span>:  <span style="color:#75715e"># Needed only for compatibility with Python 2.6</span>
+            credentials <span style="color:#f92672">=</span> tools<span style="color:#f92672">.</span>run(flow, store)
+        <span style="color:#66d9ef">print</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">Storing credentials to </span><span style="color:#e6db74">&#39;</span> <span style="color:#f92672">+</span> credential_path)
+    <span style="color:#66d9ef">return</span> credentials
 
-    pdffile = 'sample.pdf'
-    txtfile = 'sample.txt'
 
-    mime = 'application/vnd.google-apps.document'
-    res = service.files().create(
-        body={
-            'name': pdffile,
-            'mimeType': mime
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>():
+    credentials <span style="color:#f92672">=</span> get_credentials()
+    http <span style="color:#f92672">=</span> credentials<span style="color:#f92672">.</span>authorize(httplib2<span style="color:#f92672">.</span>Http())
+    service <span style="color:#f92672">=</span> discovery<span style="color:#f92672">.</span>build(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">drive</span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">v3</span><span style="color:#e6db74">&#39;</span>, http<span style="color:#f92672">=</span>http)
+
+    pdffile <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">sample.pdf</span><span style="color:#e6db74">&#39;</span>
+    txtfile <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">sample.txt</span><span style="color:#e6db74">&#39;</span>
+
+    mime <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">application/vnd.google-apps.document</span><span style="color:#e6db74">&#39;</span>
+    res <span style="color:#f92672">=</span> service<span style="color:#f92672">.</span>files()<span style="color:#f92672">.</span>create(
+        body<span style="color:#f92672">=</span>{
+            <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">name</span><span style="color:#e6db74">&#39;</span>: pdffile,
+            <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">mimeType</span><span style="color:#e6db74">&#39;</span>: mime
         },
-        media_body=MediaFileUpload(pdffile, mimetype=mime, resumable=True)
-    ).execute()
+        media_body<span style="color:#f92672">=</span>MediaFileUpload(pdffile, mimetype<span style="color:#f92672">=</span>mime, resumable<span style="color:#f92672">=</span>True)
+    )<span style="color:#f92672">.</span>execute()
 
-    dl = MediaIoBaseDownload(
-        io.FileIO(txtfile, 'wb'),
-        service.files().export_media(fileId=res['id'], mimeType=&quot;text/plain&quot;)
+    dl <span style="color:#f92672">=</span> MediaIoBaseDownload(
+        io<span style="color:#f92672">.</span>FileIO(txtfile, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">wb</span><span style="color:#e6db74">&#39;</span>),
+        service<span style="color:#f92672">.</span>files()<span style="color:#f92672">.</span>export_media(fileId<span style="color:#f92672">=</span>res[<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">id</span><span style="color:#e6db74">&#39;</span>], mimeType<span style="color:#f92672">=</span><span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">text/plain</span><span style="color:#e6db74">&#34;</span>)
     )
-    done = False
-    while done is False:
-        status, done = dl.next_chunk()
-    print(&quot;Done.&quot;)
+    done <span style="color:#f92672">=</span> False
+    <span style="color:#66d9ef">while</span> done <span style="color:#f92672">is</span> False:
+        status, done <span style="color:#f92672">=</span> dl<span style="color:#f92672">.</span>next_chunk()
+    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">Done.</span><span style="color:#e6db74">&#34;</span>)
 
 
-if __name__ == '__main__':
+<span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">__main__</span><span style="color:#e6db74">&#39;</span>:
     main()
-</code></pre>
+</code></pre></div>
+  
+  <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2017%2f05%2f01%2fconverting-pdf-to-txt%2f" target="_blank" title="Share on Facebook"><i class="fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2017%2f05%2f01%2fconverting-pdf-to-txt%2f&via=HorribleGeek" target="_blank" title="Tweet"><i class="fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2017%2f05%2f01%2fconverting-pdf-to-txt%2f" target="_blank" title="Share on Google+"><i class="fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2017%2f05%2f01%2fconverting-pdf-to-txt%2f" target="_blank" title="Post to Tumblr"><i class="fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2017%2f05%2f01%2fconverting-pdf-to-txt%2f" target="_blank" title="Pin it"><i class="fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2017%2f05%2f01%2fconverting-pdf-to-txt%2f" target="_blank" title="Submit to Reddit"><i class="fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
 
 
   
@@ -380,6 +424,7 @@ if __name__ == '__main__':
 </div>
 </div>
 <script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -389,10 +434,6 @@ if __name__ == '__main__':
     }
   });
 </script>
-<script type="text/javascript"
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-</script>
-<meta http-equiv="X-UA-Compatible" CONTENT="IE=EmulateIE7" />
 
 
 <script>
@@ -407,6 +448,8 @@ if __name__ == '__main__':
     ga('send', 'pageview');
   }
 </script>
+
+
 
 
 

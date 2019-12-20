@@ -5,9 +5,11 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.49.2" />
+  <meta name="generator" content="Hugo 0.61.0" />
 
   <title>Bittrex API for Google Apps Script &middot; tanaike</title>
+
+    
 
   
   
@@ -30,7 +32,7 @@
   <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
 
   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
@@ -105,6 +107,12 @@
       
       
         <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
           <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
       
         </li>
@@ -165,7 +173,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/tanaikech" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
     </li>
     
 
@@ -175,7 +183,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
     </li>
     
 
@@ -265,40 +273,73 @@
 </div>
 
   <p><a href="https://gist.github.com/tanaikech/07fb768cf6d8256b3a72716a72e99f91">Gists</a></p>
-
 <p>This sample script is for using <a href="https://bittrex.com/home/api">Bittrex API</a> by Google Apps Script.</p>
-
 <p>The following PHP script is a sample at <a href="https://bittrex.com/home/api">bittrex.com</a>.</p>
-
-<pre><code class="language-php">$apikey='xxx';
-$apisecret='xxx';
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php">$apikey=&#39;xxx&#39;;
+$apisecret=&#39;xxx&#39;;
 $nonce=time();
-$uri='https://bittrex.com/api/v1.1/market/getopenorders?apikey='.$apikey.'&amp;nonce='.$nonce;
-$sign=hash_hmac('sha512',$uri,$apisecret);
+$uri=&#39;https://bittrex.com/api/v1.1/market/getopenorders?apikey=&#39;.$apikey.&#39;&amp;nonce=&#39;.$nonce;
+$sign=hash_hmac(&#39;sha512&#39;,$uri,$apisecret);
 $ch = curl_init($uri);
-curl_setopt($ch, CURLOPT_HTTPHEADER, array('apisign:'.$sign));
+curl_setopt($ch, CURLOPT_HTTPHEADER, array(&#39;apisign:&#39;.$sign));
 $execResult = curl_exec($ch);
 $obj = json_decode($execResult);
-</code></pre>
-
-<p>When this is converted to GAS, the script is as follows.</p>
-
-<pre><code class="language-javascript">function main() {
-  var apikey = '#####'; // Please input your key.
-  var apisecret = '#####'; // Please input your secret.
-
-  var nonce = Number(new Date().getTime() / 1000).toFixed(0);
-  var uri = 'https://bittrex.com/api/v1.1/market/getopenorders?apikey=' + apikey + '&amp;nonce=' + nonce;
-  var sign = Utilities.computeHmacSignature(Utilities.MacAlgorithm.HMAC_SHA_512, uri, apisecret);
-  sign = sign.map(function(e) {return (&quot;0&quot; + (e &lt; 0 ? e + 256 : e).toString(16)).slice(-2);}).join(&quot;&quot;);
-  var params = {
-    method: &quot;get&quot;,
-    headers: {Apisign: sign}
+</code></pre></div><p>When this is converted to GAS, the script is as follows.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">apikey</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;#####&#39;</span>; <span style="color:#75715e">// Please input your key.
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">apisecret</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;#####&#39;</span>; <span style="color:#75715e">// Please input your secret.
+</span><span style="color:#75715e"></span>
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">nonce</span> <span style="color:#f92672">=</span> Number(<span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>() <span style="color:#f92672">/</span> <span style="color:#ae81ff">1000</span>).<span style="color:#a6e22e">toFixed</span>(<span style="color:#ae81ff">0</span>);
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">uri</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;https://bittrex.com/api/v1.1/market/getopenorders?apikey=&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">apikey</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;&amp;nonce=&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">nonce</span>;
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sign</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">computeHmacSignature</span>(<span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">MacAlgorithm</span>.<span style="color:#a6e22e">HMAC_SHA_512</span>, <span style="color:#a6e22e">uri</span>, <span style="color:#a6e22e">apisecret</span>);
+  <span style="color:#a6e22e">sign</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sign</span>.<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {<span style="color:#66d9ef">return</span> (<span style="color:#e6db74">&#34;0&#34;</span> <span style="color:#f92672">+</span> (<span style="color:#a6e22e">e</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">e</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">256</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>).<span style="color:#a6e22e">toString</span>(<span style="color:#ae81ff">16</span>)).<span style="color:#a6e22e">slice</span>(<span style="color:#f92672">-</span><span style="color:#ae81ff">2</span>);}).<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;&#34;</span>);
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> {
+    <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;get&#34;</span>,
+    <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {<span style="color:#a6e22e">Apisign</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">sign</span>}
   }
-  var res = UrlFetchApp.fetch(uri, params);
-  Logger.log(res.getContentText())
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">uri</span>, <span style="color:#a6e22e">params</span>);
+  <span style="color:#a6e22e">Logger</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getContentText</span>())
 }
-</code></pre>
+</code></pre></div>
+  
+  <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2018%2f01%2f12%2fbittrex-api-for-google-apps-script%2f" target="_blank" title="Share on Facebook"><i class="fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2018%2f01%2f12%2fbittrex-api-for-google-apps-script%2f&via=HorribleGeek" target="_blank" title="Tweet"><i class="fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2018%2f01%2f12%2fbittrex-api-for-google-apps-script%2f" target="_blank" title="Share on Google+"><i class="fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2018%2f01%2f12%2fbittrex-api-for-google-apps-script%2f" target="_blank" title="Post to Tumblr"><i class="fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2018%2f01%2f12%2fbittrex-api-for-google-apps-script%2f" target="_blank" title="Pin it"><i class="fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2018%2f01%2f12%2fbittrex-api-for-google-apps-script%2f" target="_blank" title="Submit to Reddit"><i class="fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
 
 
   
@@ -341,6 +382,7 @@ $obj = json_decode($execResult);
 </div>
 </div>
 <script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -350,10 +392,6 @@ $obj = json_decode($execResult);
     }
   });
 </script>
-<script type="text/javascript"
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-</script>
-<meta http-equiv="X-UA-Compatible" CONTENT="IE=EmulateIE7" />
 
 
 <script>
@@ -371,6 +409,11 @@ $obj = json_decode($execResult);
 
 
 
+
+
+<script src="https://tanaikech.github.io/js/math-code.js"></script>
+  <script async src="//cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  
 
 
 </body>

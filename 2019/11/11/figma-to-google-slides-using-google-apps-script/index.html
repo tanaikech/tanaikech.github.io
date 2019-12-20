@@ -5,9 +5,11 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.49.2" />
+  <meta name="generator" content="Hugo 0.61.0" />
 
   <title>Figma to Google Slides using Google Apps Script &middot; tanaike</title>
+
+    
 
   
   
@@ -30,7 +32,7 @@
   <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
 
   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
@@ -105,6 +107,12 @@
       
       
         <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
           <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
       
         </li>
@@ -165,7 +173,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/tanaikech" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
     </li>
     
 
@@ -175,7 +183,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
     </li>
     
 
@@ -264,21 +272,13 @@
 
 </div>
 
-  
-
-<p><a href="https://gist.github.com/tanaikech/6aeb3ff13765cfba465862e2e2c3dd3b">Gists</a></p>
-
+  <p><a href="https://gist.github.com/tanaikech/6aeb3ff13765cfba465862e2e2c3dd3b">Gists</a></p>
 <p>In this sample script, all pages in the Figma file are retrieved and the retrieved pages are put to new Google Slides as the image.</p>
-
 <h2 id="usage">Usage</h2>
-
 <h3 id="1-retrieve-access-token">1. Retrieve access token</h3>
-
 <p>You can see the method for retrieving the access token at <a href="https://www.figma.com/developers/api#access-tokens">here</a>. Although there is also OAuth2 for retrieving the access token, in your situation, I thought that the method for directly generating the access token on the site might be suitable. So in this answer, the generated access token on the site is used. Please retrieve the access token as follows.</p>
-
 <blockquote>
 <p><strong>Generate a personal access token</strong></p>
-
 <ol>
 <li>Login to your Figma account.</li>
 <li>Head to the Account Settings from the top-left menu inside Figma.</li>
@@ -287,83 +287,110 @@
 <li>A token will be generated. This will be your only chance to copy the token, so make sure you keep a copy of this in a secure place.</li>
 </ol>
 </blockquote>
-
 <p>The access token is like <code>#####-########-####-####-####-############</code>. At Google Apps Script, the authorization is done by <code>headers: {&quot;X-Figma-Token&quot;: accessToken}</code>.</p>
-
 <h3 id="2-retrieve-file-key">2. Retrieve file key</h3>
-
 <p>In order to retrieve the Figma file using Figma API, the file key is required. You can retrieve the file key from the URL of the file.</p>
-
 <p>The URL of the file is like <code>https://www.figma.com/file/###/sampleFilename</code>. In this case, <code>###</code> is the file key.</p>
-
 <h3 id="3-run-script">3. Run script</h3>
-
 <p>The sample script is as follows. Before you run the script, please set the variables of <code>accessToken</code> and <code>fileKey</code>.</p>
-
-<pre><code class="language-javascript">function myFunction() {
-  var accessToken = &quot;###&quot;; // Please set your access token.
-  var fileKey = &quot;###&quot;; // Please set the file key.
-
-  var baseUrl = &quot;https://api.figma.com/v1&quot;;
-  var params = {
-    method: &quot;get&quot;,
-    headers: { &quot;X-Figma-Token&quot;: accessToken },
-    muteHttpExceptions: true
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">accessToken</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set your access token.
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">fileKey</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set the file key.
+</span><span style="color:#75715e"></span>
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">baseUrl</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://api.figma.com/v1&#34;</span>;
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> {
+    <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;get&#34;</span>,
+    <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> { <span style="color:#e6db74">&#34;X-Figma-Token&#34;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">accessToken</span> },
+    <span style="color:#a6e22e">muteHttpExceptions</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>
   };
-  var fileInfo = JSON.parse(
-    UrlFetchApp.fetch(baseUrl + &quot;/files/&quot; + fileKey, params)
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">fileInfo</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(
+    <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">baseUrl</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/files/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">fileKey</span>, <span style="color:#a6e22e">params</span>)
   );
-  var children = JSON.parse(
-    UrlFetchApp.fetch(
-      baseUrl +
-        &quot;/images/&quot; +
-        fileKey +
-        &quot;?format=jpg&amp;scale=3&amp;ids=&quot; +
-        fileInfo.document.children
-          .map(function(c) {
-            return c.id;
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">children</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(
+    <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(
+      <span style="color:#a6e22e">baseUrl</span> <span style="color:#f92672">+</span>
+        <span style="color:#e6db74">&#34;/images/&#34;</span> <span style="color:#f92672">+</span>
+        <span style="color:#a6e22e">fileKey</span> <span style="color:#f92672">+</span>
+        <span style="color:#e6db74">&#34;?format=jpg&amp;scale=3&amp;ids=&#34;</span> <span style="color:#f92672">+</span>
+        <span style="color:#a6e22e">fileInfo</span>.document.<span style="color:#a6e22e">children</span>
+          .<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">c</span>) {
+            <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">id</span>;
           })
-          .join(&quot;,&quot;),
-      params
+          .<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;,&#34;</span>),
+      <span style="color:#a6e22e">params</span>
     )
   );
-  if (!children.err) {
-    var s = SlidesApp.create(&quot;sampleSlide&quot;);
-    var slide = s.getSlides()[0];
-    var keys = Object.keys(children.images);
-    keys.forEach(function(c, i) {
-      slide.insertImage(children.images[c]);
-      if (i != keys.length - 1) slide = s.insertSlide(i + 1);
+  <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">children</span>.<span style="color:#a6e22e">err</span>) {
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">s</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SlidesApp</span>.<span style="color:#a6e22e">create</span>(<span style="color:#e6db74">&#34;sampleSlide&#34;</span>);
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">slide</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getSlides</span>()[<span style="color:#ae81ff">0</span>];
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">keys</span> <span style="color:#f92672">=</span> Object.<span style="color:#a6e22e">keys</span>(<span style="color:#a6e22e">children</span>.<span style="color:#a6e22e">images</span>);
+    <span style="color:#a6e22e">keys</span>.<span style="color:#a6e22e">forEach</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">c</span>, <span style="color:#a6e22e">i</span>) {
+      <span style="color:#a6e22e">slide</span>.<span style="color:#a6e22e">insertImage</span>(<span style="color:#a6e22e">children</span>.<span style="color:#a6e22e">images</span>[<span style="color:#a6e22e">c</span>]);
+      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">i</span> <span style="color:#f92672">!=</span> <span style="color:#a6e22e">keys</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) <span style="color:#a6e22e">slide</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">insertSlide</span>(<span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>);
     });
-  } else {
-    throw new Error(children);
+  } <span style="color:#66d9ef">else</span> {
+    <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#a6e22e">children</span>);
   }
 }
-</code></pre>
-
-<ul>
+</code></pre></div><ul>
 <li>When <code>myFunction()</code> is run, at first, the file information is retrieved with the file key <code>fileKey</code>. Then, all pages are retrieved from the retrieved file information, and the retrieved pages are put to each slide of new Google Slides.</li>
 <li>I think that the action of this script is similar to <a href="https://github.com/alyssaxuu/figma-to-google-slides/blob/master/Chrome%20Extension/background.js">the script</a> which is shown at the bottom of your question.</li>
 </ul>
-
 <h2 id="note">Note</h2>
-
 <ul>
 <li>This is a sample script. So please modify it for your actual situation.</li>
 </ul>
-
 <h2 id="references">References</h2>
-
 <ul>
 <li><a href="https://www.figma.com/developers/api">Figma API</a></li>
 <li><a href="https://developers.google.com/apps-script/reference/url-fetch/url-fetch-app">Class UrlFetchApp</a></li>
 <li><a href="https://developers.google.com/apps-script/reference/slides/slides-app">Class SlidesApp</a></li>
 <li><a href="https://stackoverflow.com/q/58792786">How do I get Figma API to work with the Google App-script API?</a>
-
 <ul>
 <li>I answered this script to the question.</li>
-</ul></li>
 </ul>
+</li>
+</ul>
+
+  
+  <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2019%2f11%2f11%2ffigma-to-google-slides-using-google-apps-script%2f" target="_blank" title="Share on Facebook"><i class="fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2019%2f11%2f11%2ffigma-to-google-slides-using-google-apps-script%2f&via=HorribleGeek" target="_blank" title="Tweet"><i class="fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f11%2f11%2ffigma-to-google-slides-using-google-apps-script%2f" target="_blank" title="Share on Google+"><i class="fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2019%2f11%2f11%2ffigma-to-google-slides-using-google-apps-script%2f" target="_blank" title="Post to Tumblr"><i class="fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f11%2f11%2ffigma-to-google-slides-using-google-apps-script%2f" target="_blank" title="Pin it"><i class="fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f11%2f11%2ffigma-to-google-slides-using-google-apps-script%2f" target="_blank" title="Submit to Reddit"><i class="fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
 
 
   
@@ -406,6 +433,7 @@
 </div>
 </div>
 <script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -415,10 +443,6 @@
     }
   });
 </script>
-<script type="text/javascript"
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-</script>
-<meta http-equiv="X-UA-Compatible" CONTENT="IE=EmulateIE7" />
 
 
 <script>
@@ -433,6 +457,8 @@
     ga('send', 'pageview');
   }
 </script>
+
+
 
 
 

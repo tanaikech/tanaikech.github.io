@@ -5,9 +5,11 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.49.2" />
+  <meta name="generator" content="Hugo 0.61.0" />
 
   <title>Running Functions by Specifying Function Names with Web Apps for Google Apps Script &middot; tanaike</title>
+
+    
 
   
   
@@ -30,7 +32,7 @@
   <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
 
   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
@@ -105,6 +107,12 @@
       
       
         <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
           <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
       
         </li>
@@ -165,7 +173,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/tanaikech" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
     </li>
     
 
@@ -175,7 +183,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
     </li>
     
 
@@ -260,124 +268,134 @@
 
 </div>
 
-  
-
-<p><a href="https://gist.github.com/tanaikech/b2e0325a28efe7c609e4688ec22ee22c">Gists</a></p>
-
+  <p><a href="https://gist.github.com/tanaikech/b2e0325a28efe7c609e4688ec22ee22c">Gists</a></p>
 <p>In this report, I would like to introduce the method for running functions by directly specifying the function names with Web Apps for Google Apps Script.</p>
-
 <h2 id="description">Description</h2>
-
 <p>It has already been known that the directly specified functions in the project can be run from the outside by enabling &ldquo;API executable&rdquo; and using the method of <a href="https://developers.google.com/apps-script/api/reference/rest/v1/scripts">scripts.run</a> in Google Apps Script API. In this case, the installation for using Apps Script API is a bit complicate. I think that this is making users difficult to use Apps Script API, although the important settings are including in the installation when the importance of the security is considered. As one of workarounds for making easy to run the directly specified functions in the project, I would like to introduce the method using Web Apps. When Web Apps is accessed, the functions of <code>doGet()</code> and <code>doPost()</code> are used. These are the reserved function name. But, when this method is used, the functions in the project can be run by directly selecting from the outside.</p>
-
 <p>This method is also used at <a href="https://github.com/tanaikech/RunAll">RunAll</a> which is a library for running the concurrent processing using only native Google Apps Script.</p>
-
 <h2 id="usage">Usage</h2>
-
 <h3 id="1-create-new-project">1. Create new project</h3>
-
 <p>Please create new project. In this case, you can use both the standalone script type and the container-bound script type. Here, as a sample case, the standalone script type is used. In order to create new standalone project, please access to <a href="https://script.google.com">https://script.google.com</a>, and click &ldquo;New script&rdquo;. By this, the script editor is opened as new project. Then please give the project name. By this, new standalone project is created.</p>
-
 <h3 id="2-copy-and-paste-script-for-web-apps">2. Copy and paste script for Web Apps</h3>
-
 <p>Please copy and paste the script to the created project on the script editor for using with Web Apps. The script is as follows.</p>
-
 <h4 id="script">Script</h4>
-
-<pre><code class="language-javascript">// This function is used for running the script of Web Apps.
-function doGet(e) {
-  if (&quot;function&quot; in e.parameter) {
-    var f = e.parameter[&quot;function&quot;];
-    var a = e.parameter[&quot;arguments&quot;];
-    if (f in this &amp;&amp; typeof this[f] == &quot;function&quot;) {
-      return ContentService.createTextOutput(this[f](a));
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// This function is used for running the script of Web Apps.
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">doGet</span>(<span style="color:#a6e22e">e</span>) {
+  <span style="color:#66d9ef">if</span> (<span style="color:#e6db74">&#34;function&#34;</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameter</span>) {
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">f</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameter</span>[<span style="color:#e6db74">&#34;function&#34;</span>];
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">a</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameter</span>[<span style="color:#e6db74">&#34;arguments&#34;</span>];
+    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">f</span> <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">this</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#66d9ef">typeof</span> <span style="color:#66d9ef">this</span>[<span style="color:#a6e22e">f</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;function&#34;</span>) {
+      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ContentService</span>.<span style="color:#a6e22e">createTextOutput</span>(<span style="color:#66d9ef">this</span>[<span style="color:#a6e22e">f</span>](<span style="color:#a6e22e">a</span>));
     }
-    throw new Error(f + &quot; was not found.&quot;);
+    <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#a6e22e">f</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34; was not found.&#34;</span>);
   }
-  throw new Error(&quot;Function name was not given.&quot;);
+  <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">&#34;Function name was not given.&#34;</span>);
 }
 
-// Sample function that you want to run using Web Apps.
-function sample(s) {
-  return &quot;Received arguments are &quot; + s;
+<span style="color:#75715e">// Sample function that you want to run using Web Apps.
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">sample</span>(<span style="color:#a6e22e">s</span>) {
+  <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Received arguments are &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">s</span>;
 }
-</code></pre>
-
-<ul>
+</code></pre></div><ul>
 <li><code>doGet(e)</code> is used for Web Apps.</li>
 <li><code>sample(s)</code> is a test function that you want to run using Web Apps. - You can add the other functions you want to run in the project.</li>
 </ul>
-
 <h3 id="deploy-web-apps">Deploy Web Apps</h3>
-
 <p>Please deploy Web Apps as follow.</p>
-
 <ol>
 <li>On the script editor, Open a dialog box by &ldquo;Publish&rdquo; -&gt; &ldquo;Deploy as web app&rdquo;.</li>
-<li>Select <strong>&ldquo;User accessing the web app&rdquo;</strong> or <strong>&ldquo;Me&rdquo;</strong> for &ldquo;Execute the app as:&ldquo;.</li>
-<li>Select <strong>&ldquo;Anyone, even anonymous&rdquo;</strong> for &ldquo;Who has access to the app:&ldquo;.
-
+<li>Select <strong>&ldquo;User accessing the web app&rdquo;</strong> or <strong>&ldquo;Me&rdquo;</strong> for &ldquo;Execute the app as:&quot;.</li>
+<li>Select <strong>&ldquo;Anyone, even anonymous&rdquo;</strong> for &ldquo;Who has access to the app:&quot;.
 <ul>
 <li>This setting is used for testing this method. In this settings, all people who know the URL of Web Apps can be accessed. So please be careful.</li>
 <li>When you use at the actual situation, please select &ldquo;Only myself&rdquo;. By this, only you can access to Web Apps.</li>
-</ul></li>
+</ul>
+</li>
 <li>Click &ldquo;Deploy&rdquo; button as new &ldquo;Project version&rdquo;.</li>
 <li>Automatically open a dialog box of &ldquo;Authorization required&rdquo;.
-
 <ol>
 <li>Click &ldquo;Review Permissions&rdquo;.</li>
 <li>Select own account.</li>
-<li>Click &ldquo;Advanced&rdquo; at &ldquo;This app isn&rsquo;t verified&rdquo;.</li>
+<li>Click &ldquo;Advanced&rdquo; at &ldquo;This app isn't verified&rdquo;.</li>
 <li>Click &ldquo;Go to ### project name ###(unsafe)&rdquo;</li>
 <li>Click &ldquo;Allow&rdquo; button.</li>
-</ol></li>
-<li>Copy &ldquo;Current web app URL:&ldquo;.
-
+</ol>
+</li>
+<li>Copy &ldquo;Current web app URL:&quot;.
 <ul>
-<li>It&rsquo;s like <code>https://script.google.com/macros/s/#####/exec</code>.</li>
-</ul></li>
+<li>It's like <code>https://script.google.com/macros/s/#####/exec</code>.</li>
+</ul>
+</li>
 <li>Click &ldquo;OK&rdquo;.</li>
 </ol>
-
 <blockquote>
 <p>IMPORTANT: <strong>In above settings, when you modified the script, please redeploy Web Apps as new version. By this, the latest script is reflected. Please be careful this.</strong></p>
 </blockquote>
-
 <h3 id="run-function">Run function</h3>
-
 <p>After above settings were done, you can run the function of <code>sample(s)</code> as follows.</p>
-
 <h4 id="curl-sample">Curl sample</h4>
-
-<pre><code class="language-bash">$ curl -L &quot;https://script.google.com/macros/s/#####/exec?function=sample&amp;arguments=foo&quot;
-</code></pre>
-
-<h4 id="result">Result</h4>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ curl -L <span style="color:#e6db74">&#34;https://script.google.com/macros/s/#####/exec?function=sample&amp;arguments=foo&#34;</span>
+</code></pre></div><h4 id="result">Result</h4>
 <pre><code>Received arguments are foo
-</code></pre>
-
-<p>From this result, you can see the function of <code>sample(s)</code> was run by accessing to Web Apps.</p>
-
+</code></pre><p>From this result, you can see the function of <code>sample(s)</code> was run by accessing to Web Apps.</p>
 <h2 id="references">References</h2>
-
 <ul>
 <li><a href="https://github.com/tanaikech/taking-advantage-of-Web-Apps-with-google-apps-script">Taking advantage of Web Apps with Google Apps Script</a></li>
 <li><a href="https://github.com/tanaikech/RunAll">RunAll</a></li>
 </ul>
+
+  
+  <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2019%2f08%2f26%2frunning-functions-by-specifying-function-names-with-web-apps-for-google-apps-script%2f" target="_blank" title="Share on Facebook"><i class="fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2019%2f08%2f26%2frunning-functions-by-specifying-function-names-with-web-apps-for-google-apps-script%2f&via=HorribleGeek" target="_blank" title="Tweet"><i class="fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f08%2f26%2frunning-functions-by-specifying-function-names-with-web-apps-for-google-apps-script%2f" target="_blank" title="Share on Google+"><i class="fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2019%2f08%2f26%2frunning-functions-by-specifying-function-names-with-web-apps-for-google-apps-script%2f" target="_blank" title="Post to Tumblr"><i class="fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f08%2f26%2frunning-functions-by-specifying-function-names-with-web-apps-for-google-apps-script%2f" target="_blank" title="Pin it"><i class="fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f08%2f26%2frunning-functions-by-specifying-function-names-with-web-apps-for-google-apps-script%2f" target="_blank" title="Submit to Reddit"><i class="fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2019/08/26/updated-gas-library---runall/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2019/08/26/updated-gas-library-runall/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2019/08/26/updated-gas-library---runall/">Updated: GAS Library - RunAll</a>
+      <a href="https://tanaikech.github.io/2019/08/26/updated-gas-library-runall/">Updated: GAS Library - RunAll</a>
     </nav>
     
   </div>
@@ -407,6 +425,7 @@ function sample(s) {
 </div>
 </div>
 <script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -416,10 +435,6 @@ function sample(s) {
     }
   });
 </script>
-<script type="text/javascript"
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-</script>
-<meta http-equiv="X-UA-Compatible" CONTENT="IE=EmulateIE7" />
 
 
 <script>
@@ -437,6 +452,11 @@ function sample(s) {
 
 
 
+
+
+<script src="https://tanaikech.github.io/js/math-code.js"></script>
+  <script async src="//cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  
 
 
 </body>

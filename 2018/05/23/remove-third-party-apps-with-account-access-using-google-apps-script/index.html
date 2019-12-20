@@ -5,9 +5,11 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.49.2" />
+  <meta name="generator" content="Hugo 0.61.0" />
 
   <title>Remove Third-party Apps with Account Access using Google Apps Script &middot; tanaike</title>
+
+    
 
   
   
@@ -30,7 +32,7 @@
   <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
 
   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
@@ -105,6 +107,12 @@
       
       
         <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
           <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
       
         </li>
@@ -165,7 +173,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/tanaikech" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
     </li>
     
 
@@ -175,7 +183,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
     </li>
     
 
@@ -262,51 +270,71 @@
 
 </div>
 
-  
-
-<p><a href="https://gist.github.com/tanaikech/608e65fee105989df1a7b645c20572c2">Gists</a></p>
-
+  <p><a href="https://gist.github.com/tanaikech/608e65fee105989df1a7b645c20572c2">Gists</a></p>
 <h2 id="overview">Overview</h2>
-
 <p>This is a method for removing Third-party Apps with Account Access using a script.</p>
-
 <h2 id="demo">Demo</h2>
-
-<p><img src="https://tanaikech.github.io/img/20180523a-demo.gif" alt="" /></p>
-
+<p><img src="https://tanaikech.github.io/img/20180523a-demo.gif" alt=""></p>
 <h2 id="description">Description</h2>
-
 <p>When users create a script in a project and run the script, if the methods which are required to use scopes are included, users have to authorize to use the scopes using the browser. By authorizing it, users can use the script. The authorized projects can be seen at <a href="https://myaccount.google.com/permissions">Third-party Apps with Account Access</a>. One day, I had a situation that it required to remove the authorization of project, because of the security. Third-party Apps with Account Access can be manually removed as you know. But at that time, I wanted to remove using a script. So I came up with this method.</p>
-
-<p>This method achieve to remove Third-party Apps with Account Access by revoking access token of the project. In document, according to the official Google&rsquo;s document, the access token retrieved by refresh token can be revoked. When the access token was revoked, both the access token and the refresh token are revoked. I thought that this might be able to be also used for the project of standalone type and the container-bound script type. So I have tried and could confirm that it worked.</p>
-
+<p>This method achieve to remove Third-party Apps with Account Access by revoking access token of the project. In document, according to the official Google's document, the access token retrieved by refresh token can be revoked. When the access token was revoked, both the access token and the refresh token are revoked. I thought that this might be able to be also used for the project of standalone type and the container-bound script type. So I have tried and could confirm that it worked.</p>
 <h2 id="usage">Usage</h2>
-
 <p>It supposes that a project has already been created and the authorization has also already been done. Under this situation, run the following sample script.</p>
-
-<pre><code class="language-javascript">function myFunction() {
-  var url = &quot;https://accounts.google.com/o/oauth2/revoke?token=&quot; + ScriptApp.getOAuthToken();
-  var res = UrlFetchApp.fetch(url);
-  Logger.log(res.getResponseCode());
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://accounts.google.com/o/oauth2/revoke?token=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>);
+  <span style="color:#a6e22e">Logger</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getResponseCode</span>());
 }
-</code></pre>
-
-<p>This sample script revokes the access token retrieved by <code>ScriptApp.getOAuthToken()</code>. I thought that <code>ScriptApp.getOAuthToken()</code> may retrieve the access token using a refresh token. If this access token was revoked, the refresh token is also revoked, and when the script is run again, the authorization is required again. My estimation was correct.</p>
-
+</code></pre></div><p>This sample script revokes the access token retrieved by <code>ScriptApp.getOAuthToken()</code>. I thought that <code>ScriptApp.getOAuthToken()</code> may retrieve the access token using a refresh token. If this access token was revoked, the refresh token is also revoked, and when the script is run again, the authorization is required again. My estimation was correct.</p>
 <p>This is a sample script of Google Apps Script. But if you want to revoke it from outside of the script editor, for example, you can use the following curl sample.</p>
-
-<pre><code class="language-bash">curl https://accounts.google.com/o/oauth2/revoke?token=#####
-</code></pre>
-
-<h2 id="references">References</h2>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">curl https://accounts.google.com/o/oauth2/revoke?token<span style="color:#f92672">=</span><span style="color:#75715e">#####</span>
+</code></pre></div><h2 id="references">References</h2>
 <ul>
 <li><a href="https://myaccount.google.com/permissions">Site for manually removing Third-party Apps with Account Access</a></li>
 <li><a href="https://support.google.com/accounts/answer/3466521">Apps with access to your account</a></li>
 <li><a href="https://developers.google.com/identity/protocols/OAuth2WebServer#tokenrevoke">Revoking a token</a></li>
 </ul>
+<p>If this information is useful for you, I'm glad.</p>
 
-<p>If this information is useful for you, I&rsquo;m glad.</p>
+  
+  <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2018%2f05%2f23%2fremove-third-party-apps-with-account-access-using-google-apps-script%2f" target="_blank" title="Share on Facebook"><i class="fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2018%2f05%2f23%2fremove-third-party-apps-with-account-access-using-google-apps-script%2f&via=HorribleGeek" target="_blank" title="Tweet"><i class="fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2018%2f05%2f23%2fremove-third-party-apps-with-account-access-using-google-apps-script%2f" target="_blank" title="Share on Google+"><i class="fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2018%2f05%2f23%2fremove-third-party-apps-with-account-access-using-google-apps-script%2f" target="_blank" title="Post to Tumblr"><i class="fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2018%2f05%2f23%2fremove-third-party-apps-with-account-access-using-google-apps-script%2f" target="_blank" title="Pin it"><i class="fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2018%2f05%2f23%2fremove-third-party-apps-with-account-access-using-google-apps-script%2f" target="_blank" title="Submit to Reddit"><i class="fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
 
 
   
@@ -349,6 +377,7 @@
 </div>
 </div>
 <script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -358,10 +387,6 @@
     }
   });
 </script>
-<script type="text/javascript"
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-</script>
-<meta http-equiv="X-UA-Compatible" CONTENT="IE=EmulateIE7" />
 
 
 <script>
@@ -376,6 +401,8 @@
     ga('send', 'pageview');
   }
 </script>
+
+
 
 
 

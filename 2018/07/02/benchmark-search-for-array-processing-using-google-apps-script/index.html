@@ -5,9 +5,11 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.49.2" />
+  <meta name="generator" content="Hugo 0.61.0" />
 
   <title>Benchmark: Search for Array Processing using Google Apps Script &middot; tanaike</title>
+
+    
 
   
   
@@ -30,7 +32,7 @@
   <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
 
   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
@@ -105,6 +107,12 @@
       
       
         <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
           <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
       
         </li>
@@ -165,7 +173,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/tanaikech" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
     </li>
     
 
@@ -175,7 +183,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
     </li>
     
 
@@ -264,78 +272,46 @@
 
 </div>
 
-  
-
-<p><a href="https://gist.github.com/tanaikech/eda9234822b5dec80549216a43c52652">Gists</a></p>
-
-<p><a name="TOP"></a></p>
-
+  <p><a href="https://gist.github.com/tanaikech/eda9234822b5dec80549216a43c52652">Gists</a></p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
 <h1 id="benchmark-search-for-array-processing-using-google-apps-script">Benchmark: Search for Array Processing using Google Apps Script</h1>
-
-<p><center>
-July 2, 2018</p>
-
-<p>Kanshi Tanaike
-</center></p>
-
+<!-- raw HTML omitted -->
+<p>Kanshi Tanaike</p>
+<!-- raw HTML omitted -->
 <h1 id="introduction">Introduction</h1>
-
 <p><strong>Please be careful! This result can be only used for Google Apps Script.</strong></p>
-
-<p>There are a limit executing time for Google Apps Script (GAS). That is 6 minutes.<a href="#References"><sup>1</sup></a> So users always have to pay attention to reducing the process cost of the scripts. Especially, it is very important to know the process cost for the array processing, because the array processing is often used for spreadsheet and Google APIs. Recently, I have reported about the process cost of the loop for the array processing.<a href="#References"><sup>2</sup></a> Also I have reported &ldquo;Improved Algorithms for Summation of Array Elements&rdquo; as a method for reducing the process cost.<a href="#References"><sup>3</sup></a> From these reports, it has found that GAS shows much different process cost from other languages. So it is important to investigate the process cost for various scenes. In this report, the process cost of &ldquo;searching strings in an array&rdquo; for the array processing using GAS has been investigated.</p>
-
+<p>There are a limit executing time for Google Apps Script (GAS). That is 6 minutes.<a href="#References"><!-- raw HTML omitted -->1<!-- raw HTML omitted --></a> So users always have to pay attention to reducing the process cost of the scripts. Especially, it is very important to know the process cost for the array processing, because the array processing is often used for spreadsheet and Google APIs. Recently, I have reported about the process cost of the loop for the array processing.<a href="#References"><!-- raw HTML omitted -->2<!-- raw HTML omitted --></a> Also I have reported &ldquo;Improved Algorithms for Summation of Array Elements&rdquo; as a method for reducing the process cost.<a href="#References"><!-- raw HTML omitted -->3<!-- raw HTML omitted --></a> From these reports, it has found that GAS shows much different process cost from other languages. So it is important to investigate the process cost for various scenes. In this report, the process cost of &ldquo;searching strings in an array&rdquo; for the array processing using GAS has been investigated.</p>
 <p>Here, as a sample, it supposes the situation that it searches 3 strings from one dimensional array. When users use the process for this situation using GAS, the following 3 methods can be considered.</p>
-
 <ol>
 <li>Search using linear search by for loop</li>
 <li>Search using hash by creating an object</li>
-<li>Search using indexOf() <a href="#References"><sup>4</sup></a></li>
+<li>Search using indexOf() <a href="#References"><!-- raw HTML omitted -->4<!-- raw HTML omitted --></a></li>
 </ol>
-
 <blockquote>
-<p>From the report of loop cost, <a href="#References"><sup>2</sup></a> it has already found that the loop by map and filter is the fastest at GAS. <a href="#References"><sup>2</sup></a> But in this report, &ldquo;for loop&rdquo; which is the general loop was used.</p>
+<p>From the report of loop cost, <a href="#References"><!-- raw HTML omitted -->2<!-- raw HTML omitted --></a> it has already found that the loop by map and filter is the fastest at GAS. <a href="#References"><!-- raw HTML omitted -->2<!-- raw HTML omitted --></a> But in this report, &ldquo;for loop&rdquo; which is the general loop was used.</p>
 </blockquote>
-
 <p>As the result, it was found that the cost of search by indexOf() was the lowest of all methods. Namely, it was the fastest of all. 2nd and last one were the search by for loop and the search by the hash, respectively. In the case of the search by hash, it was fount that although the cost of search by the hash from the object is very low, the cost for creating the object to search the hash was the highest of all. By this, the search by the hash became the lowest rank. If the object for searching has already been created, the cost of search by the hash will be the lowest of all.</p>
-
 <h1 id="experimental-procedure">Experimental procedure</h1>
-
 <p>In the experiment, the sample scripts for GAS were used. 1 dimensional array including 3 strings for searching was used as a source array. The 3 string values were put to the top, center and end of the array in order to measure the same condition. In this case, it uses all of elements in the array. 3 methods as mentioned above were used for searching the strings from the array. As the measurements of process cost, those 3 strings were searched from the source array by changing the number of elements of the array, and the process cost which is the search time was measured. In each search, the index of array which has the searched string was retrieved. The cost for creating array was not included. Only the cost for searching was measured. By the way, at GAS, the processing time is not stable as you know. So the average value for more than 250 times measurements was used for each data point which is shown by figures. At this time, the fluctuation of the average values was less than 1 %. I worry that each detailed-data point at my environment might be different from that at other user’s environment. But I think that the trend of this result can be used.</p>
-
 <h1 id="results">Results</h1>
-
-<p><img src="https://tanaikech.github.io/img/20180702a_fig1.png" alt="" /></p>
-
+<p><img src="https://tanaikech.github.io/img/20180702a_fig1.png" alt=""></p>
 <p>Fig 1. Number of elements vs. processing time (process cost) for searching 3 strings. The solid lines with the color of red, blue and green mean the result from the search using hash, the linear search and the search using indexOf, respectively.</p>
-
-<p><br></p>
-
-<p><img src="https://tanaikech.github.io/img/20180702a_fig2.png" alt="" /></p>
-
+<!-- raw HTML omitted -->
+<p><img src="https://tanaikech.github.io/img/20180702a_fig2.png" alt=""></p>
 <p>Fig 2. Each method vs. processing efficiency time (process cost) for searching strings. Here, the chart of search using indexOf shown in Fig. 1 was magnified.</p>
-
-<p><br></p>
-
+<!-- raw HTML omitted -->
 <p>Figure 1 shows the number of elements vs. processing time (process cost) for searching 3 strings. At figure 2, the chart of search using indexOf shown in Fig. 1 was magnified. From Fig. 1, it was found that the search using indexOf is the fastest of all. The second is the linear search. The last is the search using hash. It is considered that the reason of this order is as follows.</p>
-
 <ol>
-<li>From the sample script, both the linear search and the search using hash process all elements in the array using the for loop. On the other hand, the search using indexOf doesn&rsquo;t process all elements using the for loop. The index of the element with the found string is directly retrieved using indexOf. When the string is found, the elements in the array are removed from the start index to the index of element with the found string. By this, the array length becomes small. This flow is repeated until to find all strings for searching. So it is considered that the search cost of indexOf which doesn&rsquo;t process all elements using the for loop became the lowest of all. This may indicate that the scan for indexOf() is different from it for the general for loop.</li>
+<li>From the sample script, both the linear search and the search using hash process all elements in the array using the for loop. On the other hand, the search using indexOf doesn't process all elements using the for loop. The index of the element with the found string is directly retrieved using indexOf. When the string is found, the elements in the array are removed from the start index to the index of element with the found string. By this, the array length becomes small. This flow is repeated until to find all strings for searching. So it is considered that the search cost of indexOf which doesn't process all elements using the for loop became the lowest of all. This may indicate that the scan for indexOf() is different from it for the general for loop.</li>
 <li>In the case of the search by hash, it was found that although the cost of search by the hash from the object is very low, the cost for creating the object to search the hash was the highest of all. So it is considered that the search by hash became the lowest rank. If the object for searching has already been created, the cost of search by the hash will be the lowest of all.</li>
 <li>The linear search processes all elements using the for loop as same as the search using hash. At the linear search, the elements are scanned and the searched string is retrieved using <code>if</code>. On the other hand, at the search using hash, the object is created to search while using <code>if</code>. After the object was created, the strings are searched. From the result of order of cost, it is considered that the cost for creating an object is higher than that of <code>push()</code>. So it is considered that the linear search became the second.</li>
 </ol>
-
-<p><img src="https://tanaikech.github.io/img/20180702a_fig3.png" alt="" /></p>
-
+<p><img src="https://tanaikech.github.io/img/20180702a_fig3.png" alt=""></p>
 <p>Fig 3. Number of elements which can be searched per unit time. Vertical axis is the logger scale. Horizontal axis is each method. These were calculated using the slopes of each method in Figs 1 and 2.</p>
-
-<p><br></p>
-
+<!-- raw HTML omitted -->
 <p>Figure 3 shows the number of elements which can be searched per unit time. The vertical axis and horizontal axis are the logger scale and each method, respectively. These values were calculated using the slopes of each method in Figs 1 and 2. From Fig. 3, it was found that the search using indexOf can reduce the process cost of more than 99 % from the linear search and the search using hash.</p>
-
 <h1 id="summary">Summary</h1>
-
 <p>In this report, the process cost of &ldquo;searching strings in an array&rdquo; for the array processing by 3 methods using GAS was investigated. As the result, it was found the following important features for GAS.</p>
-
 <ul>
 <li>Process cost of search by indexOf() was the lowest of all methods.</li>
 <li>2nd and last one were the search by for loop and the search by the hash, respectively.</li>
@@ -343,42 +319,30 @@ July 2, 2018</p>
 <li>Search using indexOf can reduce the process cost of more than 99 % from the linear search and the search using hash.</li>
 <li>From these results, it is considered that the scan for indexOf() may be different from the general for loop.</li>
 </ul>
-
 <p>As a note, I have to describe that this is the result for Google Apps Script. For other languages, this result might be difference. And also, the process cost of this report might be modified by future update of Google.</p>
-
-<p><a name="References"></a></p>
-
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
 <h1 id="references">References</h1>
-
 <ol>
 <li><a href="https://developers.google.com/apps-script/guides/services/quotas#current_limitations">Current limitations at Quotas for Google Services</a></li>
 <li><a href="https://gist.github.com/tanaikech/848aeafaac1ec676900bb78e3ce220b6">Benchmark: Loop for Array Processing using Google Apps Script</a></li>
 <li><a href="https://tanaikech.github.io/2016/10/13/improved-algorithms-for-summation-of-array-elements/">Improved Algorithms for Summation of Array Elements</a></li>
 <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/indexOf">String.prototype.indexOf()</a></li>
 </ol>
-
 <h2 id="appendix">Appendix</h2>
-
 <h3 id="scripts">Scripts</h3>
-
 <h4 id="creating-sample-arrays">Creating sample arrays</h4>
-
 <p>The function for creating an array is as follows. &ldquo;searchText&rdquo; is put to the center, top and end of the array. In this report, the script searches the index of array elements with &ldquo;searchText&rdquo; from the array including 3 &ldquo;searchText&rdquo;.</p>
-
-<pre><code class="language-javascript">function createSampleArray(max, searchText) {
-  var r = Array.apply(null, new Array(max)).map(function(_, i) {return &quot;val&quot; + ('0000000000' + i).slice(-8)});
-  // Put the search value to center of the array.
-  Array.prototype.splice.apply(r, [Math.floor(r.length / 2), 0].concat([searchText]));
-  // Put the search value to top of the array.
-  r.unshift(searchText);
-  // Put the search value to end of the array.
-  r.push(searchText);
-  return r;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">createSampleArray</span>(<span style="color:#a6e22e">max</span>, <span style="color:#a6e22e">searchText</span>) {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> Array.<span style="color:#a6e22e">apply</span>(<span style="color:#66d9ef">null</span>, <span style="color:#66d9ef">new</span> Array(<span style="color:#a6e22e">max</span>)).<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">i</span>) {<span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;val&#34;</span> <span style="color:#f92672">+</span> (<span style="color:#e6db74">&#39;0000000000&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">i</span>).<span style="color:#a6e22e">slice</span>(<span style="color:#f92672">-</span><span style="color:#ae81ff">8</span>)});
+  <span style="color:#75715e">// Put the search value to center of the array.
+</span><span style="color:#75715e"></span>  Array.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">splice</span>.<span style="color:#a6e22e">apply</span>(<span style="color:#a6e22e">r</span>, [Math.<span style="color:#a6e22e">floor</span>(<span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">/</span> <span style="color:#ae81ff">2</span>), <span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">concat</span>([<span style="color:#a6e22e">searchText</span>]));
+  <span style="color:#75715e">// Put the search value to top of the array.
+</span><span style="color:#75715e"></span>  <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">unshift</span>(<span style="color:#a6e22e">searchText</span>);
+  <span style="color:#75715e">// Put the search value to end of the array.
+</span><span style="color:#75715e"></span>  <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">searchText</span>);
+  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">r</span>;
 }
-</code></pre>
-
-<p>The array becomes like below.</p>
-
+</code></pre></div><p>The array becomes like below.</p>
 <pre><code>[
   &quot;searchText&quot;,
   &quot;val00000000&quot;,
@@ -398,65 +362,101 @@ July 2, 2018</p>
   &quot;val00000100&quot;,
   &quot;searchText&quot;
 ]
-</code></pre>
-
-<h4 id="searching-values">Searching values</h4>
-
-<pre><code class="language-javascript">// Linear search
-function linearSearch(array, searchText) {
-  var result = [];
-  for (var i = 0; i &lt; array.length; i++) {
-    if (array[i] == searchText) {
-      result.push(i);
+</code></pre><h4 id="searching-values">Searching values</h4>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// Linear search
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">linearSearch</span>(<span style="color:#a6e22e">array</span>, <span style="color:#a6e22e">searchText</span>) {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> [];
+  <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">array</span>.<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
+    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">array</span>[<span style="color:#a6e22e">i</span>] <span style="color:#f92672">==</span> <span style="color:#a6e22e">searchText</span>) {
+      <span style="color:#a6e22e">result</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">i</span>);
     }
   }
-  return result;
+  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">result</span>;
 }
 
-// Search using hash
-function hashSearch(array, searchText) {
-  var hash = {};
-  for (var i = 0; i &lt; array.length; i++) {
-    if (hash[array[i]]) {
-      hash[array[i]] = hash[array[i]].concat(i);
-    } else {
-      hash[array[i]] = [i];
+<span style="color:#75715e">// Search using hash
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">hashSearch</span>(<span style="color:#a6e22e">array</span>, <span style="color:#a6e22e">searchText</span>) {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">hash</span> <span style="color:#f92672">=</span> {};
+  <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">array</span>.<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
+    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">hash</span>[<span style="color:#a6e22e">array</span>[<span style="color:#a6e22e">i</span>]]) {
+      <span style="color:#a6e22e">hash</span>[<span style="color:#a6e22e">array</span>[<span style="color:#a6e22e">i</span>]] <span style="color:#f92672">=</span> <span style="color:#a6e22e">hash</span>[<span style="color:#a6e22e">array</span>[<span style="color:#a6e22e">i</span>]].<span style="color:#a6e22e">concat</span>(<span style="color:#a6e22e">i</span>);
+    } <span style="color:#66d9ef">else</span> {
+      <span style="color:#a6e22e">hash</span>[<span style="color:#a6e22e">array</span>[<span style="color:#a6e22e">i</span>]] <span style="color:#f92672">=</span> [<span style="color:#a6e22e">i</span>];
     }
   }
-  return hash[searchText];
+  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">hash</span>[<span style="color:#a6e22e">searchText</span>];
 }
 
-// Search using indexOf
-function indexofSearch(array, searchText) {
-  var result = [];
-  var base = 0;
-  var len = array.length;
-  for (var i = 0; i &lt; len; i++) {
-    var c = array.indexOf(searchText);
-    if (c &gt; -1) {
-      base += c;
-      result.push(i + base);
-      array.splice(0, c + 1);
-    } else {
-      break;
+<span style="color:#75715e">// Search using indexOf
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">indexofSearch</span>(<span style="color:#a6e22e">array</span>, <span style="color:#a6e22e">searchText</span>) {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> [];
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">base</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">len</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">array</span>.<span style="color:#a6e22e">length</span>;
+  <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">len</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
+    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">c</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">array</span>.<span style="color:#a6e22e">indexOf</span>(<span style="color:#a6e22e">searchText</span>);
+    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">c</span> <span style="color:#f92672">&gt;</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) {
+      <span style="color:#a6e22e">base</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">c</span>;
+      <span style="color:#a6e22e">result</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">base</span>);
+      <span style="color:#a6e22e">array</span>.<span style="color:#a6e22e">splice</span>(<span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">c</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>);
+    } <span style="color:#66d9ef">else</span> {
+      <span style="color:#66d9ef">break</span>;
     }
   }
-  return result;
+  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">result</span>;
 }
-</code></pre>
+</code></pre></div>
+  
+  <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2018%2f07%2f02%2fbenchmark-search-for-array-processing-using-google-apps-script%2f" target="_blank" title="Share on Facebook"><i class="fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2018%2f07%2f02%2fbenchmark-search-for-array-processing-using-google-apps-script%2f&via=HorribleGeek" target="_blank" title="Tweet"><i class="fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2018%2f07%2f02%2fbenchmark-search-for-array-processing-using-google-apps-script%2f" target="_blank" title="Share on Google+"><i class="fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2018%2f07%2f02%2fbenchmark-search-for-array-processing-using-google-apps-script%2f" target="_blank" title="Post to Tumblr"><i class="fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2018%2f07%2f02%2fbenchmark-search-for-array-processing-using-google-apps-script%2f" target="_blank" title="Pin it"><i class="fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2018%2f07%2f02%2fbenchmark-search-for-array-processing-using-google-apps-script%2f" target="_blank" title="Submit to Reddit"><i class="fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
 
 
   
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2018/06/26/resumable-conversion-from-csv-file-with-large-size--50-mb-to-several-spreadsheets-by-splitting-file/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2018/06/26/resumable-conversion-from-csv-file-with-large-size-50-mb-to-several-spreadsheets-by-splitting-file/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2018/06/26/resumable-conversion-from-csv-file-with-large-size--50-mb-to-several-spreadsheets-by-splitting-file/">Resumable Conversion from CSV File with Large Size (&gt; 50 MB) to Several Spreadsheets by Splitting File</a>
+      <a href="https://tanaikech.github.io/2018/06/26/resumable-conversion-from-csv-file-with-large-size-50-mb-to-several-spreadsheets-by-splitting-file/">Resumable Conversion from CSV File with Large Size (&gt; 50 MB) to Several Spreadsheets by Splitting File</a>
     </nav>
     
   </div>
@@ -486,6 +486,7 @@ function indexofSearch(array, searchText) {
 </div>
 </div>
 <script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -495,10 +496,6 @@ function indexofSearch(array, searchText) {
     }
   });
 </script>
-<script type="text/javascript"
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-</script>
-<meta http-equiv="X-UA-Compatible" CONTENT="IE=EmulateIE7" />
 
 
 <script>
@@ -513,6 +510,8 @@ function indexofSearch(array, searchText) {
     ga('send', 'pageview');
   }
 </script>
+
+
 
 
 

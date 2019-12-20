@@ -5,9 +5,11 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.49.2" />
+  <meta name="generator" content="Hugo 0.61.0" />
 
   <title>Append Values by Inserting Rows using Google Sheets API &middot; tanaike</title>
+
+    
 
   
   
@@ -30,7 +32,7 @@
   <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
 
   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
@@ -105,6 +107,12 @@
       
       
         <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
           <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
       
         </li>
@@ -165,7 +173,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/tanaikech" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
     </li>
     
 
@@ -175,7 +183,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
     </li>
     
 
@@ -264,104 +272,125 @@
 
 </div>
 
-  
-
-<p><a href="https://gist.github.com/tanaikech/7846ebcafbab8318ff74c9955a99e06b">Gists</a></p>
-
+  <p><a href="https://gist.github.com/tanaikech/7846ebcafbab8318ff74c9955a99e06b">Gists</a></p>
 <p>In the case appending values to cell by inserting rows, when <code>sheets.spreadsheets.values.append</code> is used, the values are appended to the next empty row of the last row. If you want to append values to between cells with values by inserting row, you can achieve it using <code>sheets.spreadsheets.batchUpdate</code>.</p>
-
 <p>When you use this, please use your access token.</p>
-
-<h2 id="endpoint">Endpoint :</h2>
-
+<h2 id="endpoint-">Endpoint :</h2>
 <pre><code>POST https://sheets.googleapis.com/v4/spreadsheets/### spreadsheet ID ###:batchUpdate
-</code></pre>
-
-<h2 id="request-body">Request body :</h2>
-
+</code></pre><h2 id="request-body-">Request body :</h2>
 <p>In this request body, it appends the data of &ldquo;sample1, sample2, sample3&rdquo; to &ldquo;A1:A3&rdquo; of the sheetId of &ldquo;1234567890&rdquo;. Before appends the data, it supposes that there are some values at &ldquo;A1:A3&rdquo;.</p>
-
 <p>The flow of request is as follows.</p>
-
 <ol>
 <li>Insert new row to row 1 using &ldquo;insertRange&rdquo;.</li>
 <li>Import values of &ldquo;sample1, sample2, sample3&rdquo; using &ldquo;pasteData&rdquo;.</li>
 </ol>
-
 <p>When the order of &ldquo;insertRange&rdquo; and &ldquo;pasteData&rdquo; is changed, at first, the value of &ldquo;A1:A3&rdquo; is overwritten. After this, the new row is inserted to the row 1. So it is found that the elements of &ldquo;requests&rdquo; which is an array run in the order.</p>
-
-<pre><code class="language-json">{
- &quot;requests&quot;: [
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+ <span style="color:#f92672">&#34;requests&#34;</span>: [
   {
-   &quot;insertRange&quot;: {
-    &quot;range&quot;: {
-     &quot;sheetId&quot;: 1234567890,
-     &quot;startRowIndex&quot;: 0,
-     &quot;endRowIndex&quot;: 1
+   <span style="color:#f92672">&#34;insertRange&#34;</span>: {
+    <span style="color:#f92672">&#34;range&#34;</span>: {
+     <span style="color:#f92672">&#34;sheetId&#34;</span>: <span style="color:#ae81ff">1234567890</span>,
+     <span style="color:#f92672">&#34;startRowIndex&#34;</span>: <span style="color:#ae81ff">0</span>,
+     <span style="color:#f92672">&#34;endRowIndex&#34;</span>: <span style="color:#ae81ff">1</span>
     },
-    &quot;shiftDimension&quot;: &quot;ROWS&quot;
+    <span style="color:#f92672">&#34;shiftDimension&#34;</span>: <span style="color:#e6db74">&#34;ROWS&#34;</span>
    }
   },
   {
-   &quot;pasteData&quot;: {
-    &quot;data&quot;: &quot;sample1, sample2, sample3&quot;,
-    &quot;type&quot;: &quot;PASTE_NORMAL&quot;,
-    &quot;delimiter&quot;: &quot;,&quot;,
-    &quot;coordinate&quot;: {
-     &quot;sheetId&quot;: 1234567890,
-     &quot;rowIndex&quot;: 0,
+   <span style="color:#f92672">&#34;pasteData&#34;</span>: {
+    <span style="color:#f92672">&#34;data&#34;</span>: <span style="color:#e6db74">&#34;sample1, sample2, sample3&#34;</span>,
+    <span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;PASTE_NORMAL&#34;</span>,
+    <span style="color:#f92672">&#34;delimiter&#34;</span>: <span style="color:#e6db74">&#34;,&#34;</span>,
+    <span style="color:#f92672">&#34;coordinate&#34;</span>: {
+     <span style="color:#f92672">&#34;sheetId&#34;</span>: <span style="color:#ae81ff">1234567890</span>,
+     <span style="color:#f92672">&#34;rowIndex&#34;</span>: <span style="color:#ae81ff">0</span>,
     }
    }
   }
  ]
 }
-</code></pre>
+</code></pre></div><h2 id="python-sample-">Python sample :</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>():
+    credentials <span style="color:#f92672">=</span> get_credentials()
+    http <span style="color:#f92672">=</span> credentials<span style="color:#f92672">.</span>authorize(httplib2<span style="color:#f92672">.</span>Http())
+    discoveryUrl <span style="color:#f92672">=</span> (<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">https://sheets.googleapis.com/$discovery/rest?</span><span style="color:#e6db74">&#39;</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">version=v4</span><span style="color:#e6db74">&#39;</span>)
+    service <span style="color:#f92672">=</span> discovery<span style="color:#f92672">.</span>build(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">sheets</span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">v4</span><span style="color:#e6db74">&#39;</span>, http<span style="color:#f92672">=</span>http, discoveryServiceUrl<span style="color:#f92672">=</span>discoveryUrl)
 
-<h2 id="python-sample">Python sample :</h2>
-
-<pre><code class="language-python">def main():
-    credentials = get_credentials()
-    http = credentials.authorize(httplib2.Http())
-    discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?' 'version=v4')
-    service = discovery.build('sheets', 'v4', http=http, discoveryServiceUrl=discoveryUrl)
-
-    spreadsheet_id = '### spreadsheet ID ###'
-    batch_update_spreadsheet_request_body = {
-        &quot;requests&quot;: [
+    spreadsheet_id <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">### spreadsheet ID ###</span><span style="color:#e6db74">&#39;</span>
+    batch_update_spreadsheet_request_body <span style="color:#f92672">=</span> {
+        <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">requests</span><span style="color:#e6db74">&#34;</span>: [
             {
-                &quot;insertRange&quot;: {
-                    &quot;range&quot;: {
-                        &quot;sheetId&quot;: 1234567890,
-                        &quot;startRowIndex&quot;: 0,
-                        &quot;endRowIndex&quot;: 1
+                <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">insertRange</span><span style="color:#e6db74">&#34;</span>: {
+                    <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">range</span><span style="color:#e6db74">&#34;</span>: {
+                        <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">sheetId</span><span style="color:#e6db74">&#34;</span>: <span style="color:#ae81ff">1234567890</span>,
+                        <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">startRowIndex</span><span style="color:#e6db74">&#34;</span>: <span style="color:#ae81ff">0</span>,
+                        <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">endRowIndex</span><span style="color:#e6db74">&#34;</span>: <span style="color:#ae81ff">1</span>
                     },
-                    &quot;shiftDimension&quot;: &quot;ROWS&quot;
+                    <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">shiftDimension</span><span style="color:#e6db74">&#34;</span>: <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">ROWS</span><span style="color:#e6db74">&#34;</span>
                 }
             },
             {
-                &quot;pasteData&quot;: {
-                    &quot;data&quot;: &quot;sample1, sample2, sample3&quot;,
-                    &quot;type&quot;: &quot;PASTE_NORMAL&quot;,
-                    &quot;delimiter&quot;: &quot;,&quot;,
-                    &quot;coordinate&quot;: {
-                        &quot;sheetId&quot;: 1234567890,
-                        &quot;rowIndex&quot;: 0
+                <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">pasteData</span><span style="color:#e6db74">&#34;</span>: {
+                    <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">data</span><span style="color:#e6db74">&#34;</span>: <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">sample1, sample2, sample3</span><span style="color:#e6db74">&#34;</span>,
+                    <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">type</span><span style="color:#e6db74">&#34;</span>: <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">PASTE_NORMAL</span><span style="color:#e6db74">&#34;</span>,
+                    <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">delimiter</span><span style="color:#e6db74">&#34;</span>: <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">,</span><span style="color:#e6db74">&#34;</span>,
+                    <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">coordinate</span><span style="color:#e6db74">&#34;</span>: {
+                        <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">sheetId</span><span style="color:#e6db74">&#34;</span>: <span style="color:#ae81ff">1234567890</span>,
+                        <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">rowIndex</span><span style="color:#e6db74">&#34;</span>: <span style="color:#ae81ff">0</span>
                     }
                 }
             }
         ]
     }
 
-    request = service.spreadsheets().batchUpdate(spreadsheetId=spreadsheet_id, body=batch_update_spreadsheet_request_body)
-    response = request.execute()
-    print(response)
-</code></pre>
-
-<h2 id="reference">Reference :</h2>
-
+    request <span style="color:#f92672">=</span> service<span style="color:#f92672">.</span>spreadsheets()<span style="color:#f92672">.</span>batchUpdate(spreadsheetId<span style="color:#f92672">=</span>spreadsheet_id, body<span style="color:#f92672">=</span>batch_update_spreadsheet_request_body)
+    response <span style="color:#f92672">=</span> request<span style="color:#f92672">.</span>execute()
+    <span style="color:#66d9ef">print</span>(response)
+</code></pre></div><h2 id="reference-">Reference :</h2>
 <ul>
 <li><a href="https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/batchUpdate">sheets.spreadsheets.batchUpdate</a></li>
 </ul>
+
+  
+  <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2018%2f02%2f27%2fappend-values-by-inserting-rows-using-google-sheets-api%2f" target="_blank" title="Share on Facebook"><i class="fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2018%2f02%2f27%2fappend-values-by-inserting-rows-using-google-sheets-api%2f&via=HorribleGeek" target="_blank" title="Tweet"><i class="fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2018%2f02%2f27%2fappend-values-by-inserting-rows-using-google-sheets-api%2f" target="_blank" title="Share on Google+"><i class="fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2018%2f02%2f27%2fappend-values-by-inserting-rows-using-google-sheets-api%2f" target="_blank" title="Post to Tumblr"><i class="fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2018%2f02%2f27%2fappend-values-by-inserting-rows-using-google-sheets-api%2f" target="_blank" title="Pin it"><i class="fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2018%2f02%2f27%2fappend-values-by-inserting-rows-using-google-sheets-api%2f" target="_blank" title="Submit to Reddit"><i class="fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
 
 
   
@@ -384,13 +413,13 @@
   <div class="pure-u-10-24">
     
     <nav class="next">
-      <a href="https://tanaikech.github.io/2018/03/01/cli-tool---gonetatmo/">CLI Tool - gonetatmo</a>
+      <a href="https://tanaikech.github.io/2018/03/01/cli-tool-gonetatmo/">CLI Tool - gonetatmo</a>
     </nav>
     
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
     
-    <a href="https://tanaikech.github.io/2018/03/01/cli-tool---gonetatmo/"><i class="fa fa-chevron-right"></i></a>
+    <a href="https://tanaikech.github.io/2018/03/01/cli-tool-gonetatmo/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
@@ -404,6 +433,7 @@
 </div>
 </div>
 <script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -413,10 +443,6 @@
     }
   });
 </script>
-<script type="text/javascript"
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-</script>
-<meta http-equiv="X-UA-Compatible" CONTENT="IE=EmulateIE7" />
 
 
 <script>
@@ -434,6 +460,11 @@
 
 
 
+
+
+<script src="https://tanaikech.github.io/js/math-code.js"></script>
+  <script async src="//cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  
 
 
 </body>

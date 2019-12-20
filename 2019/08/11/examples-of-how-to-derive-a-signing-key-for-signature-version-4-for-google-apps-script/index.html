@@ -5,9 +5,11 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.49.2" />
+  <meta name="generator" content="Hugo 0.61.0" />
 
   <title>Examples of How to Derive a Signing Key for Signature Version 4 for Google Apps Script &middot; tanaike</title>
+
+    
 
   
   
@@ -30,7 +32,7 @@
   <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
 
   
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
 
   
   <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
@@ -105,6 +107,12 @@
       
       
         <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
           <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
       
         </li>
@@ -165,7 +173,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/tanaikech" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
     </li>
     
 
@@ -175,7 +183,7 @@
 
     
     <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" target="_blank"><i class="fa fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
     </li>
     
 
@@ -262,91 +270,108 @@
 
 </div>
 
-  
-
-<p><a href="https://gist.github.com/tanaikech/97a2787db7be94180a64e1f4c194d415">Gists</a></p>
-
+  <p><a href="https://gist.github.com/tanaikech/97a2787db7be94180a64e1f4c194d415">Gists</a></p>
 <p>This is a sample script for &ldquo;<a href="https://docs.aws.amazon.com/general/latest/gr/signature-v4-examples.html">Examples of How to Derive a Signing Key for Signature Version 4</a>&rdquo; using Google Apps Script.</p>
-
 <p>In order to use <a href="https://aws.amazon.com/tools/#sdk">AWS SDKs</a>, there are the sample scripts for the languages of Java, .NET (C#), Python, Ruby, JavaScript (Node.js). But the sample script of Google Apps Script is not prepared. I saw <a href="https://stackoverflow.com/q/57439671">the question</a> related to this at Stackoverflow. So I would like to also introduce the sample script here.</p>
-
 <p>In <a href="https://docs.aws.amazon.com/general/latest/gr/signature-v4-examples.html">the sample scripts</a>, the input values are as follows.</p>
-
 <pre><code>key = 'wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY'
 dateStamp = '20120215'
 regionName = 'us-east-1'
 serviceName = 'iam'
-</code></pre>
-
-<p>From above values, the following value is required to be retrieved.</p>
-
+</code></pre><p>From above values, the following value is required to be retrieved.</p>
 <pre><code>f4780e2d9f65fa895f9c67b32ce1baf0b0d8a43505a000a1a9e090d414db404d
-</code></pre>
-
-<p>In this report, above process is achieved with Google Apps Script.</p>
-
+</code></pre><p>In this report, above process is achieved with Google Apps Script.</p>
 <h3 id="important-points">Important points:</h3>
-
 <ul>
-<li><p>At Google Apps Script, the data which was encrypted by <code>Utilities.computeHmacSha256Signature()</code> is the bytes array of the signed hexadecimal. In <a href="https://docs.aws.amazon.com/general/latest/gr/signature-v4-examples.html">the sample scripts</a>, the bytes array is converted to the unsigned hexadecimal. So it is required to be converted.</p>
-
+<li>
+<p>At Google Apps Script, the data which was encrypted by <code>Utilities.computeHmacSha256Signature()</code> is the bytes array of the signed hexadecimal. In <a href="https://docs.aws.amazon.com/general/latest/gr/signature-v4-examples.html">the sample scripts</a>, the bytes array is converted to the unsigned hexadecimal. So it is required to be converted.</p>
 <ul>
 <li>But, when the byte array is created by <code>Utilities.computeHmacSha256Signature()</code>, the created byte array can be used for <code>Utilities.computeHmacSha256Signature()</code> without converting.</li>
-</ul></li>
 </ul>
-
+</li>
+</ul>
 <p>From above situation, the sample script for Google Apps Script can be made as follows.</p>
-
 <h3 id="sample-script">Sample script:</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
+  <span style="color:#75715e">// These are the sample values of https://docs.aws.amazon.com/general/latest/gr/signature-v4-examples.html
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">key</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY&#34;</span>;
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dateStamp</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;20120215&#34;</span>;
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">regionName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;us-east-1&#34;</span>;
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">serviceName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;iam&#34;</span>;
 
-<pre><code class="language-javascript">function myFunction() {
-  // These are the sample values of https://docs.aws.amazon.com/general/latest/gr/signature-v4-examples.html
-  var key = &quot;wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY&quot;;
-  var dateStamp = &quot;20120215&quot;;
-  var regionName = &quot;us-east-1&quot;;
-  var serviceName = &quot;iam&quot;;
-
-  // I prepared the following script.
-  var kDate = Utilities.computeHmacSha256Signature(dateStamp, &quot;AWS4&quot; + key);
-  var kRegion = Utilities.computeHmacSha256Signature(
-    Utilities.newBlob(regionName).getBytes(),
-    kDate
+  <span style="color:#75715e">// I prepared the following script.
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">kDate</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">computeHmacSha256Signature</span>(<span style="color:#a6e22e">dateStamp</span>, <span style="color:#e6db74">&#34;AWS4&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">key</span>);
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">kRegion</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">computeHmacSha256Signature</span>(
+    <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">newBlob</span>(<span style="color:#a6e22e">regionName</span>).<span style="color:#a6e22e">getBytes</span>(),
+    <span style="color:#a6e22e">kDate</span>
   );
-  var kService = Utilities.computeHmacSha256Signature(
-    Utilities.newBlob(serviceName).getBytes(),
-    kRegion
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">kService</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">computeHmacSha256Signature</span>(
+    <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">newBlob</span>(<span style="color:#a6e22e">serviceName</span>).<span style="color:#a6e22e">getBytes</span>(),
+    <span style="color:#a6e22e">kRegion</span>
   );
-  var kSigning = Utilities.computeHmacSha256Signature(
-    Utilities.newBlob(&quot;aws4_request&quot;).getBytes(),
-    kService
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">kSigning</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">computeHmacSha256Signature</span>(
+    <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">newBlob</span>(<span style="color:#e6db74">&#34;aws4_request&#34;</span>).<span style="color:#a6e22e">getBytes</span>(),
+    <span style="color:#a6e22e">kService</span>
   );
-  kSigning = kSigning
-    .map(function(e) {
-      return (&quot;0&quot; + (e &lt; 0 ? e + 256 : e).toString(16)).slice(-2);
+  <span style="color:#a6e22e">kSigning</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">kSigning</span>
+    .<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
+      <span style="color:#66d9ef">return</span> (<span style="color:#e6db74">&#34;0&#34;</span> <span style="color:#f92672">+</span> (<span style="color:#a6e22e">e</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">e</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">256</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>).<span style="color:#a6e22e">toString</span>(<span style="color:#ae81ff">16</span>)).<span style="color:#a6e22e">slice</span>(<span style="color:#f92672">-</span><span style="color:#ae81ff">2</span>);
     })
-    .join(&quot;&quot;);
-  Logger.log(kSigning); // Result
-}
-</code></pre>
-
-<ul>
+    .<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;&#34;</span>);
+  <span style="color:#a6e22e">Logger</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">kSigning</span>); <span style="color:#75715e">// Result
+</span><span style="color:#75715e"></span>}
+</code></pre></div><ul>
 <li>About above script, for example, <code>kDate</code> is the byte array. So <code>regionName</code> is required to be converted to the byte array. Please be careful this.</li>
 </ul>
-
 <h3 id="result">Result:</h3>
-
 <p>When above script is run, the following value can be retrieved. This value is the same with the <a href="https://docs.aws.amazon.com/general/latest/gr/signature-v4-examples.html">sample value</a>.</p>
-
 <pre><code>f4780e2d9f65fa895f9c67b32ce1baf0b0d8a43505a000a1a9e090d414db404d
-</code></pre>
-
-<h3 id="references">References:</h3>
-
+</code></pre><h3 id="references">References:</h3>
 <ul>
 <li><a href="https://developers.google.com/apps-script/reference/utilities/utilities#computehmacsha256signaturevalue-key_4">computeHmacSha256Signature(value, key)</a></li>
 <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map">map()</a></li>
 <li><a href="https://stackoverflow.com/q/57439671">How to HMAC SHA256 sign a string with a double array key or an hex string key using google apps script?</a></li>
 </ul>
+
+  
+  <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2019%2f08%2f11%2fexamples-of-how-to-derive-a-signing-key-for-signature-version-4-for-google-apps-script%2f" target="_blank" title="Share on Facebook"><i class="fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2019%2f08%2f11%2fexamples-of-how-to-derive-a-signing-key-for-signature-version-4-for-google-apps-script%2f&via=HorribleGeek" target="_blank" title="Tweet"><i class="fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f08%2f11%2fexamples-of-how-to-derive-a-signing-key-for-signature-version-4-for-google-apps-script%2f" target="_blank" title="Share on Google+"><i class="fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2019%2f08%2f11%2fexamples-of-how-to-derive-a-signing-key-for-signature-version-4-for-google-apps-script%2f" target="_blank" title="Post to Tumblr"><i class="fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f08%2f11%2fexamples-of-how-to-derive-a-signing-key-for-signature-version-4-for-google-apps-script%2f" target="_blank" title="Pin it"><i class="fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2019%2f08%2f11%2fexamples-of-how-to-derive-a-signing-key-for-signature-version-4-for-google-apps-script%2f" target="_blank" title="Submit to Reddit"><i class="fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
 
 
   
@@ -369,13 +394,13 @@ serviceName = 'iam'
   <div class="pure-u-10-24">
     
     <nav class="next">
-      <a href="https://tanaikech.github.io/2019/08/23/updated-python-library---getfilelistpy/">Updated: python library - getfilelistpy</a>
+      <a href="https://tanaikech.github.io/2019/08/23/updated-python-library-getfilelistpy/">Updated: python library - getfilelistpy</a>
     </nav>
     
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
     
-    <a href="https://tanaikech.github.io/2019/08/23/updated-python-library---getfilelistpy/"><i class="fa fa-chevron-right"></i></a>
+    <a href="https://tanaikech.github.io/2019/08/23/updated-python-library-getfilelistpy/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
@@ -389,6 +414,7 @@ serviceName = 'iam'
 </div>
 </div>
 <script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
@@ -398,10 +424,6 @@ serviceName = 'iam'
     }
   });
 </script>
-<script type="text/javascript"
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML">
-</script>
-<meta http-equiv="X-UA-Compatible" CONTENT="IE=EmulateIE7" />
 
 
 <script>
@@ -416,6 +438,8 @@ serviceName = 'iam'
     ga('send', 'pageview');
   }
 </script>
+
+
 
 
 
