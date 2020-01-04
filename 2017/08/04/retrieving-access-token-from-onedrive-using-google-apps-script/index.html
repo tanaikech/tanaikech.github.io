@@ -308,21 +308,41 @@
 </ol>
 <h2 id="onedrive-side">OneDrive side</h2>
 <ol>
-<li>Add new application at <a href="https://apps.dev.microsoft.com">https://apps.dev.microsoft.com</a>.
+<li>Log in to <a href="https://portal.azure.com/">Microsoft Azure portal</a>.</li>
+<li>Search &ldquo;Azure Active Directory&rdquo; at the top of text input box. And open &ldquo;Azure Active Directory&rdquo;.</li>
+<li>Click &ldquo;App registrations&rdquo; at the left side bar.
 <ul>
-<li>Enable &ldquo;Guided Setup&rdquo;.</li>
+<li>In my environment, when I used Chrome as the browser, no response occurred. So in that case, I used Microsoft Edge.</li>
 </ul>
 </li>
-<li>Retrieve application ID. This is client ID.</li>
-<li>By creating new password, retrieve application secret. This is client secret.</li>
-<li>Add platform. Select WEB.</li>
-<li>Input <code>https://script.google.com/macros/s/###/usercallback</code> as redirect uri. This URL is from &ldquo;Google side&rdquo;.</li>
-<li>Click save button.</li>
+<li>Click &ldquo;New registration&rdquo;
+<ol>
+<li>app name: &ldquo;sample app name&rdquo;</li>
+<li>Supported account types: &ldquo;Accounts in any organizational directory (Any Azure AD directory - Multitenant) and personal Microsoft accounts (e.g. Skype, Xbox)&rdquo;</li>
+<li>Redirect URI (optional): Web
+<ul>
+<li>URL: <a href="https://script.google.com/macros/s/###/usercallback">https://script.google.com/macros/s/###/usercallback</a></li>
+</ul>
+</li>
+<li>Click &ldquo;Register&rdquo;</li>
+</ol>
+</li>
+<li>Copy <strong>&ldquo;Application (client) ID&rdquo;</strong>.</li>
+<li>Click &ldquo;Certificates &amp; secrets&rdquo; at the left side bar.
+<ol>
+<li>Click &ldquo;New client secrets&rdquo;.</li>
+<li>After input the description and select &ldquo;expire&rdquo;, click &ldquo;Add&rdquo; button.</li>
+<li>Copy <strong>the created secret value</strong>.</li>
+</ol>
+</li>
 </ol>
 <p>By above operation, the preparation is done.</p>
-<h2 id="launch-script">Launch Script</h2>
+<h2 id="launch-script-google-side">Launch Script: Google side</h2>
 <p>In order to run the script, please launch as follows.</p>
-<p><strong>At first, please input &ldquo;application ID&rdquo; and &ldquo;application secret&rdquo; from OneDrive to <code>setProp()</code>. And run <code>setProp()</code>.</strong></p>
+<ol>
+<li>Input &ldquo;Application (client) ID&rdquo; and &ldquo;Created secret value&rdquo; from OneDrive to <code>clientId</code> and <code>clientSecret</code> in the function <code>setProp()</code> of the sample script of Google Apps Script.</li>
+<li>Run <code>setProp()</code>.</li>
+</ol>
 <p>As a next step, launch as follows.</p>
 <ul>
 <li>On the Script Editor
@@ -333,46 +353,55 @@
 </ul>
 </li>
 </ul>
+<p>By this, the script is run.</p>
 <h3 id="note">Note</h3>
 <p>Refresh token can be retrieved by including <code>offline_access</code> in the Scope.</p>
 <h1 id="script">Script</h1>
 <p>This is Google Apps Script.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">setProp</span>(){
- <span style="color:#a6e22e">PropertiesService</span>.<span style="color:#a6e22e">getScriptProperties</span>().<span style="color:#a6e22e">setProperties</span>({
-   <span style="color:#a6e22e">clientId</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;### application ID ###&#39;</span>,
-   <span style="color:#a6e22e">clientSecret</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;### application secret ###&#39;</span>,
-   <span style="color:#a6e22e">scope</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;offline_access files.readwrite.all&#34;</span>, <span style="color:#75715e">// This is sample. So please modify for your environment.
-</span><span style="color:#75715e"></span> });
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">setProp</span>() {
+  <span style="color:#a6e22e">PropertiesService</span>.<span style="color:#a6e22e">getScriptProperties</span>().<span style="color:#a6e22e">setProperties</span>({
+    <span style="color:#a6e22e">clientId</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;### application ID ###&#34;</span>,
+    <span style="color:#a6e22e">clientSecret</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;### application secret ###&#34;</span>,
+    <span style="color:#a6e22e">scope</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;offline_access files.readwrite.all&#34;</span> <span style="color:#75715e">// This is sample. So please modify for your environment.
+</span><span style="color:#75715e"></span>  });
 }
 
 <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">doGet</span>() {
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">prop</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">PropertiesService</span>.<span style="color:#a6e22e">getScriptProperties</span>().<span style="color:#a6e22e">getProperties</span>();
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://login.microsoftonline.com/common/oauth2/v2.0/authorize&#34;</span>;
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">param</span> <span style="color:#f92672">=</span> {
-    <span style="color:#e6db74">&#34;response_type&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;code&#34;</span>,
-    <span style="color:#e6db74">&#34;client_id&#34;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">prop</span>.<span style="color:#a6e22e">clientId</span>,
-    <span style="color:#e6db74">&#34;redirect_uri&#34;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">getCallbackURL</span>(),
-    <span style="color:#e6db74">&#34;state&#34;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">newStateToken</span>().<span style="color:#a6e22e">withMethod</span>(<span style="color:#e6db74">&#34;callback&#34;</span>).<span style="color:#a6e22e">withTimeout</span>(<span style="color:#ae81ff">300</span>).<span style="color:#a6e22e">createToken</span>(),
-    <span style="color:#e6db74">&#34;scope&#34;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">prop</span>.<span style="color:#a6e22e">scope</span>,
+    <span style="color:#a6e22e">response_type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;code&#34;</span>,
+    <span style="color:#a6e22e">client_id</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">prop</span>.<span style="color:#a6e22e">clientId</span>,
+    <span style="color:#a6e22e">redirect_uri</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">getCallbackURL</span>(),
+    <span style="color:#a6e22e">state</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">newStateToken</span>()
+      .<span style="color:#a6e22e">withMethod</span>(<span style="color:#e6db74">&#34;callback&#34;</span>)
+      .<span style="color:#a6e22e">withTimeout</span>(<span style="color:#ae81ff">300</span>)
+      .<span style="color:#a6e22e">createToken</span>(),
+    <span style="color:#a6e22e">scope</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">prop</span>.<span style="color:#a6e22e">scope</span>
   };
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> [];
-  <span style="color:#66d9ef">for</span>(<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">name</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">param</span>){
+  <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">name</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">param</span>) {
     <span style="color:#a6e22e">params</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">name</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">+</span> encodeURIComponent(<span style="color:#a6e22e">param</span>[<span style="color:#a6e22e">name</span>]));
   }
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">html</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&lt;input type=\&#34;button\&#34; value=\&#34;auth\&#34; onclick=\&#34;window.open(&#39;&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;?&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">params</span>.<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;&amp;&#34;</span>) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39;, &#39;Authorization&#39;, &#39;width=500,height=600&#39;);\&#34;&gt;&#34;</span>
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">HtmlService</span>.<span style="color:#a6e22e">createHtmlOutput</span>(<span style="color:#a6e22e">html</span>)
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">html</span> <span style="color:#f92672">=</span>
+    <span style="color:#e6db74">&#39;&lt;input type=&#34;button&#34; value=&#34;auth&#34; onclick=&#34;window.open(\&#39;&#39;</span> <span style="color:#f92672">+</span>
+    <span style="color:#a6e22e">url</span> <span style="color:#f92672">+</span>
+    <span style="color:#e6db74">&#34;?&#34;</span> <span style="color:#f92672">+</span>
+    <span style="color:#a6e22e">params</span>.<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;&amp;&#34;</span>) <span style="color:#f92672">+</span>
+    <span style="color:#e6db74">&#34;&#39;, &#39;Authorization&#39;, &#39;width=500,height=600&#39;);\&#34;&gt;&#34;</span>;
+  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">HtmlService</span>.<span style="color:#a6e22e">createHtmlOutput</span>(<span style="color:#a6e22e">html</span>);
 }
 
 <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getCallbackURL</span>() {
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getService</span>().<span style="color:#a6e22e">getUrl</span>();
   <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">url</span>.<span style="color:#a6e22e">indexOf</span>(<span style="color:#e6db74">&#34;/exec&#34;</span>) <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">0</span>) {
-    <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">url</span>.<span style="color:#a6e22e">slice</span>(<span style="color:#ae81ff">0</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">4</span>) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;usercallback&#39;</span>;
+    <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">url</span>.<span style="color:#a6e22e">slice</span>(<span style="color:#ae81ff">0</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">4</span>) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;usercallback&#34;</span>;
   }
-  <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">url</span>.<span style="color:#a6e22e">slice</span>(<span style="color:#ae81ff">0</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">3</span>) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;usercallback&#39;</span>;
+  <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">url</span>.<span style="color:#a6e22e">slice</span>(<span style="color:#ae81ff">0</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">3</span>) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;usercallback&#34;</span>;
   <span style="color:#a6e22e">PropertiesService</span>.<span style="color:#a6e22e">getScriptProperties</span>().<span style="color:#a6e22e">setProperties</span>({
-    <span style="color:#a6e22e">redirect_uri</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">url</span>,
+    <span style="color:#a6e22e">redirect_uri</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">url</span>
   });
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">url</span>
+  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">url</span>;
 }
 
 <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">callback</span>(<span style="color:#a6e22e">e</span>) {
@@ -383,20 +412,27 @@
 <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">fetchAccessToken</span>(<span style="color:#a6e22e">code</span>) {
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">prop</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">PropertiesService</span>.<span style="color:#a6e22e">getScriptProperties</span>().<span style="color:#a6e22e">getProperties</span>();
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">payload</span> <span style="color:#f92672">=</span> {
-      <span style="color:#e6db74">&#34;code&#34;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">code</span>,
-      <span style="color:#e6db74">&#34;client_id&#34;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">prop</span>.<span style="color:#a6e22e">clientId</span>,
-      <span style="color:#e6db74">&#34;client_secret&#34;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">prop</span>.<span style="color:#a6e22e">clientSecret</span>,
-      <span style="color:#e6db74">&#34;redirect_uri&#34;</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">prop</span>.<span style="color:#a6e22e">redirect_uri</span>,
-      <span style="color:#e6db74">&#34;grant_type&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;authorization_code&#34;</span>
+    <span style="color:#a6e22e">code</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">code</span>,
+    <span style="color:#a6e22e">client_id</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">prop</span>.<span style="color:#a6e22e">clientId</span>,
+    <span style="color:#a6e22e">client_secret</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">prop</span>.<span style="color:#a6e22e">clientSecret</span>,
+    <span style="color:#a6e22e">redirect_uri</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">prop</span>.<span style="color:#a6e22e">redirect_uri</span>,
+    <span style="color:#a6e22e">grant_type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;authorization_code&#34;</span>
+  };
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(
+    <span style="color:#e6db74">&#34;https://login.microsoftonline.com/common/oauth2/v2.0/token&#34;</span>,
+    {
+      <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;POST&#34;</span>,
+      <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">payload</span>,
+      <span style="color:#a6e22e">muteHttpExceptions</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>
     }
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#e6db74">&#34;https://login.microsoftonline.com/common/oauth2/v2.0/token&#34;</span>, {
-    <span style="color:#e6db74">&#34;method&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;POST&#34;</span>,
-    <span style="color:#a6e22e">payload</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">payload</span>,
-    <span style="color:#a6e22e">muteHttpExceptions</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>
-  });
+  );
   <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getContentText</span>());
 }
-</code></pre></div>
+</code></pre></div><h1 id="note-1">Note:</h1>
+<ul>
+<li>At January 3, 2019, I could know that the flow for retrieving the client ID and secret had been changed by an email. By this, I could update this. The sample script is not changed.</li>
+</ul>
+
   
 
 
