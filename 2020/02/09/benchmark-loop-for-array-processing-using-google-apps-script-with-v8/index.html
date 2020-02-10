@@ -316,7 +316,7 @@
 <blockquote>
 <p>Note: When v8 runtime is used, the comprehension like <code>[e for each (e in array)]</code> cannot be used. In this case, when the script is saved, an error occurs. Please be careful this.</p>
 </blockquote>
-<p>About the difference with and without V8 runtime, it was found that when v8 runtime is used for the loop process, the process cost could be largely reduced. For all methods of &ldquo;for loop&rdquo;, &ldquo;for in&rdquo;, &ldquo;while&rdquo;, &ldquo;forEach&rdquo;, &ldquo;map, filter&rdquo; and &ldquo;reduce&rdquo;, the process costs of 97.0 % for 1D array and 98.4 % for 2D array could be reduced.</p>
+<p>About the difference with and without V8 runtime, it was found that when v8 runtime is used for the loop process, the process cost could be largely reduced. For all methods of &ldquo;for loop&rdquo;, &ldquo;for in&rdquo;, &ldquo;while&rdquo;, &ldquo;forEach&rdquo;, &ldquo;map, filter&rdquo; and &ldquo;reduce&rdquo;, the process costs of 15709 % for 1D array and 253887 % for 2D array in the average were reduced.</p>
 <h1 id="experimental-procedure">Experimental procedure</h1>
 <p>As the samples of array, 1 dimensional and 2 dimensional array were used. The array processing was performed by &ldquo;for loop&rdquo;, &ldquo;for in&rdquo;, &ldquo;while&rdquo;, &ldquo;forEach&rdquo;, &ldquo;map, filter&rdquo; and &ldquo;reduce&rdquo;. The process time was measured and the results were compared. Then, when we see the scripts for the array processing at various sites, <code>push()</code> is often used. As another way, there is the way for using <code>new Array()</code>. In this report, the process costs of <code>push()</code> and <code>new Array()</code> were also compared. In order to measure the process cost of array processing, the script which retrieves the multiple of 5 from the elements of arrays was used as a sample script. The sample scripts of Google Apps Scripts which were used for this report are here. <a href="#samplescripts"><!-- raw HTML omitted -->a<!-- raw HTML omitted --></a> For measuring the process cost, the cost for creating array to use at the methods is not included. By the way, at GAS, the processing time is not stable as you know. So the average value for more than 100 times measurements was used for each data point which is shown by figures. At this time, the fluctuation of the average values was less than 1 %. I worry that each detailed-data point at my environment might be different from that at other user's environment. But I think that the trend of this result can be used.</p>
 <p><strong>In this report, in order to compare the process costs with and without V8 runtime, exactly the same scripts used at <a href="https://gist.github.com/tanaikech/848aeafaac1ec676900bb78e3ce220b6">Benchmark: Loop for Array Processing using Google Apps Script</a> was used.</strong></p>
@@ -339,7 +339,80 @@ Also it is found that at GAS, the costs of <code>push()</code> and <code>new Arr
 <p>Fig 4. Process costs with and without V8 for 2 dimensional array.</p>
 <!-- raw HTML omitted -->
 <p>As the additional discussion, here, the comparison of the process costs with and without V8 is introduced. The results without V8 can be seen at <a href="https://gist.github.com/tanaikech/848aeafaac1ec676900bb78e3ce220b6">here</a>.</p>
-<p>About the difference with and without V8 runtime, it was found that when v8 runtime is used for the loop process, the process cost could be largely reduced. For all methods of &ldquo;for loop&rdquo;, &ldquo;for in&rdquo;, &ldquo;while&rdquo;, &ldquo;forEach&rdquo;, &ldquo;map, filter&rdquo; and &ldquo;reduce&rdquo;, the process costs of 97.0 % for 1D array and 98.4 % for 2D array could be reduced. In this case, when all result values with and without V8 are put in a chart, the lines of the values with V8 are the same with the X-axis as shown in Figs. 3 and 4. From this result, it is considered that to use V8 runtime can largely improve the performance of the loop process ofGoogle Apps Script.</p>
+<p>About the difference with and without V8 runtime, it was found that when v8 runtime is used for the loop process, the process cost could be largely reduced. For all methods of &ldquo;for loop&rdquo;, &ldquo;for in&rdquo;, &ldquo;while&rdquo;, &ldquo;forEach&rdquo;, &ldquo;map, filter&rdquo; and &ldquo;reduce&rdquo;, the process costs of 15709 % for 1D array and 253887 % for 2D array in the average were reduced. In this case, when all result values with and without V8 are put in a chart, the lines of the values with V8 are the same with the X-axis as shown in Figs. 3 and 4. From this result, it is considered that to use V8 runtime can largely improve the performance of the loop process ofGoogle Apps Script.</p>
+<!-- raw HTML omitted -->
+<p>Table 1: Reduction (percentage) of the process cost When V8 is enabled under the same script. The calculation method is <code>(Result_with_V8 - Result_without_V8) / Result_with_V8</code>.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Methods</th>
+<th align="right">1D</th>
+<th align="right">2D</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">map,filter</td>
+<td align="right">-4464%</td>
+<td align="right">-202033%</td>
+</tr>
+<tr>
+<td align="left">for loop (newArray)</td>
+<td align="right">-40788%</td>
+<td align="right">-241181%</td>
+</tr>
+<tr>
+<td align="left">for in (newArray)</td>
+<td align="right">-1601%</td>
+<td align="right">-50574%</td>
+</tr>
+<tr>
+<td align="left">while (newArray)</td>
+<td align="right">-41573%</td>
+<td align="right">-200235%</td>
+</tr>
+<tr>
+<td align="left">foreach (newArray)</td>
+<td align="right">-8886%</td>
+<td align="right">-258614%</td>
+</tr>
+<tr>
+<td align="left">for loop (push)</td>
+<td align="right">-23059%</td>
+<td align="right">-171697%</td>
+</tr>
+<tr>
+<td align="left">for in (push)</td>
+<td align="right">-1782%</td>
+<td align="right">-54261%</td>
+</tr>
+<tr>
+<td align="left">while (push)</td>
+<td align="right">-19505%</td>
+<td align="right">-256434%</td>
+</tr>
+<tr>
+<td align="left">foreach (push)</td>
+<td align="right">-7431%</td>
+<td align="right">-253924%</td>
+</tr>
+<tr>
+<td align="left">reduce</td>
+<td align="right">-7999%</td>
+<td align="right">-253887%</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="right"></td>
+<td></td>
+</tr>
+<tr>
+<td align="left">Average</td>
+<td align="right">-15709%</td>
+<td align="right">-253887%</td>
+</tr>
+</tbody>
+</table>
 <h1 id="summary">Summary</h1>
 <p>In this report, the process cost of &ldquo;loop&rdquo; for the array processing using GAS with using V8 runtime has been investigated. As the result, it was found the following important features for GAS with V8.</p>
 <ul>
