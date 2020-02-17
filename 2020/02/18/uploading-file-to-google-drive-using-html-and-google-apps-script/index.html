@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.61.0" />
 
-  <title>tanaike</title>
+  <title>Uploading File to Google Drive using HTML and Google Apps Script &middot; tanaike</title>
 
     
 
@@ -41,9 +41,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
  
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike"
-    href='https://tanaikech.github.io/index.xml' />
   
 
   
@@ -132,11 +129,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href='https://tanaikech.github.io/index.xml'><i
-          class="fas fa-rss"></i>RSS</a>
-    </li>
     
 
     
@@ -240,21 +232,16 @@
 
 
 <div class="header">
-  <h1>tanaike</h1>
-  <h2>The Thinker</h2>
+  <h1>Uploading File to Google Drive using HTML and Google Apps Script</h1>
+  <h2></h2>
 </div>
-
 <div class="content">
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2017/05/21/decoding-json-by-golang/">Decoding JSON by Golang</a></h2>
 
-    <div class="post-meta">
+  <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>21 May 2017, 11:55</time>
+    <time>18 Feb 2020, 08:36</time>
   </div>
 
   
@@ -265,7 +252,7 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gotips">GoTips</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
     
   </div>
   
@@ -277,7 +264,9 @@
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/upload">upload</a>
     
   </div>
   
@@ -285,242 +274,63 @@
 
 </div>
 
-  </header>
+  <p><a href="https://gist.github.com/tanaikech/280b782ee0518aa083a4fe0d71384823">Gists</a></p>
+<p>This is a simple sample script for uploading a file using the file input tag of HTML. As the important point, the file is sent as the byte array for using Google Apps Script. By this, at Google Apps Script side, the byte array can be converted to a blob using a simple script.</p>
+<h3 id="html--javascript">HTML &amp; Javascript</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;file&#34;</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;file&#34;</span> <span style="color:#a6e22e">onchange</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;saveFile(this)&#34;</span> /&gt;
+&lt;<span style="color:#f92672">script</span>&gt;
+  <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">saveFile</span>(<span style="color:#a6e22e">f</span>) {
+    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">file</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">files</span>[<span style="color:#ae81ff">0</span>];
+    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">fr</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">FileReader</span>();
+    <span style="color:#a6e22e">fr</span>.<span style="color:#a6e22e">onload</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
+      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> {
+        <span style="color:#a6e22e">filename</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">name</span>,
+        <span style="color:#a6e22e">mimeType</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">type</span>,
+        <span style="color:#a6e22e">bytes</span><span style="color:#f92672">:</span> [...<span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Int8Array</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">result</span>)]
+      };
+      <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">script</span>.<span style="color:#a6e22e">run</span>.<span style="color:#a6e22e">withSuccessHandler</span>(<span style="color:#a6e22e">e</span> =&gt; <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">e</span>)).<span style="color:#a6e22e">saveFile</span>(<span style="color:#a6e22e">obj</span>);
+    };
+    <span style="color:#a6e22e">fr</span>.<span style="color:#a6e22e">readAsArrayBuffer</span>(<span style="color:#a6e22e">file</span>);
+  }
+&lt;/<span style="color:#f92672">script</span>&gt;
+</code></pre></div><h3 id="google-apps-script">Google Apps Script</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">saveFile</span>(<span style="color:#a6e22e">e</span>) {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">blob</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">newBlob</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">bytes</span>, <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">mimeType</span>, <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">filename</span>);
+  <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">createFile</span>(<span style="color:#a6e22e">blob</span>);
+  <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Done.&#34;</span>;
+}
+</code></pre></div>
+  
 
-  <p>
-  Decoding JSON by Golang
-func main() { data := `{ &quot;A_key1&quot;: { &quot;B_key1&quot;: { &quot;C_key&quot;: &quot;value&quot; } }, &quot;A_key2&quot;: { &quot;B_key2&quot;: { &quot;C_key&quot;: &quot;value&quot; } }, &quot;A_key3&quot;: { &quot;B_key3&quot;: { &quot;C_key&quot;: &quot;value&quot; } }, &quot;A_key4&quot;: { &quot;B_key4&quot;: { &quot;C_key&quot;: &quot;value&quot; } }, &quot;A_key5&quot;: { &quot;B_key5&quot;: { &quot;C_key&quot;: &quot;value&quot; } } }` var p interface{} json.NewDecoder(strings.NewReader(data)).Decode(&amp;p) fmt.Println(p) } Go Playground
-  </p>
 
   
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2017/05/21/dynamically-creating-json-by-golang/">Dynamically Creating JSON by Golang</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>21 May 2017, 10:55</time>
-  </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gotips">GoTips</a>
-    
-  </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>
+    <a href="https://tanaikech.github.io/2020/02/17/google-apps-script-library-database-and-search-application/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
-  
-  
-
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2020/02/17/google-apps-script-library-database-and-search-application/">Google Apps Script Library Database and Search Application</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
 </div>
 
-  </header>
-
-  <p>
-  Dynamically Creating JSON by Golang
-obj := map[string]interface{}{} obj[&quot;hoge&quot;] = &quot;huga&quot; fmt.Println(obj) Go Playground
-  </p>
-
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2017/05/21/retrieving-response-headers-by-golang/">Retrieving Response Headers by Golang</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>21 May 2017, 10:43</time>
-  </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gotips">GoTips</a>
-    
-  </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>
-    
-  </div>
-  
-  
-
-</div>
-
-  </header>
-
-  <p>
-  Retrieving Response Headers by Golang
-res, _ := client.Do(req) contentType := res.Header.Get(&quot;Content-Type&quot;) contentLength := res.Header.Get(&quot;Content-Length&quot;) 
-  </p>
-
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2017/05/19/updated-ggsrun-to-v120/">Updated ggsrun to v120</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>19 May 2017, 08:49</time>
-  </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/clitool">CLITool</a>
-    
-  </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/ggsrun">ggsrun</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/cli">CLI</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>
-    
-  </div>
-  
-  
-
-</div>
-
-  </header>
-
-  <p>
-  ggsrun was updated to v.1.2.0  Added a command for retrieving revision files on Google Drive. Some modifications.  You can check this at here.
-  </p>
-
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2017/05/16/updated-cli-tool-goris/">Updated: CLI Tool - goris</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>16 May 2017, 12:56</time>
-  </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/clitool">CLITool</a>
-    
-  </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google">Google</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/cli">CLI</a>
-    
-  </div>
-  
-  
-
-</div>
-
-  </header>
-
-  <p>
-  goris is a CLI tool to search for images with Google Reverse Image Search.
-Today, it was updated to v1.0.1. Please check it out. https://github.com/tanaikech/goris
-When number of retrieved URLs is smaller than number of default output, an error had occurred. This was fixed.
-  </p>
-
-  
-</article>
-
-  
-
-  
 
 
-<nav class="pagination" role="pagination">
   
-  <a href="https://tanaikech.github.io/page/59/"><i class="fa fa-chevron-left"></i></a>
-  
-  <span>&nbsp;60 / 70&nbsp;</span>
-  
-  <a href="https://tanaikech.github.io/page/61/"><i class="fa fa-chevron-right"></i></a>
-  
-</nav>
-
-
 
 </div>
 
