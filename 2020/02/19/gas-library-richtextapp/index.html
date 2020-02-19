@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.61.0" />
 
-  <title>Uploading File to Google Drive using HTML and Google Apps Script &middot; tanaike</title>
+  <title>GAS Library - RichTextApp &middot; tanaike</title>
 
     
 
@@ -232,7 +232,7 @@
 
 
 <div class="header">
-  <h1>Uploading File to Google Drive using HTML and Google Apps Script</h1>
+  <h1>GAS Library - RichTextApp</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -241,7 +241,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>18 Feb 2020, 08:36</time>
+    <time>19 Feb 2020, 14:28</time>
   </div>
 
   
@@ -252,7 +252,9 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>
     
   </div>
   
@@ -266,7 +268,11 @@
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/upload">upload</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">Spreadsheet</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/rich-text">rich text</a>
     
   </div>
   
@@ -274,32 +280,35 @@
 
 </div>
 
-  <p><a href="https://gist.github.com/tanaikech/280b782ee0518aa083a4fe0d71384823">Gists</a></p>
-<p>This is a simple sample script for uploading a file using the file input tag of HTML. As the important point, the file is sent as the byte array for using Google Apps Script. By this, at Google Apps Script side, the byte array can be converted to a blob using a simple script.</p>
-<h3 id="html--javascript">HTML &amp; Javascript</h3>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;file&#34;</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;file&#34;</span> <span style="color:#a6e22e">onchange</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;saveFile(this)&#34;</span> /&gt;
-&lt;<span style="color:#f92672">script</span>&gt;
-  <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">saveFile</span>(<span style="color:#a6e22e">f</span>) {
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">file</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">files</span>[<span style="color:#ae81ff">0</span>];
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">fr</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">FileReader</span>();
-    <span style="color:#a6e22e">fr</span>.<span style="color:#a6e22e">onload</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
-      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> {
-        <span style="color:#a6e22e">filename</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">name</span>,
-        <span style="color:#a6e22e">mimeType</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">type</span>,
-        <span style="color:#a6e22e">bytes</span><span style="color:#f92672">:</span> [...<span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Int8Array</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">result</span>)]
-      };
-      <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">script</span>.<span style="color:#a6e22e">run</span>.<span style="color:#a6e22e">withSuccessHandler</span>(<span style="color:#a6e22e">e</span> =&gt; <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">e</span>)).<span style="color:#a6e22e">saveFile</span>(<span style="color:#a6e22e">obj</span>);
-    };
-    <span style="color:#a6e22e">fr</span>.<span style="color:#a6e22e">readAsArrayBuffer</span>(<span style="color:#a6e22e">file</span>);
-  }
-&lt;/<span style="color:#f92672">script</span>&gt;
-</code></pre></div><h3 id="google-apps-script">Google Apps Script</h3>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">saveFile</span>(<span style="color:#a6e22e">e</span>) {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">blob</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">newBlob</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">bytes</span>, <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">mimeType</span>, <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">filename</span>);
-  <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">createFile</span>(<span style="color:#a6e22e">blob</span>);
-  <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Done.&#34;</span>;
-}
-</code></pre></div>
+  <h1 id="overview">Overview</h1>
+<p><img src="https://github.com/tanaikech/RichTextApp/raw/master/images/fig1.png" alt=""></p>
+<p><strong>This is a GAS library for copying the rich text with the text styles from Google Document to Google Spreadsheet or from Google Spreadsheet to Google Document using Google Apps Script (GAS).</strong></p>
+<h2 id="description">Description</h2>
+<p>Google Spreadsheet can use the rich text as the cell value. But I thought that it is difficult for me to directly edit the rich text in a cell. So I wanted to copy the rich text, that I edited at the Google Document, to the cell of Google Spreadsheet. But, unfortunately, when the rich text in Google Document is manually copied to a cell in Google Spreadsheet, the text style is removed. By this, only text values are copied. It seemed that this was the current specification. So in order to achieve above, I created this as a library.</p>
+<p>This library can do as follows.</p>
+<ol>
+<li>
+<p>Rich text in Google Document can be copied to the cell of Google Spreadsheet with keeping the text style.</p>
+</li>
+<li>
+<p>Rich text in the cell of Google Spreadsheet can be copied to Google Document with keeping the text style.</p>
+</li>
+</ol>
+<h2 id="available-text-styles">Available text styles</h2>
+<p>In the current stage, the rich text of Google Spreadsheet can use the following text styles. <a href="https://developers.google.com/apps-script/reference/spreadsheet/text-style-builder">Ref1</a>, <a href="https://developers.google.com/apps-script/reference/spreadsheet/text-style">Ref2</a></p>
+<ul>
+<li>Font family of the text</li>
+<li>Font size of the text in points</li>
+<li>Font color of the text</li>
+<li>bold</li>
+<li>italic</li>
+<li>strikethrough</li>
+<li>underlined</li>
+</ul>
+<h1 id="librarys-project-key">Library's project key</h1>
+<pre><code>1Ka6RcIG6G9P8AhkJtjy1DAnHk1_rShFPWtdCQ2bxwMsrRE8cfn0cDXBv
+</code></pre><p><strong>You can see the detail information here <a href="https://github.com/tanaikech/RichTextApp">https://github.com/tanaikech/RichTextApp</a></strong></p>
+
   
 
 
@@ -307,13 +316,13 @@
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2020/02/17/google-apps-script-library-database-and-search-application/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2020/02/18/uploading-file-to-google-drive-using-html-and-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2020/02/17/google-apps-script-library-database-and-search-application/">Google Apps Script Library Database and Search Application</a>
+      <a href="https://tanaikech.github.io/2020/02/18/uploading-file-to-google-drive-using-html-and-google-apps-script/">Uploading File to Google Drive using HTML and Google Apps Script</a>
     </nav>
     
   </div>
@@ -322,14 +331,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2020/02/19/gas-library-richtextapp/">GAS Library - RichTextApp</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2020/02/19/gas-library-richtextapp/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
