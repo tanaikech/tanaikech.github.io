@@ -278,6 +278,7 @@
 
   <p><a href="https://gist.github.com/tanaikech/3331e1e631d619abef8f32c4be14ba3a">Gists</a></p>
 <p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h1 id="benchmark-loop-for-array-processing-using-google-apps-script-with-v8">Benchmark: Loop for Array Processing using Google Apps Script with V8</h1>
 <!-- raw HTML omitted -->
 <p>Kanshi Tanaike</p>
 <!-- raw HTML omitted -->
@@ -317,31 +318,42 @@
 <li><code>array.reduce(function(ar,e){e},[])</code></li>
 </ul>
 </li>
+<li>for of
+<ul>
+<li><code>for (var e of array) {e}</code></li>
+</ul>
+</li>
+<li>for of with iterator
+<ul>
+<li><code>for (var e of array[Symbol.iterator]()) {e}</code></li>
+</ul>
+</li>
 </ol>
 <p>As the result, it was found that when v8 runtime is used, the process costs of methods except for &ldquo;for in&rdquo; were almost the same for the array processing of both 1 dimensional and 2 dimensional array. The process costs of &ldquo;for loop&rdquo;, &ldquo;while&rdquo;, &ldquo;forEach&rdquo;, &ldquo;map, filter&rdquo; and &ldquo;reduce&rdquo; were not changed with increasing the array length. At &ldquo;for in&rdquo;, when the array length is large, the process cost was linearly increased. Also it was found that at GAS, the cost of <code>push()</code> and <code>new Array()</code> was almost the same.</p>
 <blockquote>
 <p>Note: When v8 runtime is used, the comprehension like <code>[e for each (e in array)]</code> cannot be used. In this case, when the script is saved, an error occurs. Please be careful this.</p>
 </blockquote>
-<p>About the difference with and without V8 runtime, it was found that when v8 runtime is used for the loop process, the process cost could be largely reduced. For all methods of &ldquo;for loop&rdquo;, &ldquo;for in&rdquo;, &ldquo;while&rdquo;, &ldquo;forEach&rdquo;, &ldquo;map, filter&rdquo; and &ldquo;reduce&rdquo;, the process costs of 15709 % for 1D array and 253887 % for 2D array in the average were reduced.</p>
+<p>About the difference with and without V8 runtime, it was found that when v8 runtime is used for the loop process, the process cost could be largely reduced. For all methods of &ldquo;for loop&rdquo;, &ldquo;for in&rdquo;, &ldquo;while&rdquo;, &ldquo;forEach&rdquo;, &ldquo;map, filter&rdquo; and &ldquo;reduce&rdquo;, the process costs of 15709 % for 1D array and 253887 % for 2D array in the average were reduced. About &ldquo;for of&rdquo; and &ldquo;for of with iterator&rdquo;, these cannot be used without V8. So in this case, the values of 15709 % and 253887 % don't include them.</p>
 <h1 id="experimental-procedure">Experimental procedure</h1>
 <p>As the samples of array, 1 dimensional and 2 dimensional array were used. The array processing was performed by &ldquo;for loop&rdquo;, &ldquo;for in&rdquo;, &ldquo;while&rdquo;, &ldquo;forEach&rdquo;, &ldquo;map, filter&rdquo; and &ldquo;reduce&rdquo;. The process time was measured and the results were compared. Then, when we see the scripts for the array processing at various sites, <code>push()</code> is often used. As another way, there is the way for using <code>new Array()</code>. In this report, the process costs of <code>push()</code> and <code>new Array()</code> were also compared. In order to measure the process cost of array processing, the script which retrieves the multiple of 5 from the elements of arrays was used as a sample script. The sample scripts of Google Apps Scripts which were used for this report are here. <a href="#samplescripts"><!-- raw HTML omitted -->a<!-- raw HTML omitted --></a> For measuring the process cost, the cost for creating array to use at the methods is not included. By the way, at GAS, the processing time is not stable as you know. So the average value for more than 100 times measurements was used for each data point which is shown by figures. At this time, the fluctuation of the average values was less than 1 %. I worry that each detailed-data point at my environment might be different from that at other user's environment. But I think that the trend of this result can be used.</p>
 <p><strong>In this report, in order to compare the process costs with and without V8 runtime, exactly the same scripts used at <a href="https://gist.github.com/tanaikech/848aeafaac1ec676900bb78e3ce220b6">Benchmark: Loop for Array Processing using Google Apps Script</a> was used.</strong></p>
 <h1 id="results">Results</h1>
-<p><img src="https://tanaikech.github.io/img/20200209a-fig1.png" alt=""></p>
+<p><img src="20200209a-fig1.png" alt=""></p>
 <p>Fig 1. Number of elements vs. processing time for 1 dimensional array.</p>
 <!-- raw HTML omitted -->
-<p><img src="https://tanaikech.github.io/img/20200209a-fig2.png" alt=""></p>
+<p><img src="20200209a-fig2.png" alt=""></p>
 <p>Fig 2. Number of elements vs. processing time for 2 dimensional array.</p>
 <!-- raw HTML omitted -->
 <p>Figures 1 and 2 show that the number of elements vs. processing time for 1 and 2 dimensional arrays, respectively. The results of <code>push()</code> and <code>new Array()</code> are also included in these figures.</p>
-<p>From both figures, it can be seen the 2 patterns. One is the lines which linearly increase. Another is the lines in almost parallel to the X-axis. The lines which linearly increases are &ldquo;for in&rdquo;. The lines in almost parallel to the X-axis are &ldquo;for loop&rdquo;, &ldquo;while&rdquo;, &ldquo;forEach&rdquo;, &ldquo;map, filter&rdquo; and &ldquo;reduce&rdquo;. From these lines in almost parallel to the X-axis, it is found that the process costs of &ldquo;for loop&rdquo;, &ldquo;while&rdquo;, &ldquo;forEach&rdquo;, &ldquo;map, filter&rdquo; and &ldquo;reduce&rdquo; are almost the same.
-Also it is found that at GAS, the costs of <code>push()</code> and <code>new Array()</code> were almost the same. This is the interesting result. This is the important result for using Google Apps Script with V8 runtime.</p>
+<p>From both figures, it can be seen the 2 patterns. One is the lines which linearly increase. Another is the lines in almost parallel to the X-axis. The lines which linearly increases are &ldquo;for in&rdquo;. The lines in almost parallel to the X-axis are &ldquo;for loop&rdquo;, &ldquo;while&rdquo;, &ldquo;forEach&rdquo;, &ldquo;map, filter&rdquo;, &ldquo;reduce&rdquo; , &ldquo;for of&rdquo; and &ldquo;for of with iterator&rdquo;. From these lines in almost parallel to the X-axis, it is found that the process costs of &ldquo;for loop&rdquo;, &ldquo;while&rdquo;, &ldquo;forEach&rdquo;, &ldquo;map, filter&rdquo;, &ldquo;reduce&rdquo;, &ldquo;for of&rdquo; and &ldquo;for of with iterator&quot;are almost the same.</p>
+<p>Here, when &ldquo;for of&rdquo; and &ldquo;for of with iterator&rdquo; are compared, the cost of &ldquo;for of&rdquo; is a bit lower than that of &ldquo;for of with iterator&rdquo;. It is considered that this is due to the cost for creating the iterator.</p>
+<p>Also it is found that at GAS, the costs of <code>push()</code> and <code>new Array()</code> were almost the same. This is the interesting result. This is the important result for using Google Apps Script with V8 runtime.</p>
 <p>Here, it can be seen that the process cost of 1D array is higher than that of 2D array. At the 1D array, when the number of element is increased, the number of element in the 1D array is increased. On the other hand, at the 2D array, even when the number of element is increased, each array length of 2D array is 1,000. It means that the 1D array, which is the element of 2D array, is the constant length. Then, when the number of element is increased, the number of each element in 2D array is increased. It is considered that it is due to this different. For example, it supposes that the process costs for 1D and 2D arrays are measured with the condition of the number of element of 1,000,000. In this case, at 1D array, 1,000,000 elements are put in an array and it is measured. At 2D array, 1,000,000 elements are that one 1D array of 1,000 elements is put in an array of 1,000 times.</p>
 <h2 id="compare-process-costs-with-and-without-v8">Compare process costs with and without V8</h2>
-<p><img src="https://tanaikech.github.io/img/20200209a-fig3.png" alt=""></p>
+<p><img src="20200209a-fig3.png" alt=""></p>
 <p>Fig 3. Process costs with and without V8 for 1 dimensional array.</p>
 <!-- raw HTML omitted -->
-<p><img src="https://tanaikech.github.io/img/20200209a-fig4.png" alt=""></p>
+<p><img src="20200209a-fig4.png" alt=""></p>
 <p>Fig 4. Process costs with and without V8 for 2 dimensional array.</p>
 <!-- raw HTML omitted -->
 <p>As the additional discussion, here, the comparison of the process costs with and without V8 is introduced. The results without V8 can be seen at <a href="https://gist.github.com/tanaikech/848aeafaac1ec676900bb78e3ce220b6">here</a>.</p>
@@ -408,6 +420,16 @@ Also it is found that at GAS, the costs of <code>push()</code> and <code>new Arr
 <td align="right">-253887%</td>
 </tr>
 <tr>
+<td align="left">for of</td>
+<td align="right">-</td>
+<td align="right">-</td>
+</tr>
+<tr>
+<td align="left">for of with iterator</td>
+<td align="right">-</td>
+<td align="right">-</td>
+</tr>
+<tr>
 <td align="left"></td>
 <td align="right"></td>
 <td></td>
@@ -419,11 +441,12 @@ Also it is found that at GAS, the costs of <code>push()</code> and <code>new Arr
 </tr>
 </tbody>
 </table>
+<p>About &ldquo;for of&rdquo; and &ldquo;for of with iterator&rdquo;, these cannot be used without V8. So in this case, the values of 15709 % and 253887 % don't include them.</p>
 <h1 id="summary">Summary</h1>
 <p>In this report, the process cost of &ldquo;loop&rdquo; for the array processing using GAS with using V8 runtime has been investigated. As the result, it was found the following important features for GAS with V8.</p>
 <ul>
-<li>In the case of the sample script for retrieving the multiple of 5 from the array, the loop costs using &ldquo;for loop&rdquo;, &ldquo;while&rdquo;, &ldquo;forEach&rdquo;, &ldquo;map, filter&rdquo; and &ldquo;reduce&rdquo; are almost the same.</li>
-<li>In the case of &ldquo;for in&rdquo;, the process cost is higher than those of &ldquo;for loop&rdquo;, &ldquo;while&rdquo;, &ldquo;forEach&rdquo;, &ldquo;map, filter&rdquo; and &ldquo;reduce&rdquo;. But when that is compared with the condition without V8, the cost of &ldquo;for in&rdquo; with V8 is much lower than those without V8.</li>
+<li>In the case of the sample script for retrieving the multiple of 5 from the array, the loop costs using &ldquo;for loop&rdquo;, &ldquo;while&rdquo;, &ldquo;forEach&rdquo;, &ldquo;map, filter&rdquo;, &ldquo;reduce&rdquo;, &ldquo;for of&rdquo; and &ldquo;for of with iterator&rdquo; are almost the same.</li>
+<li>In the case of &ldquo;for in&rdquo;, the process cost is higher than those of &ldquo;for loop&rdquo;, &ldquo;while&rdquo;, &ldquo;forEach&rdquo;, &ldquo;map, filter&rdquo;, &ldquo;reduce&rdquo;, &ldquo;for of&rdquo; and &ldquo;for of with iterator&rdquo;. But when that is compared with the condition without V8, the cost of &ldquo;for in&rdquo; with V8 is much lower than those without V8.</li>
 <li>Costs of <code>push()</code> and <code>new Array()</code> are almost the same.</li>
 <li>When v8 runtime is used for the loop process, the process cost could be largely reduced when it is compared with the script without V8.
 <ul>
@@ -546,6 +569,23 @@ Also it is found that at GAS, the costs of <code>push()</code> and <code>new Arr
   <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">e</span> <span style="color:#f92672">%</span> <span style="color:#ae81ff">5</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">e</span>);
   <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
 }, []);
+
+<span style="color:#75715e">// for of
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> [];
+<span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">e</span> <span style="color:#66d9ef">of</span> <span style="color:#a6e22e">array</span>) {
+  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">e</span> <span style="color:#f92672">%</span> <span style="color:#ae81ff">5</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) {
+    <span style="color:#a6e22e">result</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">e</span>);
+  }
+}
+
+<span style="color:#75715e">// for of with iterator
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">it</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">array</span>[<span style="color:#a6e22e">Symbol</span>.<span style="color:#a6e22e">iterator</span>]();
+<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> [];
+<span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">e</span> <span style="color:#66d9ef">of</span> <span style="color:#a6e22e">it</span>) {
+  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">e</span> <span style="color:#f92672">%</span> <span style="color:#ae81ff">5</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) {
+    <span style="color:#a6e22e">result</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">e</span>);
+  }
+}
 </code></pre></div><h3 id="for-2-dimensional-array">For 2 dimensional array</h3>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// for loop using push()
 </span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> [];
@@ -672,6 +712,32 @@ Also it is found that at GAS, the costs of <code>push()</code> and <code>new Arr
   <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">temp</span>);
   <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
 }, []);
+
+<span style="color:#75715e">// for of
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> [];
+<span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">e</span> <span style="color:#66d9ef">of</span> <span style="color:#a6e22e">array</span>) {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> [];
+  <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">f</span> <span style="color:#66d9ef">of</span> <span style="color:#a6e22e">e</span>) {
+    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">f</span> <span style="color:#f92672">%</span> <span style="color:#ae81ff">5</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) {
+      <span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">f</span>);
+    }
+  }
+  <span style="color:#a6e22e">result</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">temp</span>);
+}
+
+<span style="color:#75715e">// for of with iterator
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">it1</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">array</span>[<span style="color:#a6e22e">Symbol</span>.<span style="color:#a6e22e">iterator</span>]();
+<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> [];
+<span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">e</span> <span style="color:#66d9ef">of</span> <span style="color:#a6e22e">it1</span>) {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">it2</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>[<span style="color:#a6e22e">Symbol</span>.<span style="color:#a6e22e">iterator</span>]();
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> [];
+  <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">f</span> <span style="color:#66d9ef">of</span> <span style="color:#a6e22e">it2</span>) {
+    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">f</span> <span style="color:#f92672">%</span> <span style="color:#ae81ff">5</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) {
+      <span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">f</span>);
+    }
+  }
+  <span style="color:#a6e22e">result</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">temp</span>);
+}
 </code></pre></div>
   
 
