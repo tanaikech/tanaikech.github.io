@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="generator" content="Hugo 0.61.0" />
+
+  <title>Benchmark: Process Costs under V8 using Google Apps Script &middot; tanaike</title>
+
+    
+
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/pure-min.css">
+
+  <!--[if lte IE 8]>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-old-ie-min.css">
+  <![endif]-->
+  <!--[if gt IE 8]><!-->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-min.css">
+  <!--<![endif]-->
+
+  <!--[if lte IE 8]>
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/side-menu-old-ie.css">
+  <![endif]-->
+  <!--[if gt IE 8]><!-->
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/side-menu.css">
+  <!--<![endif]-->
+
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
+
+  
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
+
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+ 
+  
+
+  
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/androidstudio.min.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  
+  <script>hljs.initHighlightingOnLoad();</script>
+  
+
+  <link rel="shortcut icon" href="https://tanaikech.github.io/img/favicon.ico" type="image/x-icon" />
+
+  
+  
+
+</head>
+
+
+<body>
+<div id="layout">
+
+  
+<a href="#menu" id="menuLink" class="menu-link">
+  
+  <span></span>
+</a>
+<div id="menu">
+
+  
+  <a class="pure-menu-heading brand" href="https://tanaikech.github.io/">TANAIKE</a>
+
+
+  <div class="pure-menu">
+    <ul class="pure-menu-list">
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/about/"><i class='fa fa-user fa-fw'></i>About</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/post/"><i class='fa fa-list fa-fw'></i>Posts</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/topics/"><i class='fa fa-folder fa-fw'></i>Topics</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/tags/"><i class='fa fa-tags fa-fw'></i>Tags</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/contact/"><i class='fa fa-phone fa-fw'></i>Contact</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/webapps/"><i class='fas fa-toolbox'></i>Web Applications</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
+      
+        </li>
+      
+    </ul>
+  </div>
+
+  <div class="pure-menu social">
+  <ul class="pure-menu-list">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
+    </li>
+    
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+    </li>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+  </ul>
+</div>
+
+
+  <div>
+  <div class="small-print">
+    <small>&copy; 2017. All rights reserved.</small>
+  </div>
+  <div class="small-print">
+    <small>Built with&nbsp;<a href="https://gohugo.io/" target="_blank">Hugo</a></small>
+    <small>Theme&nbsp;<a href="https://github.com/yoshiharuyamashita/blackburn" target="_blank">Blackburn</a></small>
+  </div>
+</div>
+
+</div>
+
+
+  <div id="main">
+
+
+<div class="header">
+  <h1>Benchmark: Process Costs under V8 using Google Apps Script</h1>
+  <h2></h2>
+</div>
+<div class="content">
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>22 Mar 2020, 13:46</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/report">report</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/benchmark">Benchmark</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  <p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<p><a href="">Gists</a></p>
+<h1 id="benchmark-process-costs-under-v8-using-google-apps-script">Benchmark: Process Costs under V8 using Google Apps Script</h1>
+<ul>
+<li>March 22, 2020
+<ul>
+<li>Published.</li>
+</ul>
+</li>
+</ul>
+<p>Kanshi Tanaike</p>
+<h1 id="introduction">Introduction</h1>
+<p>V8 engine got to be able to be used at Google Apps Script. By this, I have reported about the process costs with and without using V8. <a href="https://gist.github.com/tanaikech/3331e1e631d619abef8f32c4be14ba3a">Ref</a> It is considered that knowing the process costs for various methods will be useful for creating the applications with Google Apps Script. Here, I would like to introduce the process costs of each situations under V8. The situations which measured the cost are as follows.</p>
+<ol>
+<li><a href="#section1">With and without Arrow function</a></li>
+<li><a href="#section2">&ldquo;includes&rdquo; and &ldquo;indexOf&rdquo;</a></li>
+<li><a href="#section3">With and without Destructuring Assignment</a></li>
+<li><a href="#section4">With and without Map object</a></li>
+<li><a href="#section5">&ldquo;Array.prototype.push.apply&rdquo;, Spread syntax and &ldquo;concat&rdquo;</a></li>
+<li><a href="#section6">only &ldquo;reduce&rdquo;, &ldquo;Object.assign&rdquo; and Spread syntax</a></li>
+<li><a href="#section7">&ldquo;Array.from&rdquo;, only &ldquo;map&rdquo; and &ldquo;Object.entries&rdquo;</a></li>
+</ol>
+<h1 id="experimental-procedure">Experimental procedure</h1>
+<p>In this report, the following 2 dimensional array was used for the sample value. 1 dimensional array including 3 strings for searching was used as a source array. The 3 string values were put to the top, center and end of the array in order to measure the same condition. In this case, it uses all of elements in the array. The script for creating this sample array can be seen at <a href="https://gist.github.com/tanaikech/eda9234822b5dec80549216a43c52652#appendix">here</a>.</p>
+<p>By the way, at GAS, the processing time is not stable as you know. So the average value for more than 250 times measurements was used for each data point which is shown by figures. At this time, the fluctuation of the average values was less than 1 %. I worry that each detailed-data point at my environment might be different from that at other user’s environment. But I think that the trend of this result can be used.</p>
+<h1 id="results-and-discussions">Results and discussions</h1>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h2 id="1-with-and-without-arrow-function">1. With and without Arrow function</h2>
+<p>The sample script is as follows. The sample script retrieves the rows which include <code>searchText</code>. In this measurement, the array (<code>ar</code>) of 3,000,000 rows and 10 columns was used.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withArrowFunction</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt;
+  <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">filter</span>(<span style="color:#a6e22e">row</span> =&gt; <span style="color:#a6e22e">row</span>.<span style="color:#a6e22e">some</span>(<span style="color:#a6e22e">col</span> =&gt; <span style="color:#a6e22e">col</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span>));
+
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withoutArrowFunction</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt;
+  <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">filter</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">row</span>) {
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">row</span>.<span style="color:#a6e22e">some</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">col</span>) {
+      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">col</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span>;
+    });
+  });
+</code></pre></div><p>The result is as follows.</p>
+<p><img src="https://tanaikech.github.io/img/20200323a-fig1.png" alt=""></p>
+<p>From the result, it was found that the process cost with and without the arrow function was almost the same.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h2 id="2-includes-and-indexof">2. &ldquo;includes&rdquo; and &ldquo;indexOf&rdquo;</h2>
+<p>The sample script is as follows. The sample script retrieves the rows which include <code>searchText</code>. In this measurement, the array (<code>ar</code>) of 3,000,000 rows and 10 columns was used.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withIncludes</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt; <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">filter</span>(<span style="color:#a6e22e">row</span> =&gt; <span style="color:#a6e22e">row</span>.<span style="color:#a6e22e">includes</span>(<span style="color:#a6e22e">searchText</span>));
+
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withIndexOf</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt; <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">filter</span>(<span style="color:#a6e22e">row</span> =&gt; <span style="color:#a6e22e">row</span>.<span style="color:#a6e22e">indexOf</span>(<span style="color:#a6e22e">searchText</span>) <span style="color:#f92672">&gt;</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>);
+</code></pre></div><p>The result is as follows.</p>
+<p><img src="https://tanaikech.github.io/img/20200323a-fig2.png" alt=""></p>
+<p>From the result, it was found that the process cost &ldquo;includes&rdquo; and &ldquo;indexOf&rdquo; was almost the same.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h2 id="3-with-and-without-destructuring-assignment">3. With and without Destructuring Assignment</h2>
+<p>The sample script is as follows. The sample script retrieves the rows when the values of columns &ldquo;A&rdquo;, &ldquo;E&rdquo; and &ldquo;J&rdquo; are <code>searchText</code>. In this measurement, the array (<code>ar</code>) of 3,000,000 rows and 10 columns was used.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withDestructuringAssignment</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt;
+  <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">filter</span>(
+    ([<span style="color:#a6e22e">a</span>, , , , <span style="color:#a6e22e">e</span>, , , , , <span style="color:#a6e22e">j</span>]) =&gt;
+      <span style="color:#a6e22e">a</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">e</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">j</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span>
+  );
+
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withoutDestructuringAssignment</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt;
+  <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">filter</span>(
+    <span style="color:#a6e22e">row</span> =&gt;
+      <span style="color:#a6e22e">row</span>[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">row</span>[<span style="color:#ae81ff">4</span>] <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">row</span>[<span style="color:#ae81ff">9</span>] <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span>
+  );
+</code></pre></div><p>The result is as follows.</p>
+<p><img src="https://tanaikech.github.io/img/20200323a-fig3.png" alt=""></p>
+<p>From the result, it was found that when the destructuring assignment is used, the cost was about 15 % higher than that without the destructuring assignment.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h2 id="4-with-and-without-map-object">4. With and without Map object</h2>
+<p>The sample script is as follows. The sample script removes the duplicated rows. In this measurement, the array (<code>ar</code>) of 3,000,000 rows and 10 columns was used.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withMap</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt;
+  Object.<span style="color:#a6e22e">fromEntries</span>(
+    <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">m</span>, [<span style="color:#a6e22e">a</span>, , , , <span style="color:#a6e22e">e</span>, , , , , <span style="color:#a6e22e">j</span>]) =&gt; {
+      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">a</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">e</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">j</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span>)
+        <span style="color:#a6e22e">m</span>.<span style="color:#a6e22e">set</span>(<span style="color:#a6e22e">searchText</span>, <span style="color:#a6e22e">m</span>.<span style="color:#a6e22e">has</span>(<span style="color:#a6e22e">searchText</span>) <span style="color:#f92672">?</span> <span style="color:#a6e22e">m</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">searchText</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">:</span> <span style="color:#ae81ff">1</span>);
+      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">m</span>;
+    }, <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Map</span>())
+  );
+
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withoutMap</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt;
+  <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">o</span>, [<span style="color:#a6e22e">a</span>, , , , <span style="color:#a6e22e">e</span>, , , , , <span style="color:#a6e22e">j</span>]) =&gt; {
+    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">a</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">e</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">j</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span>)
+      <span style="color:#a6e22e">o</span>[<span style="color:#a6e22e">searchText</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">searchText</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">o</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">o</span>[<span style="color:#a6e22e">searchText</span>] <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">:</span> <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
+  }, {});
+</code></pre></div><p>The result is as follows.</p>
+<p><img src="https://tanaikech.github.io/img/20200323a-fig4.png" alt=""></p>
+<p>From the result, it was found that the process cost with and without Map object was almost the same. But in this case, the cost of <code>Object.fromEntries</code> is added. It was found that when <code>Object.fromEntries</code> is not used, the cost with Map object was about 20 % lower than that without Map object.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h2 id="5-arrayprototypepushapply-spread-syntax-and-concat">5. &ldquo;Array.prototype.push.apply&rdquo;, Spread syntax and &ldquo;concat&rdquo;</h2>
+<p>The sample script is as follows. The sample script merges all rows. The costs of <code>Array.prototype.push.apply</code>, Spread syntax and <code>concat</code> were measured. In this measurement, the array (<code>ar</code>) of 3,000 rows and 10 columns was used.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">arrayPrototypePushApply</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt;
+  <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">row</span>) =&gt; {
+    Array.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">push</span>.<span style="color:#a6e22e">apply</span>(<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">row</span>);
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">a</span>;
+  }, []);
+
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">spreadSyntax</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt; <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">row</span>) =&gt; [...<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">row</span>], []);
+
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">concat</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt; <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">row</span>) =&gt; <span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">concat</span>(<span style="color:#a6e22e">row</span>), []);
+</code></pre></div><p>The result is as follows.</p>
+<p><img src="https://tanaikech.github.io/img/20200323a-fig5.png" alt=""></p>
+<p>From the result, it was found that the process cost of <code>Array.prototype.push</code> was the lowest of 3 methods. The costs of Spread syntax and <code>concat</code> were about 3,040 % and 36,666 % higher than that of <code>Array.prototype.push</code>, respectively.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h2 id="6-only-reduce-objectassign-and-spread-syntax">6. only &ldquo;reduce&rdquo;, &ldquo;Object.assign&rdquo; and Spread syntax</h2>
+<p>The sample script is as follows. The sample script converts array to JSON object by removing duplicating. The costs of only reduce, <code>Object.assign</code> and the spread syntax were measured. In this measurement, the array (<code>ar</code>) of 3,000 rows and 10 columns was used.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withoutSpreadSyntax</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt;
+  <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">o</span>, <span style="color:#a6e22e">row</span>) =&gt; {
+    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">row</span>[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">!=</span> <span style="color:#a6e22e">searchText</span>) <span style="color:#a6e22e">o</span>[<span style="color:#a6e22e">row</span>[<span style="color:#ae81ff">0</span>]] <span style="color:#f92672">=</span> <span style="color:#a6e22e">row</span>;
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
+  }, {});
+
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withObjectAssign</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt;
+  <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">o</span>, <span style="color:#a6e22e">row</span>) =&gt; {
+    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">row</span>[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">!=</span> <span style="color:#a6e22e">searchText</span>) <span style="color:#66d9ef">return</span> Object.<span style="color:#a6e22e">assign</span>(<span style="color:#a6e22e">o</span>, { [<span style="color:#a6e22e">row</span>[<span style="color:#ae81ff">0</span>]]<span style="color:#f92672">:</span> <span style="color:#a6e22e">row</span> });
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
+  }, {});
+
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withSpreadSyntax</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt;
+  <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">o</span>, <span style="color:#a6e22e">row</span>) =&gt; {
+    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">row</span>[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">!=</span> <span style="color:#a6e22e">searchText</span>) <span style="color:#66d9ef">return</span> { ...<span style="color:#a6e22e">o</span>, [<span style="color:#a6e22e">row</span>[<span style="color:#ae81ff">0</span>]]<span style="color:#f92672">:</span> <span style="color:#a6e22e">row</span> };
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
+  }, {});
+</code></pre></div><p>The result is as follows.</p>
+<p><img src="https://tanaikech.github.io/img/20200323a-fig6.png" alt=""></p>
+<p>From the result, it was found that the process cost of only <code>reduce</code> without the spread syntax and <code>Object.assign</code> was the lowest of 3 methods. The costs of <code>Object.assign</code> and Spread syntax were about 265 % and 448,063 % higher than that of only <code>reduce</code>, respectively.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h2 id="7-arrayfrom-only-map-and-objectentries">7. &ldquo;Array.from&rdquo;, only &ldquo;map&rdquo; and &ldquo;Object.entries&rdquo;</h2>
+<p>The sample script is as follows. The sample script converts JSON object to array. The costs of <code>Array.from</code>, only map and <code>Object.entries</code> were measured. In this measurement, the array (<code>ar</code>) of 300,000 rows and 10 columns was used.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withArrayFrom</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span> =&gt; Array.<span style="color:#a6e22e">from</span>(Object.<span style="color:#a6e22e">keys</span>(<span style="color:#a6e22e">obj</span>), <span style="color:#a6e22e">e</span> =&gt; [<span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">obj</span>[<span style="color:#a6e22e">e</span>]]);
+
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withoutObjectEntries</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span> =&gt; Object.<span style="color:#a6e22e">keys</span>(<span style="color:#a6e22e">obj</span>).<span style="color:#a6e22e">map</span>(<span style="color:#a6e22e">e</span> =&gt; [<span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">obj</span>[<span style="color:#a6e22e">e</span>]]);
+
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withObjectEntries</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span> =&gt; Object.<span style="color:#a6e22e">entries</span>(<span style="color:#a6e22e">obj</span>);
+</code></pre></div><p>The result is as follows.</p>
+<p><img src="https://tanaikech.github.io/img/20200323a-fig7.png" alt=""></p>
+<p>From the result, it was found that the process costs of <code>Array.from</code> and only map were almost the same. The cost of <code>Object.entries</code> was about 131 % higher than that of <code>Array.from</code>.</p>
+<h1 id="summary">Summary</h1>
+<p>In this report, the process costs of 7 situations under V8 were measured. As the result, the following results could be obtained.</p>
+<ol>
+<li>Process cost with and without the arrow function was almost the same.</li>
+<li>Process cost &ldquo;includes&rdquo; and &ldquo;indexOf&rdquo; was almost the same.</li>
+<li>When the destructuring assignment is used, the cost was about 15 % higher than that without the destructuring assignment.</li>
+<li>Process cost with and without Map object was almost the same.
+<ul>
+<li>But in this case, the cost of <code>Object.fromEntries</code> is added for retrieving the result as the object. And when <code>Object.fromEntries</code> is not used, the cost with Map object was about 20 % lower than that without Map object.</li>
+</ul>
+</li>
+<li>Process cost of <code>Array.prototype.push</code> was the lowest of <code>Array.prototype.push.apply</code>, Spread syntax and <code>concat</code>. The costs of Spread syntax and <code>concat</code> were about 3,040 % and 36,666 % higher than that of <code>Array.prototype.push</code>, respectively.</li>
+<li>Process cost of only <code>reduce</code> was the lowest of only <code>reduce</code>, <code>Object.assign</code> and Spread syntax. The costs of <code>Object.assign</code> and Spread syntax were about 265 % and 448,063 % higher than that of only <code>reduce</code>, respectively.</li>
+<li>Process costs of <code>Array.from</code> and only map were almost the same. The cost of <code>Object.entries</code> was about 131 % higher than that of <code>Array.from</code>.</li>
+</ol>
+<h1 id="note">Note</h1>
+<ul>
+<li>As a note, I have to describe that this is the result for Google Apps Script. For other languages, this result might be difference. And also, the process cost of this report might be modified by future update of Google.</li>
+<li>I think that there are various situations except for above situations. So I would like to measure more situations in the future.</li>
+</ul>
+<p><a href="#top">Top</a></p>
+
+  
+
+
+  
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2020/03/13/retrieving-files-and-folders-without-parents-in-google-drive/"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2020/03/13/retrieving-files-and-folders-without-parents-in-google-drive/">Retrieving Files and Folders without Parents in Google Drive</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
+</div>
+
+
+
+  
+
+</div>
+
+</div>
+</div>
+<script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
+    }
+  });
+</script>
+
+
+<script>
+  
+  if (window.location.hostname != "localhost") {
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-84325623-1', 'auto');
+    ga('send', 'pageview');
+  }
+</script>
+
+
+
+
+
+
+
+</body>
+</html>
+
