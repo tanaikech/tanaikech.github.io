@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.61.0" />
 
-  <title>go &middot; tanaike</title>
+  <title>Limitation of Array.prototype.push.apply under V8 for Google Apps Script &middot; tanaike</title>
 
     
 
@@ -41,9 +41,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
  
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike"
-    href='https://tanaikech.github.io/tags/go/index.xml' />
   
 
   
@@ -132,11 +129,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href='https://tanaikech.github.io/tags/go/index.xml'><i
-          class="fas fa-rss"></i>RSS</a>
-    </li>
     
 
     
@@ -240,20 +232,16 @@
 
 
 <div class="header">
-  <h1>go</h1>
+  <h1>Limitation of Array.prototype.push.apply under V8 for Google Apps Script</h1>
+  <h2></h2>
 </div>
-
 <div class="content">
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2017/03/29/put-a-channel-to-a-channel-for-golang/">Put a channel to a channel for golang</a></h2>
 
-    <div class="post-meta">
+  <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>29 Mar 2017, 07:53</time>
+    <time>20 Apr 2020, 14:11</time>
   </div>
 
   
@@ -264,7 +252,7 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gotips">GoTips</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
     
   </div>
   
@@ -276,7 +264,9 @@
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/go">go</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/array">array</a>
     
   </div>
   
@@ -284,86 +274,64 @@
 
 </div>
 
-  </header>
-
-  <p>
-  I have never heard this. I would like to use this from now.
-package main import &quot;fmt&quot; type st struct { data1 int data2 int } func main() { c1 := make(chan *st, 1) c2 := make(chan *st, 1) c1 &lt;- &amp;st{1, 2} c2 &lt;- &lt;-c1 close(c1) close(c2) res, _ := &lt;-c2 fmt.Println(res.data2) } &gt;&gt;&gt; 2 
-  </p>
+  <p><a href="https://gist.github.com/tanaikech/3e3c16b58f6b30de366eba99de84c861">Gists</a></p>
+<h2 id="description">Description</h2>
+<p>When V8 is enabled, <code>Array.apply</code> has the limitation for the number of elements. When it is over the limitation, an error like <code>RangeError: Maximum call stack size exceeded</code> occurs, while the issue didn't occur when V8 is disabled. In this case, this issue occurs at both Google Apps Script and Javascript. So please be careful this.</p>
+<h2 id="sample-situation">Sample situation</h2>
+<p>For example, when <code>Array.prototype.push.apply</code> is used for combining the arrays because the process cost of <code>Array.prototype.push.apply</code> is lowest of 3 patterns of <code>Array.prototype.push.apply</code>, <code>Spread syntax</code> and <code>concat</code>, please be careful above issue. <a href="https://gist.github.com/tanaikech/7198bc9019202f4080de8fd2e1b278fb#5-arrayprototypepushapply-spread-syntax-and-concat">Ref</a></p>
+<p>Please see the following script.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">let</span> <span style="color:#a6e22e">ar1</span> <span style="color:#f92672">=</span> [];
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ar2</span> <span style="color:#f92672">=</span> Array(<span style="color:#ae81ff">125859</span>).<span style="color:#a6e22e">fill</span>(<span style="color:#e6db74">&#34;sample&#34;</span>);
+Array.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">push</span>.<span style="color:#a6e22e">apply</span>(<span style="color:#a6e22e">ar1</span>, <span style="color:#a6e22e">ar2</span>);
+</code></pre></div><p>When above script is run, the error of <code>RangeError: Maximum call stack size exceeded</code> occurs at <code>Array.prototype.push.apply(ar1, ar2);</code>. But when <code>const r = Array(125858).fill(&quot;sample&quot;);</code> is used, no error occurs. On the other hand, the following script is used, no error occurs.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">let</span> <span style="color:#a6e22e">ar1</span> <span style="color:#f92672">=</span> Array(<span style="color:#ae81ff">1000000</span>).<span style="color:#a6e22e">fill</span>(<span style="color:#e6db74">&#34;sample&#34;</span>);
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ar2</span> <span style="color:#f92672">=</span> Array(<span style="color:#ae81ff">125858</span>).<span style="color:#a6e22e">fill</span>(<span style="color:#e6db74">&#34;sample&#34;</span>);
+Array.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">push</span>.<span style="color:#a6e22e">apply</span>(<span style="color:#a6e22e">ar1</span>, <span style="color:#a6e22e">ar2</span>);
+</code></pre></div><p>From above sample scripts, when the array is combined using <code>Array.prototype.push.apply(ar1, ar2)</code>, it is found the following points.</p>
+<ul>
+<li>When you want to combine the array with the small size (for example, it's in the for loop.) with V8, <code>Array.prototype.push.apply</code> is suitable.</li>
+<li>When you want to combine the array with the large size is combined with V8, <code>Spread syntax</code> is suitable.</li>
+<li>When you want to combine the array with the large size (for example, it's in the for loop.) without V8, <code>Array.prototype.push.apply</code> is suitable.</li>
+<li>When you want to combine the array with the large size (for example, it's in the for loop.) with and without V8, <code>concat</code> is suitable.</li>
+</ul>
+<h2 id="references">References:</h2>
+<ul>
+<li><a href="https://stackoverflow.com/q/22123769">&ldquo;RangeError: Maximum call stack size exceeded&rdquo; Why?</a></li>
+<li><a href="https://gist.github.com/tanaikech/7198bc9019202f4080de8fd2e1b278fb">Benchmark: Process Costs under V8 using Google Apps Script</a></li>
+</ul>
 
   
-</article>
+
 
   
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2016/10/13/gas-library-souwa_gas-effects-on-optimized-codes-of-pyramid-method/">GAS Library - SOUWA_GAS - Effects on Optimized Codes of Pyramid Method</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>13 Oct 2016, 15:57</time>
-  </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/report">report</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/benchmark">Benchmark</a>
+    <a href="https://tanaikech.github.io/2020/04/13/updated-gas-library-fetchapp/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
+  <div class="pure-u-10-24">
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/c&#43;&#43;">c&#43;&#43;</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/node.js">Node.js</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/python">Python</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/go">Go</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/java">Java</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/ruby">Ruby</a>
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2020/04/13/updated-gas-library-fetchapp/">Updated: GAS Library - FetchApp</a>
+    </nav>
     
   </div>
-  
-  
-
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
 </div>
 
-  </header>
 
-  <p>
-  Abstract I have already reported that the pyramid method is one of very effectively algolithms for summing string elements in an array using Google Apps Script (GAS). This report describes the adaptability of the pyramid method to any languages except for GAS. c++ (g++), Go, Java, Javascript on Node.js, Python and Ruby were chosen as the sample languages. In those languages, there are languages which have the distinctive commands for summing the array elements.
-  </p>
 
   
-  <footer>
-    <a href="https://tanaikech.github.io/2016/10/13/gas-library-souwa_gas-effects-on-optimized-codes-of-pyramid-method/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
-  
-</article>
 
-  
 </div>
 
 </div>
@@ -402,3 +370,4 @@ package main import &quot;fmt&quot; type st struct { data1 int data2 int } func 
 
 </body>
 </html>
+
