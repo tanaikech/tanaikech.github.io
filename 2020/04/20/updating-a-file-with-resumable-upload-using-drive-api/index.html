@@ -290,36 +290,36 @@
 <h2 id="flow-for-updating-a-file-with-the-resumable-upload">Flow for updating a file with the resumable upload:</h2>
 <h3 id="1-initiate-a-resumable-upload-session">1. Initiate a resumable upload session</h3>
 <p>Create the session for uploading with the resumable upload. In this case, the existing file is updated, so the endpoint is <code>PUT https://www.googleapis.com/upload/drive/v3/files/[FILE_ID]?uploadType=resumable</code>. But as an important point, please use the method of <code>PATCH</code> instead of <code>PUT</code>. When <code>PUT</code> is used, <code>location</code> is not included in the response header. I thought that the official document might be not correct.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ curl -X PATCH -i <span style="color:#ae81ff">\</span>
-    -H <span style="color:#e6db74">&#34;Authorization: Bearer ###accessToken###&#34;</span> <span style="color:#ae81ff">\</span>
-    <span style="color:#e6db74">&#34;https://www.googleapis.com/upload/drive/v3/files/[FILE_ID]?uploadType=resumable&#34;</span>
-</code></pre></div><p>If you want to update the file as the multipart upload, please use the following sample command. In this case, the filename is changed.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ curl -X PATCH -i <span style="color:#ae81ff">\</span>
-    -H <span style="color:#e6db74">&#34;Authorization: Bearer ###accessToken###&#34;</span> <span style="color:#ae81ff">\</span>
-    -H <span style="color:#e6db74">&#34;Content-Type: application/json; charset=UTF-8&#34;</span> <span style="color:#ae81ff">\</span>
-    -d <span style="color:#e6db74">&#39;{&#34;name&#34;:&#34;updatedFilename.txt&#34;}&#39;</span> <span style="color:#ae81ff">\</span>
-    <span style="color:#e6db74">&#34;https://www.googleapis.com/upload/drive/v3/files/[FILE_ID]?uploadType=resumable&#34;</span>
-</code></pre></div><ul>
+<pre><code>$ curl -X PATCH -i \
+    -H &quot;Authorization: Bearer ###accessToken###&quot; \
+    &quot;https://www.googleapis.com/upload/drive/v3/files/[FILE_ID]?uploadType=resumable&quot;
+</code></pre><p>If you want to update the file as the multipart upload, please use the following sample command. In this case, the filename is changed.</p>
+<pre><code>$ curl -X PATCH -i \
+    -H &quot;Authorization: Bearer ###accessToken###&quot; \
+    -H &quot;Content-Type: application/json; charset=UTF-8&quot; \
+    -d '{&quot;name&quot;:&quot;updatedFilename.txt&quot;}' \
+    &quot;https://www.googleapis.com/upload/drive/v3/files/[FILE_ID]?uploadType=resumable&quot;
+</code></pre><ul>
 <li>When above sample command is run, <code>200 OK</code> is returned, and the response header includes <code>location</code> like <code>location: https://www.googleapis.com/upload/drive/v3/files/[FILE_ID]?uploadType=resumable&amp;upload_id=###</code>. For uploading the data, <code>location</code> is used as the endpoint.</li>
 </ul>
 <h3 id="2-upload-the-1st-chunk">2. Upload the 1st chunk</h3>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ curl -X PUT -i <span style="color:#ae81ff">\</span>
-    -H <span style="color:#e6db74">&#34;Content-Length: 262144&#34;</span> <span style="color:#ae81ff">\</span>
-    -H <span style="color:#e6db74">&#34;Content-Range: bytes 0-262143/300000&#34;</span> <span style="color:#ae81ff">\</span>
-    -H <span style="color:#e6db74">&#34;Content-Type: text/plain&#34;</span> <span style="color:#ae81ff">\</span>
-    -F <span style="color:#e6db74">&#34;file=@data1.txt&#34;</span> <span style="color:#ae81ff">\</span>
-    <span style="color:#e6db74">&#34;https://www.googleapis.com/upload/drive/v3/files/[FILE_ID]?uploadType=resumable&amp;upload_id=###&#34;</span>
-</code></pre></div><ul>
+<pre><code>$ curl -X PUT -i \
+    -H &quot;Content-Length: 262144&quot; \
+    -H &quot;Content-Range: bytes 0-262143/300000&quot; \
+    -H &quot;Content-Type: text/plain&quot; \
+    -F &quot;file=@data1.txt&quot; \
+    &quot;https://www.googleapis.com/upload/drive/v3/files/[FILE_ID]?uploadType=resumable&amp;upload_id=###&quot;
+</code></pre><ul>
 <li>When this curl command is run, <code>308 Resume Incomplete</code> is returned. By this, it is found that the chunk could be correctly uploaded.</li>
 </ul>
 <h3 id="3-upload-the-2nd-chunk-this-is-the-last-chunk-of-this-sample-flow">3. Upload the 2nd chunk (This is the last chunk of this sample flow.)</h3>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ curl -X PUT -i <span style="color:#ae81ff">\</span>
-    -H <span style="color:#e6db74">&#34;Content-Length: 37856&#34;</span> <span style="color:#ae81ff">\</span>
-    -H <span style="color:#e6db74">&#34;Content-Range: bytes 262144-299999/300000&#34;</span> <span style="color:#ae81ff">\</span>
-    -H <span style="color:#e6db74">&#34;Content-Type: text/plain&#34;</span> <span style="color:#ae81ff">\</span>
-    -F <span style="color:#e6db74">&#34;file=@data2.txt&#34;</span> <span style="color:#ae81ff">\</span>
-    <span style="color:#e6db74">&#34;https://www.googleapis.com/upload/drive/v3/files/[FILE_ID]?uploadType=resumable&amp;upload_id=###&#34;</span>
-</code></pre></div><ul>
+<pre><code>$ curl -X PUT -i \
+    -H &quot;Content-Length: 37856&quot; \
+    -H &quot;Content-Range: bytes 262144-299999/300000&quot; \
+    -H &quot;Content-Type: text/plain&quot; \
+    -F &quot;file=@data2.txt&quot; \
+    &quot;https://www.googleapis.com/upload/drive/v3/files/[FILE_ID]?uploadType=resumable&amp;upload_id=###&quot;
+</code></pre><ul>
 <li>When this curl command is run, <code>200 OK</code> is returned, and the file metadata is also returned. By this, it is found that the resumable upload could be correctly done.</li>
 </ul>
 <h2 id="note">Note:</h2>
