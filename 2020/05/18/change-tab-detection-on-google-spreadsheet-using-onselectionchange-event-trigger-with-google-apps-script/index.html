@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.61.0" />
 
-  <title>trigger &middot; tanaike</title>
+  <title>Change Tab Detection on Google Spreadsheet using onSelectionChange Event Trigger with Google Apps Script &middot; tanaike</title>
 
     
 
@@ -41,9 +41,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
  
-  
-  <link rel="alternate" type="application/rss+xml" title="tanaike"
-    href='https://tanaikech.github.io/tags/trigger/index.xml' />
   
 
   
@@ -132,11 +129,6 @@
   <div class="pure-menu social">
   <ul class="pure-menu-list">
 
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href='https://tanaikech.github.io/tags/trigger/index.xml'><i
-          class="fas fa-rss"></i>RSS</a>
-    </li>
     
 
     
@@ -240,16 +232,12 @@
 
 
 <div class="header">
-  <h1>trigger</h1>
+  <h1>Change Tab Detection on Google Spreadsheet using onSelectionChange Event Trigger with Google Apps Script</h1>
+  <h2></h2>
 </div>
-
 <div class="content">
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2020/05/18/change-tab-detection-on-google-spreadsheet-using-onselectionchange-event-trigger-with-google-apps-script/">Change Tab Detection on Google Spreadsheet using onSelectionChange Event Trigger with Google Apps Script</a></h2>
 
-    <div class="post-meta">
+  <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
@@ -290,142 +278,84 @@
 
 </div>
 
-  </header>
+  <p><a href="">Gists</a></p>
+<p><code>onSelectionChange</code> has been released at <a href="https://developers.google.com/apps-script/releases/#april_22_2020">April 22, 2020</a>. But this couldn't be used at the released day. But now, I could confirm that this got to be able to be used. So in order to test this event trigger, I prepared a simple sample script. This is a sample script for detecting the change tab on Google Spreadsheet using onSelectionChange Event Trigger with Google Apps Script.</p>
+<h2 id="demo">Demo</h2>
+<p><img src="https://tanaikech.github.io/img/20200518a-fig1.gif" alt=""></p>
+<h2 id="usage">Usage</h2>
+<ol>
+<li>Please copy and paste the following script to the container-bound script of Google Spreadsheet, and save the script.</li>
+<li>Please reopen the Google Spreadsheet.
+<ul>
+<li>By this, <code>onOpen</code> is run and the current sheet is put to PropertiesService.</li>
+<li>Unfortunately, the event object of <code>onSelectionChange</code> has no information about the change of tab. So in order to detect the change of tab, I used the PropertiesService.</li>
+</ul>
+</li>
+<li>Then, please select a cell and cells on sheet.
+<ul>
+<li>By this, <code>onSelectionChange</code> is run by the onSelectionChange event trigger, and put the A1Notation to the cell.</li>
+<li>When the active tab is moved, the sample script detects this, and the information of the changed tab is put to the cell.</li>
+</ul>
+</li>
+</ol>
+<h3 id="sample-script">Sample script</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">onOpen</span>(<span style="color:#a6e22e">e</span>) {
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">prop</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">PropertiesService</span>.<span style="color:#a6e22e">getScriptProperties</span>();
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheetName</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getSheet</span>().<span style="color:#a6e22e">getSheetName</span>();
+  <span style="color:#a6e22e">prop</span>.<span style="color:#a6e22e">setProperty</span>(<span style="color:#e6db74">&#34;previousSheet&#34;</span>, <span style="color:#a6e22e">sheetName</span>);
+}
 
-  <p>
-  Gists
-onSelectionChange has been released at April 22, 2020. But this couldn't be used at the released day. But now, I could confirm that this got to be able to be used. So in order to test this event trigger, I prepared a simple sample script. This is a sample script for detecting the change tab on Google Spreadsheet using onSelectionChange Event Trigger with Google Apps Script.
-Demo Usage  Please copy and paste the following script to the container-bound script of Google Spreadsheet, and save the script.
-  </p>
+<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">onSelectionChange</span>(<span style="color:#a6e22e">e</span>) {
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">prop</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">PropertiesService</span>.<span style="color:#a6e22e">getScriptProperties</span>();
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">previousSheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">prop</span>.<span style="color:#a6e22e">getProperty</span>(<span style="color:#e6db74">&#34;previousSheet&#34;</span>);
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">range</span>;
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">a1Notation</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getA1Notation</span>();
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheetName</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getSheet</span>().<span style="color:#a6e22e">getSheetName</span>();
+  <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">setValue</span>(
+    <span style="color:#a6e22e">sheetName</span> <span style="color:#f92672">!=</span> <span style="color:#a6e22e">previousSheet</span>
+      <span style="color:#f92672">?</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">Changed tab from </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">previousSheet</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> to </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">sheetName</span><span style="color:#e6db74">}</span><span style="color:#e6db74">. </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">a1Notation</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>
+      <span style="color:#f92672">:</span> <span style="color:#a6e22e">a1Notation</span>
+  );
+  <span style="color:#a6e22e">prop</span>.<span style="color:#a6e22e">setProperty</span>(<span style="color:#e6db74">&#34;previousSheet&#34;</span>, <span style="color:#a6e22e">sheetName</span>);
+}
+</code></pre></div><h2 id="reference">Reference</h2>
+<ul>
+<li><a href="https://developers.google.com/apps-script/guides/triggers#onselectionchangee">onSelectionChange(e)</a></li>
+<li><a href="https://developers.google.com/apps-script/reference/properties">Properties Service</a></li>
+</ul>
 
   
-  <footer>
-    <a href="https://tanaikech.github.io/2020/05/18/change-tab-detection-on-google-spreadsheet-using-onselectionchange-event-trigger-with-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
-  
-</article>
+
 
   
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2018/09/21/asynchronous-processing-using-event-triggers/">Asynchronous Processing using Event Triggers</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>21 Sep 2018, 17:00</time>
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2020/05/15/updated-specification-of-google-spreadsheet-multiple-hyperlinks-to-a-cell/"><i class="fa fa-chevron-left"></i></a>
+    
   </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
+  <div class="pure-u-10-24">
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/report">report</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2020/05/15/updated-specification-of-google-spreadsheet-multiple-hyperlinks-to-a-cell/">Updated Specification of Google Spreadsheet: Multiple Hyperlinks to a Cell</a>
+    </nav>
     
   </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/event">event</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/trigger">trigger</a>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
     
   </div>
-  
-  
-
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
 </div>
 
-  </header>
 
-  <p>
-  Gists
-Kanshi Tanaike
-Overview This is a report about the possibility of asynchronous process using event triggers. This is for Google Apps Script (GAS).
-Description onEdit() which is a simple trigger is often used as a trigger when the values are modified on Spreadsheet. When users want to use the script including some methods which are required to be authorized as the onEdit event, a installable trigger of onEdit is used.
-  </p>
-
-  
-  <footer>
-    <a href="https://tanaikech.github.io/2018/09/21/asynchronous-processing-using-event-triggers/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2017/05/14/sending-e-mail-when-spreadsheet-was-edited-from-outside-by-sheet-api/">Sending E-mail When Spreadsheet was Edited from Outside by Sheet API</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>14 May 2017, 17:43</time>
-  </div>
 
   
 
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
-    
-  </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/trigger">trigger</a>
-    
-  </div>
-  
-  
-
-</div>
-
-  </header>
-
-  <p>
-  This sample script sends an e-mail, when spreadsheet was edited from outside by Sheet API v4. When you use this sample, please create a container bound script with spreadsheet which is edited by Sheet API. And please input your e-mail and run firstly a method of createTrigger(). By this, a trigger is installed as onChange(). After this, edit spreadsheet from outside by Sheet API v4.
-When when spreadsheet was edited from outside by Sheet API v4, I used sendEmail() as a sample, because script editor is closed.
-  </p>
-
-  
-  <footer>
-    <a href="https://tanaikech.github.io/2017/05/14/sending-e-mail-when-spreadsheet-was-edited-from-outside-by-sheet-api/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
-  
-</article>
-
-  
 </div>
 
 </div>
@@ -460,7 +390,11 @@ When when spreadsheet was edited from outside by Sheet API v4, I used sendEmail(
 
 
 
+<script src="https://tanaikech.github.io/js/math-code.js"></script>
+  <script async src="//cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  
 
 
 </body>
 </html>
+
