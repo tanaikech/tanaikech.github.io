@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.61.0" />
 
-  <title>Workaround: Correctly Exporting Charts on Google Spreadsheet as Images using Google Apps Script &middot; tanaike</title>
+  <title>Workaround: Putting Multiple Hyperlinks to a Cell using Sheets API &middot; tanaike</title>
 
     
 
@@ -232,7 +232,7 @@
 
 
 <div class="header">
-  <h1>Workaround: Correctly Exporting Charts on Google Spreadsheet as Images using Google Apps Script</h1>
+  <h1>Workaround: Putting Multiple Hyperlinks to a Cell using Sheets API</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -241,7 +241,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>23 Jun 2020, 13:22</time>
+    <time>26 Jun 2020, 08:09</time>
   </div>
 
   
@@ -254,7 +254,7 @@
     
       <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/googlecharttips">GoogleChartTips</a>&nbsp;&#47;
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/spreadsheet">Spreadsheet</a>&nbsp;&#47;
     
       <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/workaround">workaround</a>
     
@@ -270,9 +270,7 @@
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">Spreadsheet</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/chart">chart</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">Spreadsheet</a>
     
   </div>
   
@@ -280,29 +278,51 @@
 
 </div>
 
-  <p><a href="https://gist.github.com/tanaikech/0237042dcdaf53d3164468ca37e08a80">Gists</a></p>
-<p>This is a sample script for correctly exporting the charts on Google Spreadsheet as the images using Google Apps Script. In the current stage, using Google Apps Script, when the charts on Google Spreadsheet are exported as the images, it seems that the exported images are not the same with the original one on Google Spreadsheet. About this, today, I could notice that I had answered for 2 questions. <a href="https://stackoverflow.com/q/55890392">Q1</a>, <a href="https://stackoverflow.com/q/62038597">Q2</a> And also, I had already been reported this at the issue tracker. <a href="https://issuetracker.google.com/issues/131557147">Ref</a></p>
-<p>In this post, as the current workaround, I would like to introduce the method for exporting the chart on Google Spreadsheet as the same images with the original one.</p>
-<h2 id="sample-situation">Sample situation</h2>
-<p>As a sample situation, the following chart is used.</p>
-<p><img src="https://tanaikech.github.io/img/20200623a-fig1.png" alt=""></p>
-<p>When above chart is exported as an image using the following script.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">chart</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSheet</span>().<span style="color:#a6e22e">getCharts</span>()[<span style="color:#ae81ff">0</span>];
-<span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">createFile</span>(<span style="color:#a6e22e">chart</span>.<span style="color:#a6e22e">getBlob</span>().<span style="color:#a6e22e">setName</span>(<span style="color:#e6db74">&#34;sample.png&#34;</span>));
-</code></pre></div><p>The following image is retrieved. In this case, it is found that the exported image is NOT the same with the original one.</p>
-<p><img src="https://tanaikech.github.io/img/20200623a-fig2.png" alt=""></p>
-<p>I think that this might be the bug or the current specification. So as a workaround, Google Slides is used as the temporal file. When a chart on Google Spreadsheet is inserted to Google Slides, the chart object can be directly used. And, when the blob is retrieved from the chart inserted to Google Slides, the correct image can be retrieved. So I used this method as a workaround. The sample script is as follows.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">chart</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSheet</span>().<span style="color:#a6e22e">getCharts</span>()[<span style="color:#ae81ff">0</span>];
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">slides</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SlidesApp</span>.<span style="color:#a6e22e">create</span>(<span style="color:#e6db74">&#34;temp&#34;</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">imageBlob</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">slides</span>
-  .<span style="color:#a6e22e">getSlides</span>()[<span style="color:#ae81ff">0</span>]
-  .<span style="color:#a6e22e">insertSheetsChartAsImage</span>(<span style="color:#a6e22e">chart</span>)
-  .<span style="color:#a6e22e">getAs</span>(<span style="color:#e6db74">&#34;image/png&#34;</span>);
-<span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">slides</span>.<span style="color:#a6e22e">getId</span>()).<span style="color:#a6e22e">setTrashed</span>(<span style="color:#66d9ef">true</span>);
-<span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">createFile</span>(<span style="color:#a6e22e">imageBlob</span>.<span style="color:#a6e22e">setName</span>(<span style="color:#e6db74">&#34;sample.png&#34;</span>));
-</code></pre></div><p>When this script is run, the following image is retrieved. In this case, it is found that the exported image is the same with the original one. By the way, when the chart is manually exported as an image, the image is the same with the original one. it seems that only when the script is used, this issue occurs.</p>
-<p><img src="https://tanaikech.github.io/img/20200623a-fig3.png" alt=""></p>
-<p>I believe that this bug or the current specification will be resolved in the future update. So until this issue was resolved, I would like to use the above workaround for exporting the chart using a script.</p>
+  <p><a href="">Gists</a></p>
+<p>This is a current workaround for putting the multiple hyperlinks to a cell using Sheets API.</p>
+<h2 id="description">Description</h2>
+<p>Recently, at Spreadsheet service, the multiple hyperlinks got to be able to be put to a cell. <a href="https://stackoverflow.com/a/61788303/7108653">Ref</a> In this case, it can be achieved using <a href="https://developers.google.com/apps-script/reference/spreadsheet/rich-text-value">RichTextValue</a>. On the other hand, at Sheets API, in the current stage, there are no methods for directly putting the multiple hyperlinks to a cell. And also, such methods have not been added. I believe that such methods will be added in the future update. I think that when this is implemented, it might be added to <a href="https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/cells#TextFormatRun">TextFormatRun</a>.</p>
+<p>So, in this post, I would like to introduce for putting the multiple hyperlinks using Sheets API as a current workaround.</p>
+<h2 id="workaround">Workaround</h2>
+<p>In this workaround, <a href="https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/request#pastedatarequest">PasteDataRequest</a> of the method batchUpdate in Sheets API is used. PasteDataRequest can parse the HTML data and put the values to the cells. When I used this, I noticed that when one hyperlink is included in a table, the pasted value on the sheet has the hyperlink. By this, I thought that when the multiple hyperlinks are used in the HTML data, those might be able to be pasted to a cell. When I tested this, it was found that this can be achieved.</p>
+<p>The sample script is as follows. As the sample, Sheets API is used with Advanced Google services with Google Apps Script. So when you test this script, <a href="https://developers.google.com/apps-script/guides/services/advanced#enabling_advanced_services">please enable Sheets API at Advanced Google services</a>.</p>
+<h3 id="sample-script">Sample script</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>();
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>);
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">html</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">
+</span><span style="color:#e6db74">&lt;table&gt;
+</span><span style="color:#e6db74">  &lt;tr&gt;
+</span><span style="color:#e6db74">    &lt;td&gt;sample &lt;a href=&#34;https://www.google.com/&#34;&gt;link1&lt;/a&gt; sample &lt;a href=&#34;https://tanaikech.github.io/&#34;&gt;link2&lt;/a&gt; sample&lt;/td&gt;
+</span><span style="color:#e6db74">    &lt;td&gt;&lt;a href=&#34;https://www.google.com/&#34;&gt;link1&lt;/a&gt;&lt;/td&gt;
+</span><span style="color:#e6db74">  &lt;/tr&gt;
+</span><span style="color:#e6db74">&lt;/table&gt;</span><span style="color:#e6db74">`</span>;
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">resource</span> <span style="color:#f92672">=</span> {
+    <span style="color:#a6e22e">requests</span><span style="color:#f92672">:</span> [
+      {
+        <span style="color:#a6e22e">pasteData</span><span style="color:#f92672">:</span> {
+          <span style="color:#a6e22e">html</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>,
+          <span style="color:#a6e22e">data</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">html</span>,
+          <span style="color:#a6e22e">coordinate</span><span style="color:#f92672">:</span> {
+            <span style="color:#a6e22e">sheetId</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getSheetId</span>(),
+          },
+        },
+      },
+    ],
+  };
+  <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">batchUpdate</span>(<span style="color:#a6e22e">resource</span>, <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getId</span>());
+}
+</code></pre></div><h2 id="result">Result</h2>
+<p><img src="https://tanaikech.github.io/img/20200626a-fig1.png" alt=""></p>
+<p><img src="https://tanaikech.github.io/img/20200626a-fig2.png" alt=""></p>
+<h2 id="limitation">Limitation</h2>
+<ul>
+<li>In the current stage, it seems that PasteDataRequest cannot use the rich text for a part of text in a cell as shown in above images. By this, when 2 texts with 2 hyperlinks are put to a cell using PasteDataRequest, each text has the hyperlink. But the rich text for the hyperlink cannot be seen. On the other hand, when only the text with the hyperlink is put to a cell, the rich text for the hyperlink is set. I would like to expect to resolve this for the future update.</li>
+</ul>
+<h2 id="note">Note</h2>
+<ul>
+<li>As another workaround, I think that it is to use Web Apps as an API. When Web Apps created by Google Apps Script is used, the spreadsheet service can be used. By this, the rich text can be also used.</li>
+</ul>
 
   
 
@@ -311,13 +331,13 @@
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2020/06/19/retrieving-difference-between-2-arrays-using-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2020/06/24/managing-texts-on-google-slides-using-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2020/06/19/retrieving-difference-between-2-arrays-using-google-apps-script/">Retrieving Difference Between 2 Arrays using Google Apps Script</a>
+      <a href="https://tanaikech.github.io/2020/06/24/managing-texts-on-google-slides-using-google-apps-script/">Managing Texts on Google Slides using Google Apps Script</a>
     </nav>
     
   </div>
@@ -326,14 +346,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2020/06/24/managing-texts-on-google-slides-using-google-apps-script/">Managing Texts on Google Slides using Google Apps Script</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2020/06/24/managing-texts-on-google-slides-using-google-apps-script/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
