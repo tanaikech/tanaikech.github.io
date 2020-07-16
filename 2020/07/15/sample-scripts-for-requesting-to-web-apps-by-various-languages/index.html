@@ -643,8 +643,15 @@
 <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
 	<span style="color:#a6e22e">url</span> <span style="color:#f92672">:=</span> <span style="color:#e6db74">&#34;https://script.google.com/macros/s/###/exec&#34;</span>
 	<span style="color:#a6e22e">url</span> <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#34;?key3=value3&#34;</span>
-	<span style="color:#a6e22e">data</span> <span style="color:#f92672">:=</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">{</span><span style="color:#e6db74">key1: &#34;value1&#34;, key2: &#34;value2&#34;}</span><span style="color:#e6db74">`</span>
-	<span style="color:#a6e22e">res</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Post</span>(<span style="color:#a6e22e">url</span>, <span style="color:#e6db74">&#34;application/json&#34;</span>, <span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">NewReader</span>(<span style="color:#a6e22e">data</span>))
+	<span style="color:#a6e22e">dataStr</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">struct</span> {
+		<span style="color:#a6e22e">Key1</span> <span style="color:#66d9ef">string</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">json:&#34;key1&#34;</span><span style="color:#e6db74">`</span>
+		<span style="color:#a6e22e">Key2</span> <span style="color:#66d9ef">string</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">json:&#34;key2&#34;</span><span style="color:#e6db74">`</span>
+	}{
+		<span style="color:#e6db74">&#34;value1&#34;</span>,
+		<span style="color:#e6db74">&#34;value2&#34;</span>,
+	}
+	<span style="color:#a6e22e">data</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">json</span>.<span style="color:#a6e22e">Marshal</span>(<span style="color:#a6e22e">dataStr</span>)
+	<span style="color:#a6e22e">res</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Post</span>(<span style="color:#a6e22e">url</span>, <span style="color:#e6db74">&#34;application/json&#34;</span>, <span style="color:#a6e22e">bytes</span>.<span style="color:#a6e22e">NewReader</span>(<span style="color:#a6e22e">data</span>))
 	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
 		<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatal</span>(<span style="color:#a6e22e">err</span>)
 	}
@@ -659,17 +666,17 @@
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
   <span style="color:#f92672">&#34;method&#34;</span>: <span style="color:#e6db74">&#34;POST&#34;</span>,
   <span style="color:#f92672">&#34;eventObject&#34;</span>: {
-    <span style="color:#f92672">&#34;contextPath&#34;</span>: <span style="color:#e6db74">&#34;&#34;</span>,
-    <span style="color:#f92672">&#34;contentLength&#34;</span>: <span style="color:#ae81ff">32</span>,
     <span style="color:#f92672">&#34;parameters&#34;</span>: { <span style="color:#f92672">&#34;key3&#34;</span>: [<span style="color:#e6db74">&#34;value3&#34;</span>] },
+    <span style="color:#f92672">&#34;contentLength&#34;</span>: <span style="color:#ae81ff">33</span>,
+    <span style="color:#f92672">&#34;contextPath&#34;</span>: <span style="color:#e6db74">&#34;&#34;</span>,
+    <span style="color:#f92672">&#34;queryString&#34;</span>: <span style="color:#e6db74">&#34;key3=value3&#34;</span>,
+    <span style="color:#f92672">&#34;parameter&#34;</span>: { <span style="color:#f92672">&#34;key3&#34;</span>: <span style="color:#e6db74">&#34;value3&#34;</span> },
     <span style="color:#f92672">&#34;postData&#34;</span>: {
-      <span style="color:#f92672">&#34;contents&#34;</span>: <span style="color:#e6db74">&#34;{key1: \&#34;value1\&#34;, key2: \&#34;value2\&#34;}&#34;</span>,
-      <span style="color:#f92672">&#34;length&#34;</span>: <span style="color:#ae81ff">32</span>,
+      <span style="color:#f92672">&#34;contents&#34;</span>: <span style="color:#e6db74">&#34;{\&#34;key1\&#34;:\&#34;value1\&#34;,\&#34;key2\&#34;:\&#34;value2\&#34;}&#34;</span>,
+      <span style="color:#f92672">&#34;length&#34;</span>: <span style="color:#ae81ff">33</span>,
       <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;postData&#34;</span>,
       <span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;application/json&#34;</span>
-    },
-    <span style="color:#f92672">&#34;queryString&#34;</span>: <span style="color:#e6db74">&#34;key3=value3&#34;</span>,
-    <span style="color:#f92672">&#34;parameter&#34;</span>: { <span style="color:#f92672">&#34;key3&#34;</span>: <span style="color:#e6db74">&#34;value3&#34;</span> }
+    }
   }
 }
 </code></pre></div><ul>
