@@ -379,6 +379,47 @@
       <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">row</span>.<span style="color:#a6e22e">indexOf</span>(<span style="color:#a6e22e">findText</span>) <span style="color:#f92672">&gt;</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">row</span>);
       <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ar</span>;
     }, []);
+</code></pre></div><h3 id="sample-script-for-measuring-the-cost">Sample script for measuring the cost:</h3>
+<p>Above result could be obtained by the following sample script. When you measure other pattern, you can add them.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">pattern1_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">spreadsheetId</span>, <span style="color:#a6e22e">sheetName</span>, <span style="color:#a6e22e">findText</span>) =&gt; <span style="color:#a6e22e">SpreadsheetApp</span>
+  .<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">spreadsheetId</span>)
+  .<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#a6e22e">sheetName</span>)
+  .<span style="color:#a6e22e">createTextFinder</span>(<span style="color:#a6e22e">findText</span>)
+  .<span style="color:#a6e22e">findAll</span>()
+  .<span style="color:#a6e22e">map</span>(<span style="color:#a6e22e">range</span> =&gt; <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getRow</span>());
+
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">pattern2_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">spreadsheetId</span>, <span style="color:#a6e22e">sheetName</span>, <span style="color:#a6e22e">findText</span>) =&gt; <span style="color:#a6e22e">SpreadsheetApp</span>
+  .<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">spreadsheetId</span>)
+  .<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#a6e22e">sheetName</span>)
+  .<span style="color:#a6e22e">getDataRange</span>()
+  .<span style="color:#a6e22e">getValues</span>()
+  .<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">ar</span>, <span style="color:#a6e22e">row</span>, <span style="color:#a6e22e">i</span>) =&gt; {
+    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">row</span>.<span style="color:#a6e22e">indexOf</span>(<span style="color:#a6e22e">findText</span>) <span style="color:#f92672">&gt;</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>);
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ar</span>;
+  }, []);
+
+<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">run</span>() {
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">measureSpreadsheetIds</span> <span style="color:#f92672">=</span> [
+    {<span style="color:#a6e22e">c</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">10000</span>, <span style="color:#a6e22e">id</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;###&#34;</span>},
+    {<span style="color:#a6e22e">c</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">40000</span>, <span style="color:#a6e22e">id</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;###&#34;</span>},
+    {<span style="color:#a6e22e">c</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">70000</span>, <span style="color:#a6e22e">id</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;###&#34;</span>},
+    {<span style="color:#a6e22e">c</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">100000</span>, <span style="color:#a6e22e">id</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;###&#34;</span>},
+  ];
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">functions</span> <span style="color:#f92672">=</span> [
+    {<span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;pattern 1&#34;</span>, <span style="color:#a6e22e">f</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">pattern1_</span>},
+    {<span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;pattern 2&#34;</span>, <span style="color:#a6e22e">f</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">pattern2_</span>},
+  ];
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">functions</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">ar</span>, {<span style="color:#a6e22e">name</span>, <span style="color:#a6e22e">f</span>}) =&gt; {
+    <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">name</span>);
+    <span style="color:#a6e22e">measureSpreadsheetIds</span>.<span style="color:#a6e22e">forEach</span>(({<span style="color:#a6e22e">c</span>, <span style="color:#a6e22e">id</span>}) =&gt; {
+      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">processStart</span> <span style="color:#f92672">=</span> Date.<span style="color:#a6e22e">now</span>();
+      <span style="color:#a6e22e">f</span>(<span style="color:#a6e22e">id</span>, <span style="color:#e6db74">&#34;Sheet1&#34;</span>, <span style="color:#e6db74">&#34;sampleValue&#34;</span>);
+      <span style="color:#a6e22e">ar</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">concat</span>([<span style="color:#a6e22e">c</span>, (<span style="color:#a6e22e">processEnd</span> <span style="color:#f92672">-</span> Date.<span style="color:#a6e22e">now</span>()) <span style="color:#f92672">/</span> <span style="color:#ae81ff">1000</span>]);
+    });
+    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ar</span>;
+  }, [<span style="color:#66d9ef">new</span> Date()]);
+  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>)
+}
 </code></pre></div>
   
 
