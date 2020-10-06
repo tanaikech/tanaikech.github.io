@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.61.0" />
 
-  <title>Running Specific Function When Specific Sheet is Edited on Google Spreadsheet &middot; tanaike</title>
+  <title>Setting Alternate Background Colors for Rows in Google Spreadsheet using Google Apps Script &middot; tanaike</title>
 
     
 
@@ -232,7 +232,7 @@
 
 
 <div class="header">
-  <h1>Running Specific Function When Specific Sheet is Edited on Google Spreadsheet</h1>
+  <h1>Setting Alternate Background Colors for Rows in Google Spreadsheet using Google Apps Script</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -241,7 +241,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>04 Oct 2020, 09:23</time>
+    <time>06 Oct 2020, 13:39</time>
   </div>
 
   
@@ -268,11 +268,7 @@
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/event">event</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/trigger">trigger</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>
     
   </div>
   
@@ -280,50 +276,40 @@
 
 </div>
 
-  <p><a href="https://gist.github.com/tanaikech/bc09d1e03a0ebed3af894a6ed61cf12d">Gists</a></p>
-<p>This is a sample Google Apps Script for running the specific function when the specific sheet is edited.</p>
+  <p><a href="https://gist.github.com/tanaikech/89aaa3adcd3a1fc37187ca61f389cbe9">Gists</a></p>
+<p>This is a sample script for setting alternate background colors for rows in Google Spreadsheet using Google Apps Script.</p>
+<p>It has already been known when the conditional formatting rule and custom function are used, this can be simply achieved. <a href="https://stackoverflow.com/q/30268451">Ref</a> In this report, I would like to introduce the method for using Google Apps Script.</p>
+<p><img src="https://tanaikech.github.io/img/20201006a-fig1.png" alt=""></p>
 <h2 id="sample-script">Sample script</h2>
-<p>Please copy and paste the following script to the container-bound script of Spreadsheet and set <code>sheets</code> object.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// When the cells are edited, this function is run by the fire of event trigger.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">onEdit</span>(<span style="color:#a6e22e">e</span>) {
-  <span style="color:#75715e">// Please set the sheet name and function as follows.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheets</span> <span style="color:#f92672">=</span> {
-    <span style="color:#a6e22e">Sheet1</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">functionForSheet1</span>, <span style="color:#75715e">// Sheet1 is the sheet name. functionForSheet1 is the function name of function which is run when Sheet1 is edited.
-</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">Sheet2</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">functionForSheet2</span>,
-  };
+<p>In this sample script, the values of column &ldquo;A&rdquo; are checked.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">colors</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">color1</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;#f4cccc&#34;</span>, <span style="color:#a6e22e">color2</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;#d9ead3&#34;</span> };
 
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheetName</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getSheet</span>().<span style="color:#a6e22e">getSheetName</span>();
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">sheets</span>[<span style="color:#a6e22e">sheetName</span>]) {
-    <span style="color:#a6e22e">sheets</span>[<span style="color:#a6e22e">sheetName</span>](<span style="color:#a6e22e">e</span>);
-  }
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSheet</span>();
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ranges</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>
+    .<span style="color:#a6e22e">getRange</span>(<span style="color:#e6db74">&#34;A1:A&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getLastRow</span>())
+    .<span style="color:#a6e22e">getValues</span>()
+    .<span style="color:#a6e22e">reduce</span>(
+      (<span style="color:#a6e22e">o</span>, [<span style="color:#a6e22e">b</span>], <span style="color:#a6e22e">i</span>) =&gt; {
+        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">b</span> <span style="color:#f92672">!=</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>) {
+          <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">b</span>;
+          <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">c</span><span style="color:#f92672">++</span>;
+        }
+        <span style="color:#a6e22e">o</span>[[<span style="color:#e6db74">&#34;color1&#34;</span>, <span style="color:#e6db74">&#34;color2&#34;</span>][<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">c</span> <span style="color:#f92672">%</span> <span style="color:#ae81ff">2</span>]].<span style="color:#a6e22e">push</span>(<span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">:</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
+        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
+      },
+      { <span style="color:#a6e22e">color1</span><span style="color:#f92672">:</span> [], <span style="color:#a6e22e">color2</span><span style="color:#f92672">:</span> [], <span style="color:#a6e22e">c</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">temp</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;&#34;</span> }
+    );
+  Object.<span style="color:#a6e22e">entries</span>(<span style="color:#a6e22e">colors</span>).<span style="color:#a6e22e">forEach</span>(([<span style="color:#a6e22e">k</span>, <span style="color:#a6e22e">v</span>]) =&gt;
+    <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRangeList</span>(<span style="color:#a6e22e">ranges</span>[<span style="color:#a6e22e">k</span>]).<span style="color:#a6e22e">setBackground</span>(<span style="color:#a6e22e">v</span>)
+  );
 }
-
-<span style="color:#75715e">// In this sample, when Sheet1 is edited, this function is run.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">functionForSheet1</span>(<span style="color:#a6e22e">e</span>) {
-  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Sheet1 was edited.&#34;</span>);
-
-  <span style="color:#75715e">// do something
-</span><span style="color:#75715e"></span>}
-
-<span style="color:#75715e">// In this sample, when Sheet2 is edited, this function is run.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">functionForSheet2</span>(<span style="color:#a6e22e">e</span>) {
-  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Sheet2 was edited.&#34;</span>);
-
-  <span style="color:#75715e">// do something
-</span><span style="color:#75715e"></span>}
 </code></pre></div><ul>
-<li>In this sample script, when the cells of &ldquo;Sheet1&rdquo; and &ldquo;Sheet2&rdquo; are edited, <code>functionForSheet1()</code> and <code>functionForSheet2()</code> are run, respectively. When other sheets are edited, no functions are run.</li>
-<li>In this sample script, <code>onEdit</code> of the simple trigger is used. When the functions you want to run include the methods which are required to authorize, please use the installable trigger.</li>
+<li>The process cost of this script can be reduced by using RangeList.</li>
 </ul>
-<h2 id="note">Note</h2>
+<h2 id="reference">Reference</h2>
 <ul>
-<li>This method can be also used for other event triggers like OnChange, OnSelectionChange and so son.</li>
-</ul>
-<h2 id="references">References</h2>
-<ul>
-<li><a href="https://developers.google.com/apps-script/guides/triggers">Simple Triggers</a></li>
-<li><a href="https://developers.google.com/apps-script/guides/triggers/installable">Installable Triggers</a></li>
-<li><a href="https://developers.google.com/apps-script/guides/triggers/events">Event Objects</a></li>
+<li><a href="https://developers.google.com/apps-script/reference/spreadsheet/range-list">Class RangeList</a></li>
 </ul>
 
   
@@ -333,13 +319,13 @@
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2020/09/30/benchmark-process-costs-for-searching-values-in-spreadsheet-using-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2020/10/04/running-specific-function-when-specific-sheet-is-edited-on-google-spreadsheet/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2020/09/30/benchmark-process-costs-for-searching-values-in-spreadsheet-using-google-apps-script/">Benchmark: Process Costs for Searching Values in Spreadsheet using Google Apps Script</a>
+      <a href="https://tanaikech.github.io/2020/10/04/running-specific-function-when-specific-sheet-is-edited-on-google-spreadsheet/">Running Specific Function When Specific Sheet is Edited on Google Spreadsheet</a>
     </nav>
     
   </div>
@@ -348,14 +334,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2020/10/06/setting-alternate-background-colors-for-rows-in-google-spreadsheet-using-google-apps-script/">Setting Alternate Background Colors for Rows in Google Spreadsheet using Google Apps Script</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2020/10/06/setting-alternate-background-colors-for-rows-in-google-spreadsheet-using-google-apps-script/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
@@ -398,6 +378,9 @@
 
 
 
+<script src="https://tanaikech.github.io/js/math-code.js"></script>
+  <script async src="//cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  
 
 
 </body>
