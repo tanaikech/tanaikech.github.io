@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.61.0" />
 
-  <title>Updated: GAS Library - OnedriveApp &middot; tanaike</title>
+  <title>Sorting Cells on Google Spreadsheet with Background colors using Google Apps Script &middot; tanaike</title>
 
     
 
@@ -232,7 +232,7 @@
 
 
 <div class="header">
-  <h1>Updated: GAS Library - OnedriveApp</h1>
+  <h1>Sorting Cells on Google Spreadsheet with Background colors using Google Apps Script</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -241,7 +241,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>21 Aug 2017, 15:02</time>
+    <time>09 Oct 2020, 12:46</time>
   </div>
 
   
@@ -254,7 +254,7 @@
     
       <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/spreadsheet">spreadsheet</a>
     
   </div>
   
@@ -268,9 +268,7 @@
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/onedrive">OneDrive</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>
     
   </div>
   
@@ -278,9 +276,69 @@
 
 </div>
 
-  <p>OnedriveApp was updated to v1.0.2.</p>
-<p><a href="https://github.com/tanaikech/OnedriveApp#authprocess">Moved the instance of PropertiesService.getScriptProperties() to outside of this library. When there is the PropertiesService.getScriptProperties() inside the library, it was found that the parameters that users set was saved to the library. So this was modified. I'm sorry that I couldn't notice this situation.</a></p>
-<p><a href="https://github.com/tanaikech/OnedriveApp">GitHub of OnedriveApp</a></p>
+  <p><a href="https://gist.github.com/tanaikech/8e531fdb4125c843b58cf7bef6165786">Gists</a></p>
+<p>This is a sample script for sorting the cells on Google Spreadsheet with the background colors using Google Apps Script.</p>
+<p>Unfortunately, in the current stage, it seems that <code>sort(sortSpecObj)</code> of Class Range cannot directly sort by the background colors of cells. But when Sheets API is used, this goal can be achieved. Here, &ldquo;SortRangeRequest&rdquo; of the method of &ldquo;spreadsheets.batchUpdate&rdquo; in Sheets API is used.</p>
+<p><img src="https://tanaikech.github.io/img/20201009a-fig1.png" alt=""></p>
+<h2 id="flow">Flow</h2>
+<p>The flow of this sample script is as follows.</p>
+<ol>
+<li>Retrieve the background colors from the cells.</li>
+<li>Create the request body for using the batchUpdate method of Sheets API.</li>
+<li>Request to Sheets API using the request body.</li>
+</ol>
+<h2 id="sample-script">Sample script</h2>
+<p>Please copy and paste the following script to the script editor of the container-bound script of Spreadsheet. And <a href="https://developers.google.com/apps-script/guides/services/advanced#enabling_advanced_services">please enable Sheets API at Advanced Google services</a>. By this, Sheets API can be used with Google Apps Script.</p>
+<pre><code>function myFunction() {
+  const sheetName = &quot;Sheet1&quot;;  // Please set the sheet name.
+  const a1Notation = &quot;A1:C10&quot;; // Please set the sort range as a1Notation.
+
+  // 1. Retrieve the background colors from the cells.
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(sheetName);
+  const range = sheet.getRange(a1Notation);
+  const backgrounds = range.getBackgroundObjects();
+
+  // 2. Create the request body for using the batchUpdate method of Sheets API.
+  const backgroundColors = Object.values(
+    backgrounds.reduce((o, [a]) =&gt; {
+      const rgb = a.asRgbColor();
+      return Object.assign(o, {[rgb.asHexString()]: {red: rgb.getRed() / 255, green: rgb.getGreen() / 255, blue: rgb.getBlue() / 255}})
+    }, {})
+  );
+  const startRow = range.getRow() - 1;
+  const startColumn = range.getColumn() - 1;
+  const srange = {
+    sheetId: sheet.getSheetId(),
+    startRowIndex: startRow,
+    endRowIndex: startRow + range.getNumRows(),
+    startColumnIndex: startColumn,
+    endColumnIndex: startColumn + range.getNumColumns()
+  };
+  const requests = [
+    {sortRange: {range: srange, sortSpecs: [{dimensionIndex: 0, sortOrder: &quot;ASCENDING&quot;}]}},
+    {sortRange: {range: srange, sortSpecs: backgroundColors.map(rgb =&gt; ({backgroundColor: rgb}))}}
+  ];
+
+  // 3. Request to Sheets API using the request body.
+  Sheets.Spreadsheets.batchUpdate({requests: requests}, ss.getId());
+}
+</code></pre>
+<ul>
+<li>In this sample, before the sort of background color is run, the column &ldquo;A&rdquo; is sorted with &ldquo;ASCENDING&rdquo;.</li>
+<li>When this sample script is used, the situation of above demo image can be obtained.</li>
+</ul>
+<h2 id="note">Note</h2>
+<ul>
+<li>If you want to set the order of colors, please set the array for <code>sortSpecs</code> like <code>sortSpecs: [{backgroundColor: rgb1}, {backgroundColor: rgb2}, {backgroundColor: rgb3},,,]</code>.</li>
+</ul>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://developers.google.com/apps-script/reference/spreadsheet/range#sort(Object)">sort(sortSpecObj)</a></li>
+<li><a href="https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/batchUpdate">Method: spreadsheets.batchUpdate</a></li>
+<li><a href="https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/request#sortrangerequest">SortRangeRequest</a></li>
+<li>This sample script was posted as an answer for <a href="https://stackoverflow.com/q/64263264">this question</a> of Stackoverflow.</li>
+</ul>
 
   
 
@@ -289,13 +347,13 @@
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2017/08/21/updated-gas-library-onedriveapp/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2020/10/07/statistical-analysis-of-duplicated-questions-for-google-apps-script-tag-in-stackoverflow/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2017/08/21/updated-gas-library-onedriveapp/">Updated: GAS Library - OnedriveApp</a>
+      <a href="https://tanaikech.github.io/2020/10/07/statistical-analysis-of-duplicated-questions-for-google-apps-script-tag-in-stackoverflow/">Statistical Analysis of Duplicated Questions for google-apps-script tag in Stackoverflow</a>
     </nav>
     
   </div>
@@ -304,14 +362,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2017/08/27/exporting-project-on-google-drive-using-golang-quickstart/">Exporting Project on Google Drive using Golang Quickstart</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2017/08/27/exporting-project-on-google-drive-using-golang-quickstart/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
