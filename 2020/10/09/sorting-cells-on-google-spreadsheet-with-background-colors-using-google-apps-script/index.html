@@ -289,42 +289,57 @@
 </ol>
 <h2 id="sample-script">Sample script</h2>
 <p>Please copy and paste the following script to the script editor of the container-bound script of Spreadsheet. And <a href="https://developers.google.com/apps-script/guides/services/advanced#enabling_advanced_services">please enable Sheets API at Advanced Google services</a>. By this, Sheets API can be used with Google Apps Script.</p>
-<pre><code>function myFunction() {
-  const sheetName = &quot;Sheet1&quot;;  // Please set the sheet name.
-  const a1Notation = &quot;A1:C10&quot;; // Please set the sort range as a1Notation.
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheetName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Sheet1&#34;</span>; <span style="color:#75715e">// Please set the sheet name.
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">a1Notation</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;A1:C10&#34;</span>; <span style="color:#75715e">// Please set the sort range as a1Notation.
+</span><span style="color:#75715e"></span>
+  <span style="color:#75715e">// 1. Retrieve the background colors from the cells.
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>();
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#a6e22e">sheetName</span>);
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">a1Notation</span>);
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">backgrounds</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getBackgroundObjects</span>();
 
-  // 1. Retrieve the background colors from the cells.
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName(sheetName);
-  const range = sheet.getRange(a1Notation);
-  const backgrounds = range.getBackgroundObjects();
-
-  // 2. Create the request body for using the batchUpdate method of Sheets API.
-  const backgroundColors = Object.values(
-    backgrounds.reduce((o, [a]) =&gt; {
-      const rgb = a.asRgbColor();
-      return Object.assign(o, {[rgb.asHexString()]: {red: rgb.getRed() / 255, green: rgb.getGreen() / 255, blue: rgb.getBlue() / 255}})
+  <span style="color:#75715e">// 2. Create the request body for using the batchUpdate method of Sheets API.
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">backgroundColors</span> <span style="color:#f92672">=</span> Object.<span style="color:#a6e22e">values</span>(
+    <span style="color:#a6e22e">backgrounds</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">o</span>, [<span style="color:#a6e22e">a</span>]) =&gt; {
+      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">rgb</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">asRgbColor</span>();
+      <span style="color:#66d9ef">return</span> Object.<span style="color:#a6e22e">assign</span>(<span style="color:#a6e22e">o</span>, {
+        [<span style="color:#a6e22e">rgb</span>.<span style="color:#a6e22e">asHexString</span>()]<span style="color:#f92672">:</span> {
+          <span style="color:#a6e22e">red</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">rgb</span>.<span style="color:#a6e22e">getRed</span>() <span style="color:#f92672">/</span> <span style="color:#ae81ff">255</span>,
+          <span style="color:#a6e22e">green</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">rgb</span>.<span style="color:#a6e22e">getGreen</span>() <span style="color:#f92672">/</span> <span style="color:#ae81ff">255</span>,
+          <span style="color:#a6e22e">blue</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">rgb</span>.<span style="color:#a6e22e">getBlue</span>() <span style="color:#f92672">/</span> <span style="color:#ae81ff">255</span>,
+        },
+      });
     }, {})
   );
-  const startRow = range.getRow() - 1;
-  const startColumn = range.getColumn() - 1;
-  const srange = {
-    sheetId: sheet.getSheetId(),
-    startRowIndex: startRow,
-    endRowIndex: startRow + range.getNumRows(),
-    startColumnIndex: startColumn,
-    endColumnIndex: startColumn + range.getNumColumns()
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">startRow</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getRow</span>() <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>;
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">startColumn</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getColumn</span>() <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>;
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">srange</span> <span style="color:#f92672">=</span> {
+    <span style="color:#a6e22e">sheetId</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getSheetId</span>(),
+    <span style="color:#a6e22e">startRowIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">startRow</span>,
+    <span style="color:#a6e22e">endRowIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">startRow</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getNumRows</span>(),
+    <span style="color:#a6e22e">startColumnIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">startColumn</span>,
+    <span style="color:#a6e22e">endColumnIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">startColumn</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getNumColumns</span>(),
   };
-  const requests = [
-    {sortRange: {range: srange, sortSpecs: [{dimensionIndex: 0, sortOrder: &quot;ASCENDING&quot;}]}},
-    {sortRange: {range: srange, sortSpecs: backgroundColors.map(rgb =&gt; ({backgroundColor: rgb}))}}
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">requests</span> <span style="color:#f92672">=</span> [
+    {
+      <span style="color:#a6e22e">sortRange</span><span style="color:#f92672">:</span> {
+        <span style="color:#a6e22e">range</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">srange</span>,
+        <span style="color:#a6e22e">sortSpecs</span><span style="color:#f92672">:</span> [{ <span style="color:#a6e22e">dimensionIndex</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">sortOrder</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;ASCENDING&#34;</span> }],
+      },
+    },
+    {
+      <span style="color:#a6e22e">sortRange</span><span style="color:#f92672">:</span> {
+        <span style="color:#a6e22e">range</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">srange</span>,
+        <span style="color:#a6e22e">sortSpecs</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">backgroundColors</span>.<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">rgb</span>) =&gt; ({ <span style="color:#a6e22e">backgroundColor</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">rgb</span> })),
+      },
+    },
   ];
 
-  // 3. Request to Sheets API using the request body.
-  Sheets.Spreadsheets.batchUpdate({requests: requests}, ss.getId());
+  <span style="color:#75715e">// 3. Request to Sheets API using the request body.
+</span><span style="color:#75715e"></span>  <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">batchUpdate</span>({ <span style="color:#a6e22e">requests</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">requests</span> }, <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getId</span>());
 }
-</code></pre>
-<ul>
+</code></pre></div><ul>
 <li>In this sample, before the sort of background color is run, the column &ldquo;A&rdquo; is sorted with &ldquo;ASCENDING&rdquo;.</li>
 <li>When this sample script is used, the situation of above demo image can be obtained.</li>
 </ul>
