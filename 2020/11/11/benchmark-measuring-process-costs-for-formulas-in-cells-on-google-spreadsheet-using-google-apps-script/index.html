@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="generator" content="Hugo 0.61.0" />
+
+  <title>Benchmark: Measuring Process Costs for Formulas in Cells on Google Spreadsheet using Google Apps Script &middot; tanaike</title>
+
+    
+
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/pure-min.css">
+
+  <!--[if lte IE 8]>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-old-ie-min.css">
+  <![endif]-->
+  <!--[if gt IE 8]><!-->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-min.css">
+  <!--<![endif]-->
+
+  <!--[if lte IE 8]>
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/side-menu-old-ie.css">
+  <![endif]-->
+  <!--[if gt IE 8]><!-->
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/side-menu.css">
+  <!--<![endif]-->
+
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
+
+  
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
+
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+ 
+  
+
+  
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/androidstudio.min.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  
+  <script>hljs.initHighlightingOnLoad();</script>
+  
+
+  <link rel="shortcut icon" href="https://tanaikech.github.io/img/favicon.ico" type="image/x-icon" />
+
+  
+  
+
+</head>
+
+
+<body>
+<div id="layout">
+
+  
+<a href="#menu" id="menuLink" class="menu-link">
+  
+  <span></span>
+</a>
+<div id="menu">
+
+  
+  <a class="pure-menu-heading brand" href="https://tanaikech.github.io/">TANAIKE</a>
+
+
+  <div class="pure-menu">
+    <ul class="pure-menu-list">
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/about/"><i class='fa fa-user fa-fw'></i>About</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/post/"><i class='fa fa-list fa-fw'></i>Posts</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/topics/"><i class='fa fa-folder fa-fw'></i>Topics</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/tags/"><i class='fa fa-tags fa-fw'></i>Tags</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/contact/"><i class='fa fa-phone fa-fw'></i>Contact</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/webapps/"><i class='fas fa-toolbox'></i>Web Applications</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
+      
+        </li>
+      
+    </ul>
+  </div>
+
+  <div class="pure-menu social">
+  <ul class="pure-menu-list">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
+    </li>
+    
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+    </li>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+  </ul>
+</div>
+
+
+  <div>
+  <div class="small-print">
+    <small>&copy; 2017. All rights reserved.</small>
+  </div>
+  <div class="small-print">
+    <small>Built with&nbsp;<a href="https://gohugo.io/" target="_blank">Hugo</a></small>
+    <small>Theme&nbsp;<a href="https://github.com/yoshiharuyamashita/blackburn" target="_blank">Blackburn</a></small>
+  </div>
+</div>
+
+</div>
+
+
+  <div id="main">
+
+
+<div class="header">
+  <h1>Benchmark: Measuring Process Costs for Formulas in Cells on Google Spreadsheet using Google Apps Script</h1>
+  <h2></h2>
+</div>
+<div class="content">
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>11 Nov 2020, 14:20</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/report">report</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/benchmark">Benchmark</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/spreadsheet">spreadsheet</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/custom-function">custom function</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  <p><a href="https://gist.github.com/tanaikech/b00be25a02ec283689480ac8138cbfeb">Gists</a></p>
+<h2 id="description">Description</h2>
+<p>When Google Spreadsheet is used, there is the case that the built-in functions and the custom functions in the cells are used. For the functions of Google Apps Script, there is the method for measuring the process cost. <a href="https://github.com/tanaikech/taking-advantage-of-google-apps-script#benchmarks">Ref</a> But for the built-in functions, it is required to create the script for it. In this report, the script for measuring a function put in a cell has been proposed, and the process cost of the built-in functions has been measured. The proposed script can measure the process cost for the built-in functions and custom functions on Google Spreadsheet. The script is created with using Google Apps Script. When the process cost can be known for the built-in functions and custom functions, it is considered that it will be useful for the developers using Google Spreadsheet.</p>
+<p>The origin of this method is <a href="https://stackoverflow.com/q/46923770">my answer of this thread</a>.</p>
+<h2 id="experimental-procedure">Experimental procedure</h2>
+<p>This is a simple sample script for measuring the process cost of functions on a cell. At first, in order to confirm whether this script can be used for measuring the process cost of the function put in a cell, a custom function was used. Because when the custom function is used, the process time of the script can be known by using <code>Utilities.sleep(time)</code>.</p>
+<h3 id="sample-script">Sample script</h3>
+<p>When you test this script, please copy and paste the following script to the container-bound script of Google Spreadsheet. When you run the function of <code>main()</code>, the process cost of <code>=SAMPLE(5000)</code> can be obtained.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// This is a sample custom formula. This is used for testing.
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">SAMPLE</span>(<span style="color:#a6e22e">time</span>) {
+  <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">sleep</span>(<span style="color:#a6e22e">time</span>);
+  <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;ok&#34;</span>;
+}
+
+<span style="color:#75715e">// This is a script for measuring the process cost.
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">formula</span><span style="color:#f92672">:</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">=SAMPLE(5000)</span><span style="color:#e6db74">`</span>, <span style="color:#a6e22e">returnValue</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;ok&#34;</span> }; <span style="color:#75715e">// Set formula and response value.
+</span><span style="color:#75715e"></span>
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">label</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Execution time&#34;</span>;
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>().<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>);
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#e6db74">&#34;A1&#34;</span>);
+  <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">clear</span>();
+
+  <span style="color:#75715e">// start --- measure
+</span><span style="color:#75715e"></span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">time</span>(<span style="color:#a6e22e">label</span>);
+  <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">setFormula</span>(<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">formula</span>);
+  <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">flush</span>();
+  <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getDisplayValue</span>() <span style="color:#f92672">!=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">returnValue</span>) {}
+  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">timeEnd</span>(<span style="color:#a6e22e">label</span>);
+  <span style="color:#75715e">// end --- measure
+</span><span style="color:#75715e"></span>
+  <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">clear</span>();
+}
+</code></pre></div><ul>
+<li>In this sample, when <code>=SAMPLE(5000)</code> is put to a cell, the value of <code>ok</code> is shown in the cell after 5 seconds. <code>main()</code> measures the process time for this.</li>
+<li>This sample script checks the output value from the function. So please set <code>returnValue</code>. Please be careful this.</li>
+<li>At the formula of Spreadsheet, when the formula is put to the cell, the measurement of process time is started. So I included <code>setFormula</code> and <code>flush</code> to the measured process cost. Because the detail process of <code>setFormula</code> and <code>flush</code> in the internal server are not cleared.</li>
+</ul>
+<h2 id="results-and-discussions">Results and discussions</h2>
+<h3 id="1-measuring-process-cost-of-custom-functions">1. Measuring process cost of custom functions</h3>
+<p>In this section, the measurement result of the process costs for the custom functions is discussed.</p>
+<!-- raw HTML omitted -->
+<p><img src="https://tanaikech.github.io/img/20201105a-fig1.png" alt=""></p>
+<p>Fig. 1. Sleep time in custom function vs. process cost.</p>
+<!-- raw HTML omitted -->
+<p>As an experiment, it shows the change of process time with increasing the sleep time of the custom function as Fig. 1. This result indicates that the process time is linearly increased with the increase in the sleep time. It was found that the process time was at least, more than the sleep time, and the process time was large in about 0.5 s for each sleep time as the offset. It is considered that this offset includes the process costs of <code>setFormula</code>, <code>flush</code>, <code>getDisplayValue</code> and the while loop. But, from Fig. 1, it is considered that when the process costs of various formulas are measured using above script, those can be compared by the relative comparison. And from this result, it is considered that above script can be used for measuring the process time of the function in a cell of Spreadsheet, and also, this method can be used for measuring the process cost for not only te custom function, but also, the built-in functions.</p>
+<p>As the next step, the process costs of the built-in functions are measured.</p>
+<h3 id="2-measuring-process-cost-of-built-in-functions">2. Measuring process cost of built-in functions</h3>
+<p>In this section, using the script proposed at the section 1, the measurement result of the process costs for the built-in functions is discussed. In this experiment, the process cost for retrieving <code>bb2</code> from <code>aa1,bb2,cc3</code> put in a cell was measured. The input sheet is as shown in Fig. 2.</p>
+<!-- raw HTML omitted -->
+<p><img src="https://tanaikech.github.io/img/20201105a-fig2.png" alt=""></p>
+<p>Fig. 2. Spreadsheet for measuring process cost.</p>
+<!-- raw HTML omitted -->
+<p>When the process cost is measured, the formula is put to the cell &ldquo;B1&rdquo;. When the result is retrieved, the process time is retrieved. This flow is achieved using the script proposed at the section 1. In this experiment, the result values are retrieved from the all cells using <code>ARRAYFORMULA</code> by putting a formula to the cell &ldquo;B1&rdquo;. When <code>ARRAYFORMULA</code> is used, when no error occurs, it was found that the result values are shown in the cells after all rows were done. So in this measurement, the cell &ldquo;B1&rdquo; was checked for finishing the formula using the above script.</p>
+<p>As the sample formulas for measuring the process costs, the following formulas are used. Each formula is put to the cell &ldquo;B1&rdquo; and all formulas show the same result which is <code>bb2</code>.</p>
+<ol>
+<li>REGEXREPLACE: <code>=ARRAYFORMULA(REGEXREPLACE(A1:A,&quot;.+?,(.+?),.+&quot;,&quot;$1&quot;))</code></li>
+<li>REGEXEXTRACT: <code>=ARRAYFORMULA(REGEXEXTRACT(A1:A,&quot;.+?,(.+?),.+&quot;))</code></li>
+<li>SPLIT and INDEX: <code>=ARRAYFORMULA(INDEX(SPLIT(A1:A,&quot;,&quot;),,2))</code></li>
+<li>SPLIT and QUERY: <code>=ARRAYFORMULA(QUERY(SPLIT(A1:A,&quot;,&quot;),&quot;SELECT Col2&quot;))</code></li>
+</ol>
+<p>The measured process costs are shown in Fig. 3. The process costs were measured by changing the number of rows.</p>
+<p><img src="https://tanaikech.github.io/img/20201105a-fig3.png" alt=""></p>
+<p>Fig. 3. Process costs of <code>REGEXREPLACE</code>, <code>REGEXEXTRACT</code>, <code>SPLIT</code> and <code>INDEX</code>, <code>SPLIT</code> and <code>QUERY</code>.</p>
+<!-- raw HTML omitted -->
+<p>From Fig. 3, it was found that the process costs of all formulas were almost linearly increasing with the increase in the number of rows. The process costs were REGEXEXTRACT, REGEXREPLACE, SPLIT and INDEX, SPLIT and QUERY in the ascending order. It was found that in above experimental condition, the process cost of REGEXEXTRACT was lowest of all. And also, the process costs of REGEXEXTRACT, REGEXREPLACE are lower than those of SPLIT and INDEX, SPLIT and QUERY. These are very interesting result. When the process costs of SPLIT and INDEX, SPLIT and QUERY are seen, it was found that when the array element is retrieved from an array, the process cost of INDEX is lower than that of QUERY. Also, it was found that REGEXEXTRACT can reduce the process cost with 56 % for SPLIT and QUERY.</p>
+<h2 id="summary">Summary</h2>
+<p>In this report, I proposed the script for measuring the process cost of the function put in a cell (the built-in functions the custom functions) for Google Spreadsheet. As the result, the following results were obtained.</p>
+<ol>
+<li>Proposal script could be used for measuring the process cost of the function in a cell.</li>
+<li>At the experiment for retrieving <code>bb2</code> from <code>aa1,bb2,cc3</code> in a cell, the process costs were REGEXEXTRACT, REGEXREPLACE, SPLIT and INDEX, SPLIT and QUERY in the ascending order.</li>
+<li>Process cost of REGEXEXTRACT was lowest of REGEXREPLACE, REGEXEXTRACT, SPLIT and INDEX, SPLIT and QUERY.</li>
+<li>Process costs of REGEXEXTRACT, REGEXREPLACE are lower than those of SPLIT and INDEX, SPLIT and QUERY.</li>
+</ol>
+<ul>
+<li>REGEXEXTRACT can reduce the process cost with 56 % for SPLIT and QUERY.</li>
+</ul>
+<ol start="5">
+<li>When the process costs of SPLIT and INDEX, SPLIT and QUERY are seen, it was found that when the array element is retrieved from an array, the process cost of INDEX is lower than that of QUERY.</li>
+</ol>
+<h2 id="note">Note</h2>
+<ul>
+<li>
+<p>As other situation of function, when <code>ARRAYFORMULA</code> is used, it seems that the result values are shown in the cells after all rows were done. When this is used, it is considered that the process time using <code>ARRAYFORMULA</code> can be measured by checking one cell.</p>
+</li>
+<li>
+<p>In above script, even when <code>while (range.getDisplayValue() != obj.returnValue){}</code> is replaced to <code>range.getDisplayValue()</code>, the same result can be obtained. And also, even when <code>SpreadsheetApp.flush()</code> and <code>while (range.getDisplayValue() != obj.returnValue){}</code> are replaced to <code>range.getDisplayValue()</code>, the same result can be obtained. From these situation, I thought that in the case that the formula is put using <code>setFormula</code> and the cell value is retrieved by <code>getValue</code> and <code>getDisplayValue</code>, the value might be able to be retrieved when the calculation of the formula was done.</p>
+<ul>
+<li>But when the process costs are measured using the same script, those can be compared by the relative comparison. Please be careful this.</li>
+</ul>
+</li>
+<li>
+<p>Also, I have to describe that this is the result for Google Apps Script. The process cost of this report might be modified by future update of Google.</p>
+</li>
+</ul>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://developers.google.com/apps-script/guides/sheets/functions">Custom Functions in Google Sheets</a></li>
+<li>Related thread
+<ul>
+<li><a href="https://stackoverflow.com/q/46923770">Measurement of execution time of built-in functions for Spreadsheet</a></li>
+</ul>
+</li>
+<li><a href="https://github.com/tanaikech/taking-advantage-of-google-apps-script#benchmarks">Other benchmarks</a></li>
+</ul>
+
+  
+
+
+  
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2020/11/10/downloading-google-spreadsheet-as-xlsx-and-pdf-file-by-clicking-button/"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2020/11/10/downloading-google-spreadsheet-as-xlsx-and-pdf-file-by-clicking-button/">Downloading Google Spreadsheet as XLSX and PDF file by Clicking Button</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
+</div>
+
+
+
+  
+
+</div>
+
+</div>
+</div>
+<script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
+    }
+  });
+</script>
+
+
+<script>
+  
+  if (window.location.hostname != "localhost") {
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-84325623-1', 'auto');
+    ga('send', 'pageview');
+  }
+</script>
+
+
+
+
+
+<script src="https://tanaikech.github.io/js/math-code.js"></script>
+  <script async src="//cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  
+
+
+</body>
+</html>
+
