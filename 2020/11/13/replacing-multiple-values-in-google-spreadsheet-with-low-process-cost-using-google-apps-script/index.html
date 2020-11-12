@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.61.0" />
 
-  <title>Updated: GAS Library - OnedriveApp &middot; tanaike</title>
+  <title>Replacing Multiple Values in Google Spreadsheet with Low Process Cost using Google Apps Script &middot; tanaike</title>
 
     
 
@@ -232,7 +232,7 @@
 
 
 <div class="header">
-  <h1>Updated: GAS Library - OnedriveApp</h1>
+  <h1>Replacing Multiple Values in Google Spreadsheet with Low Process Cost using Google Apps Script</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -241,7 +241,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>21 Aug 2017, 15:02</time>
+    <time>13 Nov 2020, 08:06</time>
   </div>
 
   
@@ -254,7 +254,7 @@
     
       <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/spreadsheet">spreadsheet</a>
     
   </div>
   
@@ -268,9 +268,7 @@
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/onedrive">OneDrive</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>
     
   </div>
   
@@ -278,9 +276,42 @@
 
 </div>
 
-  <p>OnedriveApp was updated to v1.0.2.</p>
-<p><a href="https://github.com/tanaikech/OnedriveApp#authprocess">Moved the instance of PropertiesService.getScriptProperties() to outside of this library. When there is the PropertiesService.getScriptProperties() inside the library, it was found that the parameters that users set was saved to the library. So this was modified. I'm sorry that I couldn't notice this situation.</a></p>
-<p><a href="https://github.com/tanaikech/OnedriveApp">GitHub of OnedriveApp</a></p>
+  <p><a href="https://gist.github.com/tanaikech/3030603299d1e302821611c834420258">Gists</a></p>
+<p>This is a sample script for replacing the multiple values with various values in Google Spreadsheet with the low process cost using Google Apps Script. In this script, the batchUpdate method of Sheets API is used. So the request can be done by one API call. When <a href="https://developers.google.com/apps-script/reference/spreadsheet">Spreadsheet services</a> is used for this situation, the values are retrieved from the sheet and replaced the retrieved values, and then, the updated values are put to the sheet. Or the TextFinder is used in a loop. In this case, the process cost is higher than that using Sheets API. By using the bathUpdate method of Sheets API, the process cost is reduced.</p>
+<p><img src="https://tanaikech.github.io/img/20201113a-img.gif" alt=""></p>
+<h2 id="sample-script">Sample script</h2>
+<p>Before you use this script, please enable Sheets API at Advanced Google services. <a href="https://developers.google.com/apps-script/guides/services/advanced#enabling_advanced_services">Ref</a></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">replaceConditions</span> <span style="color:#f92672">=</span> {
+  <span style="color:#a6e22e">a1</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;updated_a1&#34;</span>,
+  <span style="color:#a6e22e">b2</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;updated_b2&#34;</span>,
+  <span style="color:#a6e22e">c3</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;updated_c3&#34;</span>,
+  <span style="color:#a6e22e">d4</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;updated_d4&#34;</span>,
+  <span style="color:#a6e22e">e5</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;updated_e5&#34;</span>,
+  <span style="color:#a6e22e">d6</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;updated_d6&#34;</span>,
+  <span style="color:#a6e22e">c7</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;updated_c7&#34;</span>,
+  <span style="color:#a6e22e">b8</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;updated_b8&#34;</span>,
+  <span style="color:#a6e22e">a9</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;updated_a9&#34;</span>,
+};
+
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>();
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheetId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>).<span style="color:#a6e22e">getSheetId</span>();
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">requests</span> <span style="color:#f92672">=</span> Object.<span style="color:#a6e22e">entries</span>(<span style="color:#a6e22e">replaceConditions</span>).<span style="color:#a6e22e">map</span>(([<span style="color:#a6e22e">k</span>, <span style="color:#a6e22e">v</span>]) =&gt; ({
+  <span style="color:#a6e22e">findReplace</span><span style="color:#f92672">:</span> {
+    <span style="color:#a6e22e">find</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">k</span>.<span style="color:#a6e22e">toString</span>(),
+    <span style="color:#a6e22e">replacement</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">v</span>.<span style="color:#a6e22e">toString</span>(),
+    <span style="color:#a6e22e">matchEntireCell</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>,
+    <span style="color:#a6e22e">sheetId</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">sheetId</span>,
+  },
+}));
+<span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">batchUpdate</span>({ <span style="color:#a6e22e">requests</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">requests</span> }, <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getId</span>());
+</code></pre></div><ul>
+<li>In this script, when <code>sheetId: sheetId</code> is replaced with <code>allSheets: true</code>, <code>replaceConditions</code> are used for all sheets in the Google Spreadsheet.</li>
+</ul>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/batchUpdate">Method: spreadsheets.batchUpdate</a></li>
+<li><a href="https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/request#findreplacerequest">FindReplaceRequest</a></li>
+</ul>
 
   
 
@@ -289,13 +320,13 @@
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2017/08/21/updated-gas-library-onedriveapp/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2020/11/11/benchmark-measuring-process-costs-for-formulas-in-cells-on-google-spreadsheet-using-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2017/08/21/updated-gas-library-onedriveapp/">Updated: GAS Library - OnedriveApp</a>
+      <a href="https://tanaikech.github.io/2020/11/11/benchmark-measuring-process-costs-for-formulas-in-cells-on-google-spreadsheet-using-google-apps-script/">Benchmark: Measuring Process Costs for Formulas in Cells on Google Spreadsheet using Google Apps Script</a>
     </nav>
     
   </div>
@@ -304,14 +335,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2017/08/27/exporting-project-on-google-drive-using-golang-quickstart/">Exporting Project on Google Drive using Golang Quickstart</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2017/08/27/exporting-project-on-google-drive-using-golang-quickstart/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
