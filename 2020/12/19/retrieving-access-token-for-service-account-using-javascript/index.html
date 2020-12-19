@@ -289,37 +289,42 @@
 &lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js&#34;</span>&gt;&lt;/<span style="color:#f92672">script</span>&gt;
 
 &lt;<span style="color:#f92672">script</span>&gt;
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">private_key</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// private_key of JSON file retrieved by creating Service Account
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">client_email</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// client_email of JSON file retrieved by creating Service Account
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">scopes</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;https://www.googleapis.com/auth/drive.readonly&#34;</span>]; <span style="color:#75715e">// Scopes
+  <span style="color:#a6e22e">async</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">sample</span>() {
+    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">private_key</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// private_key of JSON file retrieved by creating Service Account
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">client_email</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// client_email of JSON file retrieved by creating Service Account
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">scopes</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;https://www.googleapis.com/auth/drive.readonly&#34;</span>]; <span style="color:#75715e">// Scopes
 </span><span style="color:#75715e"></span>
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://www.googleapis.com/oauth2/v3/token&#34;</span>;
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">header</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">alg</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;RS256&#34;</span>, <span style="color:#a6e22e">typ</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;JWT&#34;</span> };
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">now</span> <span style="color:#f92672">=</span> Math.<span style="color:#a6e22e">floor</span>(Date.<span style="color:#a6e22e">now</span>() <span style="color:#f92672">/</span> <span style="color:#ae81ff">1000</span>);
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">claim</span> <span style="color:#f92672">=</span> {
-    <span style="color:#a6e22e">iss</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">client_email</span>,
-    <span style="color:#a6e22e">scope</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">scopes</span>.<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34; &#34;</span>),
-    <span style="color:#a6e22e">aud</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">url</span>,
-    <span style="color:#a6e22e">exp</span><span style="color:#f92672">:</span> (<span style="color:#a6e22e">now</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">3600</span>).<span style="color:#a6e22e">toString</span>(),
-    <span style="color:#a6e22e">iat</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">now</span>.<span style="color:#a6e22e">toString</span>(),
-  };
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">signature</span> <span style="color:#f92672">=</span>
-    <span style="color:#a6e22e">btoa</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">header</span>)) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;.&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">btoa</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">claim</span>));
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sign</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">JSEncrypt</span>();
-  <span style="color:#a6e22e">sign</span>.<span style="color:#a6e22e">setPrivateKey</span>(<span style="color:#a6e22e">private_key</span>);
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">jwt</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">signature</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;.&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">sign</span>.<span style="color:#a6e22e">sign</span>(<span style="color:#a6e22e">signature</span>, <span style="color:#a6e22e">CryptoJS</span>.<span style="color:#a6e22e">SHA256</span>, <span style="color:#e6db74">&#34;sha256&#34;</span>);
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> {
-    <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;POST&#34;</span>,
-    <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> { <span style="color:#e6db74">&#34;Content-Type&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/json&#34;</span> },
-    <span style="color:#a6e22e">body</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>({
-      <span style="color:#a6e22e">assertion</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">jwt</span>,
-      <span style="color:#a6e22e">grant_type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;urn:ietf:params:oauth:grant-type:jwt-bearer&#34;</span>,
-    }),
-  };
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">await</span> <span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">params</span>)
-    .<span style="color:#a6e22e">then</span>((<span style="color:#a6e22e">res</span>) =&gt; <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">json</span>())
-    .<span style="color:#66d9ef">catch</span>((<span style="color:#a6e22e">err</span>) =&gt; <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">err</span>));
-  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">obj</span>);
+    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://www.googleapis.com/oauth2/v3/token&#34;</span>;
+    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">header</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">alg</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;RS256&#34;</span>, <span style="color:#a6e22e">typ</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;JWT&#34;</span> };
+    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">now</span> <span style="color:#f92672">=</span> Math.<span style="color:#a6e22e">floor</span>(Date.<span style="color:#a6e22e">now</span>() <span style="color:#f92672">/</span> <span style="color:#ae81ff">1000</span>);
+    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">claim</span> <span style="color:#f92672">=</span> {
+      <span style="color:#a6e22e">iss</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">client_email</span>,
+      <span style="color:#a6e22e">scope</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">scopes</span>.<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34; &#34;</span>),
+      <span style="color:#a6e22e">aud</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">url</span>,
+      <span style="color:#a6e22e">exp</span><span style="color:#f92672">:</span> (<span style="color:#a6e22e">now</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">3600</span>).<span style="color:#a6e22e">toString</span>(),
+      <span style="color:#a6e22e">iat</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">now</span>.<span style="color:#a6e22e">toString</span>(),
+    };
+    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">signature</span> <span style="color:#f92672">=</span>
+      <span style="color:#a6e22e">btoa</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">header</span>)) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;.&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">btoa</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">claim</span>));
+    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sign</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">JSEncrypt</span>();
+    <span style="color:#a6e22e">sign</span>.<span style="color:#a6e22e">setPrivateKey</span>(<span style="color:#a6e22e">private_key</span>);
+    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">jwt</span> <span style="color:#f92672">=</span>
+      <span style="color:#a6e22e">signature</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;.&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">sign</span>.<span style="color:#a6e22e">sign</span>(<span style="color:#a6e22e">signature</span>, <span style="color:#a6e22e">CryptoJS</span>.<span style="color:#a6e22e">SHA256</span>, <span style="color:#e6db74">&#34;sha256&#34;</span>);
+    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> {
+      <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;POST&#34;</span>,
+      <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> { <span style="color:#e6db74">&#34;Content-Type&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/json&#34;</span> },
+      <span style="color:#a6e22e">body</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>({
+        <span style="color:#a6e22e">assertion</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">jwt</span>,
+        <span style="color:#a6e22e">grant_type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;urn:ietf:params:oauth:grant-type:jwt-bearer&#34;</span>,
+      }),
+    };
+    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">await</span> <span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">params</span>)
+      .<span style="color:#a6e22e">then</span>((<span style="color:#a6e22e">res</span>) =&gt; <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">json</span>())
+      .<span style="color:#66d9ef">catch</span>((<span style="color:#a6e22e">err</span>) =&gt; <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">err</span>));
+    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">obj</span>);
+  }
+
+  <span style="color:#a6e22e">sample</span>();
 &lt;/<span style="color:#f92672">script</span>&gt;
 </code></pre></div><p>If the access token retrieved at above is used for retrieving file list, the sample script is as follows.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">u</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">https://www.googleapis.com/drive/v3/files?access_token=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">access_token</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>;
