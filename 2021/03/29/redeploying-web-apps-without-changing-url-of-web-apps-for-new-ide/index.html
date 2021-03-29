@@ -7,7 +7,7 @@
   <meta name="description" content="">
   <meta name="generator" content="Hugo 0.61.0" />
 
-  <title>Linking Google Cloud Platform Project to Google Apps Script Project for New IDE &middot; tanaike</title>
+  <title>Redeploying Web Apps without Changing URL of Web Apps for new IDE &middot; tanaike</title>
 
     
 
@@ -232,7 +232,7 @@
 
 
 <div class="header">
-  <h1>Linking Google Cloud Platform Project to Google Apps Script Project for New IDE</h1>
+  <h1>Redeploying Web Apps without Changing URL of Web Apps for new IDE</h1>
   <h2></h2>
 </div>
 <div class="content">
@@ -241,7 +241,7 @@
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>29 Mar 2021, 12:45</time>
+    <time>29 Mar 2021, 14:51</time>
   </div>
 
   
@@ -266,9 +266,7 @@
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/specification">Specification</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/project">Project</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/webapps">WebApps</a>
     
   </div>
   
@@ -276,8 +274,86 @@
 
 </div>
 
-  <p>This is the document for linking Google Cloud Platform Project to Google Apps Script Project for New IDE. And also, several sample scripts using Google Apps Script API and Google Photos API are introduced.</p>
-<p>You can see the detail of this document at <a href="https://github.com/tanaikech/Linking-Google-Cloud-Platform-Project-to-Google-Apps-Script-Project-for-New-IDE">https://github.com/tanaikech/Linking-Google-Cloud-Platform-Project-to-Google-Apps-Script-Project-for-New-IDE</a>.</p>
+  <p><a href="https://gist.github.com/tanaikech/ebf92d8f427d02d53989d6c3464a9c43">Gists</a></p>
+<p>At March 15, 2021, one endpoint is created for one deployment. <a href="https://developers.google.com/apps-script/releases/#march_15_2021">Ref</a> By this, when you redeploy &ldquo;API Executable&rdquo;, the endpoint is changed. So please be careful this.</p>
+<h2 id="deploy-web-apps">Deploy Web Apps</h2>
+<ol>
+<li>
+<p>Open &ldquo;New deployment&rdquo; dialog with &ldquo;Deploy&rdquo; -&gt; &ldquo;New deployment&rdquo;.</p>
+</li>
+<li>
+<p>Select &ldquo;Web app&rdquo; for &ldquo;Select type&rdquo;.</p>
+</li>
+<li>
+<p>Input &ldquo;Description&rdquo; and as a sample, set &ldquo;Web apps&rdquo; as follows.</p>
+<ul>
+<li><code>Execute as: Me</code></li>
+<li><code>Who has access: Anyone</code></li>
+</ul>
+<p><img src="https://tanaikech.github.io/img/20210329a-fig2.png" alt=""></p>
+</li>
+<li>
+<p>Click &ldquo;Deploy&rdquo; button. And, copy the URL of &ldquo;Web app&rdquo; and click &ldquo;Done&rdquo; button. By this, you can see the following endpoint.</p>
+<ul>
+<li><code>https://script.google.com/macros/s/###/exec</code></li>
+</ul>
+</li>
+</ol>
+<h2 id="important-point">IMPORTANT POINT</h2>
+<ul>
+<li>When the script of Web Apps is changed and redeploy Web Apps, after March 15, 2021, the endpoint is changed. This is new specification. Because the deployment ID of <code>###</code> in <code>https://script.google.com/macros/s/###/exec</code> is changed.</li>
+</ul>
+<p>By this, there is an issue that the endpoint is changed. When you want to use the same endpoint by reflected the latest script to Web Apps, please do the following flow.</p>
+<ol>
+<li>
+<p>Create new Google Apps Script project and copy and paste the following script.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">doGet</span>() {
+  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ContentService</span>.<span style="color:#a6e22e">createTextOutput</span>(<span style="color:#e6db74">&#34;sample1&#34;</span>);
+}
+</code></pre></div></li>
+<li>
+<p>Deploy Web Apps as the following settings.</p>
+<ul>
+<li><code>Execute as: Me</code></li>
+<li><code>Who has access: Anyone</code></li>
+</ul>
+</li>
+<li>
+<p>Test the Web Apps using the following curl command.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ curl -L <span style="color:#e6db74">&#34;https://script.google.com/macros/s/###/exec&#34;</span>
+</code></pre></div><ul>
+<li>Please confirm that <code>sample1</code> is returned.</li>
+</ul>
+</li>
+<li>
+<p>Modify the script of Web Apps as follows.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">doGet</span>() {
+  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ContentService</span>.<span style="color:#a6e22e">createTextOutput</span>(<span style="color:#e6db74">&#34;sample2&#34;</span>); <span style="color:#75715e">// Modified
+</span><span style="color:#75715e"></span>}
+</code></pre></div></li>
+<li>
+<p>Update the deployment as follows.</p>
+<p><img src="https://tanaikech.github.io/img/20210329a-fig2.png" alt=""></p>
+<ol>
+<li>Open &ldquo;New deployment&rdquo; dialog with &ldquo;Deploy&rdquo; -&gt; &ldquo;Manage deployments&rdquo;.</li>
+<li>For the 1st deployment, click the pencil icon for editing the deployment.</li>
+<li>Set &ldquo;version&rdquo; as &ldquo;New version&rdquo;.</li>
+<li>When you want to change the description, please modify it.</li>
+<li>Click &ldquo;Deploy&rdquo; button.</li>
+</ol>
+</li>
+<li>
+<p>Testing.</p>
+<ul>
+<li>Please use above sample curl command. By this, you can confirm that <code>sample2</code> is returned without changing the endpoint.</li>
+</ul>
+</li>
+</ol>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://developers.google.com/apps-script/concepts/deployments">Create and manage deployments</a></li>
+<li><a href="https://developers.google.com/apps-script/guides/web#test_a_web_app_deployment">Web Apps</a></li>
+</ul>
 
   
 
@@ -286,13 +362,13 @@
 <div class="prev-next-post pure-g">
   <div class="pure-u-1-24" style="text-align: left;">
     
-    <a href="https://tanaikech.github.io/2021/03/26/copying-protections-for-spreadsheet-using-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
+    <a href="https://tanaikech.github.io/2021/03/29/linking-google-cloud-platform-project-to-google-apps-script-project-for-new-ide/"><i class="fa fa-chevron-left"></i></a>
     
   </div>
   <div class="pure-u-10-24">
     
     <nav class="prev">
-      <a href="https://tanaikech.github.io/2021/03/26/copying-protections-for-spreadsheet-using-google-apps-script/">Copying Protections for Spreadsheet using Google Apps Script</a>
+      <a href="https://tanaikech.github.io/2021/03/29/linking-google-cloud-platform-project-to-google-apps-script-project-for-new-ide/">Linking Google Cloud Platform Project to Google Apps Script Project for New IDE</a>
     </nav>
     
   </div>
@@ -301,14 +377,8 @@
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="https://tanaikech.github.io/2021/03/29/redeploying-web-apps-without-changing-url-of-web-apps-for-new-ide/">Redeploying Web Apps without Changing URL of Web Apps for new IDE</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2021/03/29/redeploying-web-apps-without-changing-url-of-web-apps-for-new-ide/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
@@ -351,6 +421,9 @@
 
 
 
+<script src="https://tanaikech.github.io/js/math-code.js"></script>
+  <script async src="//cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  
 
 
 </body>
