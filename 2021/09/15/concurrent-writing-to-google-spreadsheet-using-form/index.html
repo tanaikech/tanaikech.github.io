@@ -283,13 +283,23 @@
 </div>
 
   <p><a href="https://gist.github.com/tanaikech/c2f3fccabbf4906a18fdc38463982f31">Gists</a></p>
+<ul>
+<li>
 <p>Published: September 15, 2021</p>
+</li>
+<li>
+<p>Updated: September 17, 2021</p>
+<ul>
+<li>From <a href="https://twitter.com/mhawksey/status/1438593557888212992">the discussions</a>, added data by changing the wait time of LockService for Web Apps.</li>
+</ul>
+</li>
+</ul>
 <p>Kanshi Tanaike</p>
 <h2 id="introduction">Introduction</h2>
-<p>When the users try to write to Spreadsheet using a form, the developers have to consider to the concurrent submission from the form. For example, when the multiple users submit the data with the form simultaneously, all data are possibly not to be saved to the Spreadsheet. So it is considered that it is important to know the information about the concurrent writing to Google Spreadsheet using a form. In this report, such situation was investigated.</p>
-<p>As the result, when the success rate for writing concurrently to Google Spreadsheet is investigated, it was found that the concurrent writing with Google Form is suitable rather than Web Apps created by Google Apps Script. The threshold number of users for succeeding to write all data to Spreadsheet was 35 for Google Form and 26 for Web Apps, respectively. And, when Web Apps is used, it was also found that Lock Service was definitely required to be used for the multiple submission.</p>
+<p>When the users try to write to a Spreadsheet using a form, the developers have to consider the concurrent submission from the form. For example, when multiple users submit the data with the form simultaneously, all data are possibly not to be saved to the Spreadsheet. So it is considered that it is important to know the information about the concurrent writing to Google Spreadsheet using a form. In this report, such a situation was investigated.</p>
+<p>As the result, when the success rate for writing concurrently to Google Spreadsheet is investigated, it was found that the concurrent writing with Web Apps created by Google Apps Script was suitable rather than Google Form. The threshold number of users for succeeding to write all data to Spreadsheet was 60 for Web Apps and 35 for Google Form, respectively. And, when Web Apps is used, it was also found that Lock Service and the long wait time was definitely required to be used for the multiple submission.</p>
 <h2 id="experimental-procedure">Experimental procedure</h2>
-<p>In order to investigate the success rate for writing concurrently to Google Spreadsheet with a form, in this report, Google Form and Web Apps were used. As the sample situation, it supposes that a text data is submitted to Google Spreadsheet with a form. Figure 1 shows the Google Form used in this report. There is only one question for inputting a text data.</p>
+<p>In order to investigate the success rate for writing concurrently to Google Spreadsheet with a form, in this report, Google Form and Web Apps were used. As the sample situation, it supposes that text data is submitted to Google Spreadsheet with a form. Figure 1 shows the Google Form used in this report. There is only one question for inputting text data.</p>
 <!-- raw HTML omitted -->
 <p><img src="https://tanaikech.github.io/image-storage/20210915a/fig1.png" alt=""></p>
 <p>Fig. 1: Google Form used in this report</p>
@@ -300,47 +310,47 @@
 <ol>
 <li>Submitting the text data to each form with 50 requests. The number of requests is changed for each condition.</li>
 <li>Counting the submitted data rows on Google Spreadsheet.</li>
-<li>When the number of submissions is the same with the number of submitted data rows, no error occurs. When the number of submissions is NOT the same with the number of submitted data rows, the error occurs.</li>
+<li>When the number of submissions is the same as the number of submitted data rows, no error occurs. When the number of submissions is NOT the same as the number of submitted data rows, the error occurs.</li>
 <li>The cycle from 1 to 3 was run 100 times and the success rate was obtained.</li>
 </ol>
-<p>I worry that each detailed-data point at my environment might be different from that at other user’s environment. But I think that the trend of this result can be used.</p>
+<p>I worry that each detailed data point in my environment might be different from that of other user’s environments. But I think that the trend of this result can be used.</p>
 <!-- raw HTML omitted -->
-<p>In this report, the inputted text data is written to Google Spreadsheet by submitting the form. So when the data is submitted with Google Form, when the Google Apps Script is run, this data might not be able to be used. And, when the script for Web Apps is changed, I'm not sure whether the same result can be obtained. So please be careful this.</p>
+<p>In this report, the inputted text data is written to Google Spreadsheet by submitting the form. So when the data is submitted with Google Form, when the Google Apps Script is run, this data might not be able to be used. And, when the script for Web Apps is changed, I'm not sure whether the same result can be obtained. So please be careful about this.</p>
 <h2 id="results-and-discussions">Results and discussions</h2>
 <p>Figure 2 shows the max concurrent submissions vs. the success rate for writing concurrently to Google Spreadsheet with Google Form. From Fig. 2, it is found that when the number of concurrent submissions is below 35, the success rate is 100 %. This indicates that the threshold value of this situation is 35 and when the number of concurrent submissions is more than 35, all submitted data cannot be saved to the Google Spreadsheet.</p>
 <!-- raw HTML omitted -->
 <p><img src="https://tanaikech.github.io/image-storage/20210915a/fig2.png" alt=""></p>
 <p>Fig. 2: Max concurrent submissions vs. Success rate for writing concurrently to Google Spreadsheet with Google Form.</p>
 <!-- raw HTML omitted -->
-<p>Figure 3 shows the max concurrent submissions vs. the success rate for writing concurrently to Google Spreadsheet with Web Apps created by Google Apps Script. From Fig. 3, it is found that when the LockService is not used, even the number of concurrent submissions is 2, all data cannot be saved. This indicates that to use the LockService is very important for submitting from multiple users to Web Apps. It is also found that when the LockService is used, the threshold value is 26.</p>
+<p>Figure 3 shows the max concurrent submissions vs. the success rate for writing concurrently to Google Spreadsheet with Web Apps created by Google Apps Script. From Fig. 3, it is found that when the LockService is not used, even the number of concurrent submissions is 2, all data cannot be saved. This indicates that using the LockService is very important for submitting from multiple users to Web Apps. It is also found that when the LockService is used, the threshold value is 26 for the wait time of 20 seconds and 60 for the wait time of 350 seconds. From this result, it was found that the wait time of LockService is also important. It is considered that this result indicates that for example, when the process cost of Google Apps Script for creating Web Apps is high, the wait time of 350 seconds might not be enough.</p>
 <!-- raw HTML omitted -->
 <p><img src="https://tanaikech.github.io/image-storage/20210915a/fig3.png" alt=""></p>
-<p>Fig. 3: Max concurrent submissions vs. Success rate for writing concurrently to Google Spreadsheet with Web Apps. Blue and red dots means with and without LockService in Web Apps created by Google Apps Script.</p>
+<p>Fig. 3: Max concurrent submissions vs. Success rate for writing concurrently to Google Spreadsheet with Web Apps. Blue, red and yellow dots mean without LockService, with LockService by the wait time of 20 seconds and with LockService by the wait time of 350 seconds in Web Apps created by Google Apps Script.</p>
 <!-- raw HTML omitted -->
-<p>The threshold value of 26 for Web Apps is smaller than that of Google Form. From this result, it is considered that when the multiple users are concurrently submitted to Spreadsheet using a form, Google Form is suitable.</p>
+<p>The threshold value of 60 for Web Apps using LockService with a long wait time is larger than that of Google Form. From this result, it is considered that when the multiple users are concurrently submitted to Spreadsheet using a form, Web Apps using LockService with a long wait time is suitable.</p>
 <h2 id="summary">Summary</h2>
 <p>In this report, the information about the concurrent writing to Google Spreadsheet using a form was investigated. From this experiment, the following results were obtained.</p>
 <ol>
 <li>
-<p>When the multiple users are concurrently submitted to Spreadsheet using a form, Google Form is suitable rather than Web Apps created by Google Apps Script.</p>
+<p>When the multiple users are concurrently submitted to Spreadsheet using a form, Web Apps created by Google Apps Script is suitable rather than Google Form.</p>
 </li>
 <li>
 <p>For Google Form, the threshold value of concurrent submissions is 35.</p>
 </li>
 <li>
-<p>For Web Apps, the threshold value of concurrent submissions is 26.</p>
+<p>For Web Apps, the threshold value of concurrent submissions is 60.</p>
 </li>
 <li>
-<p>When Web Apps is used for the concurrent submissions, to use LockService is required.</p>
+<p>When Web Apps is used for concurrent submissions, use LockService with a long wait time is required.</p>
 </li>
 </ol>
 <h2 id="for-concurrently-submitting-by-more-than-35-users">For concurrently submitting by more than 35 users</h2>
 <ul>
 <li>
-<p>About the threshold value of 35 for Google Form, for example, I think that when the possibility for concurrently submitting by 35 users is low in your users, Google Form can be used for the situation even when the total number of users is more than 35.</p>
+<p>About the threshold value of 60 for Web Apps, for example, I think that when the possibility for concurrently submitting by 60 users is low in your users, Web Apps can be used for the situation even when the total number of users is more than 60 .</p>
 </li>
 <li>
-<p>When you worry about the error that the users more than 35 are concurrently submitted, I think that the retry for submitting can be achieved using the error process. For example, when Google Form is used, when the data cannot be saved by the concurrent submission, the status code except for 200 is returned. I think that this might be used for this situation.</p>
+<p>When you worry about the error that the users more than 60 are concurrently submitted, I think that the retry for submitting can be achieved using the error process. In this case, I think that it is required to check the saved row on Spreadsheet.</p>
 </li>
 </ul>
 <p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
@@ -358,7 +368,9 @@
 </code></pre></div><h4 id="with-lockservice">With LockService</h4>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">doGet</span> <span style="color:#f92672">=</span> ({ <span style="color:#a6e22e">parameter</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">sample</span> } }) =&gt; {
   <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">lock</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">LockService</span>.<span style="color:#a6e22e">getDocumentLock</span>();
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">lock</span>.<span style="color:#a6e22e">tryLock</span>(<span style="color:#ae81ff">20000</span>)) {
+
+  <span style="color:#75715e">// This is an important point.
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">lock</span>.<span style="color:#a6e22e">tryLock</span>(<span style="color:#ae81ff">350000</span>)) {
     <span style="color:#66d9ef">try</span> {
       <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>().<span style="color:#a6e22e">getSheets</span>()[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">appendRow</span>([<span style="color:#a6e22e">sample</span>]);
     } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">e</span>) {
