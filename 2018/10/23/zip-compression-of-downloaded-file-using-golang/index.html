@@ -284,64 +284,64 @@
   <p><a href="https://gist.github.com/tanaikech/0d91da9888393e6ee737a67c57eeab70">Gists</a></p>
 <p>This is a sample script for creating a downloaded file as a zip file using Golang. The downloaded file is not created to a file as a temporal file. The zip file is directly created. When you use this, please modify <code>url</code>, <code>downloadedFileName</code> and <code>zipFileName</code>.</p>
 <h2 id="sample-script">Sample script:</h2>
-<pre tabindex="0"><code>package main
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
 
-import (
-    &quot;archive/zip&quot;
-    &quot;bytes&quot;
-    &quot;fmt&quot;
-    &quot;io&quot;
-    &quot;io/ioutil&quot;
-    &quot;log&quot;
-    &quot;net/http&quot;
-    &quot;os&quot;
-    &quot;time&quot;
+<span style="color:#f92672">import</span> (
+    <span style="color:#e6db74">&#34;archive/zip&#34;</span>
+    <span style="color:#e6db74">&#34;bytes&#34;</span>
+    <span style="color:#e6db74">&#34;fmt&#34;</span>
+    <span style="color:#e6db74">&#34;io&#34;</span>
+    <span style="color:#e6db74">&#34;io/ioutil&#34;</span>
+    <span style="color:#e6db74">&#34;log&#34;</span>
+    <span style="color:#e6db74">&#34;net/http&#34;</span>
+    <span style="color:#e6db74">&#34;os&#34;</span>
+    <span style="color:#e6db74">&#34;time&#34;</span>
 )
 
-func main() {
-    url := &quot;https://localhost/sample.png&quot;
-    downloadedFileName := &quot;sample.png&quot;
-    zipFileName := &quot;sample.zip&quot;
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+    <span style="color:#a6e22e">url</span> <span style="color:#f92672">:=</span> <span style="color:#e6db74">&#34;https://localhost/sample.png&#34;</span>
+    <span style="color:#a6e22e">downloadedFileName</span> <span style="color:#f92672">:=</span> <span style="color:#e6db74">&#34;sample.png&#34;</span>
+    <span style="color:#a6e22e">zipFileName</span> <span style="color:#f92672">:=</span> <span style="color:#e6db74">&#34;sample.zip&#34;</span>
 
-    res, err := http.Get(url)
-    if err != nil {
-        log.Fatal(err)
+    <span style="color:#a6e22e">res</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Get</span>(<span style="color:#a6e22e">url</span>)
+    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+        <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatal</span>(<span style="color:#a6e22e">err</span>)
     }
-    body, err := ioutil.ReadAll(res.Body)
-    if err != nil {
-        fmt.Fprintf(os.Stderr, &quot;Error: %v. &quot;, err)
-        os.Exit(1)
+    <span style="color:#a6e22e">body</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">ioutil</span>.<span style="color:#a6e22e">ReadAll</span>(<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">Body</span>)
+    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+        <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Fprintf</span>(<span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Stderr</span>, <span style="color:#e6db74">&#34;Error: %v. &#34;</span>, <span style="color:#a6e22e">err</span>)
+        <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Exit</span>(<span style="color:#ae81ff">1</span>)
     }
-    defer res.Body.Close()
-    buf := new(bytes.Buffer)
-    w := zip.NewWriter(buf)
-    fh := &amp;zip.FileHeader{
-        Name:     downloadedFileName,
-        Modified: time.Now(),
-        Method:   8,
+    <span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">Body</span>.<span style="color:#a6e22e">Close</span>()
+    <span style="color:#a6e22e">buf</span> <span style="color:#f92672">:=</span> new(<span style="color:#a6e22e">bytes</span>.<span style="color:#a6e22e">Buffer</span>)
+    <span style="color:#a6e22e">w</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">zip</span>.<span style="color:#a6e22e">NewWriter</span>(<span style="color:#a6e22e">buf</span>)
+    <span style="color:#a6e22e">fh</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">zip</span>.<span style="color:#a6e22e">FileHeader</span>{
+        <span style="color:#a6e22e">Name</span>:     <span style="color:#a6e22e">downloadedFileName</span>,
+        <span style="color:#a6e22e">Modified</span>: <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Now</span>(),
+        <span style="color:#a6e22e">Method</span>:   <span style="color:#ae81ff">8</span>,
     }
-    f, err := w.CreateHeader(fh)
-    if err != nil {
-        log.Fatal(err)
+    <span style="color:#a6e22e">f</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">w</span>.<span style="color:#a6e22e">CreateHeader</span>(<span style="color:#a6e22e">fh</span>)
+    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+        <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatal</span>(<span style="color:#a6e22e">err</span>)
     }
-    if _, err := f.Write(body); err != nil {
-        log.Fatal(err)
+    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">Write</span>(<span style="color:#a6e22e">body</span>); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+        <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatal</span>(<span style="color:#a6e22e">err</span>)
     }
-    err = w.Close()
-    if err != nil {
-        log.Fatal(err)
+    <span style="color:#a6e22e">err</span> = <span style="color:#a6e22e">w</span>.<span style="color:#a6e22e">Close</span>()
+    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+        <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatal</span>(<span style="color:#a6e22e">err</span>)
     }
-    file, err := os.Create(zipFileName)
-    if err != nil {
-        log.Fatal(err)
+    <span style="color:#a6e22e">file</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Create</span>(<span style="color:#a6e22e">zipFileName</span>)
+    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+        <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatal</span>(<span style="color:#a6e22e">err</span>)
     }
-    if _, err = io.Copy(file, buf); err != nil {
-        log.Fatal(err)
+    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">err</span> = <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">Copy</span>(<span style="color:#a6e22e">file</span>, <span style="color:#a6e22e">buf</span>); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+        <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatal</span>(<span style="color:#a6e22e">err</span>)
     }
-    file.Close()
-    fmt.Println(&quot;Done.&quot;)
+    <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">Close</span>()
+    <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Done.&#34;</span>)
 }
-</code></pre><h2 id="note">Note:</h2>
+</code></pre></div><h2 id="note">Note:</h2>
 <p>As an important point, when the file is downloaded, os.FileInfo cannot be used. So in this situation, it uses zip.FileHeader. At that time, please remember to set <code>Method</code>. <code>Method</code> is 0 as the default. This means no compression. The sample script uses 8 to <code>Method</code>. This means the DEFLATE method.</p>
 <h2 id="reference">Reference:</h2>
 <ul>
