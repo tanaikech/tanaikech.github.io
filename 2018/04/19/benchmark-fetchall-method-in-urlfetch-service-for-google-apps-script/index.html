@@ -5,7 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.61.0" />
+  <meta name="generator" content="Hugo 0.88.1" />
 
   <title>Benchmark: fetchAll method in UrlFetch service for Google Apps Script &middot; tanaike</title>
 
@@ -284,12 +284,12 @@
 </div>
 
   <p><a href="https://gist.github.com/tanaikech/c0f383034045ab63c19604139ecb0728">Gists</a></p>
-<p>By Google's update at January 19, 2018, <a href="https://developers.google.com/apps-script/reference/url-fetch/url-fetch-app#fetchAll(Object)">fetchAll method</a> was added to the UrlFetch service. When I saw the usage, I couldn't find the detail information about the actual running state. So I investigated about it.</p>
+<p>By Google&rsquo;s update at January 19, 2018, <a href="https://developers.google.com/apps-script/reference/url-fetch/url-fetch-app#fetchAll(Object)">fetchAll method</a> was added to the UrlFetch service. When I saw the usage, I couldn&rsquo;t find the detail information about the actual running state. So I investigated about it.</p>
 <p>As the result, it was found that the fetchAll method is worked by the asynchronous processing. The returned data is reordered by the order of requests. By this, it was also found that if you want to retrieve the data from the several URL, the process cost of <code>UrlFetchApp.fetchAll()</code> is much lower than that of <code>UrlFetchApp.fetch()</code> using for loop.</p>
 <p>The sample scripts for server side and client side are as follows.</p>
 <h1 id="sample-script-for-server-side">Sample script for server side</h1>
 <p>In this report, 5 Web Apps were used as the servers. At first, 5 standalone projects were created and the following server script was put to each project. Then, Web Apps was deployed for each project. These deployed Web Apps were accessed from the script of client side. When the client accesses to the server, the server returns unix time (milliseconds) and server ID. From unix time, the order of actual fetch can be obtained.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">doGet</span>(<span style="color:#a6e22e">e</span>) {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">doGet</span>(<span style="color:#a6e22e">e</span>) {
     <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getService</span>().<span style="color:#a6e22e">getUrl</span>().<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;/&#34;</span>);
     <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">val</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>({
         <span style="color:#a6e22e">date</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>().<span style="color:#a6e22e">toString</span>(),
@@ -303,7 +303,7 @@
 }
 </code></pre></div><h1 id="sample-script-for-client-side">Sample script for client side</h1>
 <p>When you use this script, after you deployed Web Apps, please run a function of <code>main()</code>. The reason that I often use <code>map()</code> is <a href="https://gist.github.com/tanaikech/848aeafaac1ec676900bb78e3ce220b6">here</a>.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// As a sample, 5 URLs were used.
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// As a sample, 5 URLs were used.
 </span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">actions</span> <span style="color:#f92672">=</span> {
   <span style="color:#e6db74">&#34;### ID for Web Apps URL ###&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;action1&#34;</span>, <span style="color:#75715e">// https://script.google.com/macros/s/### ID for Web Apps URL ###/exec
 </span><span style="color:#75715e"></span>  <span style="color:#e6db74">&#34;### ID for Web Apps URL ###&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;action2&#34;</span>,
@@ -360,13 +360,13 @@
 </code></pre></div><h1 id="result">Result</h1>
 <p>For the results, elapsedTime, responsedOrder and actualOrder mean the elapsed time of 5 requests, the order of returned data and the order of actual fetching, respectively.</p>
 <h4 id="urlfetchappfetchall">UrlFetchApp.fetchAll()</h4>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
     <span style="color:#f92672">&#34;elapsedTime&#34;</span>    : <span style="color:#ae81ff">5.502</span>,
     <span style="color:#f92672">&#34;responsedOrder&#34;</span> : [<span style="color:#e6db74">&#34;action1&#34;</span>,<span style="color:#e6db74">&#34;action2&#34;</span>,<span style="color:#e6db74">&#34;action3&#34;</span>,<span style="color:#e6db74">&#34;action4&#34;</span>,<span style="color:#e6db74">&#34;action5&#34;</span>],
     <span style="color:#f92672">&#34;actualOrder&#34;</span>    : [<span style="color:#e6db74">&#34;action5&#34;</span>,<span style="color:#e6db74">&#34;action1&#34;</span>,<span style="color:#e6db74">&#34;action3&#34;</span>,<span style="color:#e6db74">&#34;action2&#34;</span>,<span style="color:#e6db74">&#34;action4&#34;</span>]
 }
 </code></pre></div><h4 id="urlfetchappfetch">UrlFetchApp.fetch()</h4>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
     <span style="color:#f92672">&#34;elapsedTime&#34;</span>    : <span style="color:#ae81ff">27.011</span>,
     <span style="color:#f92672">&#34;responsedOrder&#34;</span> : [<span style="color:#e6db74">&#34;action1&#34;</span>,<span style="color:#e6db74">&#34;action2&#34;</span>,<span style="color:#e6db74">&#34;action3&#34;</span>,<span style="color:#e6db74">&#34;action4&#34;</span>,<span style="color:#e6db74">&#34;action5&#34;</span>],
     <span style="color:#f92672">&#34;actualOrder&#34;</span>    : [<span style="color:#e6db74">&#34;action1&#34;</span>,<span style="color:#e6db74">&#34;action2&#34;</span>,<span style="color:#e6db74">&#34;action3&#34;</span>,<span style="color:#e6db74">&#34;action4&#34;</span>,<span style="color:#e6db74">&#34;action5&#34;</span>]
@@ -386,9 +386,9 @@
 <li>After it worked by the asynchronous processing, the returned values is reordered by the order of requests.</li>
 <li>It was also found that if you want to retrieve the data from the several URL, the process cost of <code>UrlFetchApp.fetchAll()</code> is much lower than that of <code>UrlFetchApp.fetch()</code> using for loop.</li>
 </ul>
-<p>In this report, I could confirm 30 requests could be worked for the fetchAll method. But I couldn't find the limitation of the number of requests.</p>
+<p>In this report, I could confirm 30 requests could be worked for the fetchAll method. But I couldn&rsquo;t find the limitation of the number of requests.</p>
 <h1 id="limitation-of-number-of-requests">Limitation of number of requests</h1>
-<p>I could confirm that 1000 requests work fine. But I couldn't find the limitation.</p>
+<p>I could confirm that 1000 requests work fine. But I couldn&rsquo;t find the limitation.</p>
 
   
   <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>

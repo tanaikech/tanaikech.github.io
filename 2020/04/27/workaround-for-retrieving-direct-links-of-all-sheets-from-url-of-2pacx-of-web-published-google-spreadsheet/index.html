@@ -5,7 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.61.0" />
+  <meta name="generator" content="Hugo 0.88.1" />
 
   <title>Workaround for Retrieving Direct Links of All Sheets from URL of 2PACX- of Web Published Google Spreadsheet &middot; tanaike</title>
 
@@ -284,7 +284,7 @@
 <ol>
 <li>The Spreadsheet is published to Web and the URL like <code>https://docs.google.com/spreadsheets/d/e/2PACX-###/pubhtml</code> is known</li>
 <li>You are not the owner of Google Spreadsheet.</li>
-<li>You don't know the Spreadsheet ID and Sheet IDs.</li>
+<li>You don&rsquo;t know the Spreadsheet ID and Sheet IDs.</li>
 </ol>
 <p>Under above situation, unfortunately, the direct links of each sheet cannot be directly retrieved. I think that this is the specification of Google side. So in this post, I would like to introduce a workaround for retrieving the direct links of each sheet under above situation.</p>
 <h2 id="flow">Flow</h2>
@@ -297,7 +297,7 @@
 </ol>
 <h2 id="sample-script-1">Sample script 1</h2>
 <p>Please copy and paste the following script (Google Apps Script) to the script editor. And <strong><a href="https://developers.google.com/apps-script/guides/services/advanced#enabling_advanced_services">please enable Google Drive API at Advanced Google services</a></strong>. This script is for the Web Apps.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
   <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">inputUrl</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://docs.google.com/spreadsheets/d/e/2PACX-###/pubhtml&#34;</span>;
 
   <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">prop</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">PropertiesService</span>.<span style="color:#a6e22e">getScriptProperties</span>();
@@ -310,7 +310,7 @@
     <span style="color:#e6db74">&#34;(https?:\\/\\/docs\\.google\\.com\\/spreadsheets\\/d\\/e\\/2PACX-.+?\\/)&#34;</span>
   );
   <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">re</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">inputUrl</span>)) <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">&#34;Wrong URL.&#34;</span>);
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">inputUrl</span>.<span style="color:#a6e22e">match</span>(<span style="color:#a6e22e">re</span>)[<span style="color:#ae81ff">1</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">pub?output=xlsx</span><span style="color:#e6db74">`</span>;
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">inputUrl</span>.<span style="color:#a6e22e">match</span>(<span style="color:#a6e22e">re</span>)[<span style="color:#ae81ff">1</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">pub?output=xlsx`</span>;
   <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">blob</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>).<span style="color:#a6e22e">getBlob</span>();
   <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">id</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Drive</span>.<span style="color:#a6e22e">Files</span>.<span style="color:#a6e22e">insert</span>(
     { <span style="color:#a6e22e">mimeType</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">MimeType</span>.<span style="color:#a6e22e">GOOGLE_SHEETS</span>, <span style="color:#a6e22e">title</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;temp&#34;</span> },
@@ -324,7 +324,7 @@
   );
   <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheets</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">id</span>).<span style="color:#a6e22e">getSheets</span>();
   <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">pubUrls</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheets</span>.<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">s</span>) =&gt; ({
-    [<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getSheetName</span>()]<span style="color:#f92672">:</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">https://docs.google.com/spreadsheets/d/</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">id</span><span style="color:#e6db74">}</span><span style="color:#e6db74">/pubhtml?gid=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getSheetId</span>()<span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
+    [<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getSheetName</span>()]<span style="color:#f92672">:</span> <span style="color:#e6db74">`https://docs.google.com/spreadsheets/d/</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">id</span><span style="color:#e6db74">}</span><span style="color:#e6db74">/pubhtml?gid=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getSheetId</span>()<span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
   }));
   <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">pubUrls</span>);
 }
@@ -347,12 +347,12 @@
 <h2 id="sample-script-2">Sample script 2</h2>
 <p>Please copy and paste the following script (Google Apps Script) to the script editor. And <strong><a href="https://developers.google.com/apps-script/guides/services/advanced#enabling_advanced_services">please enable Google Drive API at Advanced Google services</a></strong>. This script is for the Web Apps.</p>
 <p>As another workaround, when the original Spreadsheet is often changed, and the number of sheet is constant in the original Spreadsheet, and then, you want to retrieve only values, you can also use the following script. In this script, the URL is not changed even when the script is run again. So you can continue to use the URL. And, when this function is run using the time-driven trigger, you can also synchronize with the original Spreadsheet.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
   <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">inputUrl</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://docs.google.com/spreadsheets/d/e/2PACX-###/pubhtml&#34;</span>;
   
   <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">re</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> RegExp(<span style="color:#e6db74">&#34;(https?:\\/\\/docs\\.google\\.com\\/spreadsheets\\/d\\/e\\/2PACX-.+?\\/)&#34;</span>);
   <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">re</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">inputUrl</span>)) <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">&#34;Wrong URL.&#34;</span>);
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">inputUrl</span>.<span style="color:#a6e22e">match</span>(<span style="color:#a6e22e">re</span>)[<span style="color:#ae81ff">1</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">pub?output=xlsx</span><span style="color:#e6db74">`</span>;
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">inputUrl</span>.<span style="color:#a6e22e">match</span>(<span style="color:#a6e22e">re</span>)[<span style="color:#ae81ff">1</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">pub?output=xlsx`</span>;
   <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">blob</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>).<span style="color:#a6e22e">getBlob</span>();
   <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">prop</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">PropertiesService</span>.<span style="color:#a6e22e">getScriptProperties</span>();
   <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">sheets</span>;
@@ -372,7 +372,7 @@
     <span style="color:#a6e22e">prop</span>.<span style="color:#a6e22e">setProperty</span>(<span style="color:#e6db74">&#34;ssId&#34;</span>, <span style="color:#a6e22e">ssId</span>);
     <span style="color:#a6e22e">sheets</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>).<span style="color:#a6e22e">getSheets</span>();
   }
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">pubUrls</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheets</span>.<span style="color:#a6e22e">map</span>(<span style="color:#a6e22e">s</span> =&gt; ({[<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getSheetName</span>()]<span style="color:#f92672">:</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">https://docs.google.com/spreadsheets/d/</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">ssId</span><span style="color:#e6db74">}</span><span style="color:#e6db74">/pubhtml?gid=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getSheetId</span>()<span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>}));
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">pubUrls</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheets</span>.<span style="color:#a6e22e">map</span>(<span style="color:#a6e22e">s</span> =&gt; ({[<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getSheetName</span>()]<span style="color:#f92672">:</span> <span style="color:#e6db74">`https://docs.google.com/spreadsheets/d/</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">ssId</span><span style="color:#e6db74">}</span><span style="color:#e6db74">/pubhtml?gid=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getSheetId</span>()<span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>}));
   <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">pubUrls</span>);  <span style="color:#75715e">// You can see the URLs for each sheet at the log.
 </span><span style="color:#75715e"></span>}
 </code></pre></div><h2 id="references">References</h2>

@@ -5,7 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.61.0" />
+  <meta name="generator" content="Hugo 0.88.1" />
 
   <title>Enhanced makeCopy() using Google Apps Script &middot; tanaike</title>
 
@@ -294,7 +294,7 @@
 <li>If the file is the standalone project, the file is moved from the root folder to the destination folder using &ldquo;update&rdquo; method of Drive API.</li>
 </ol>
 <p>When you use this sample, please enable Drive API at Advanced Google Services and API console.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">makeCopy</span>(<span style="color:#a6e22e">srcFolderId</span>, <span style="color:#a6e22e">dstFolderId</span>) {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">makeCopy</span>(<span style="color:#a6e22e">srcFolderId</span>, <span style="color:#a6e22e">dstFolderId</span>) {
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">srcFolder</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFolderById</span>(<span style="color:#a6e22e">srcFolderId</span>);
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dstFolder</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFolderById</span>(<span style="color:#a6e22e">dstFolderId</span>);
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">files</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">srcFolder</span>.<span style="color:#a6e22e">getFiles</span>();
@@ -314,9 +314,9 @@
 }
 </code></pre></div><p>If you want to use DriveApp instead of Drive API, please modify as follows.</p>
 <h4 id="from">From:</h4>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">Drive</span>.<span style="color:#a6e22e">Files</span>.<span style="color:#a6e22e">update</span>({<span style="color:#e6db74">&#34;parents&#34;</span><span style="color:#f92672">:</span> [{<span style="color:#e6db74">&#34;id&#34;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">dstFolderId</span>}]}, <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">getId</span>());
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">Drive</span>.<span style="color:#a6e22e">Files</span>.<span style="color:#a6e22e">update</span>({<span style="color:#e6db74">&#34;parents&#34;</span><span style="color:#f92672">:</span> [{<span style="color:#e6db74">&#34;id&#34;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">dstFolderId</span>}]}, <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">getId</span>());
 </code></pre></div><h4 id="to">To:</h4>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">dstFolder</span>.<span style="color:#a6e22e">addFile</span>(<span style="color:#a6e22e">file</span>);
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">dstFolder</span>.<span style="color:#a6e22e">addFile</span>(<span style="color:#a6e22e">file</span>);
 <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">getParents</span>().<span style="color:#a6e22e">next</span>().<span style="color:#a6e22e">removeFile</span>(<span style="color:#a6e22e">file</span>);
 </code></pre></div><h2 id="sample-script-2">Sample script 2</h2>
 <p>In the sample script 1, the Drive API is required to be called for the number of the standalone projects. In order to reduce the number of calling Drive API, this sample uses the batch request. The flow is as follows.</p>
@@ -329,7 +329,7 @@
 </ol>
 <p>From this flow, when the number of total files is less than 100, the number of API calls is 2. And the batch request is worked by the asynchronous processing. So the copy speed of sample 2 is faster than that of sample 1.</p>
 <p>When you use this sample, please enable Drive API at API console. And please install <a href="https://github.com/tanaikech/BatchRequest">the GAS library (BatchRequest) for using batch request at GAS</a>.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">makeCopy</span>(<span style="color:#a6e22e">srcFolderId</span>, <span style="color:#a6e22e">dstFolderId</span>) {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">makeCopy</span>(<span style="color:#a6e22e">srcFolderId</span>, <span style="color:#a6e22e">dstFolderId</span>) {
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">parseBatchRes</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">res</span>) {
     <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">splittedRes</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;--batch&#34;</span>);
     <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">splittedRes</span>.<span style="color:#a6e22e">slice</span>(<span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">splittedRes</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>).<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {

@@ -5,7 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.61.0" />
+  <meta name="generator" content="Hugo 0.88.1" />
 
   <title>Retrieving All Values from All Sheets from URL of 2PACX- of Web Published Google Spreadsheet using Python &middot; tanaike</title>
 
@@ -297,37 +297,37 @@
 </ol>
 <h2 id="sample-script">Sample script</h2>
 <p>Please set <code>spreadsheetUrl</code>.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> openpyxl
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> openpyxl
 <span style="color:#f92672">import</span> re
 <span style="color:#f92672">import</span> requests
 <span style="color:#f92672">from</span> io <span style="color:#f92672">import</span> BytesIO
 
-spreadsheetUrl <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">https://docs.google.com/spreadsheets/d/e/2PACX-###/pubhtml</span><span style="color:#e6db74">&#34;</span>
+spreadsheetUrl <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://docs.google.com/spreadsheets/d/e/2PACX-###/pubhtml&#34;</span>
 
 regex <span style="color:#f92672">=</span> re<span style="color:#f92672">.</span>compile(
-    <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">https:</span><span style="color:#e6db74">\</span><span style="color:#e6db74">/</span><span style="color:#e6db74">\</span><span style="color:#e6db74">/docs</span><span style="color:#e6db74">\</span><span style="color:#e6db74">.google</span><span style="color:#e6db74">\</span><span style="color:#e6db74">.com</span><span style="color:#e6db74">\</span><span style="color:#e6db74">/spreadsheets</span><span style="color:#e6db74">\</span><span style="color:#e6db74">/d</span><span style="color:#e6db74">\</span><span style="color:#e6db74">/e</span><span style="color:#e6db74">\</span><span style="color:#e6db74">/2PACX-.+</span><span style="color:#e6db74">\</span><span style="color:#e6db74">/pub(html)?</span><span style="color:#e6db74">&#39;</span>)
+    <span style="color:#e6db74">&#39;https:\/\/docs\.google\.com\/spreadsheets\/d\/e\/2PACX-.+\/pub(html)?&#39;</span>)
 <span style="color:#66d9ef">if</span> re<span style="color:#f92672">.</span>match(regex, spreadsheetUrl):
-    temp <span style="color:#f92672">=</span> spreadsheetUrl<span style="color:#f92672">.</span>split(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">/</span><span style="color:#e6db74">&#39;</span>)
+    temp <span style="color:#f92672">=</span> spreadsheetUrl<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;/&#39;</span>)
     temp<span style="color:#f92672">.</span>pop()
-    url <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">/</span><span style="color:#e6db74">&#34;</span><span style="color:#f92672">.</span>join(temp) <span style="color:#f92672">+</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">/pub?output=xlsx</span><span style="color:#e6db74">&#34;</span>
+    url <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;/&#34;</span><span style="color:#f92672">.</span>join(temp) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/pub?output=xlsx&#34;</span>
     res <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>get(url)
     wb <span style="color:#f92672">=</span> openpyxl<span style="color:#f92672">.</span>load_workbook(
-        filename<span style="color:#f92672">=</span>BytesIO(res<span style="color:#f92672">.</span>content), data_only<span style="color:#f92672">=</span>False)
+        filename<span style="color:#f92672">=</span>BytesIO(res<span style="color:#f92672">.</span>content), data_only<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>)
     sheets <span style="color:#f92672">=</span> wb<span style="color:#f92672">.</span>sheetnames
     r <span style="color:#f92672">=</span> []
     <span style="color:#66d9ef">for</span> sheetName <span style="color:#f92672">in</span> sheets:
         sheet <span style="color:#f92672">=</span> wb[sheetName]
-        temp <span style="color:#f92672">=</span> {<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">sheetName</span><span style="color:#e6db74">&#39;</span>: sheetName, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">values</span><span style="color:#e6db74">&#39;</span>: []}
+        temp <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#39;sheetName&#39;</span>: sheetName, <span style="color:#e6db74">&#39;values&#39;</span>: []}
         <span style="color:#66d9ef">for</span> cells <span style="color:#f92672">in</span> sheet<span style="color:#f92672">.</span>rows:
             column <span style="color:#f92672">=</span> []
             <span style="color:#66d9ef">for</span> cell <span style="color:#f92672">in</span> cells:
                 column<span style="color:#f92672">.</span>append(cell<span style="color:#f92672">.</span>value)
-            temp[<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">values</span><span style="color:#e6db74">&#39;</span>]<span style="color:#f92672">.</span>append(column)
+            temp[<span style="color:#e6db74">&#39;values&#39;</span>]<span style="color:#f92672">.</span>append(column)
         r<span style="color:#f92672">.</span>append(temp)
-    <span style="color:#66d9ef">print</span>(r)
+    print(r)
 </code></pre></div><h2 id="result">Result</h2>
 <p>When above script is run, the following sample value is returned.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">[
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">[
   {
     <span style="color:#f92672">&#34;sheetName&#34;</span>: <span style="color:#e6db74">&#34;Sheet1&#34;</span>,
     <span style="color:#f92672">&#34;values&#34;</span>: [[<span style="color:#e6db74">&#34;a1&#34;</span>, <span style="color:#e6db74">&#34;b1&#34;</span>, <span style="color:#e6db74">&#34;c1&#34;</span>], [<span style="color:#e6db74">&#34;a2&#34;</span>, <span style="color:#e6db74">&#34;b2&#34;</span>, <span style="color:#e6db74">&#34;c2&#34;</span>], , ,]

@@ -5,7 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.61.0" />
+  <meta name="generator" content="Hugo 0.88.1" />
 
   <title>Limitation of Array.prototype.push.apply under V8 for Google Apps Script &middot; tanaike</title>
 
@@ -281,24 +281,24 @@
 
   <p><a href="https://gist.github.com/tanaikech/3e3c16b58f6b30de366eba99de84c861">Gists</a></p>
 <h2 id="description">Description</h2>
-<p>When V8 is enabled, <code>Array.apply</code> has the limitation for the number of elements. When it is over the limitation, an error like <code>RangeError: Maximum call stack size exceeded</code> occurs, while the issue didn't occur when V8 is disabled. In this case, this issue occurs at both Google Apps Script and Javascript. So please be careful this.</p>
+<p>When V8 is enabled, <code>Array.apply</code> has the limitation for the number of elements. When it is over the limitation, an error like <code>RangeError: Maximum call stack size exceeded</code> occurs, while the issue didn&rsquo;t occur when V8 is disabled. In this case, this issue occurs at both Google Apps Script and Javascript. So please be careful this.</p>
 <h2 id="sample-situation">Sample situation</h2>
 <p>For example, when <code>Array.prototype.push.apply</code> is used for combining the arrays because the process cost of <code>Array.prototype.push.apply</code> is lowest of 3 patterns of <code>Array.prototype.push.apply</code>, <code>Spread syntax</code> and <code>concat</code>, please be careful above issue. <a href="https://gist.github.com/tanaikech/7198bc9019202f4080de8fd2e1b278fb#5-arrayprototypepushapply-spread-syntax-and-concat">Ref</a></p>
 <p>Please see the following script.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">let</span> <span style="color:#a6e22e">ar1</span> <span style="color:#f92672">=</span> [];
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">let</span> <span style="color:#a6e22e">ar1</span> <span style="color:#f92672">=</span> [];
 <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ar2</span> <span style="color:#f92672">=</span> Array(<span style="color:#ae81ff">125859</span>).<span style="color:#a6e22e">fill</span>(<span style="color:#e6db74">&#34;sample&#34;</span>);
 Array.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">push</span>.<span style="color:#a6e22e">apply</span>(<span style="color:#a6e22e">ar1</span>, <span style="color:#a6e22e">ar2</span>);
 </code></pre></div><p>When above script is run, the error of <code>RangeError: Maximum call stack size exceeded</code> occurs at <code>Array.prototype.push.apply(ar1, ar2);</code>. But when <code>const r = Array(125858).fill(&quot;sample&quot;);</code> is used, no error occurs. On the other hand, the following script is used, no error occurs.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">let</span> <span style="color:#a6e22e">ar1</span> <span style="color:#f92672">=</span> Array(<span style="color:#ae81ff">1000000</span>).<span style="color:#a6e22e">fill</span>(<span style="color:#e6db74">&#34;sample&#34;</span>);
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">let</span> <span style="color:#a6e22e">ar1</span> <span style="color:#f92672">=</span> Array(<span style="color:#ae81ff">1000000</span>).<span style="color:#a6e22e">fill</span>(<span style="color:#e6db74">&#34;sample&#34;</span>);
 <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ar2</span> <span style="color:#f92672">=</span> Array(<span style="color:#ae81ff">125858</span>).<span style="color:#a6e22e">fill</span>(<span style="color:#e6db74">&#34;sample&#34;</span>);
 Array.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">push</span>.<span style="color:#a6e22e">apply</span>(<span style="color:#a6e22e">ar1</span>, <span style="color:#a6e22e">ar2</span>);
 </code></pre></div><h2 id="summary">Summary</h2>
 <p>From above sample scripts, when the array is combined using <code>Array.prototype.push.apply(ar1, ar2)</code>, it is found the following points.</p>
 <ul>
-<li>When you want to combine the array with the small size (for example, it's in the for loop.) with V8, <code>Array.prototype.push.apply</code> is suitable.</li>
+<li>When you want to combine the array with the small size (for example, it&rsquo;s in the for loop.) with V8, <code>Array.prototype.push.apply</code> is suitable.</li>
 <li>When you want to combine the array with the large size is combined with V8, <code>Spread syntax</code> is suitable.</li>
-<li>When you want to combine the array with the large size (for example, it's in the for loop.) without V8, <code>Array.prototype.push.apply</code> is suitable.</li>
-<li>When you want to combine the array with the large size (for example, it's in the for loop.) with and without V8, <code>concat</code> is suitable.</li>
+<li>When you want to combine the array with the large size (for example, it&rsquo;s in the for loop.) without V8, <code>Array.prototype.push.apply</code> is suitable.</li>
+<li>When you want to combine the array with the large size (for example, it&rsquo;s in the for loop.) with and without V8, <code>concat</code> is suitable.</li>
 </ul>
 <h2 id="references">References</h2>
 <ul>

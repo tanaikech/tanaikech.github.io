@@ -5,7 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.61.0" />
+  <meta name="generator" content="Hugo 0.88.1" />
 
   <title>Deleting Last Empty Page of Google Document using Google Apps Script &middot; tanaike</title>
 
@@ -286,21 +286,21 @@
 <p>As a sample situation, it supposes that there is the following Google Document.</p>
 <p><img src="https://tanaikech.github.io/img/20200117a-fig1.png" alt=""></p>
 <p>In this sample, the last page of Google Document has only one paragraph including no values which is <code>&quot;&quot;</code>. When I try to delete only last page without modifying the previous page, I noticed that this cannot be achieved with only <a href="https://developers.google.com/apps-script/reference/document">Google Document service</a>. For example, it try to delete the paragraph of the last page using the following scripts,</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">body</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DocumentApp</span>.<span style="color:#a6e22e">getActiveDocument</span>().<span style="color:#a6e22e">getBody</span>();
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">body</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DocumentApp</span>.<span style="color:#a6e22e">getActiveDocument</span>().<span style="color:#a6e22e">getBody</span>();
 <span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">getChild</span>(<span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">getNumChildren</span>() <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>).<span style="color:#a6e22e">removeFromParent</span>();
 </code></pre></div><p>and</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">body</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DocumentApp</span>.<span style="color:#a6e22e">getActiveDocument</span>().<span style="color:#a6e22e">getBody</span>();
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">body</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DocumentApp</span>.<span style="color:#a6e22e">getActiveDocument</span>().<span style="color:#a6e22e">getBody</span>();
 <span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">removeChild</span>(<span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">getChild</span>(<span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">getNumChildren</span>() <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>));
 </code></pre></div><p>and</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">body</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DocumentApp</span>.<span style="color:#a6e22e">getActiveDocument</span>().<span style="color:#a6e22e">getBody</span>();
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">body</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DocumentApp</span>.<span style="color:#a6e22e">getActiveDocument</span>().<span style="color:#a6e22e">getBody</span>();
 <span style="color:#a6e22e">body</span>
   .<span style="color:#a6e22e">getParagraphs</span>()
   .<span style="color:#a6e22e">pop</span>()
   .<span style="color:#a6e22e">removeFromParent</span>();
-</code></pre></div><p>An error like &ldquo;the last paragraph cannot be removed.&rdquo; occurs. Although I had looked for the method for deleting this last page using the Google Document service, unfortunately, I couldn't find it. So I used Google Docs API. When Google Docs API is used, the content can be deleted with one character unit. By this, above situation can be achieved.</p>
+</code></pre></div><p>An error like &ldquo;the last paragraph cannot be removed.&rdquo; occurs. Although I had looked for the method for deleting this last page using the Google Document service, unfortunately, I couldn&rsquo;t find it. So I used Google Docs API. When Google Docs API is used, the content can be deleted with one character unit. By this, above situation can be achieved.</p>
 <h2 id="sample-script">Sample script</h2>
 <p>Before you use this script, <a href="https://developers.google.com/apps-script/guides/services/advanced#enabling_advanced_services">please enable Google Docs API at Advanced Google services</a>.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">docId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set the Google Document ID here.
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">docId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set the Google Document ID here.
 </span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">c</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Docs</span>.<span style="color:#a6e22e">Documents</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">docId</span>, {
   <span style="color:#a6e22e">fields</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;body.content&#34;</span>
 }).<span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">content</span>.<span style="color:#a6e22e">pop</span>();
@@ -322,7 +322,7 @@
 <li><a href="https://developers.google.com/docs/api/reference/rest/v1/documents/get">documents.get</a></li>
 <li><a href="https://developers.google.com/docs/api/reference/rest/v1/documents/batchUpdate">documents.batchUpdate</a></li>
 </ul>
-<p>If you can find the method for achieving above with only Google Document service and when you propose the sample script, I'm glad.</p>
+<p>If you can find the method for achieving above with only Google Document service and when you propose the sample script, I&rsquo;m glad.</p>
 
   
   <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>

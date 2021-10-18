@@ -5,7 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.61.0" />
+  <meta name="generator" content="Hugo 0.88.1" />
 
   <title>Downloading Shared Files on Google Drive Using Curl &middot; tanaike</title>
 
@@ -285,22 +285,22 @@
 <p>When the shared files on Google Drive is downloaded, it is necessary to change the download method by the file size. The boundary of file size when the method is changed is about <strong>40MB</strong>.</p>
 <h3 id="file-size--40mb">File size &lt; 40MB</h3>
 <h4 id="curl">CURL</h4>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">filename<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;### filename ###&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">filename<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;### filename ###&#34;</span>
 fileid<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;### file ID ###&#34;</span>
-curl -L -o <span style="color:#e6db74">${</span>filename<span style="color:#e6db74">}</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">https://drive.google.com/uc?export=download&amp;id=</span><span style="color:#e6db74">${</span>fileid<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+curl -L -o <span style="color:#e6db74">${</span>filename<span style="color:#e6db74">}</span> <span style="color:#e6db74">&#34;https://drive.google.com/uc?export=download&amp;id=</span><span style="color:#e6db74">${</span>fileid<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
 </code></pre></div><h3 id="file-size--40mb-1">File size &gt; 40MB</h3>
 <p>When it tries to download the file with more than 40MB, Google says to download from following URL.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;uc-download-link&#34;</span> <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;goog-inline-block jfk-button jfk-button-action&#34;</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/uc?export=download&amp;amp;confirm=####&amp;amp;id=### file ID ###&#34;</span>&gt;download&lt;/<span style="color:#f92672">a</span>&gt;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;uc-download-link&#34;</span> <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;goog-inline-block jfk-button jfk-button-action&#34;</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/uc?export=download&amp;amp;confirm=####&amp;amp;id=### file ID ###&#34;</span>&gt;download&lt;/<span style="color:#f92672">a</span>&gt;
 </code></pre></div><p>Query included <code>confirm=####</code> is important for downloading the files with large size. In order to retrieve the query from the HTML, it uses <a href="https://github.com/EricChiang/pup"><code>pup</code></a>.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">pup <span style="color:#e6db74">&#39;a#uc-download-link attr{href}&#39;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">pup <span style="color:#e6db74">&#39;a#uc-download-link attr{href}&#39;</span>
 </code></pre></div><p>And <code>sed</code> is used to remove <code>amp;</code>.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sed -e <span style="color:#e6db74">&#39;s/amp;//g&#39;</span><span style="color:#e6db74">`</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sed -e <span style="color:#e6db74">&#39;s/amp;//g&#39;</span><span style="color:#e6db74">`</span>
 </code></pre></div><p>So curl command is as follows.</p>
 <h4 id="curl-1">CURL</h4>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">filename<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;### filename ###&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">filename<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;### filename ###&#34;</span>
 fileid<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;### file ID ###&#34;</span>
-query<span style="color:#f92672">=</span><span style="color:#e6db74">`</span>curl -c ./cookie.txt -s -L <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">https://drive.google.com/uc?export=download&amp;id=</span><span style="color:#e6db74">${</span>fileid<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> | pup <span style="color:#e6db74">&#39;a#uc-download-link attr{href}&#39;</span> | sed -e <span style="color:#e6db74">&#39;s/amp;//g&#39;</span><span style="color:#e6db74">`</span>
-curl -b ./cookie.txt -L -o <span style="color:#e6db74">${</span>filename<span style="color:#e6db74">}</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">https://drive.google.com</span><span style="color:#e6db74">${</span>query<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+query<span style="color:#f92672">=</span><span style="color:#e6db74">`</span>curl -c ./cookie.txt -s -L <span style="color:#e6db74">&#34;https://drive.google.com/uc?export=download&amp;id=</span><span style="color:#e6db74">${</span>fileid<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> | pup <span style="color:#e6db74">&#39;a#uc-download-link attr{href}&#39;</span> | sed -e <span style="color:#e6db74">&#39;s/amp;//g&#39;</span><span style="color:#e6db74">`</span>
+curl -b ./cookie.txt -L -o <span style="color:#e6db74">${</span>filename<span style="color:#e6db74">}</span> <span style="color:#e6db74">&#34;https://drive.google.com</span><span style="color:#e6db74">${</span>query<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
 </code></pre></div><p>The value of <code>confirm</code> is changed every time. So when the value of <code>confirm</code> is retrieved, the cookie is saved using <code>-c ./cookie.txt</code>, and when the file is downloaded, the cookie has to be read using <code>-b ./cookie.txt</code>.</p>
 <p>Reference: <a href="http://qiita.com/netwing/items/f2a595389f39206235e8">http://qiita.com/netwing/items/f2a595389f39206235e8</a></p>
 

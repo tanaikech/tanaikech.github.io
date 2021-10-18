@@ -5,7 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.61.0" />
+  <meta name="generator" content="Hugo 0.88.1" />
 
   <title>Benchmark: Search for Array Processing using Google Apps Script &middot; tanaike</title>
 
@@ -313,7 +313,7 @@
 <!-- raw HTML omitted -->
 <p>Figure 1 shows the number of elements vs. processing time (process cost) for searching 3 strings. At figure 2, the chart of search using indexOf shown in Fig. 1 was magnified. From Fig. 1, it was found that the search using indexOf is the fastest of all. The second is the linear search. The last is the search using hash. It is considered that the reason of this order is as follows.</p>
 <ol>
-<li>From the sample script, both the linear search and the search using hash process all elements in the array using the for loop. On the other hand, the search using indexOf doesn't process all elements using the for loop. The index of the element with the found string is directly retrieved using indexOf. When the string is found, the elements in the array are removed from the start index to the index of element with the found string. By this, the array length becomes small. This flow is repeated until to find all strings for searching. So it is considered that the search cost of indexOf which doesn't process all elements using the for loop became the lowest of all. This may indicate that the scan for indexOf() is different from it for the general for loop.</li>
+<li>From the sample script, both the linear search and the search using hash process all elements in the array using the for loop. On the other hand, the search using indexOf doesn&rsquo;t process all elements using the for loop. The index of the element with the found string is directly retrieved using indexOf. When the string is found, the elements in the array are removed from the start index to the index of element with the found string. By this, the array length becomes small. This flow is repeated until to find all strings for searching. So it is considered that the search cost of indexOf which doesn&rsquo;t process all elements using the for loop became the lowest of all. This may indicate that the scan for indexOf() is different from it for the general for loop.</li>
 <li>In the case of the search by hash, it was found that although the cost of search by the hash from the object is very low, the cost for creating the object to search the hash was the highest of all. So it is considered that the search by hash became the lowest rank. If the object for searching has already been created, the cost of search by the hash will be the lowest of all.</li>
 <li>The linear search processes all elements using the for loop as same as the search using hash. At the linear search, the elements are scanned and the searched string is retrieved using <code>if</code>. On the other hand, at the search using hash, the object is created to search while using <code>if</code>. After the object was created, the strings are searched. From the result of order of cost, it is considered that the cost for creating an object is higher than that of <code>push()</code>. So it is considered that the linear search became the second.</li>
 </ol>
@@ -343,8 +343,8 @@
 <h3 id="scripts">Scripts</h3>
 <h4 id="creating-sample-arrays">Creating sample arrays</h4>
 <p>The function for creating an array is as follows. &ldquo;searchText&rdquo; is put to the center, top and end of the array. In this report, the script searches the index of array elements with &ldquo;searchText&rdquo; from the array including 3 &ldquo;searchText&rdquo;.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">createSampleArray</span>(<span style="color:#a6e22e">max</span>, <span style="color:#a6e22e">searchText</span>) {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> Array.<span style="color:#a6e22e">apply</span>(<span style="color:#66d9ef">null</span>, <span style="color:#66d9ef">new</span> Array(<span style="color:#a6e22e">max</span>)).<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">i</span>) {<span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;val&#34;</span> <span style="color:#f92672">+</span> (<span style="color:#e6db74">&#39;0000000000&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">i</span>).<span style="color:#a6e22e">slice</span>(<span style="color:#f92672">-</span><span style="color:#ae81ff">8</span>)});
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">createSampleArray</span>(<span style="color:#a6e22e">max</span>, <span style="color:#a6e22e">searchText</span>) {
+  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> Array.<span style="color:#a6e22e">apply</span>(<span style="color:#66d9ef">null</span>, <span style="color:#66d9ef">new</span> Array(<span style="color:#a6e22e">max</span>)).<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#ae81ff">_</span>, <span style="color:#a6e22e">i</span>) {<span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;val&#34;</span> <span style="color:#f92672">+</span> (<span style="color:#e6db74">&#39;0000000000&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">i</span>).<span style="color:#a6e22e">slice</span>(<span style="color:#f92672">-</span><span style="color:#ae81ff">8</span>)});
   <span style="color:#75715e">// Put the search value to center of the array.
 </span><span style="color:#75715e"></span>  Array.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">splice</span>.<span style="color:#a6e22e">apply</span>(<span style="color:#a6e22e">r</span>, [Math.<span style="color:#a6e22e">floor</span>(<span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">/</span> <span style="color:#ae81ff">2</span>), <span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">concat</span>([<span style="color:#a6e22e">searchText</span>]));
   <span style="color:#75715e">// Put the search value to top of the array.
@@ -354,7 +354,7 @@
   <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">r</span>;
 }
 </code></pre></div><p>The array becomes like below.</p>
-<pre><code>[
+<pre tabindex="0"><code>[
   &quot;searchText&quot;,
   &quot;val00000000&quot;,
   &quot;val00000001&quot;,
@@ -374,7 +374,7 @@
   &quot;searchText&quot;
 ]
 </code></pre><h4 id="searching-values">Searching values</h4>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// Linear search
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// Linear search
 </span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">linearSearch</span>(<span style="color:#a6e22e">array</span>, <span style="color:#a6e22e">searchText</span>) {
   <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> [];
   <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">array</span>.<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
