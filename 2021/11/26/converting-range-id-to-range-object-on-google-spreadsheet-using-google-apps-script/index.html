@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="generator" content="Hugo 0.88.1" />
+
+  <title>Converting Range ID to Range Object on Google Spreadsheet using Google Apps Script &middot; tanaike</title>
+
+    
+
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/pure-min.css">
+
+  <!--[if lte IE 8]>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-old-ie-min.css">
+  <![endif]-->
+  <!--[if gt IE 8]><!-->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-min.css">
+  <!--<![endif]-->
+
+  <!--[if lte IE 8]>
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/side-menu-old-ie.css">
+  <![endif]-->
+  <!--[if gt IE 8]><!-->
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/side-menu.css">
+  <!--<![endif]-->
+
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
+
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet" type="text/css">
+
+  
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+ 
+  
+
+  
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/styles/androidstudio.min.css">
+  <script async src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/highlight.min.js"></script>
+  
+  <script>hljs.initHighlightingOnLoad();</script>
+  
+
+  <link rel="shortcut icon" href="https://tanaikech.github.io/img/favicon.ico" type="image/x-icon" />
+
+  
+  
+
+</head>
+
+
+<body>
+<div id="layout">
+
+  
+<a href="#menu" id="menuLink" class="menu-link">
+  
+  <span></span>
+</a>
+<div id="menu">
+
+  
+  <a class="pure-menu-heading brand" href="https://tanaikech.github.io/">TANAIKE</a>
+
+
+  <div class="pure-menu">
+    <ul class="pure-menu-list">
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/about/"><i class='fa fa-user fa-fw'></i>About</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/post/"><i class='fa fa-list fa-fw'></i>Posts</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/topics/"><i class='fa fa-folder fa-fw'></i>Topics</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/tags/"><i class='fa fa-tags fa-fw'></i>Tags</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/contact/"><i class='fa fa-phone fa-fw'></i>Contact</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/webapps/"><i class='fas fa-toolbox'></i>Web Applications</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/donate/"><i class='fas fa-donate'></i>Donate</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
+      
+        </li>
+      
+    </ul>
+  </div>
+
+  <div class="pure-menu social">
+  <ul class="pure-menu-list">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
+    </li>
+    
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+    </li>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+  </ul>
+</div>
+
+
+  <div>
+  <div class="small-print">
+    <small>&copy; 2017. All rights reserved.</small>
+  </div>
+  <div class="small-print">
+    <small>Built with&nbsp;<a href="https://gohugo.io/" target="_blank">Hugo</a></small>
+    <small>Theme&nbsp;<a href="https://github.com/yoshiharuyamashita/blackburn" target="_blank">Blackburn</a></small>
+  </div>
+</div>
+
+</div>
+
+
+  <div id="main">
+
+
+<div class="header">
+  <h1>Converting Range ID to Range Object on Google Spreadsheet using Google Apps Script</h1>
+  <h2></h2>
+</div>
+<div class="content">
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>26 Nov 2021, 11:48</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/spreadsheet">spreadsheet</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  <p><a href="https://gist.github.com/tanaikech/3aa69f1a8e2a944c7df926879fa0f34e">Gists</a></p>
+<p>This is a workaround for converting the range ID to the range object on Google Spreadsheet using Google Apps Script.</p>
+<p>When the named range is put to a cell as the hyperlink as follows,</p>
+<p><img src="https://tanaikech.github.io/image-storage/20211126a/fig1.png" alt=""></p>
+<p>the hyperlink is like <code>#rangeid=123456789</code>. When this link is clicked, it moves to the cells of the named range. So it is considered that this value of <code>#rangeid=123456789</code> includes the information about the range of the named range. But, unfortunately, in the current stage, there is no methods for directly retrieving the range object from the range ID. In this sample sample script, as a workaround, the range ID is converted to the range object using Google Apps Script.</p>
+<p>The flow of this workaround is as follows.</p>
+<ol>
+<li>Retrieve the range ID from a cell and create an URL with the range ID.</li>
+<li>Open a dialog and access to the URL with the range ID.
+<ul>
+<li>By this, the Spreadsheet is opened and the range of the range ID is activated.</li>
+</ul>
+</li>
+<li>When the Spreadsheet is opened, the information of the active range is stored to the CacheService.</li>
+<li>After several seconds, at Google Apps Script side, retrieve the data from CacheService.</li>
+<li>Convert the data from CacheService to the range object.</li>
+</ol>
+<p>By this flow, the range ID can be converted to the range object. I think that this might be a bit forcible. So when I could find other simple method, I would like to report it.</p>
+<h2 id="usage">Usage:</h2>
+<p>When you want to test this workaround, please do the following flow.</p>
+<h3 id="1-create-spreadsheet">1. Create Spreadsheet.</h3>
+<p>Create new Spreadsheet and set a named range, and please insert the hyperlink of the named range to a cell. In this sample, it&rsquo;s &ldquo;A1&rdquo;.</p>
+<h3 id="2-sample-script">2. Sample script.</h3>
+<p>Please copy and paste the following script to the script editor of the Spreadsheet.</p>
+<h4 id="codegs"><code>Code.gs</code></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">onOpen</span>(<span style="color:#a6e22e">e</span>) {
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">source</span>.<span style="color:#a6e22e">getActiveRange</span>();
+  <span style="color:#a6e22e">CacheService</span>.<span style="color:#a6e22e">getScriptCache</span>().<span style="color:#a6e22e">put</span>(
+    <span style="color:#e6db74">&#34;range&#34;</span>,
+    <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>({
+      <span style="color:#a6e22e">sheetName</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getSheet</span>().<span style="color:#a6e22e">getSheetName</span>(),
+      <span style="color:#a6e22e">a1Notation</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getA1Notation</span>(),
+    })
+  );
+}
+
+<span style="color:#75715e">// Please run this script.
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>(<span style="color:#a6e22e">e</span>) {
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;A1&#34;</span>; <span style="color:#75715e">// As a sample, it supposes that the hyperlink with the range ID is put in a cell &#34;A1&#34;.
+</span><span style="color:#75715e"></span>
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>();
+  <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">e</span>) {
+    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">html</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">HtmlService</span>.<span style="color:#a6e22e">createTemplateFromFile</span>(<span style="color:#e6db74">&#34;index&#34;</span>);
+    <span style="color:#a6e22e">html</span>.<span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`https://docs.google.com/spreadsheets/d/</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getId</span>()<span style="color:#e6db74">}</span><span style="color:#e6db74">/edit</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">ss</span>
+      .<span style="color:#a6e22e">getActiveSheet</span>()
+      .<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">r</span>)
+      .<span style="color:#a6e22e">getRichTextValue</span>()
+      .<span style="color:#a6e22e">getLinkUrl</span>()<span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>;
+    <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getUi</span>().<span style="color:#a6e22e">showDialog</span>(<span style="color:#a6e22e">html</span>.<span style="color:#a6e22e">evaluate</span>());
+    <span style="color:#66d9ef">return</span>;
+  }
+  <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">sleep</span>(<span style="color:#ae81ff">15000</span>); <span style="color:#75715e">// When this value is small, no range data cannot be retrieved. Please be careful this.
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">text</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">CacheService</span>.<span style="color:#a6e22e">getScriptCache</span>().<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#34;range&#34;</span>);
+  <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">text</span>) <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">&#34;Range couldn&#39;t be retrieved.&#34;</span>);
+  <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">sheetName</span>, <span style="color:#a6e22e">a1Notation</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">text</span>);
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#e6db74">`&#39;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">sheetName</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;!</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">a1Notation</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
+
+  <span style="color:#75715e">// You can use this &#34;range&#34; as the range object retrieved from the range ID.
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getValues</span>();
+  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">values</span>); <span style="color:#75715e">// You can see the values from the range object converted from the range iD.
+</span><span style="color:#75715e"></span>
+  <span style="color:#75715e">//
+</span><span style="color:#75715e"></span>  <span style="color:#75715e">// do something
+</span><span style="color:#75715e"></span>  <span style="color:#75715e">//
+</span><span style="color:#75715e"></span>}
+</code></pre></div><h4 id="indexhtml"><code>index.html</code></h4>
+<p>Please copy and paste the following script as the HTML file (<code>index.html</code>).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">iframe</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;&lt;?= url ?&gt;&#34;</span>&gt;&lt;/<span style="color:#f92672">iframe</span>&gt;
+&lt;<span style="color:#f92672">script</span>&gt;
+  <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">script</span>.<span style="color:#a6e22e">run</span>.<span style="color:#a6e22e">withSuccessHandler</span>(<span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">script</span>.<span style="color:#a6e22e">host</span>.<span style="color:#a6e22e">close</span>).<span style="color:#a6e22e">main</span>(<span style="color:#66d9ef">true</span>);
+&lt;/<span style="color:#f92672">script</span>&gt;
+</code></pre></div><h3 id="3-testing">3. Testing.</h3>
+<p>Please run <code>main()</code> function at the script editor. By this, a dialog is opened to the Spreadsheet. And, the Spreadsheet is opened in the dialog, and the active range is retrieved and converted to the range object. When the script is finished, the dialog is closed.</p>
+<p>When above demonstration image is used, when you run the script, you can see the following values at the log. By this, you can confirm that the range ID can be converted to the range object.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">[
+  [<span style="color:#e6db74">&#34;e2&#34;</span>, <span style="color:#e6db74">&#34;f2&#34;</span>],
+  [<span style="color:#e6db74">&#34;e3&#34;</span>, <span style="color:#e6db74">&#34;f3&#34;</span>],
+  [<span style="color:#e6db74">&#34;e4&#34;</span>, <span style="color:#e6db74">&#34;f4&#34;</span>],
+  [<span style="color:#e6db74">&#34;e5&#34;</span>, <span style="color:#e6db74">&#34;f5&#34;</span>],
+  [<span style="color:#e6db74">&#34;e6&#34;</span>, <span style="color:#e6db74">&#34;f6&#34;</span>]
+]
+</code></pre></div><h2 id="note">Note:</h2>
+<ul>
+<li>In this workaround, the dialog is used. So the user is required to open the Spreadsheet. Please be careful this.</li>
+</ul>
+
+  
+  <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2021%2f11%2f26%2fconverting-range-id-to-range-object-on-google-spreadsheet-using-google-apps-script%2f" target="_blank" title="Share on Facebook"><i class="fab fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2021%2f11%2f26%2fconverting-range-id-to-range-object-on-google-spreadsheet-using-google-apps-script%2f" target="_blank" title="Tweet"><i class="fab fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2021%2f11%2f26%2fconverting-range-id-to-range-object-on-google-spreadsheet-using-google-apps-script%2f" target="_blank" title="Share on Google+"><i class="fab fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2021%2f11%2f26%2fconverting-range-id-to-range-object-on-google-spreadsheet-using-google-apps-script%2f" target="_blank" title="Post to Tumblr"><i class="fab fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2021%2f11%2f26%2fconverting-range-id-to-range-object-on-google-spreadsheet-using-google-apps-script%2f" target="_blank" title="Pin it"><i class="fab fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2021%2f11%2f26%2fconverting-range-id-to-range-object-on-google-spreadsheet-using-google-apps-script%2f" target="_blank" title="Submit to Reddit"><i class="fab fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
+
+
+  
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2021/11/24/exporting-all-thumbnail-images-retrieved-from-google-slides-as-zip-file-using-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2021/11/24/exporting-all-thumbnail-images-retrieved-from-google-slides-as-zip-file-using-google-apps-script/">Exporting All Thumbnail Images Retrieved from Google Slides as Zip File using Google Apps Script</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
+</div>
+
+
+  
+  
+  
+  
+
+  
+
+</div>
+
+</div>
+</div>
+<script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
+    }
+  });
+</script>
+
+
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-84325623-1"></script>
+<script>
+  
+  if (window.location.hostname != "localhost") {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-84325623-1');
+  }
+</script>
+
+
+
+
+
+
+<script src="https://tanaikech.github.io/js/math-code.js"></script>
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  
+
+
+</body>
+</html>
+
