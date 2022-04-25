@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="generator" content="Hugo 0.88.1" />
+
+  <title>Handling 10,000,000 cells in Google Spreadsheet using Google Apps Script &middot; tanaike</title>
+
+    
+
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/pure-min.css">
+
+  <!--[if lte IE 8]>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-old-ie-min.css">
+  <![endif]-->
+  <!--[if gt IE 8]><!-->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-min.css">
+  <!--<![endif]-->
+
+  <!--[if lte IE 8]>
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/side-menu-old-ie.css">
+  <![endif]-->
+  <!--[if gt IE 8]><!-->
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/side-menu.css">
+  <!--<![endif]-->
+
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
+
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet" type="text/css">
+
+  
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+ 
+  
+
+  
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/styles/androidstudio.min.css">
+  <script async src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/highlight.min.js"></script>
+  
+  <script>hljs.initHighlightingOnLoad();</script>
+  
+
+  <link rel="shortcut icon" href="https://tanaikech.github.io/img/favicon.ico" type="image/x-icon" />
+
+  
+  
+
+</head>
+
+
+<body>
+<div id="layout">
+
+  
+<a href="#menu" id="menuLink" class="menu-link">
+  
+  <span></span>
+</a>
+<div id="menu">
+
+  
+  <a class="pure-menu-heading brand" href="https://tanaikech.github.io/">TANAIKE</a>
+
+
+  <div class="pure-menu">
+    <ul class="pure-menu-list">
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/about/"><i class='fa fa-user fa-fw'></i>About</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/post/"><i class='fa fa-list fa-fw'></i>Posts</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/topics/"><i class='fa fa-folder fa-fw'></i>Topics</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/tags/"><i class='fa fa-tags fa-fw'></i>Tags</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/contact/"><i class='fa fa-phone fa-fw'></i>Contact</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/webapps/"><i class='fas fa-toolbox'></i>Web Applications</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/donate/"><i class='fas fa-donate'></i>Donate</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
+      
+        </li>
+      
+    </ul>
+  </div>
+
+  <div class="pure-menu social">
+  <ul class="pure-menu-list">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
+    </li>
+    
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+    </li>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+  </ul>
+</div>
+
+
+  <div>
+  <div class="small-print">
+    <small>&copy; 2017. All rights reserved.</small>
+  </div>
+  <div class="small-print">
+    <small>Built with&nbsp;<a href="https://gohugo.io/" target="_blank">Hugo</a></small>
+    <small>Theme&nbsp;<a href="https://github.com/yoshiharuyamashita/blackburn" target="_blank">Blackburn</a></small>
+  </div>
+</div>
+
+</div>
+
+
+  <div id="main">
+
+
+<div class="header">
+  <h1>Handling 10,000,000 cells in Google Spreadsheet using Google Apps Script</h1>
+  <h2></h2>
+</div>
+<div class="content">
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>25 Apr 2022, 15:06</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/spreadsheet">spreadsheet</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  <p><a href="https://gist.github.com/tanaikech/cc4380692790150cc090114553e38a0e">Gists</a></p>
+<h1 id="introduction">Introduction</h1>
+<p>On March 14, 2022, it reported about &ldquo;Google Sheets doubles cell limit&rdquo;. <a href="https://workspaceupdates.googleblog.com/2022/03/ten-million-cells-google-sheets.html">Ref</a> By this update, now, the users can use 10,000,000 cells in a Google Spreadsheet. This is great news for us. When I tried to handle 10,000,000 cells in a Google Spreadsheet using Google Apps Script, it was found that there were various important points. In this report, I would like to introduce the important points for handling 10,000,000 cells in Google Spreadsheet using Google Apps Script.</p>
+<h1 id="experiences">Experiences</h1>
+<p>In this report, as a sample Google Spreadsheet, a Google Spreadsheet including a sheet that has 10,000,000 cells (10 columns x 1,000,000 rows) is used.</p>
+<p>Using this sample Spreadsheet, I would like to introduce the following patterns.</p>
+<ol>
+<li>
+<p>Retrieve the metadata from Spreadsheet.</p>
+</li>
+<li>
+<p>Retrieve all values from 10,000,000 cells.</p>
+</li>
+<li>
+<p>Retrieve a value from a cell &ldquo;A1&rdquo; and a cell &ldquo;J1000000&rdquo;.</p>
+</li>
+<li>
+<p>Search a value from a cell &ldquo;A1&rdquo; and a cell &ldquo;J1000000&rdquo;.</p>
+</li>
+<li>
+<p>Put a value to a cell &ldquo;A1&rdquo; and a cell &ldquo;J1000000&rdquo;.</p>
+</li>
+<li>
+<p>Embed all 10,000,000 cells by a value.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20220425a/fig1.png" alt=""></p>
+</li>
+<li>
+<p>Embed all 10,000,000 cells by the difference values.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20220425a/fig2.png" alt=""></p>
+</li>
+<li>
+<p>Export Spreadsheet with 10,000,000 cells.</p>
+</li>
+</ol>
+<h1 id="result-and-discussions">Result and discussions</h1>
+<h2 id="1-retrieve-the-metadata-from-spreadsheet">1. Retrieve the metadata from Spreadsheet</h2>
+<p>After all different values were put to 10,000,000 cells of a sheet with 10 columns x 1,000,000 rows, when the metadata of the numbers of maximum row and maximum column is retrieved using Spreadsheet service (SpreadsheetApp) and Sheets API, the following average process time is obtained.</p>
+<ul>
+<li>
+<p>Spreadsheet service: <strong>0.3 s</strong></p>
+</li>
+<li>
+<p>Sheets API: <strong>0.3 s</strong></p>
+</li>
+</ul>
+<p>From the above results, it was found that when the metadata from a Spreadsheet that has all different values in 10,000,000 cells is retrieved, it can be done with the low process cost for Spreadsheet service and Sheets API. In this case, even when all 10,000,000 cells are empty is used, almost the same result was obtained.</p>
+<h2 id="2-retrieve-a-value-from-a-cell-a1-and-a-cell-j1000000">2. Retrieve a value from a cell &ldquo;A1&rdquo; and a cell &ldquo;J1000000&rdquo;</h2>
+<p>After all different values were put to 10,000,000 cells of a sheet with 10 columns x 1,000,000 rows, when the values from the cells &ldquo;A1&rdquo; and &ldquo;J1000000&rdquo; are retrieved using Spreadsheet service (SpreadsheetApp) and Sheets API, the following average process time is obtained.</p>
+<ul>
+<li>
+<p>Spreadsheet service: <strong>0.3 s</strong> for both &ldquo;A1&rdquo; and &ldquo;J1000000&rdquo;</p>
+</li>
+<li>
+<p>Sheets API: <strong>0.3 s</strong> for both &ldquo;A1&rdquo; and &ldquo;J1000000&rdquo;</p>
+</li>
+</ul>
+<p>From the above results, it was found that when the values from the cells &ldquo;A1&rdquo; and &ldquo;J1000000&rdquo; are retrieved, it can be done with the low process cost for Spreadsheet service and Sheets API.</p>
+<h3 id="important">IMPORTANT</h3>
+<p>As another experiment, after all different values were put to 10,000,000 cells of a sheet with 10 columns x 1,000,000 rows, when the Spreadsheet is opened soon, all values are not shown soon. But, using one script, after all different values were put to 10,000,000 cells of a sheet with 10 columns x 1,000,000 rows, when the values are continuously retrieved from the cells of &ldquo;A1&rdquo; and &ldquo;J1000000&rdquo; soon, the correct values are returned soon. From this result, it is considered that the database on the internal server side has all values even when all values are not shown by opening Spreadsheet. I thought that this might be important information.</p>
+<h2 id="3-retrieve-all-values-from-10000000-cells">3. Retrieve all values from 10,000,000 cells</h2>
+<p>When I tried to retrieve all values from 10,000,000 cells, I obtained the following important points.</p>
+<ol>
+<li>
+<p>When <code>SpreadsheetApp.openById(ssId).getDataRange().getValues()</code> with Spreadsheet service (SpreadsheetApp) is used, an error of <code>Exceeded maximum execution time</code> occurs.</p>
+</li>
+<li>
+<p>When <code>Sheets.Spreadsheets.Values.get(ssId, &quot;Sheet1&quot;)</code> with Sheets API is used, an error of <code>response too large</code> occurs.</p>
+</li>
+</ol>
+<p>Namely, it was found that all values from 10,000,000 cells cannot be directly retrieved. So, as a workaround, I proposed to retrieve all values from 10,000,000 cells by separating rows.</p>
+<p>When this is reflected in a script, it was found that all values from 10,000,000 cells can be retrieved by one execution of the script using both Spreadsheet service (SpreadsheetApp) and Sheets API. Here, I would like to introduce the result obtained by retrieving all values from 10,000,000 cells by separating the retrieved rows.</p>
+<p>After all different values were put to 10,000,000 cells of a sheet with 10 columns x 1,000,000 rows, when all values are retrieved using Spreadsheet service (SpreadsheetApp) and Sheets API, the following average process time is obtained. In this case, all values were retrieved from 10,000,000 cells of a sheet with 10 columns x 1,000,000 rows by separating every 200,000 rows.</p>
+<ul>
+<li>
+<p>Spreadsheet service: <strong>85 s</strong></p>
+</li>
+<li>
+<p>Sheets API: <strong>45 s</strong></p>
+</li>
+</ul>
+<p>From the above results, it was found that the process cost of Sheets API is lower than that of Spreadsheet service. This is the same trend with <a href="https://gist.github.com/tanaikech/d102c9600ba12a162c667287d2f20fe4">my published report</a>.</p>
+<h3 id="important-1">IMPORTANT</h3>
+<p>In this sample, the values are retrieved by separating every 200,000 rows. But I think that this is not a suitable value for obtaining the lowest process cost. This is a sample script for retrieving all values from 10,000,000 cells of a sheet with 10 columns x 1,000,000 rows by one execution of the script. Please be careful about this.</p>
+<h2 id="4-search-a-value-from-a-cell-a1-and-a-cell-j1000000">4. Search a value from a cell &ldquo;A1&rdquo; and a cell &ldquo;J1000000&rdquo;.</h2>
+<p>After all different values were put to 10,000,000 cells of a sheet with 10 columns x 1,000,000 rows, when a values of cells &ldquo;A1&rdquo; and &ldquo;J1000000&rdquo; are searched using TextFinder, the following average process time is obtained.</p>
+<ul>
+<li>
+<p>For &ldquo;A1&rdquo;: <strong>0.3 s</strong> for <code>findNext()</code> and <strong>15 s</strong> for <code>findAll()</code></p>
+</li>
+<li>
+<p>For &ldquo;J1000000&rdquo;: <strong>15 s</strong> for both <code>findNext()</code> and <code>findAll()</code></p>
+</li>
+</ul>
+<p>From the above results, it was found that when the values from the cells &ldquo;A1&rdquo; and &ldquo;J1000000&rdquo; are searched using TextFinder, the process cost of <code>findNext()</code> for searching a value that can be found from &ldquo;A1&rdquo; is lower than that of <code>findAll()</code> for searching a value which can be found from &ldquo;J1000000&rdquo;. Because it is considered that <code>findAll()</code> scans all cells while <code>findNext()</code> can be finished when a value is found.</p>
+<h2 id="5-put-a-value-to-a-cell-a1-and-a-cell-j1000000">5. Put a value to a cell &ldquo;A1&rdquo; and a cell &ldquo;J1000000&rdquo;</h2>
+<p>After all different values were put to 10,000,000 cells of a sheet with 10 columns x 1,000,000 rows, when a value is put to a cell &ldquo;A1&rdquo;, a cell &ldquo;J1000000&rdquo; using Spreadsheet service (SpreadsheetApp) and Sheets API, the following average process time is obtained.</p>
+<ul>
+<li>
+<p>Spreadsheet service: Put a value to a cell &ldquo;A1&rdquo; and &ldquo;J1000000&rdquo;: <strong>0.2 s</strong> for both</p>
+</li>
+<li>
+<p>Sheets API: Put a value to a cell &ldquo;A1&rdquo; and &ldquo;J1000000&rdquo;: <strong>0.2 s</strong> for both</p>
+</li>
+</ul>
+<p>From the above results, it was found that when a single value is put in a cell &ldquo;A1&rdquo; and &ldquo;J1000000&rdquo; in a Spreadsheet that has all different values in 10,000,000 cells is retrieved, it can be done with a low process cost for Spreadsheet service and Sheets API. In this case, even when all 10,000,000 cells are empty is used, almost the same result was obtained.</p>
+<h2 id="6-embed-all-10000000-cells-by-a-value">6. Embed all 10,000,000 cells by a value</h2>
+<p>When all cells in a sheet with 10 columns x 1,000,000 rows are embedded by one value like &ldquo;sample&rdquo; using Spreadsheet service (SpreadsheetApp) and Sheets API, the following average process time is obtained.</p>
+<ul>
+<li>
+<p>Spreadsheet service: <strong>1 s</strong>.</p>
+</li>
+<li>
+<p>Sheets API: <strong>3 s</strong>.</p>
+</li>
+</ul>
+<p>From the above results, it was found that when all cells in a sheet with 10 columns x 1,000,000 rows are embedded by one value like &ldquo;sample&rdquo; using Spreadsheet service (SpreadsheetApp) and Sheets API, both processes can be done with the low process cost. And also, it was found that in this case, the process cost of Spreadsheet service is lower than that of Sheets API. This is an interesting result.</p>
+<h2 id="7-embed-all-10000000-cells-by-the-difference-values">7. Embed all 10,000,000 cells by the difference values</h2>
+<p>When I tried to put all different values to 10,000,000 cells in a sheet with 10 columns x 1,000,000 rows, I obtained the following important points.</p>
+<ol>
+<li>
+<p>When <code>SpreadsheetApp.openById(ssId).getRange(1, 1, 1000000, 10).setValues(values)</code> with Spreadsheet service (SpreadsheetApp) is used, an error of <code>Exceeded maximum execution time</code> occurs.</p>
+</li>
+<li>
+<p>When <code>Sheets.Spreadsheets.Values.update({ values }, ssId, &quot;Sheet1!A1&quot;, { valueInputOption: &quot;USER_ENTERED&quot;})</code> with Sheets API is used, an error of <code>API call to sheets.spreadsheets.values.update failed with error: Empty response</code> occurs.</p>
+</li>
+</ol>
+<p>Namely, it was found that the values cannot be directly put to 10,000,000 cells. So, as a workaround, I proposed to put the values to 10,000,000 cells by separating rows. This is the same method for retrieving values from 10,000,000 cells.</p>
+<p>But, unfortunately, it was found that in this case, all 10,000,000 cells cannot be embedded using <code>setValues</code> of Spreadsheet service (SpreadsheetApp) even when this workaround is used, because of an error of <code>Exceeded maximum execution time</code>.</p>
+<p>When this workaround is reflected in a script, it was found that the values are put to 10,000,000 cells by one execution of the script using Sheets API. Here, I would like to introduce the result obtained by putting values to 10,000,000 cells by separating the retrieved rows.</p>
+<p>When the values are put using Sheets API, the following average process time is obtained. In this case, the values of 10 columns x 1,000,000 rows were put on a sheet by separating every 300,000 rows.</p>
+<ul>
+<li>
+<p>Spreadsheet service: fail</p>
+</li>
+<li>
+<p>Sheets API: <strong>220 s</strong></p>
+</li>
+</ul>
+<p>From the above results, it was found that when the values are put into a sheet of 10 columns x 1,000,000 rows by separating the rows using Sheets API, 10,000,000 cells can be embedded by one execution of the script.</p>
+<h3 id="important-2">IMPORTANT</h3>
+<p>In this sample, the values are put on a sheet by separating every 300,000 rows. But I think that this is not a suitable value for obtaining the lowest process cost. This is a sample script for putting the values to 10,000,000 cells of a sheet with 10 columns x 1,000,000 rows by one execution of the script. Please be careful about this.</p>
+<h2 id="8-export-spreadsheet-with-10000000-cells">8. Export Spreadsheet with 10,000,000 cells</h2>
+<p>When a Spreadsheet including a sheet of 10 columns x 1,000,000 rows are exported using a script, the following result is obtained.</p>
+<ul>
+<li>
+<p>Spreadsheet can be exported as an XLSX file and CSV file.</p>
+<ul>
+<li>
+<p>When all cell values from <code>#0000000A1</code> to <code>#0J1000000</code> are used, the file size of the exported XLSX and CSV are 49,459,938 bytes and 52,427,565 bytes, respectively.</p>
+</li>
+<li>
+<p>The average process times for exporting XLSX data and CSV data are as follows.</p>
+<ul>
+<li>XLSX: <strong>100 s</strong></li>
+<li>CSV: <strong>40 s</strong></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Spreadsheet cannot be exported as a PDF file.</p>
+</li>
+</ul>
+<h1 id="summary">Summary</h1>
+<p>In this report, handling 10,000,000 cells in Google Spreadsheet using Google Apps Script has been investigated. And, the following results could be obtained.</p>
+<ul>
+<li>
+<p>Process costs for retrieving the metadata of Spreadsheet and a single value from a cell, and also searching a value, putting the same value to 10,000,000 cells are very low.</p>
+</li>
+<li>
+<p>In order to retrieve all cell values from 10,000,000 cells using Spreadsheet service and Sheets API, it is required to retrieve them by separating the rows. Because all values cannot be directly retrieved by one request.</p>
+</li>
+<li>
+<p>In order to put all different values to 10,000,000 cells using Sheets API, it is required to put them by separating the values. Because all values cannot be directly put by one request. And also, in this case, <code>setValues</code> of the Spreadsheet service cannot be used.</p>
+</li>
+<li>
+<p>Spreadsheet embedded by all cell values to 10,000,000 cells can be exported as an XLSX file and a CSV file. But, it cannot be exported as a PDF file.</p>
+</li>
+</ul>
+<h1 id="note">Note</h1>
+<ul>
+<li>
+<p>At GAS, the processing time is not stable as you know. So the average value for more than 100 times measurements was used for each value which is shown by the showing process time. At this time, the fluctuation of the average values was less than 1 %. I worry that each detailed data in my environment might be different from that of other user’s environments. But I believe that the trend of this result can be used.</p>
+</li>
+<li>
+<p>In my experience, it was found that a sheet of 1 column and 10,000,000 rows can be created.</p>
+</li>
+<li>
+<p>These results are the current results (April 25, 2022). I would like to expect that this situation will be modified in the future update.</p>
+</li>
+</ul>
+<h1 id="appendix">Appendix</h1>
+<p>These are the sample scripts for measuring process costs for each experiment.</p>
+<h2 id="1-retrieve-the-metadata-from-spreadsheet-1">1. Retrieve the metadata from Spreadsheet</h2>
+<p>For Spreadsheet service</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>).<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>);
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getMaxRows</span>();
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">maxCol</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getMaxColumns</span>();
+</code></pre></div><p>For Sheets API</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">rowCount</span>, <span style="color:#a6e22e">columnCount</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">ssId</span>, {
+  <span style="color:#a6e22e">fields</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sheets(properties)&#34;</span>,
+}).<span style="color:#a6e22e">sheets</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">properties</span>.<span style="color:#a6e22e">gridProperties</span>;
+</code></pre></div><h2 id="2-retrieve-a-value-from-a-cell-a1-and-a-cell-j1000000-1">2. Retrieve a value from a cell &ldquo;A1&rdquo; and a cell &ldquo;J1000000&rdquo;</h2>
+<p>For Spreadsheet service</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>)
+  .<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>)
+  .<span style="color:#a6e22e">getRange</span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>) <span style="color:#75715e">// and .getRange(1000000, 10)
+</span><span style="color:#75715e"></span>  .<span style="color:#a6e22e">getValue</span>();
+</code></pre></div><p>For Sheets API</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;A1&#34;</span>; <span style="color:#75715e">// and &#34;J1000000&#34;
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">Values</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">ssId</span>, <span style="color:#e6db74">`Sheet1!</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">range</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>)
+  .<span style="color:#a6e22e">values</span>[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">0</span>];
+</code></pre></div><h2 id="3-retrieve-all-values-from-10000000-cells-1">3. Retrieve all values from 10,000,000 cells</h2>
+<p>For Spreadsheet service</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">limit</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">200000</span>; <span style="color:#75715e">// Number of rows per one request of getValues().
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">start</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>);
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> [...Array(Math.<span style="color:#a6e22e">ceil</span>(<span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">limit</span>))].<span style="color:#a6e22e">flatMap</span>((<span style="color:#ae81ff">_</span>) =&gt; {
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">last</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">start</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">limit</span>;
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`&#39;Sheet1&#39;!A</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">start</span><span style="color:#e6db74">}</span><span style="color:#e6db74">:</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">last</span> <span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">last</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>;
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">range</span>).<span style="color:#a6e22e">getValues</span>();
+  <span style="color:#a6e22e">start</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">limit</span>;
+  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">temp</span>;
+});
+</code></pre></div><p>For Sheets API</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">limit</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">200000</span>; <span style="color:#75715e">// Number of rows per one API call.
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">start</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> [...Array(Math.<span style="color:#a6e22e">ceil</span>(<span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">limit</span>))].<span style="color:#a6e22e">flatMap</span>((<span style="color:#ae81ff">_</span>) =&gt; {
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">last</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">start</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">limit</span>;
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`&#39;Sheet1&#39;!A</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">start</span><span style="color:#e6db74">}</span><span style="color:#e6db74">:</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">last</span> <span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">last</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>;
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">Values</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">ssId</span>, <span style="color:#a6e22e">range</span>).<span style="color:#a6e22e">values</span>;
+  <span style="color:#a6e22e">start</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">limit</span>;
+  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">temp</span>;
+});
+</code></pre></div><h2 id="4-search-a-value-from-a-cell-a1-and-a-cell-j1000000-1">4. Search a value from a cell &ldquo;A1&rdquo; and a cell &ldquo;J1000000&rdquo;.</h2>
+<p>For searching a value from a cell &ldquo;A1&rdquo;</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>)
+  .<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>)
+  .<span style="color:#a6e22e">createTextFinder</span>(<span style="color:#e6db74">&#34;#0000000A1&#34;</span>)
+  .<span style="color:#a6e22e">matchEntireCell</span>(<span style="color:#66d9ef">true</span>)
+  .<span style="color:#a6e22e">findNext</span>(); <span style="color:#75715e">// and findAll()
+</span></code></pre></div><p>For searching a value from a cell &ldquo;J1000000&rdquo;</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>)
+  .<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>)
+  .<span style="color:#a6e22e">createTextFinder</span>(<span style="color:#e6db74">&#34;#0J1000000&#34;</span>)
+  .<span style="color:#a6e22e">matchEntireCell</span>(<span style="color:#66d9ef">true</span>)
+  .<span style="color:#a6e22e">findNext</span>(); <span style="color:#75715e">// and findAll()
+</span></code></pre></div><h2 id="5-put-a-value-to-a-cell-a1-and-a-cell-j1000000-1">5. Put a value to a cell &ldquo;A1&rdquo; and a cell &ldquo;J1000000&rdquo;</h2>
+<p>For Spreadsheet service</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>)
+  .<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>)
+  .<span style="color:#a6e22e">getRange</span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>) <span style="color:#75715e">// and .getRange(1000000, 10)
+</span><span style="color:#75715e"></span>  .<span style="color:#a6e22e">setValue</span>(<span style="color:#e6db74">&#34;sample&#34;</span>);
+</code></pre></div><p>For Sheets API</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">Values</span>.<span style="color:#a6e22e">update</span>(
+  { <span style="color:#a6e22e">values</span><span style="color:#f92672">:</span> [[<span style="color:#e6db74">&#34;sample&#34;</span>]] },
+  <span style="color:#a6e22e">ssId</span>,
+  <span style="color:#e6db74">&#34;Sheet1!A1&#34;</span>, <span style="color:#75715e">// and &#34;Sheet1!J1000000&#34;
+</span><span style="color:#75715e"></span>  { <span style="color:#a6e22e">valueInputOption</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;USER_ENTERED&#34;</span> }
+);
+</code></pre></div><h2 id="6-embed-all-10000000-cells-by-a-value-1">6. Embed all 10,000,000 cells by a value</h2>
+<p>For Spreadsheet service</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>)
+  .<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>)
+  .<span style="color:#a6e22e">getRange</span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1000000</span>, <span style="color:#ae81ff">10</span>)
+  .<span style="color:#a6e22e">setValue</span>(<span style="color:#e6db74">&#34;sample&#34;</span>);
+</code></pre></div><p>For Sheets API</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">requests</span> <span style="color:#f92672">=</span> [
+  {
+    <span style="color:#a6e22e">repeatCell</span><span style="color:#f92672">:</span> {
+      <span style="color:#a6e22e">range</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">sheetId</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">0</span> },
+      <span style="color:#a6e22e">cell</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">userEnteredValue</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">stringValue</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sample&#34;</span> } },
+      <span style="color:#a6e22e">fields</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;userEnteredValue&#34;</span>,
+    },
+  },
+];
+<span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">batchUpdate</span>({ <span style="color:#a6e22e">requests</span> }, <span style="color:#a6e22e">ssId</span>);
+</code></pre></div><h2 id="7-embed-all-10000000-cells-by-the-difference-values-1">7. Embed all 10,000,000 cells by the difference values</h2>
+<p>For Spreadsheet service</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">limit</span> <span style="color:#f92672">=</span> <span style="color:#960050;background-color:#1e0010">###</span>; <span style="color:#75715e">// Number of rows per one request of getValues().
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> [[]]; <span style="color:#75715e">// Please set the array including 10 columns and 1,000,000 rows.
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">start</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>).<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>);
+Array.<span style="color:#a6e22e">from</span>(Array(Math.<span style="color:#a6e22e">ceil</span>(<span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">limit</span>))).<span style="color:#a6e22e">forEach</span>((<span style="color:#ae81ff">_</span>) =&gt; {
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">v</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">splice</span>(<span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">limit</span>);
+  <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">start</span>, <span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">v</span>.<span style="color:#a6e22e">length</span>, <span style="color:#a6e22e">v</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">length</span>).<span style="color:#a6e22e">setValues</span>(<span style="color:#a6e22e">v</span>);
+  <span style="color:#a6e22e">start</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">limit</span>;
+});
+</code></pre></div><ul>
+<li>In this case, all 10,000,000 cells couldn&rsquo;t be embedded using <code>setValues</code>.</li>
+</ul>
+<p>For Sheets API</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">limit</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">200000</span>; <span style="color:#75715e">// Number of rows per one API call.
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> [[]]; <span style="color:#75715e">// Please set the array including 10 columns and 1,000,000 rows.
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">start</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+Array.<span style="color:#a6e22e">from</span>(Array(Math.<span style="color:#a6e22e">ceil</span>(<span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">limit</span>))).<span style="color:#a6e22e">forEach</span>((<span style="color:#ae81ff">_</span>) =&gt; {
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">v</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">splice</span>(<span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">limit</span>);
+  <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">Values</span>.<span style="color:#a6e22e">update</span>({ <span style="color:#a6e22e">values</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">v</span> }, <span style="color:#a6e22e">ssId</span>, <span style="color:#e6db74">`Sheet1!A</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">start</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>, {
+    <span style="color:#a6e22e">valueInputOption</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;USER_ENTERED&#34;</span>,
+  });
+  <span style="color:#a6e22e">start</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">limit</span>;
+});
+</code></pre></div><p>A sample script for retrieving the sample array of <code>values</code> is as follows.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// Ref: https://stackoverflow.com/a/21231012/7108653
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">columnToLetter</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">column</span>) =&gt; {
+  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">temp</span>,
+    <span style="color:#a6e22e">letter</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
+  <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">column</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+    <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">column</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">%</span> <span style="color:#ae81ff">26</span>;
+    <span style="color:#a6e22e">letter</span> <span style="color:#f92672">=</span> String.<span style="color:#a6e22e">fromCharCode</span>(<span style="color:#a6e22e">temp</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">65</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">letter</span>;
+    <span style="color:#a6e22e">column</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">column</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">/</span> <span style="color:#ae81ff">26</span>;
+  }
+  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">letter</span>;
+};
+
+<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getSampleValues</span>() {
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">cols</span> <span style="color:#f92672">=</span> [...Array(<span style="color:#a6e22e">maxCol</span>)].<span style="color:#a6e22e">map</span>((<span style="color:#ae81ff">_</span>, <span style="color:#a6e22e">i</span>) =&gt; <span style="color:#a6e22e">columnToLetter</span>(<span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>));
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> [...Array(<span style="color:#a6e22e">maxRow</span>)].<span style="color:#a6e22e">map</span>((<span style="color:#ae81ff">_</span>, <span style="color:#a6e22e">i</span>) =&gt;
+    [...Array(<span style="color:#a6e22e">maxCol</span>)].<span style="color:#a6e22e">map</span>(
+      (<span style="color:#ae81ff">_</span>, <span style="color:#a6e22e">j</span>) =&gt; <span style="color:#e6db74">&#34;#&#34;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">cols</span>[<span style="color:#a6e22e">j</span>]<span style="color:#e6db74">}${</span><span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>.<span style="color:#a6e22e">padStart</span>(<span style="color:#ae81ff">9</span>, <span style="color:#e6db74">&#34;0&#34;</span>)
+    )
+  );
+  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">values</span>;
+}
+</code></pre></div><h2 id="8-export-spreadsheet-with-10000000-cells-1">8. Export Spreadsheet with 10,000,000 cells</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> {
+  <span style="color:#a6e22e">xlsx</span><span style="color:#f92672">:</span> <span style="color:#e6db74">`https://docs.google.com/spreadsheets/export?id=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">ssId</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&amp;exportFormat=xlsx`</span>,
+  <span style="color:#a6e22e">csv</span><span style="color:#f92672">:</span> <span style="color:#e6db74">`https://docs.google.com/spreadsheets/export?id=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">ssId</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&amp;exportFormat=csv`</span>,
+  <span style="color:#a6e22e">pdf</span><span style="color:#f92672">:</span> <span style="color:#e6db74">`https://docs.google.com/spreadsheets/export?id=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">ssId</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&amp;exportFormat=pdf`</span>,
+};
+<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">token</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>();
+Object.<span style="color:#a6e22e">entries</span>(<span style="color:#a6e22e">obj</span>).<span style="color:#a6e22e">forEach</span>(([<span style="color:#a6e22e">k</span>, <span style="color:#a6e22e">v</span>], <span style="color:#a6e22e">i</span>) =&gt; {
+  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">blob</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">v</span>, {
+    <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer ###your access token###&#34;</span> },
+  }).<span style="color:#a6e22e">getBlob</span>();
+  <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">createFile</span>(<span style="color:#a6e22e">blob</span>.<span style="color:#a6e22e">setName</span>(<span style="color:#a6e22e">k</span>));
+});
+</code></pre></div>
+  
+  <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2022%2f04%2f25%2fhandling-10000000-cells-in-google-spreadsheet-using-google-apps-script%2f" target="_blank" title="Share on Facebook"><i class="fab fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2022%2f04%2f25%2fhandling-10000000-cells-in-google-spreadsheet-using-google-apps-script%2f" target="_blank" title="Tweet"><i class="fab fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2022%2f04%2f25%2fhandling-10000000-cells-in-google-spreadsheet-using-google-apps-script%2f" target="_blank" title="Share on Google+"><i class="fab fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2022%2f04%2f25%2fhandling-10000000-cells-in-google-spreadsheet-using-google-apps-script%2f" target="_blank" title="Post to Tumblr"><i class="fab fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2022%2f04%2f25%2fhandling-10000000-cells-in-google-spreadsheet-using-google-apps-script%2f" target="_blank" title="Pin it"><i class="fab fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2022%2f04%2f25%2fhandling-10000000-cells-in-google-spreadsheet-using-google-apps-script%2f" target="_blank" title="Submit to Reddit"><i class="fab fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
+
+
+  
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2022/04/24/replacing-multiple-paragraphs-on-google-document-with-a-regex-using-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2022/04/24/replacing-multiple-paragraphs-on-google-document-with-a-regex-using-google-apps-script/">Replacing Multiple Paragraphs on Google Document with a Regex using Google Apps Script</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
+</div>
+
+
+  
+  
+  
+  
+
+  
+
+</div>
+
+</div>
+</div>
+<script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
+    }
+  });
+</script>
+
+
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-84325623-1"></script>
+<script>
+  
+  if (window.location.hostname != "localhost") {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-84325623-1');
+  }
+</script>
+
+
+
+
+
+
+<script src="https://tanaikech.github.io/js/math-code.js"></script>
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  
+
+
+</body>
+</html>
+
