@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Protecting Cells of Spreadsheet that Users Copied from Your Google Drive to User&#39;s Google Drive using Google Apps Script &middot; tanaike</title>
 
@@ -338,56 +337,56 @@
 <h3 id="standalone-script-for-web-apps-b">Standalone script for Web Apps &ldquo;B&rdquo;:</h3>
 <p>At first, please deploy Web Apps &ldquo;B&rdquo;, because the URL of Web Apps &ldquo;B&rdquo; is used at the script of Web Apps &ldquo;A&rdquo;. Please copy the following script and deploy Web Apps as <code>Execute the app as: **Me**</code> and <code>Who has access to the app: **Anyone, even anonymous**</code>. About how to deploy Web Apps, please check <a href="#deploywebapps">here</a>. And please copy the URL of this Web Apps &ldquo;B&rdquo; and paste it to <code>url</code> of the script of Web Apps &ldquo;A&rdquo;.</p>
 <h4 id="if-you-want-to-protect-the-protected-ranges-which-have-alrady-installed-in-the-spreadsheet-please-use-the-following-script">If you want to protect the protected ranges which have alrady installed in the Spreadsheet, please use the following script.</h4>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">doGet</span>(<span style="color:#a6e22e">e</span>) {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">id</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameter</span>.<span style="color:#a6e22e">id</span>;
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">id</span>) {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">owner</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Session</span>.<span style="color:#a6e22e">getActiveUser</span>().<span style="color:#a6e22e">getEmail</span>();
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">id</span>);
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">protectedRanges</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getProtections</span>(
-      <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">ProtectionType</span>.<span style="color:#a6e22e">RANGE</span>
-    );
-    <span style="color:#a6e22e">protectedRanges</span>.<span style="color:#a6e22e">forEach</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">p</span>) {
-      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">removes</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">getEditors</span>().<span style="color:#a6e22e">filter</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
-        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getEmail</span>() <span style="color:#f92672">!=</span> <span style="color:#a6e22e">owner</span>;
-      });
-      <span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">removeEditors</span>(<span style="color:#a6e22e">removes</span>);
-    });
-  }
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ContentService</span>.<span style="color:#a6e22e">createTextOutput</span>(<span style="color:#e6db74">&#34;Done&#34;</span>);
-}
-</code></pre></div><h4 id="if-you-want-to-protect-the-ranges-cells-when-the-user-copies-the-spreadsheet-please-use-the-following-script">If you want to protect the ranges (cells) when the user copies the Spreadsheet, please use the following script.</h4>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">doGet</span>(<span style="color:#a6e22e">e</span>) {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">protectRange</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Sheet1!A1:B5&#34;</span>; <span style="color:#75715e">// Sample protected range.
-</span><span style="color:#75715e"></span>
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">id</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameter</span>.<span style="color:#a6e22e">id</span>;
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">id</span>) {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">owner</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Session</span>.<span style="color:#a6e22e">getActiveUser</span>().<span style="color:#a6e22e">getEmail</span>();
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">id</span>);
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">p</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">protectRange</span>).<span style="color:#a6e22e">protect</span>();
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">removes</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">getEditors</span>().<span style="color:#a6e22e">filter</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
-      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getEmail</span>() <span style="color:#f92672">!=</span> <span style="color:#a6e22e">owner</span>;
-    });
-    <span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">removeEditors</span>(<span style="color:#a6e22e">removes</span>);
-  }
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ContentService</span>.<span style="color:#a6e22e">createTextOutput</span>(<span style="color:#e6db74">&#34;Done&#34;</span>);
-}
-</code></pre></div><h3 id="standalone-script-for-web-apps-a">Standalone script for Web Apps &ldquo;A&rdquo;:</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">doGet</span>(<span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">id</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameter</span>.<span style="color:#a6e22e">id</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">id</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">owner</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Session</span>.<span style="color:#a6e22e">getActiveUser</span>().<span style="color:#a6e22e">getEmail</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">id</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">protectedRanges</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getProtections</span>(
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">ProtectionType</span>.<span style="color:#a6e22e">RANGE</span>
+</span></span><span style="display:flex;"><span>    );
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">protectedRanges</span>.<span style="color:#a6e22e">forEach</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">p</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">removes</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">getEditors</span>().<span style="color:#a6e22e">filter</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getEmail</span>() <span style="color:#f92672">!=</span> <span style="color:#a6e22e">owner</span>;
+</span></span><span style="display:flex;"><span>      });
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">removeEditors</span>(<span style="color:#a6e22e">removes</span>);
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ContentService</span>.<span style="color:#a6e22e">createTextOutput</span>(<span style="color:#e6db74">&#34;Done&#34;</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="if-you-want-to-protect-the-ranges-cells-when-the-user-copies-the-spreadsheet-please-use-the-following-script">If you want to protect the ranges (cells) when the user copies the Spreadsheet, please use the following script.</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">doGet</span>(<span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">protectRange</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Sheet1!A1:B5&#34;</span>; <span style="color:#75715e">// Sample protected range.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">id</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameter</span>.<span style="color:#a6e22e">id</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">id</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">owner</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Session</span>.<span style="color:#a6e22e">getActiveUser</span>().<span style="color:#a6e22e">getEmail</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">id</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">p</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">protectRange</span>).<span style="color:#a6e22e">protect</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">removes</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">getEditors</span>().<span style="color:#a6e22e">filter</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getEmail</span>() <span style="color:#f92672">!=</span> <span style="color:#a6e22e">owner</span>;
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">removeEditors</span>(<span style="color:#a6e22e">removes</span>);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ContentService</span>.<span style="color:#a6e22e">createTextOutput</span>(<span style="color:#e6db74">&#34;Done&#34;</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="standalone-script-for-web-apps-a">Standalone script for Web Apps &ldquo;A&rdquo;:</h3>
 <p>Please copy the following script and set the variables of <code>srcSpreadsheetId</code> and <code>url</code>. In this case, <code>url</code> is the URL retrieved at Web Apps &ldquo;B&rdquo;. Then, please deploy Web Apps as <code>Execute the app as: **User accessing the web app**</code> and <code>Who has access to the app: **Anyone**</code>. About how to deploy Web Apps, please check <a href="#deploywebapps">here</a>. And please copy the URL of this Web Apps &ldquo;A&rdquo;. This URL is used for accessing by the user.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">doGet</span>() {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">srcSpreadsheetId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set your source Spreadsheet ID.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set the URL of Web Apps B.
-</span><span style="color:#75715e"></span>
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">srcSS</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">srcSpreadsheetId</span>);
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dstSS</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">srcSS</span>.<span style="color:#a6e22e">copy</span>(<span style="color:#a6e22e">srcSS</span>.<span style="color:#a6e22e">getName</span>());
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">file</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">dstSS</span>.<span style="color:#a6e22e">getId</span>()).<span style="color:#a6e22e">setOwner</span>(
-    <span style="color:#a6e22e">srcSS</span>.<span style="color:#a6e22e">getOwner</span>().<span style="color:#a6e22e">getEmail</span>()
-  );
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;?id=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getId</span>(), {
-    <span style="color:#a6e22e">muteHttpExceptions</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>
-  }); <span style="color:#75715e">// Here, run the script of Web Apps &#34;B&#34;.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ContentService</span>.<span style="color:#a6e22e">createTextOutput</span>(<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getContentText</span>());
-}
-</code></pre></div><h3 id="run">Run:</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">doGet</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">srcSpreadsheetId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set your source Spreadsheet ID.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set the URL of Web Apps B.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">srcSS</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">srcSpreadsheetId</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dstSS</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">srcSS</span>.<span style="color:#a6e22e">copy</span>(<span style="color:#a6e22e">srcSS</span>.<span style="color:#a6e22e">getName</span>());
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">file</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">dstSS</span>.<span style="color:#a6e22e">getId</span>()).<span style="color:#a6e22e">setOwner</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">srcSS</span>.<span style="color:#a6e22e">getOwner</span>().<span style="color:#a6e22e">getEmail</span>()
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;?id=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getId</span>(), {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">muteHttpExceptions</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>  }); <span style="color:#75715e">// Here, run the script of Web Apps &#34;B&#34;.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ContentService</span>.<span style="color:#a6e22e">createTextOutput</span>(<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getContentText</span>());
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="run">Run:</h3>
 <p>When the user uses above scripts, please make the user access to the URL of Web Apps &ldquo;A&rdquo; using own browser. When the user accesses to Web Apps &ldquo;A&rdquo;, the login screen of Google is displayed. By logging in to Google, the authorization screen is shows. By authorizing it, the script of Web Apps &ldquo;A&rdquo; is run, and Web Apps &ldquo;B&rdquo; is run by the Web Apps &ldquo;A&rdquo;. The authorization is required to do only one time.</p>
 <p>When &ldquo;Done&rdquo; is shown in user&rsquo;s browser, the user can see the copied Spreadsheet at the root folder.</p>
 <p>By this, your Spreadsheet in your Google Drive is copied to the user&rsquo;s Google Drive, and the owner of Spreadsheet is modified to you, and then, the user is removed from the editor of the protected ranges. So the user get to not be able to edit the protected ranges.</p>
@@ -513,15 +512,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -544,15 +534,6 @@
 
 
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

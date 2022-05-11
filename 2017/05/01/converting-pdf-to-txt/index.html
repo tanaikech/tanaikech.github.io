@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Converting PDF to TXT &middot; tanaike</title>
 
@@ -288,73 +287,73 @@
 <li>Download a Google Document as a TXT file</li>
 </ol>
 <p>In this sample, Python Quickstart is used. The detail information is <a href="https://developers.google.com/drive/v3/web/quickstart/python">https://developers.google.com/drive/v3/web/quickstart/python</a>. Please read &ldquo;Step 1: Turn on the Drive API&rdquo; and &ldquo;Step 2: Install the Google Client Library&rdquo;.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> __future__ <span style="color:#f92672">import</span> print_function
-<span style="color:#f92672">import</span> httplib2
-<span style="color:#f92672">import</span> os
-<span style="color:#f92672">import</span> io
-
-<span style="color:#f92672">from</span> apiclient <span style="color:#f92672">import</span> discovery
-<span style="color:#f92672">from</span> oauth2client <span style="color:#f92672">import</span> client
-<span style="color:#f92672">from</span> oauth2client <span style="color:#f92672">import</span> tools
-<span style="color:#f92672">from</span> oauth2client.file <span style="color:#f92672">import</span> Storage
-<span style="color:#f92672">from</span> apiclient.http <span style="color:#f92672">import</span> MediaFileUpload, MediaIoBaseDownload
-
-<span style="color:#66d9ef">try</span>:
-    <span style="color:#f92672">import</span> argparse
-    flags <span style="color:#f92672">=</span> argparse<span style="color:#f92672">.</span>ArgumentParser(parents<span style="color:#f92672">=</span>[tools<span style="color:#f92672">.</span>argparser])<span style="color:#f92672">.</span>parse_args()
-<span style="color:#66d9ef">except</span> <span style="color:#a6e22e">ImportError</span>:
-    flags <span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span>
-
-SCOPES <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;https://www.googleapis.com/auth/drive&#39;</span>
-CLIENT_SECRET_FILE <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;client_secret.json&#39;</span>
-APPLICATION_NAME <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Drive API Python Quickstart&#39;</span>
-
-
-<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_credentials</span>():
-    credential_path <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(<span style="color:#e6db74">&#34;./&#34;</span>, <span style="color:#e6db74">&#39;drive-python-quickstart.json&#39;</span>)
-    store <span style="color:#f92672">=</span> Storage(credential_path)
-    credentials <span style="color:#f92672">=</span> store<span style="color:#f92672">.</span>get()
-    <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> credentials <span style="color:#f92672">or</span> credentials<span style="color:#f92672">.</span>invalid:
-        flow <span style="color:#f92672">=</span> client<span style="color:#f92672">.</span>flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
-        flow<span style="color:#f92672">.</span>user_agent <span style="color:#f92672">=</span> APPLICATION_NAME
-        <span style="color:#66d9ef">if</span> flags:
-            credentials <span style="color:#f92672">=</span> tools<span style="color:#f92672">.</span>run_flow(flow, store, flags)
-        <span style="color:#66d9ef">else</span>:  <span style="color:#75715e"># Needed only for compatibility with Python 2.6</span>
-            credentials <span style="color:#f92672">=</span> tools<span style="color:#f92672">.</span>run(flow, store)
-        print(<span style="color:#e6db74">&#39;Storing credentials to &#39;</span> <span style="color:#f92672">+</span> credential_path)
-    <span style="color:#66d9ef">return</span> credentials
-
-
-<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>():
-    credentials <span style="color:#f92672">=</span> get_credentials()
-    http <span style="color:#f92672">=</span> credentials<span style="color:#f92672">.</span>authorize(httplib2<span style="color:#f92672">.</span>Http())
-    service <span style="color:#f92672">=</span> discovery<span style="color:#f92672">.</span>build(<span style="color:#e6db74">&#39;drive&#39;</span>, <span style="color:#e6db74">&#39;v3&#39;</span>, http<span style="color:#f92672">=</span>http)
-
-    pdffile <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;sample.pdf&#39;</span>
-    txtfile <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;sample.txt&#39;</span>
-
-    mime <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;application/vnd.google-apps.document&#39;</span>
-    res <span style="color:#f92672">=</span> service<span style="color:#f92672">.</span>files()<span style="color:#f92672">.</span>create(
-        body<span style="color:#f92672">=</span>{
-            <span style="color:#e6db74">&#39;name&#39;</span>: pdffile,
-            <span style="color:#e6db74">&#39;mimeType&#39;</span>: mime
-        },
-        media_body<span style="color:#f92672">=</span>MediaFileUpload(pdffile, mimetype<span style="color:#f92672">=</span>mime, resumable<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
-    )<span style="color:#f92672">.</span>execute()
-
-    dl <span style="color:#f92672">=</span> MediaIoBaseDownload(
-        io<span style="color:#f92672">.</span>FileIO(txtfile, <span style="color:#e6db74">&#39;wb&#39;</span>),
-        service<span style="color:#f92672">.</span>files()<span style="color:#f92672">.</span>export_media(fileId<span style="color:#f92672">=</span>res[<span style="color:#e6db74">&#39;id&#39;</span>], mimeType<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text/plain&#34;</span>)
-    )
-    done <span style="color:#f92672">=</span> <span style="color:#66d9ef">False</span>
-    <span style="color:#66d9ef">while</span> done <span style="color:#f92672">is</span> <span style="color:#66d9ef">False</span>:
-        status, done <span style="color:#f92672">=</span> dl<span style="color:#f92672">.</span>next_chunk()
-    print(<span style="color:#e6db74">&#34;Done.&#34;</span>)
-
-
-<span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;__main__&#39;</span>:
-    main()
-</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> __future__ <span style="color:#f92672">import</span> print_function
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> httplib2
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> io
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> apiclient <span style="color:#f92672">import</span> discovery
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> oauth2client <span style="color:#f92672">import</span> client
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> oauth2client <span style="color:#f92672">import</span> tools
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> oauth2client.file <span style="color:#f92672">import</span> Storage
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> apiclient.http <span style="color:#f92672">import</span> MediaFileUpload, MediaIoBaseDownload
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">import</span> argparse
+</span></span><span style="display:flex;"><span>    flags <span style="color:#f92672">=</span> argparse<span style="color:#f92672">.</span>ArgumentParser(parents<span style="color:#f92672">=</span>[tools<span style="color:#f92672">.</span>argparser])<span style="color:#f92672">.</span>parse_args()
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">ImportError</span>:
+</span></span><span style="display:flex;"><span>    flags <span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>SCOPES <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;https://www.googleapis.com/auth/drive&#39;</span>
+</span></span><span style="display:flex;"><span>CLIENT_SECRET_FILE <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;client_secret.json&#39;</span>
+</span></span><span style="display:flex;"><span>APPLICATION_NAME <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Drive API Python Quickstart&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_credentials</span>():
+</span></span><span style="display:flex;"><span>    credential_path <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(<span style="color:#e6db74">&#34;./&#34;</span>, <span style="color:#e6db74">&#39;drive-python-quickstart.json&#39;</span>)
+</span></span><span style="display:flex;"><span>    store <span style="color:#f92672">=</span> Storage(credential_path)
+</span></span><span style="display:flex;"><span>    credentials <span style="color:#f92672">=</span> store<span style="color:#f92672">.</span>get()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> credentials <span style="color:#f92672">or</span> credentials<span style="color:#f92672">.</span>invalid:
+</span></span><span style="display:flex;"><span>        flow <span style="color:#f92672">=</span> client<span style="color:#f92672">.</span>flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
+</span></span><span style="display:flex;"><span>        flow<span style="color:#f92672">.</span>user_agent <span style="color:#f92672">=</span> APPLICATION_NAME
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> flags:
+</span></span><span style="display:flex;"><span>            credentials <span style="color:#f92672">=</span> tools<span style="color:#f92672">.</span>run_flow(flow, store, flags)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:  <span style="color:#75715e"># Needed only for compatibility with Python 2.6</span>
+</span></span><span style="display:flex;"><span>            credentials <span style="color:#f92672">=</span> tools<span style="color:#f92672">.</span>run(flow, store)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#39;Storing credentials to &#39;</span> <span style="color:#f92672">+</span> credential_path)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> credentials
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>():
+</span></span><span style="display:flex;"><span>    credentials <span style="color:#f92672">=</span> get_credentials()
+</span></span><span style="display:flex;"><span>    http <span style="color:#f92672">=</span> credentials<span style="color:#f92672">.</span>authorize(httplib2<span style="color:#f92672">.</span>Http())
+</span></span><span style="display:flex;"><span>    service <span style="color:#f92672">=</span> discovery<span style="color:#f92672">.</span>build(<span style="color:#e6db74">&#39;drive&#39;</span>, <span style="color:#e6db74">&#39;v3&#39;</span>, http<span style="color:#f92672">=</span>http)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    pdffile <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;sample.pdf&#39;</span>
+</span></span><span style="display:flex;"><span>    txtfile <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;sample.txt&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    mime <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;application/vnd.google-apps.document&#39;</span>
+</span></span><span style="display:flex;"><span>    res <span style="color:#f92672">=</span> service<span style="color:#f92672">.</span>files()<span style="color:#f92672">.</span>create(
+</span></span><span style="display:flex;"><span>        body<span style="color:#f92672">=</span>{
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;name&#39;</span>: pdffile,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;mimeType&#39;</span>: mime
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>        media_body<span style="color:#f92672">=</span>MediaFileUpload(pdffile, mimetype<span style="color:#f92672">=</span>mime, resumable<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>    )<span style="color:#f92672">.</span>execute()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    dl <span style="color:#f92672">=</span> MediaIoBaseDownload(
+</span></span><span style="display:flex;"><span>        io<span style="color:#f92672">.</span>FileIO(txtfile, <span style="color:#e6db74">&#39;wb&#39;</span>),
+</span></span><span style="display:flex;"><span>        service<span style="color:#f92672">.</span>files()<span style="color:#f92672">.</span>export_media(fileId<span style="color:#f92672">=</span>res[<span style="color:#e6db74">&#39;id&#39;</span>], mimeType<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text/plain&#34;</span>)
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    done <span style="color:#f92672">=</span> <span style="color:#66d9ef">False</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> done <span style="color:#f92672">is</span> <span style="color:#66d9ef">False</span>:
+</span></span><span style="display:flex;"><span>        status, done <span style="color:#f92672">=</span> dl<span style="color:#f92672">.</span>next_chunk()
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;Done.&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;__main__&#39;</span>:
+</span></span><span style="display:flex;"><span>    main()
+</span></span></code></pre></div>
   
   <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
 <ul class="share-buttons">
@@ -442,15 +441,6 @@ APPLICATION_NAME <span style="color:#f92672">=</span> <span style="color:#e6db74
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -473,15 +463,6 @@ APPLICATION_NAME <span style="color:#f92672">=</span> <span style="color:#e6db74
 
 
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

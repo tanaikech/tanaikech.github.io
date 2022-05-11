@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Uploading CSV File as Spreadsheet and Modifying Permissions using Golang &middot; tanaike</title>
 
@@ -302,22 +301,22 @@
 <pre tabindex="0"><code>package main
 
 import (
-    &quot;encoding/json&quot;
-    &quot;fmt&quot;
-    &quot;io/ioutil&quot;
-    &quot;log&quot;
-    &quot;net/http&quot;
-    &quot;os&quot;
+    &#34;encoding/json&#34;
+    &#34;fmt&#34;
+    &#34;io/ioutil&#34;
+    &#34;log&#34;
+    &#34;net/http&#34;
+    &#34;os&#34;
 
-    &quot;golang.org/x/net/context&quot;
-    &quot;golang.org/x/oauth2&quot;
-    &quot;golang.org/x/oauth2/google&quot;
-    &quot;google.golang.org/api/drive/v3&quot;
-    &quot;google.golang.org/api/googleapi&quot;
+    &#34;golang.org/x/net/context&#34;
+    &#34;golang.org/x/oauth2&#34;
+    &#34;golang.org/x/oauth2/google&#34;
+    &#34;google.golang.org/api/drive/v3&#34;
+    &#34;google.golang.org/api/googleapi&#34;
 )
 
 func getClient(ctx context.Context, config *oauth2.Config) *http.Client {
-    cacheFile := &quot;./go-quickstart.json&quot;
+    cacheFile := &#34;./go-quickstart.json&#34;
     tok, err := tokenFromFile(cacheFile)
     if err != nil {
         tok = getTokenFromWeb(config)
@@ -327,16 +326,16 @@ func getClient(ctx context.Context, config *oauth2.Config) *http.Client {
 }
 
 func getTokenFromWeb(config *oauth2.Config) *oauth2.Token {
-    authURL := config.AuthCodeURL(&quot;state-token&quot;, oauth2.AccessTypeOffline)
-    fmt.Printf(&quot;Go to the following link in your browser then type the &quot;+
-        &quot;authorization code: \n%v\n&quot;, authURL)
+    authURL := config.AuthCodeURL(&#34;state-token&#34;, oauth2.AccessTypeOffline)
+    fmt.Printf(&#34;Go to the following link in your browser then type the &#34;+
+        &#34;authorization code: \n%v\n&#34;, authURL)
     var code string
     if _, err := fmt.Scan(&amp;code); err != nil {
-        log.Fatalf(&quot;Unable to read authorization code %v&quot;, err)
+        log.Fatalf(&#34;Unable to read authorization code %v&#34;, err)
     }
     tok, err := config.Exchange(oauth2.NoContext, code)
     if err != nil {
-        log.Fatalf(&quot;Unable to retrieve token from web %v&quot;, err)
+        log.Fatalf(&#34;Unable to retrieve token from web %v&#34;, err)
     }
     return tok
 }
@@ -353,10 +352,10 @@ func tokenFromFile(file string) (*oauth2.Token, error) {
 }
 
 func saveToken(file string, token *oauth2.Token) {
-    fmt.Printf(&quot;Saving credential file to: %s\n&quot;, file)
+    fmt.Printf(&#34;Saving credential file to: %s\n&#34;, file)
     f, err := os.Create(file)
     if err != nil {
-        log.Fatalf(&quot;Unable to cache oauth token: %v&quot;, err)
+        log.Fatalf(&#34;Unable to cache oauth token: %v&#34;, err)
     }
     defer f.Close()
     json.NewEncoder(f).Encode(token)
@@ -364,29 +363,29 @@ func saveToken(file string, token *oauth2.Token) {
 
 func main() {
     ctx := context.Background()
-    b, err := ioutil.ReadFile(&quot;client_secret.json&quot;)
+    b, err := ioutil.ReadFile(&#34;client_secret.json&#34;)
     if err != nil {
-        log.Fatalf(&quot;Unable to read client secret file: %v&quot;, err)
+        log.Fatalf(&#34;Unable to read client secret file: %v&#34;, err)
     }
     config, err := google.ConfigFromJSON(b, drive.DriveScope)
     if err != nil {
-        log.Fatalf(&quot;Unable to parse client secret file to config: %v&quot;, err)
+        log.Fatalf(&#34;Unable to parse client secret file to config: %v&#34;, err)
     }
     client := getClient(ctx, config)
     srv, err := drive.New(client)
     if err != nil {
-        log.Fatalf(&quot;Unable to retrieve drive Client %v&quot;, err)
+        log.Fatalf(&#34;Unable to retrieve drive Client %v&#34;, err)
     }
 
 
     // Upload CSV and convert to Spreadsheet
-    filename := &quot;sample.csv&quot;                                       // File you want to upload
-    baseMimeType := &quot;text/csv&quot;                                     // mimeType of file you want to upload
-    convertedMimeType := &quot;application/vnd.google-apps.spreadsheet&quot; // mimeType of file you want to convert on Google Drive
+    filename := &#34;sample.csv&#34;                                       // File you want to upload
+    baseMimeType := &#34;text/csv&#34;                                     // mimeType of file you want to upload
+    convertedMimeType := &#34;application/vnd.google-apps.spreadsheet&#34; // mimeType of file you want to convert on Google Drive
 
     file, err := os.Open(filename)
     if err != nil {
-        log.Fatalf(&quot;Error: %v&quot;, err)
+        log.Fatalf(&#34;Error: %v&#34;, err)
     }
     defer file.Close()
     f := &amp;drive.File{
@@ -395,23 +394,23 @@ func main() {
     }
     res, err := srv.Files.Create(f).Media(file, googleapi.ContentType(baseMimeType)).Do()
     if err != nil {
-        log.Fatalf(&quot;Error: %v&quot;, err)
+        log.Fatalf(&#34;Error: %v&#34;, err)
     }
-    fmt.Printf(&quot;%s, %s, %s\n&quot;, res.Name, res.Id, res.MimeType)
+    fmt.Printf(&#34;%s, %s, %s\n&#34;, res.Name, res.Id, res.MimeType)
 
 
     // Modify permissions
     permissiondata := &amp;drive.Permission{
-        Type:               &quot;domain&quot;,
-        Role:               &quot;writer&quot;,
-        Domain:             &quot;google.com&quot;,
+        Type:               &#34;domain&#34;,
+        Role:               &#34;writer&#34;,
+        Domain:             &#34;google.com&#34;,
         AllowFileDiscovery: true,
     }
     pres, err := srv.Permissions.Create(res.Id, permissiondata).Do()
     if err != nil {
-        log.Fatalf(&quot;Error: %v&quot;, err)
+        log.Fatalf(&#34;Error: %v&#34;, err)
     }
-    fmt.Printf(&quot;%s, %s\n&quot;, pres.Type, pres.Role)
+    fmt.Printf(&#34;%s, %s\n&#34;, pres.Type, pres.Role)
 }
 </code></pre><h2 id="result-">Result :</h2>
 <pre><code>sample.csv, ### file ID on Google Drive ###, application/vnd.google-apps.spreadsheet
@@ -512,15 +511,6 @@ domain, writer
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -546,15 +536,6 @@ domain, writer
   <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
   
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Simple Script of Resumable Upload with Google Drive API for Python &middot; tanaike</title>
 
@@ -291,37 +290,37 @@
 <p>In this sample, a PNG file is uploaded with the resumable upload using a single chunk.</p>
 <h2 id="sample-script">Sample script</h2>
 <p>Before you use this, please set the variables.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> json
-<span style="color:#f92672">import</span> os
-<span style="color:#f92672">import</span> requests
-
-access_token <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;###&#39;</span>  <span style="color:#75715e">## Please set the access token.</span>
-filename <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;./sample.png&#39;</span>
-
-filesize <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>getsize(filename)
-
-<span style="color:#75715e"># 1. Retrieve session for resumable upload.</span>
-headers <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;Authorization&#34;</span>: <span style="color:#e6db74">&#34;Bearer &#34;</span><span style="color:#f92672">+</span>access_token, <span style="color:#e6db74">&#34;Content-Type&#34;</span>: <span style="color:#e6db74">&#34;application/json&#34;</span>}
-params <span style="color:#f92672">=</span> {
-    <span style="color:#e6db74">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;sample.png&#34;</span>,
-    <span style="color:#e6db74">&#34;mimeType&#34;</span>: <span style="color:#e6db74">&#34;image/png&#34;</span>
-}
-r <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>post(
-    <span style="color:#e6db74">&#34;https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&#34;</span>,
-    headers<span style="color:#f92672">=</span>headers,
-    data<span style="color:#f92672">=</span>json<span style="color:#f92672">.</span>dumps(params)
-)
-location <span style="color:#f92672">=</span> r<span style="color:#f92672">.</span>headers[<span style="color:#e6db74">&#39;Location&#39;</span>]
-
-<span style="color:#75715e"># 2. Upload the file.</span>
-headers <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;Content-Range&#34;</span>: <span style="color:#e6db74">&#34;bytes 0-&#34;</span> <span style="color:#f92672">+</span> str(filesize <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/&#34;</span> <span style="color:#f92672">+</span> str(filesize)}
-r <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>put(
-    location,
-    headers<span style="color:#f92672">=</span>headers,
-    data<span style="color:#f92672">=</span>open(filename, <span style="color:#e6db74">&#39;rb&#39;</span>)
-)
-print(r<span style="color:#f92672">.</span>text)
-</code></pre></div><h2 id="reference">Reference</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> json
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> requests
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>access_token <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;###&#39;</span>  <span style="color:#75715e">## Please set the access token.</span>
+</span></span><span style="display:flex;"><span>filename <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;./sample.png&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>filesize <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>getsize(filename)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 1. Retrieve session for resumable upload.</span>
+</span></span><span style="display:flex;"><span>headers <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;Authorization&#34;</span>: <span style="color:#e6db74">&#34;Bearer &#34;</span><span style="color:#f92672">+</span>access_token, <span style="color:#e6db74">&#34;Content-Type&#34;</span>: <span style="color:#e6db74">&#34;application/json&#34;</span>}
+</span></span><span style="display:flex;"><span>params <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;sample.png&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;mimeType&#34;</span>: <span style="color:#e6db74">&#34;image/png&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>r <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>post(
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&#34;</span>,
+</span></span><span style="display:flex;"><span>    headers<span style="color:#f92672">=</span>headers,
+</span></span><span style="display:flex;"><span>    data<span style="color:#f92672">=</span>json<span style="color:#f92672">.</span>dumps(params)
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>location <span style="color:#f92672">=</span> r<span style="color:#f92672">.</span>headers[<span style="color:#e6db74">&#39;Location&#39;</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. Upload the file.</span>
+</span></span><span style="display:flex;"><span>headers <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;Content-Range&#34;</span>: <span style="color:#e6db74">&#34;bytes 0-&#34;</span> <span style="color:#f92672">+</span> str(filesize <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/&#34;</span> <span style="color:#f92672">+</span> str(filesize)}
+</span></span><span style="display:flex;"><span>r <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>put(
+</span></span><span style="display:flex;"><span>    location,
+</span></span><span style="display:flex;"><span>    headers<span style="color:#f92672">=</span>headers,
+</span></span><span style="display:flex;"><span>    data<span style="color:#f92672">=</span>open(filename, <span style="color:#e6db74">&#39;rb&#39;</span>)
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>print(r<span style="color:#f92672">.</span>text)
+</span></span></code></pre></div><h2 id="reference">Reference</h2>
 <ul>
 <li><a href="https://developers.google.com/drive/api/v3/manage-uploads#resumable">Perform a resumable upload</a></li>
 </ul>
@@ -413,15 +412,6 @@ print(r<span style="color:#f92672">.</span>text)
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -444,15 +434,6 @@ print(r<span style="color:#f92672">.</span>text)
 
 
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

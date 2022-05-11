@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Updating a File with Resumable Upload using Drive API &middot; tanaike</title>
 
@@ -297,34 +296,34 @@
 <h3 id="1-initiate-a-resumable-upload-session">1. Initiate a resumable upload session</h3>
 <p>Create the session for uploading with the resumable upload. In this case, the existing file is updated, so the endpoint is <code>PUT https://www.googleapis.com/upload/drive/v3/files/[FILE_ID]?uploadType=resumable</code>. But as an important point, please use the method of <code>PATCH</code> instead of <code>PUT</code>. When <code>PUT</code> is used, <code>location</code> is not included in the response header. I thought that the official document might be not correct.</p>
 <pre tabindex="0"><code>$ curl -X PATCH -i \
-    -H &quot;Authorization: Bearer ###accessToken###&quot; \
-    &quot;https://www.googleapis.com/upload/drive/v3/files/[FILE_ID]?uploadType=resumable&quot;
+    -H &#34;Authorization: Bearer ###accessToken###&#34; \
+    &#34;https://www.googleapis.com/upload/drive/v3/files/[FILE_ID]?uploadType=resumable&#34;
 </code></pre><p>If you want to update the file as the multipart upload, please use the following sample command. In this case, the filename is changed.</p>
 <pre tabindex="0"><code>$ curl -X PATCH -i \
-    -H &quot;Authorization: Bearer ###accessToken###&quot; \
-    -H &quot;Content-Type: application/json; charset=UTF-8&quot; \
-    -d '{&quot;name&quot;:&quot;updatedFilename.txt&quot;}' \
-    &quot;https://www.googleapis.com/upload/drive/v3/files/[FILE_ID]?uploadType=resumable&quot;
+    -H &#34;Authorization: Bearer ###accessToken###&#34; \
+    -H &#34;Content-Type: application/json; charset=UTF-8&#34; \
+    -d &#39;{&#34;name&#34;:&#34;updatedFilename.txt&#34;}&#39; \
+    &#34;https://www.googleapis.com/upload/drive/v3/files/[FILE_ID]?uploadType=resumable&#34;
 </code></pre><ul>
 <li>When above sample command is run, <code>200 OK</code> is returned, and the response header includes <code>location</code> like <code>location: https://www.googleapis.com/upload/drive/v3/files/[FILE_ID]?uploadType=resumable&amp;upload_id=###</code>. For uploading the data, <code>location</code> is used as the endpoint.</li>
 </ul>
 <h3 id="2-upload-the-1st-chunk">2. Upload the 1st chunk</h3>
 <pre tabindex="0"><code>$ curl -X PUT -i \
-    -H &quot;Content-Length: 262144&quot; \
-    -H &quot;Content-Range: bytes 0-262143/300000&quot; \
-    -H &quot;Content-Type: text/plain&quot; \
-    -F &quot;file=@data1.txt&quot; \
-    &quot;https://www.googleapis.com/upload/drive/v3/files/[FILE_ID]?uploadType=resumable&amp;upload_id=###&quot;
+    -H &#34;Content-Length: 262144&#34; \
+    -H &#34;Content-Range: bytes 0-262143/300000&#34; \
+    -H &#34;Content-Type: text/plain&#34; \
+    -F &#34;file=@data1.txt&#34; \
+    &#34;https://www.googleapis.com/upload/drive/v3/files/[FILE_ID]?uploadType=resumable&amp;upload_id=###&#34;
 </code></pre><ul>
 <li>When this curl command is run, <code>308 Resume Incomplete</code> is returned. By this, it is found that the chunk could be correctly uploaded.</li>
 </ul>
 <h3 id="3-upload-the-2nd-chunk-this-is-the-last-chunk-of-this-sample-flow">3. Upload the 2nd chunk (This is the last chunk of this sample flow.)</h3>
 <pre tabindex="0"><code>$ curl -X PUT -i \
-    -H &quot;Content-Length: 37856&quot; \
-    -H &quot;Content-Range: bytes 262144-299999/300000&quot; \
-    -H &quot;Content-Type: text/plain&quot; \
-    -F &quot;file=@data2.txt&quot; \
-    &quot;https://www.googleapis.com/upload/drive/v3/files/[FILE_ID]?uploadType=resumable&amp;upload_id=###&quot;
+    -H &#34;Content-Length: 37856&#34; \
+    -H &#34;Content-Range: bytes 262144-299999/300000&#34; \
+    -H &#34;Content-Type: text/plain&#34; \
+    -F &#34;file=@data2.txt&#34; \
+    &#34;https://www.googleapis.com/upload/drive/v3/files/[FILE_ID]?uploadType=resumable&amp;upload_id=###&#34;
 </code></pre><ul>
 <li>When this curl command is run, <code>200 OK</code> is returned, and the file metadata is also returned. By this, it is found that the resumable upload could be correctly done.</li>
 </ul>
@@ -431,15 +430,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -465,15 +455,6 @@
   <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
   
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>spreadsheets.values.batchUpdate using Golang &middot; tanaike</title>
 
@@ -305,23 +304,23 @@
 <pre tabindex="0"><code>package main
 
 import (
-    &quot;encoding/json&quot;
-    &quot;fmt&quot;
-    &quot;io/ioutil&quot;
-    &quot;log&quot;
-    &quot;net/http&quot;
-    &quot;os&quot;
+    &#34;encoding/json&#34;
+    &#34;fmt&#34;
+    &#34;io/ioutil&#34;
+    &#34;log&#34;
+    &#34;net/http&#34;
+    &#34;os&#34;
 
-    &quot;golang.org/x/net/context&quot;
-    &quot;golang.org/x/oauth2&quot;
-    &quot;golang.org/x/oauth2/google&quot;
-    &quot;google.golang.org/api/sheets/v4&quot;
+    &#34;golang.org/x/net/context&#34;
+    &#34;golang.org/x/oauth2&#34;
+    &#34;golang.org/x/oauth2/google&#34;
+    &#34;google.golang.org/api/sheets/v4&#34;
 )
 
 // getClient uses a Context and Config to retrieve a Token
 // then generate a Client. It returns the generated Client.
 func getClient(ctx context.Context, config *oauth2.Config) *http.Client {
-    cacheFile := &quot;./go-quickstart.json&quot;
+    cacheFile := &#34;./go-quickstart.json&#34;
     tok, err := tokenFromFile(cacheFile)
     if err != nil {
         tok = getTokenFromWeb(config)
@@ -333,18 +332,18 @@ func getClient(ctx context.Context, config *oauth2.Config) *http.Client {
 // getTokenFromWeb uses Config to request a Token.
 // It returns the retrieved Token.
 func getTokenFromWeb(config *oauth2.Config) *oauth2.Token {
-    authURL := config.AuthCodeURL(&quot;state-token&quot;, oauth2.AccessTypeOffline)
-    fmt.Printf(&quot;Go to the following link in your browser then type the &quot;+
-        &quot;authorization code: \n%v\n&quot;, authURL)
+    authURL := config.AuthCodeURL(&#34;state-token&#34;, oauth2.AccessTypeOffline)
+    fmt.Printf(&#34;Go to the following link in your browser then type the &#34;+
+        &#34;authorization code: \n%v\n&#34;, authURL)
 
     var code string
     if _, err := fmt.Scan(&amp;code); err != nil {
-        log.Fatalf(&quot;Unable to read authorization code %v&quot;, err)
+        log.Fatalf(&#34;Unable to read authorization code %v&#34;, err)
     }
 
     tok, err := config.Exchange(oauth2.NoContext, code)
     if err != nil {
-        log.Fatalf(&quot;Unable to retrieve token from web %v&quot;, err)
+        log.Fatalf(&#34;Unable to retrieve token from web %v&#34;, err)
     }
     return tok
 }
@@ -363,10 +362,10 @@ func tokenFromFile(file string) (*oauth2.Token, error) {
 }
 
 func saveToken(file string, token *oauth2.Token) {
-    fmt.Printf(&quot;Saving credential file to: %s\n&quot;, file)
+    fmt.Printf(&#34;Saving credential file to: %s\n&#34;, file)
     f, err := os.Create(file)
     if err != nil {
-        log.Fatalf(&quot;Unable to cache oauth token: %v&quot;, err)
+        log.Fatalf(&#34;Unable to cache oauth token: %v&#34;, err)
     }
     defer f.Close()
     json.NewEncoder(f).Encode(token)
@@ -374,33 +373,33 @@ func saveToken(file string, token *oauth2.Token) {
 
 type body struct {
     Data struct {
-        Range  string     `json:&quot;range&quot;`
-        Values [][]string `json:&quot;values&quot;`
-    } `json:&quot;data&quot;`
-    ValueInputOption string `json:&quot;valueInputOption&quot;`
+        Range  string     `json:&#34;range&#34;`
+        Values [][]string `json:&#34;values&#34;`
+    } `json:&#34;data&#34;`
+    ValueInputOption string `json:&#34;valueInputOption&#34;`
 }
 
 func main() {
     ctx := context.Background()
-    b, err := ioutil.ReadFile(&quot;client_secret.json&quot;)
+    b, err := ioutil.ReadFile(&#34;client_secret.json&#34;)
     if err != nil {
-        log.Fatalf(&quot;Unable to read client secret file: %v&quot;, err)
+        log.Fatalf(&#34;Unable to read client secret file: %v&#34;, err)
     }
-    config, err := google.ConfigFromJSON(b, &quot;https://www.googleapis.com/auth/spreadsheets&quot;)
+    config, err := google.ConfigFromJSON(b, &#34;https://www.googleapis.com/auth/spreadsheets&#34;)
     if err != nil {
-        log.Fatalf(&quot;Unable to parse client secret file to config: %v&quot;, err)
+        log.Fatalf(&#34;Unable to parse client secret file to config: %v&#34;, err)
     }
     client := getClient(ctx, config)
     sheetsService, err := sheets.New(client)
     if err != nil {
-        log.Fatalf(&quot;Unable to retrieve Sheets Client %v&quot;, err)
+        log.Fatalf(&#34;Unable to retrieve Sheets Client %v&#34;, err)
     }
 
-    spreadsheetId := &quot;### spreadsheet ID ###&quot;
-    rangeData := &quot;sheet1!A1:B3&quot;
-    values := [][]interface{}{{&quot;sample_A1&quot;, &quot;sample_B1&quot;}, {&quot;sample_A2&quot;, &quot;sample_B2&quot;}, {&quot;sample_A3&quot;, &quot;sample_A3&quot;}}
+    spreadsheetId := &#34;### spreadsheet ID ###&#34;
+    rangeData := &#34;sheet1!A1:B3&#34;
+    values := [][]interface{}{{&#34;sample_A1&#34;, &#34;sample_B1&#34;}, {&#34;sample_A2&#34;, &#34;sample_B2&#34;}, {&#34;sample_A3&#34;, &#34;sample_A3&#34;}}
     rb := &amp;sheets.BatchUpdateValuesRequest{
-        ValueInputOption: &quot;USER_ENTERED&quot;,
+        ValueInputOption: &#34;USER_ENTERED&#34;,
     }
     rb.Data = append(rb.Data, &amp;sheets.ValueRange{
         Range:  rangeData,
@@ -410,7 +409,7 @@ func main() {
     if err != nil {
         log.Fatal(err)
     }
-    fmt.Println(&quot;Done.&quot;)
+    fmt.Println(&#34;Done.&#34;)
 }
 </code></pre><h3 id="result-">Result :</h3>
 <p><img src="https://tanaikech.github.io/img/20170915a-img1.png" alt=""></p>
@@ -509,15 +508,6 @@ func main() {
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -543,15 +533,6 @@ func main() {
   <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
   
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

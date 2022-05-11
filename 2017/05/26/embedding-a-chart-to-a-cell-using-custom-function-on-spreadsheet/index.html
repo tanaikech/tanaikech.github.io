@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Embedding a Chart to a Cell using Custom Function on Spreadsheet &middot; tanaike</title>
 
@@ -313,36 +312,36 @@
 <p>When it deploys Web Apps, the approval required authorization can be done, simultaneously.</p>
 <h2 id="sample-script-">Sample Script :</h2>
 <p>Please copy and paste this script to a bound script of spreadsheet.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">folderId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;### Folder ID ###&#34;</span>;
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">webappsurl</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://script.google.com/macros/s/######/exec&#34;</span>;
-
-<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">embedChart</span>(<span style="color:#a6e22e">range</span>) {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ac</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSheet</span>().<span style="color:#a6e22e">getActiveCell</span>();
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">q1</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;?datarange=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">range</span>;
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">q2</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&amp;row=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">ac</span>.<span style="color:#a6e22e">getRow</span>();
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">q3</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&amp;col=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">ac</span>.<span style="color:#a6e22e">getColumn</span>();
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">webappsurl</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">q1</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">q2</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">q3</span>;
-  <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>);
-}
-
-<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">doGet</span>(<span style="color:#a6e22e">e</span>) {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSheet</span>();
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">chart</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">newChart</span>()
-    .<span style="color:#a6e22e">setChartType</span>(<span style="color:#a6e22e">Charts</span>.<span style="color:#a6e22e">ChartType</span>.<span style="color:#a6e22e">PIE</span>)
-    .<span style="color:#a6e22e">addRange</span>(<span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameters</span>.<span style="color:#a6e22e">datarange</span>))
-    .<span style="color:#a6e22e">setOption</span>(<span style="color:#e6db74">&#39;height&#39;</span>, <span style="color:#ae81ff">280</span>)
-    .<span style="color:#a6e22e">setOption</span>(<span style="color:#e6db74">&#39;width&#39;</span>, <span style="color:#ae81ff">480</span>)
-    .<span style="color:#a6e22e">setOption</span>(<span style="color:#e6db74">&#39;title&#39;</span>, <span style="color:#e6db74">&#39;Sample chart&#39;</span>)
-    .<span style="color:#a6e22e">build</span>();
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">file</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFolderById</span>(<span style="color:#a6e22e">folderId</span>).<span style="color:#a6e22e">createFile</span>(
-    <span style="color:#a6e22e">chart</span>.<span style="color:#a6e22e">getAs</span>(<span style="color:#e6db74">&#39;image/png&#39;</span>).<span style="color:#a6e22e">setName</span>(<span style="color:#e6db74">&#34;chart_image.png&#34;</span>)
-  );
-  <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">setSharing</span>(<span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">Access</span>.<span style="color:#a6e22e">ANYONE_WITH_LINK</span>, <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">Permission</span>.<span style="color:#a6e22e">VIEW</span>);
-  <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameters</span>.<span style="color:#a6e22e">row</span>, <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameters</span>.<span style="color:#a6e22e">col</span>).<span style="color:#a6e22e">setFormula</span>(
-    <span style="color:#e6db74">&#39;=IMAGE(&#34;&#39;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;http://drive.google.com/uc?id=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getId</span>() <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;&#34;)&#39;</span>
-  );
-}
-</code></pre></div><h3 id="flow-of-script-">Flow of Script :</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">folderId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;### Folder ID ###&#34;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">webappsurl</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://script.google.com/macros/s/######/exec&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">embedChart</span>(<span style="color:#a6e22e">range</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ac</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSheet</span>().<span style="color:#a6e22e">getActiveCell</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">q1</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;?datarange=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">range</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">q2</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&amp;row=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">ac</span>.<span style="color:#a6e22e">getRow</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">q3</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&amp;col=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">ac</span>.<span style="color:#a6e22e">getColumn</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">webappsurl</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">q1</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">q2</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">q3</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">doGet</span>(<span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSheet</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">chart</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">newChart</span>()
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">setChartType</span>(<span style="color:#a6e22e">Charts</span>.<span style="color:#a6e22e">ChartType</span>.<span style="color:#a6e22e">PIE</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">addRange</span>(<span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameters</span>.<span style="color:#a6e22e">datarange</span>))
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">setOption</span>(<span style="color:#e6db74">&#39;height&#39;</span>, <span style="color:#ae81ff">280</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">setOption</span>(<span style="color:#e6db74">&#39;width&#39;</span>, <span style="color:#ae81ff">480</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">setOption</span>(<span style="color:#e6db74">&#39;title&#39;</span>, <span style="color:#e6db74">&#39;Sample chart&#39;</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">build</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">file</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFolderById</span>(<span style="color:#a6e22e">folderId</span>).<span style="color:#a6e22e">createFile</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">chart</span>.<span style="color:#a6e22e">getAs</span>(<span style="color:#e6db74">&#39;image/png&#39;</span>).<span style="color:#a6e22e">setName</span>(<span style="color:#e6db74">&#34;chart_image.png&#34;</span>)
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">setSharing</span>(<span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">Access</span>.<span style="color:#a6e22e">ANYONE_WITH_LINK</span>, <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">Permission</span>.<span style="color:#a6e22e">VIEW</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameters</span>.<span style="color:#a6e22e">row</span>, <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameters</span>.<span style="color:#a6e22e">col</span>).<span style="color:#a6e22e">setFormula</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;=IMAGE(&#34;&#39;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;http://drive.google.com/uc?id=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getId</span>() <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;&#34;)&#39;</span>
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="flow-of-script-">Flow of Script :</h3>
 <p><strong>embedChart()</strong></p>
 <ol>
 <li>Input <code>=embedChart(&quot;a2:a6&quot;)</code> in cell <code>B7</code>.</li>
@@ -458,15 +457,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -489,15 +479,6 @@
 
 
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Uploading Files to OneDrive Using Node.js &middot; tanaike</title>
 
@@ -289,38 +288,38 @@
 <p>In order to use this script, please retrieve client id, client secret and refresh token before. About this, you can see the detail information at <a href="https://gist.github.com/tanaikech/d9674f0ead7e3320c5e3184f5d1b05cc">https://gist.github.com/tanaikech/d9674f0ead7e3320c5e3184f5d1b05cc</a>.</p>
 <h2 id="1-simple-item-upload">1. Simple item upload</h2>
 <p>This is for the simple item upload is available for items with less than 4 MB of content. The detail information is <a href="https://dev.onedrive.com/items/upload_put.htm">https://dev.onedrive.com/items/upload_put.htm</a>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">fs</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;fs&#39;</span>);
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">mime</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;mime&#39;</span>);
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">request</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;request&#39;</span>);
-
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">file</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;./sample.zip&#39;</span>; <span style="color:#75715e">// Filename you want to upload on your local PC
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">onedrive_folder</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;SampleFolder&#39;</span>; <span style="color:#75715e">// Folder name on OneDrive
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">onedrive_filename</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;sample.zip&#39;</span>; <span style="color:#75715e">// Filename on OneDrive
-</span><span style="color:#75715e"></span>
-<span style="color:#a6e22e">request</span>.<span style="color:#a6e22e">post</span>({
-    <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;https://login.microsoftonline.com/common/oauth2/v2.0/token&#39;</span>,
-    <span style="color:#a6e22e">form</span><span style="color:#f92672">:</span> {
-        <span style="color:#a6e22e">redirect_uri</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;http://localhost/dashboard&#39;</span>,
-        <span style="color:#a6e22e">client_id</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">onedrive_client_id</span>,
-        <span style="color:#a6e22e">client_secret</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">onedrive_client_secret</span>,
-        <span style="color:#a6e22e">refresh_token</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">onedrive_refresh_token</span>,
-        <span style="color:#a6e22e">grant_type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;refresh_token&#39;</span>
-    },
-}, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">error</span>, <span style="color:#a6e22e">response</span>, <span style="color:#a6e22e">body</span>) {
-    <span style="color:#a6e22e">fs</span>.<span style="color:#a6e22e">readFile</span>(<span style="color:#a6e22e">file</span>, <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">read</span>(<span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">f</span>) {
-        <span style="color:#a6e22e">request</span>.<span style="color:#a6e22e">put</span>({
-            <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;https://graph.microsoft.com/v1.0/drive/root:/&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">onedrive_folder</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;/&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">onedrive_filename</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;:/content&#39;</span>,
-            <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {
-                <span style="color:#e6db74">&#39;Authorization&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">body</span>).<span style="color:#a6e22e">access_token</span>,
-                <span style="color:#e6db74">&#39;Content-Type&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">mime</span>.<span style="color:#a6e22e">getType</span>(<span style="color:#a6e22e">file</span>), <span style="color:#75715e">// When you use old version, please modify this to &#34;mime.lookup(file)&#34;,
-</span><span style="color:#75715e"></span>            },
-            <span style="color:#a6e22e">body</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">f</span>,
-        }, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">er</span>, <span style="color:#a6e22e">re</span>, <span style="color:#a6e22e">bo</span>) {
-            <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">bo</span>);
-        });
-    });
-});
-</code></pre></div><h2 id="2-resumable-item-upload">2. Resumable item upload</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">fs</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;fs&#39;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">mime</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;mime&#39;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">request</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;request&#39;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">file</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;./sample.zip&#39;</span>; <span style="color:#75715e">// Filename you want to upload on your local PC
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">onedrive_folder</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;SampleFolder&#39;</span>; <span style="color:#75715e">// Folder name on OneDrive
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">onedrive_filename</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;sample.zip&#39;</span>; <span style="color:#75715e">// Filename on OneDrive
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">request</span>.<span style="color:#a6e22e">post</span>({
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;https://login.microsoftonline.com/common/oauth2/v2.0/token&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">form</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">redirect_uri</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;http://localhost/dashboard&#39;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">client_id</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">onedrive_client_id</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">client_secret</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">onedrive_client_secret</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">refresh_token</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">onedrive_refresh_token</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">grant_type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;refresh_token&#39;</span>
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>}, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">error</span>, <span style="color:#a6e22e">response</span>, <span style="color:#a6e22e">body</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fs</span>.<span style="color:#a6e22e">readFile</span>(<span style="color:#a6e22e">file</span>, <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">read</span>(<span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">f</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">request</span>.<span style="color:#a6e22e">put</span>({
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;https://graph.microsoft.com/v1.0/drive/root:/&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">onedrive_folder</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;/&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">onedrive_filename</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;:/content&#39;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#39;Authorization&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">body</span>).<span style="color:#a6e22e">access_token</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#39;Content-Type&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">mime</span>.<span style="color:#a6e22e">getType</span>(<span style="color:#a6e22e">file</span>), <span style="color:#75715e">// When you use old version, please modify this to &#34;mime.lookup(file)&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            },
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">body</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">f</span>,
+</span></span><span style="display:flex;"><span>        }, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">er</span>, <span style="color:#a6e22e">re</span>, <span style="color:#a6e22e">bo</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">bo</span>);
+</span></span><span style="display:flex;"><span>        });
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>});
+</span></span></code></pre></div><h2 id="2-resumable-item-upload">2. Resumable item upload</h2>
 <p>This is for the resumable item upload is provided for large files or when a resumable transfer may be necessary.
 The detail information is <a href="https://dev.onedrive.com/items/upload_large_files.htm">https://dev.onedrive.com/items/upload_large_files.htm</a>.</p>
 <p>The flow of this script is as follows.</p>
@@ -330,85 +329,85 @@ The detail information is <a href="https://dev.onedrive.com/items/upload_large_f
 <li>Upload file by every chunk. Current chunk size is max which is 60 * 1024 * 1024 bytes. You can change freely.</li>
 </ol>
 <p><strong>The <code>async</code> module is used for this sample to do the asynchronous processing. By this, the chunk data of the file can be sent in order. <code>stime</code> is used for <code>setTimeout()</code>. When the size of file is large, the transfer error can be avoided by increasing <code>stime</code>.</strong></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">fs</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;fs&#39;</span>);
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">request</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;request&#39;</span>);
-<span style="color:#66d9ef">var</span> <span style="color:#66d9ef">async</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;async&#39;</span>);
-
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">client_id</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#####&#34;</span>;
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">redirect_uri</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#####&#34;</span>;
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">client_secret</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#####&#34;</span>;
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">refresh_token</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#####&#34;</span>;
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">file</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;./sample.zip&#34;</span>; <span style="color:#75715e">// Filename you want to upload.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">onedrive_folder</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;SampleFolder&#39;</span>; <span style="color:#75715e">// Folder on OneDrive
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">onedrive_filename</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">file</span>; <span style="color:#75715e">// If you want to change the filename on OneDrive, please set this.
-</span><span style="color:#75715e"></span>
-<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">resUpload</span>(){
-    <span style="color:#a6e22e">request</span>.<span style="color:#a6e22e">post</span>({
-        <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;https://login.microsoftonline.com/common/oauth2/v2.0/token&#39;</span>,
-        <span style="color:#a6e22e">form</span><span style="color:#f92672">:</span> {
-            <span style="color:#a6e22e">client_id</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">client_id</span>,
-            <span style="color:#a6e22e">redirect_uri</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">redirect_uri</span>,
-            <span style="color:#a6e22e">client_secret</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">client_secret</span>,
-            <span style="color:#a6e22e">grant_type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;refresh_token&#34;</span>,
-            <span style="color:#a6e22e">refresh_token</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">refresh_token</span>,
-        },
-    }, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">error</span>, <span style="color:#a6e22e">response</span>, <span style="color:#a6e22e">body</span>) { <span style="color:#75715e">// Here, it creates the session.
-</span><span style="color:#75715e"></span>        <span style="color:#a6e22e">request</span>.<span style="color:#a6e22e">post</span>({
-            <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;https://graph.microsoft.com/v1.0/drive/root:/&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">onedrive_folder</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;/&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">onedrive_file</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;:/createUploadSession&#39;</span>,
-            <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {
-                <span style="color:#e6db74">&#39;Authorization&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">body</span>).<span style="color:#a6e22e">access_token</span>,
-                <span style="color:#e6db74">&#39;Content-Type&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/json&#34;</span>,
-            },
-            <span style="color:#a6e22e">body</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;{&#34;item&#34;: {&#34;@microsoft.graph.conflictBehavior&#34;: &#34;rename&#34;, &#34;name&#34;: &#34;&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">onedrive_filena</span> <span style="color:#e6db74">&#39;&#34;}}&#39;</span>,
-        }, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">er</span>, <span style="color:#a6e22e">re</span>, <span style="color:#a6e22e">bo</span>) {
-            <span style="color:#a6e22e">uploadFile</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">bo</span>).<span style="color:#a6e22e">uploadUrl</span>);
-        });
-    });
-}
-
-<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">uploadFile</span>(<span style="color:#a6e22e">uploadUrl</span>) { <span style="color:#75715e">// Here, it uploads the file by every chunk.
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">async</span>.<span style="color:#a6e22e">eachSeries</span>(<span style="color:#a6e22e">getparams</span>(), <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">st</span>, <span style="color:#a6e22e">callback</span>){
-        <span style="color:#a6e22e">setTimeout</span>(<span style="color:#66d9ef">function</span>() {
-            <span style="color:#a6e22e">fs</span>.<span style="color:#a6e22e">readFile</span>(<span style="color:#a6e22e">file</span>, <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">read</span>(<span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">f</span>) {
-                <span style="color:#a6e22e">request</span>.<span style="color:#a6e22e">put</span>({
-                    <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">uploadUrl</span>,
-                    <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {
-                        <span style="color:#e6db74">&#39;Content-Length&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">st</span>.<span style="color:#a6e22e">clen</span>,
-                        <span style="color:#e6db74">&#39;Content-Range&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">st</span>.<span style="color:#a6e22e">cr</span>,
-                    },
-                    <span style="color:#a6e22e">body</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">slice</span>(<span style="color:#a6e22e">st</span>.<span style="color:#a6e22e">bstart</span>, <span style="color:#a6e22e">st</span>.<span style="color:#a6e22e">bend</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>),
-                }, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">er</span>, <span style="color:#a6e22e">re</span>, <span style="color:#a6e22e">bo</span>) {
-                    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">bo</span>);
-                });
-            });
-            <span style="color:#a6e22e">callback</span>();
-        }, <span style="color:#a6e22e">st</span>.<span style="color:#a6e22e">stime</span>);
-    });
-}
-
-<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getparams</span>(){
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">allsize</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">fs</span>.<span style="color:#a6e22e">statSync</span>(<span style="color:#a6e22e">file</span>).<span style="color:#a6e22e">size</span>;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sep</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">allsize</span> <span style="color:#f92672">&lt;</span> (<span style="color:#ae81ff">60</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span>) <span style="color:#f92672">?</span> <span style="color:#a6e22e">allsize</span> <span style="color:#f92672">:</span> (<span style="color:#ae81ff">60</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span>) <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ar</span> <span style="color:#f92672">=</span> [];
-    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">allsize</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">sep</span>) {
-        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">bstart</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">i</span>;
-        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">bend</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">sep</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">allsize</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">sep</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">allsize</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>;
-        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">cr</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;bytes &#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">bstart</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;-&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">bend</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;/&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">allsize</span>;
-        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">clen</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">bend</span> <span style="color:#f92672">!=</span> <span style="color:#a6e22e">allsize</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">sep</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">allsize</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">i</span>;
-        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">stime</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">allsize</span> <span style="color:#f92672">&lt;</span> (<span style="color:#ae81ff">60</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span>) <span style="color:#f92672">?</span> <span style="color:#ae81ff">5000</span> <span style="color:#f92672">:</span> <span style="color:#ae81ff">10000</span>;
-        <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">push</span>({
-            <span style="color:#a6e22e">bstart</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">bstart</span>,
-            <span style="color:#a6e22e">bend</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">bend</span>,
-            <span style="color:#a6e22e">cr</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">cr</span>,
-            <span style="color:#a6e22e">clen</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">clen</span>,
-            <span style="color:#a6e22e">stime</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">stime</span>,
-        });
-    }
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ar</span>;
-}
-
-<span style="color:#a6e22e">resUpload</span>();
-</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">fs</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;fs&#39;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">request</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;request&#39;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#66d9ef">async</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;async&#39;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">client_id</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#####&#34;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">redirect_uri</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#####&#34;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">client_secret</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#####&#34;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">refresh_token</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#####&#34;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">file</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;./sample.zip&#34;</span>; <span style="color:#75715e">// Filename you want to upload.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">onedrive_folder</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;SampleFolder&#39;</span>; <span style="color:#75715e">// Folder on OneDrive
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">onedrive_filename</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">file</span>; <span style="color:#75715e">// If you want to change the filename on OneDrive, please set this.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">resUpload</span>(){
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">request</span>.<span style="color:#a6e22e">post</span>({
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;https://login.microsoftonline.com/common/oauth2/v2.0/token&#39;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">form</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">client_id</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">client_id</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">redirect_uri</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">redirect_uri</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">client_secret</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">client_secret</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">grant_type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;refresh_token&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">refresh_token</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">refresh_token</span>,
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>    }, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">error</span>, <span style="color:#a6e22e">response</span>, <span style="color:#a6e22e">body</span>) { <span style="color:#75715e">// Here, it creates the session.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#a6e22e">request</span>.<span style="color:#a6e22e">post</span>({
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;https://graph.microsoft.com/v1.0/drive/root:/&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">onedrive_folder</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;/&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">onedrive_file</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;:/createUploadSession&#39;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#39;Authorization&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">body</span>).<span style="color:#a6e22e">access_token</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#39;Content-Type&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/json&#34;</span>,
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">body</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;{&#34;item&#34;: {&#34;@microsoft.graph.conflictBehavior&#34;: &#34;rename&#34;, &#34;name&#34;: &#34;&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">onedrive_filena</span> <span style="color:#e6db74">&#39;&#34;}}&#39;</span>,
+</span></span><span style="display:flex;"><span>        }, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">er</span>, <span style="color:#a6e22e">re</span>, <span style="color:#a6e22e">bo</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">uploadFile</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">bo</span>).<span style="color:#a6e22e">uploadUrl</span>);
+</span></span><span style="display:flex;"><span>        });
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">uploadFile</span>(<span style="color:#a6e22e">uploadUrl</span>) { <span style="color:#75715e">// Here, it uploads the file by every chunk.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">async</span>.<span style="color:#a6e22e">eachSeries</span>(<span style="color:#a6e22e">getparams</span>(), <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">st</span>, <span style="color:#a6e22e">callback</span>){
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">setTimeout</span>(<span style="color:#66d9ef">function</span>() {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">fs</span>.<span style="color:#a6e22e">readFile</span>(<span style="color:#a6e22e">file</span>, <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">read</span>(<span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">f</span>) {
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">request</span>.<span style="color:#a6e22e">put</span>({
+</span></span><span style="display:flex;"><span>                    <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">uploadUrl</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>                        <span style="color:#e6db74">&#39;Content-Length&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">st</span>.<span style="color:#a6e22e">clen</span>,
+</span></span><span style="display:flex;"><span>                        <span style="color:#e6db74">&#39;Content-Range&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">st</span>.<span style="color:#a6e22e">cr</span>,
+</span></span><span style="display:flex;"><span>                    },
+</span></span><span style="display:flex;"><span>                    <span style="color:#a6e22e">body</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">slice</span>(<span style="color:#a6e22e">st</span>.<span style="color:#a6e22e">bstart</span>, <span style="color:#a6e22e">st</span>.<span style="color:#a6e22e">bend</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>),
+</span></span><span style="display:flex;"><span>                }, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">er</span>, <span style="color:#a6e22e">re</span>, <span style="color:#a6e22e">bo</span>) {
+</span></span><span style="display:flex;"><span>                    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">bo</span>);
+</span></span><span style="display:flex;"><span>                });
+</span></span><span style="display:flex;"><span>            });
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">callback</span>();
+</span></span><span style="display:flex;"><span>        }, <span style="color:#a6e22e">st</span>.<span style="color:#a6e22e">stime</span>);
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getparams</span>(){
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">allsize</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">fs</span>.<span style="color:#a6e22e">statSync</span>(<span style="color:#a6e22e">file</span>).<span style="color:#a6e22e">size</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sep</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">allsize</span> <span style="color:#f92672">&lt;</span> (<span style="color:#ae81ff">60</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span>) <span style="color:#f92672">?</span> <span style="color:#a6e22e">allsize</span> <span style="color:#f92672">:</span> (<span style="color:#ae81ff">60</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span>) <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ar</span> <span style="color:#f92672">=</span> [];
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">allsize</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">sep</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">bstart</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">i</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">bend</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">sep</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">allsize</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">sep</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">allsize</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">cr</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;bytes &#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">bstart</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;-&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">bend</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;/&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">allsize</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">clen</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">bend</span> <span style="color:#f92672">!=</span> <span style="color:#a6e22e">allsize</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">sep</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">allsize</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">i</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">stime</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">allsize</span> <span style="color:#f92672">&lt;</span> (<span style="color:#ae81ff">60</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span>) <span style="color:#f92672">?</span> <span style="color:#ae81ff">5000</span> <span style="color:#f92672">:</span> <span style="color:#ae81ff">10000</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">push</span>({
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">bstart</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">bstart</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">bend</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">bend</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">cr</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">cr</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">clen</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">clen</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">stime</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">stime</span>,
+</span></span><span style="display:flex;"><span>        });
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ar</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">resUpload</span>();
+</span></span></code></pre></div>
   
   <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
 <ul class="share-buttons">
@@ -496,15 +495,6 @@ The detail information is <a href="https://dev.onedrive.com/items/upload_large_f
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -527,15 +517,6 @@ The detail information is <a href="https://dev.onedrive.com/items/upload_large_f
 
 
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

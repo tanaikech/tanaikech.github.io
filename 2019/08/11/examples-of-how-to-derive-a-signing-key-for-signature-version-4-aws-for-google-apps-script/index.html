@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Examples of How to Derive a Signing Key for Signature Version 4 (AWS) for Google Apps Script &middot; tanaike</title>
 
@@ -286,10 +285,10 @@
 <p>This is a sample script for &ldquo;<a href="https://docs.aws.amazon.com/general/latest/gr/signature-v4-examples.html">Examples of How to Derive a Signing Key for Signature Version 4</a>&rdquo; using Google Apps Script.</p>
 <p>In order to use <a href="https://aws.amazon.com/tools/#sdk">AWS SDKs</a>, there are the sample scripts for the languages of Java, .NET (C#), Python, Ruby, JavaScript (Node.js). But the sample script of Google Apps Script is not prepared. I saw <a href="https://stackoverflow.com/q/57439671">the question</a> related to this at Stackoverflow. So I would like to also introduce the sample script here.</p>
 <p>In <a href="https://docs.aws.amazon.com/general/latest/gr/signature-v4-examples.html">the sample scripts</a>, the input values are as follows.</p>
-<pre tabindex="0"><code>key = 'wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY'
-dateStamp = '20120215'
-regionName = 'us-east-1'
-serviceName = 'iam'
+<pre tabindex="0"><code>key = &#39;wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY&#39;
+dateStamp = &#39;20120215&#39;
+regionName = &#39;us-east-1&#39;
+serviceName = &#39;iam&#39;
 </code></pre><p>From above values, the following value is required to be retrieved.</p>
 <pre tabindex="0"><code>f4780e2d9f65fa895f9c67b32ce1baf0b0d8a43505a000a1a9e090d414db404d
 </code></pre><p>In this report, above process is achieved with Google Apps Script.</p>
@@ -304,35 +303,35 @@ serviceName = 'iam'
 </ul>
 <p>From above situation, the sample script for Google Apps Script can be made as follows.</p>
 <h3 id="sample-script">Sample script:</h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
-  <span style="color:#75715e">// These are the sample values of https://docs.aws.amazon.com/general/latest/gr/signature-v4-examples.html
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">key</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY&#34;</span>;
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dateStamp</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;20120215&#34;</span>;
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">regionName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;us-east-1&#34;</span>;
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">serviceName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;iam&#34;</span>;
-
-  <span style="color:#75715e">// I prepared the following script.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">kDate</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">computeHmacSha256Signature</span>(<span style="color:#a6e22e">dateStamp</span>, <span style="color:#e6db74">&#34;AWS4&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">key</span>);
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">kRegion</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">computeHmacSha256Signature</span>(
-    <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">newBlob</span>(<span style="color:#a6e22e">regionName</span>).<span style="color:#a6e22e">getBytes</span>(),
-    <span style="color:#a6e22e">kDate</span>
-  );
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">kService</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">computeHmacSha256Signature</span>(
-    <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">newBlob</span>(<span style="color:#a6e22e">serviceName</span>).<span style="color:#a6e22e">getBytes</span>(),
-    <span style="color:#a6e22e">kRegion</span>
-  );
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">kSigning</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">computeHmacSha256Signature</span>(
-    <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">newBlob</span>(<span style="color:#e6db74">&#34;aws4_request&#34;</span>).<span style="color:#a6e22e">getBytes</span>(),
-    <span style="color:#a6e22e">kService</span>
-  );
-  <span style="color:#a6e22e">kSigning</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">kSigning</span>
-    .<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
-      <span style="color:#66d9ef">return</span> (<span style="color:#e6db74">&#34;0&#34;</span> <span style="color:#f92672">+</span> (<span style="color:#a6e22e">e</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">e</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">256</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>).<span style="color:#a6e22e">toString</span>(<span style="color:#ae81ff">16</span>)).<span style="color:#a6e22e">slice</span>(<span style="color:#f92672">-</span><span style="color:#ae81ff">2</span>);
-    })
-    .<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;&#34;</span>);
-  <span style="color:#a6e22e">Logger</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">kSigning</span>); <span style="color:#75715e">// Result
-</span><span style="color:#75715e"></span>}
-</code></pre></div><ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// These are the sample values of https://docs.aws.amazon.com/general/latest/gr/signature-v4-examples.html
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">key</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dateStamp</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;20120215&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">regionName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;us-east-1&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">serviceName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;iam&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// I prepared the following script.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">kDate</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">computeHmacSha256Signature</span>(<span style="color:#a6e22e">dateStamp</span>, <span style="color:#e6db74">&#34;AWS4&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">key</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">kRegion</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">computeHmacSha256Signature</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">newBlob</span>(<span style="color:#a6e22e">regionName</span>).<span style="color:#a6e22e">getBytes</span>(),
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">kDate</span>
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">kService</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">computeHmacSha256Signature</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">newBlob</span>(<span style="color:#a6e22e">serviceName</span>).<span style="color:#a6e22e">getBytes</span>(),
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">kRegion</span>
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">kSigning</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">computeHmacSha256Signature</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">newBlob</span>(<span style="color:#e6db74">&#34;aws4_request&#34;</span>).<span style="color:#a6e22e">getBytes</span>(),
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">kService</span>
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">kSigning</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">kSigning</span>
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> (<span style="color:#e6db74">&#34;0&#34;</span> <span style="color:#f92672">+</span> (<span style="color:#a6e22e">e</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">e</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">256</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>).<span style="color:#a6e22e">toString</span>(<span style="color:#ae81ff">16</span>)).<span style="color:#a6e22e">slice</span>(<span style="color:#f92672">-</span><span style="color:#ae81ff">2</span>);
+</span></span><span style="display:flex;"><span>    })
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;&#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">Logger</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">kSigning</span>); <span style="color:#75715e">// Result
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><ul>
 <li>About above script, for example, <code>kDate</code> is the byte array. So <code>regionName</code> is required to be converted to the byte array. Please be careful this.</li>
 </ul>
 <h3 id="result">Result:</h3>
@@ -432,15 +431,6 @@ serviceName = 'iam'
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -463,15 +453,6 @@ serviceName = 'iam'
 
 
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

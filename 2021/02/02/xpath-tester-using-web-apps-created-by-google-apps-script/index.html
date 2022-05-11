@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>XPath Tester using Web Apps Created by Google Apps Script &middot; tanaike</title>
 
@@ -291,39 +290,39 @@
 <p>Please open the script editor at the created new Spreadsheet and <a href="https://developers.google.com/apps-script/guides/services/advanced#enable_advanced_services">enable Sheets API at Advanced Google services</a>.</p>
 <h3 id="3-prepare-sample-script">3. Prepare sample script.</h3>
 <p>Please copy and paste the following script to the script editor on the created new Spreadsheet and save it.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">doGet</span>(<span style="color:#a6e22e">e</span>) {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameter</span>.<span style="color:#a6e22e">url</span>;
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">xpath</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameter</span>.<span style="color:#a6e22e">xpath</span>;
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>();
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getSheets</span>()[<span style="color:#ae81ff">0</span>];
-  <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">clear</span>();
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#e6db74">&#34;A1&#34;</span>);
-  <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">setFormula</span>(<span style="color:#e6db74">`=IMPORTXML(&#34;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">url</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;;&#34;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">xpath</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;)`</span>);
-  <span style="color:#66d9ef">do</span> {
-    <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">flush</span>();
-    <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">sleep</span>(<span style="color:#ae81ff">1000</span>);
-  } <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getDisplayValue</span>() <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;Loading...&#34;</span>);
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getDataRange</span>().<span style="color:#a6e22e">getDisplayValues</span>();
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">xpath</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">xpath</span>, <span style="color:#a6e22e">values</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">values</span> };
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">values</span>[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">0</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;#N/A&#34;</span>) {
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getId</span>(), {
-      <span style="color:#a6e22e">ranges</span><span style="color:#f92672">:</span> [<span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getSheetName</span>()],
-      <span style="color:#a6e22e">fields</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sheets&#34;</span>,
-    });
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">v</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">sheets</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">data</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">rowData</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">values</span>[<span style="color:#ae81ff">0</span>];
-    <span style="color:#66d9ef">if</span> (
-      <span style="color:#a6e22e">v</span>.<span style="color:#a6e22e">hasOwnProperty</span>(<span style="color:#e6db74">&#34;effectiveValue&#34;</span>) <span style="color:#f92672">&amp;&amp;</span>
-      <span style="color:#a6e22e">v</span>.<span style="color:#a6e22e">effectiveValue</span>.<span style="color:#a6e22e">hasOwnProperty</span>(<span style="color:#e6db74">&#34;errorValue&#34;</span>)
-    ) {
-      <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">error</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">v</span>.<span style="color:#a6e22e">effectiveValue</span>.<span style="color:#a6e22e">errorValue</span>;
-    }
-  }
-  <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">clear</span>();
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ContentService</span>.<span style="color:#a6e22e">createTextOutput</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">res</span>)).<span style="color:#a6e22e">setMimeType</span>(
-    <span style="color:#a6e22e">ContentService</span>.<span style="color:#a6e22e">MimeType</span>.<span style="color:#a6e22e">JSON</span>
-  );
-}
-</code></pre></div><h3 id="4-deploy-web-apps">4. Deploy Web Apps.</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">doGet</span>(<span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameter</span>.<span style="color:#a6e22e">url</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">xpath</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameter</span>.<span style="color:#a6e22e">xpath</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getSheets</span>()[<span style="color:#ae81ff">0</span>];
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">clear</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#e6db74">&#34;A1&#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">setFormula</span>(<span style="color:#e6db74">`=IMPORTXML(&#34;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">url</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;;&#34;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">xpath</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;)`</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">do</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">flush</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">sleep</span>(<span style="color:#ae81ff">1000</span>);
+</span></span><span style="display:flex;"><span>  } <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getDisplayValue</span>() <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;Loading...&#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getDataRange</span>().<span style="color:#a6e22e">getDisplayValues</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">xpath</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">xpath</span>, <span style="color:#a6e22e">values</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">values</span> };
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">values</span>[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">0</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;#N/A&#34;</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getId</span>(), {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">ranges</span><span style="color:#f92672">:</span> [<span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getSheetName</span>()],
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">fields</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sheets&#34;</span>,
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">v</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">sheets</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">data</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">rowData</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">values</span>[<span style="color:#ae81ff">0</span>];
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">v</span>.<span style="color:#a6e22e">hasOwnProperty</span>(<span style="color:#e6db74">&#34;effectiveValue&#34;</span>) <span style="color:#f92672">&amp;&amp;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">v</span>.<span style="color:#a6e22e">effectiveValue</span>.<span style="color:#a6e22e">hasOwnProperty</span>(<span style="color:#e6db74">&#34;errorValue&#34;</span>)
+</span></span><span style="display:flex;"><span>    ) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">error</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">v</span>.<span style="color:#a6e22e">effectiveValue</span>.<span style="color:#a6e22e">errorValue</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">clear</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ContentService</span>.<span style="color:#a6e22e">createTextOutput</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">res</span>)).<span style="color:#a6e22e">setMimeType</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">ContentService</span>.<span style="color:#a6e22e">MimeType</span>.<span style="color:#a6e22e">JSON</span>
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="4-deploy-web-apps">4. Deploy Web Apps.</h3>
 <p>The detail information can be seen at <a href="https://developers.google.com/apps-script/guides/web#deploy_a_script_as_a_web_app">the official document</a>.</p>
 <ol>
 <li>On the script editor, at the top right of the script editor, please click &ldquo;click Deploy&rdquo; -&gt; &ldquo;New deployment&rdquo;.</li>
@@ -354,22 +353,22 @@
 </ol>
 <h3 id="5-testing">5. Testing.</h3>
 <p>In order to test this, as a sample, the curl command is used as follows. <code>https://script.google.com/macros/s/###/exec</code> is the URL of your Web Apps.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ curl -L <span style="color:#e6db74">&#39;https://script.google.com/macros/s/###/exec?url=https://tanaikech.github.io/index.xml&amp;xpath=//channel/title&#39;</span>
-</code></pre></div><p>In this case, the value from the formula of <code>=IMPORTXML(&quot;https://tanaikech.github.io/index.xml&quot;,&quot;//channel/title&quot;)</code> is returned. When the following result can be seen, it means that above setting works.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
-  <span style="color:#f92672">&#34;url&#34;</span>: <span style="color:#e6db74">&#34;https://tanaikech.github.io/index.xml&#34;</span>,
-  <span style="color:#f92672">&#34;xpath&#34;</span>: <span style="color:#e6db74">&#34;//channel/title&#34;</span>,
-  <span style="color:#f92672">&#34;values&#34;</span>: [[<span style="color:#e6db74">&#34;tanaike&#34;</span>]]
-}
-</code></pre></div><p>For example, when the xpath occurs an error, the following result is returned.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ curl -L <span style="color:#e6db74">&#39;https://script.google.com/macros/s/###/exec?url=https://tanaikech.github.io/index.xml&amp;xpath=//channel/sample&#39;</span>
-</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
-  <span style="color:#f92672">&#34;url&#34;</span>: <span style="color:#e6db74">&#34;https://tanaikech.github.io/index.xml&#34;</span>,
-  <span style="color:#f92672">&#34;xpath&#34;</span>: <span style="color:#e6db74">&#34;//channel/sample&#34;</span>,
-  <span style="color:#f92672">&#34;values&#34;</span>: [[<span style="color:#e6db74">&#34;#N/A&#34;</span>]],
-  <span style="color:#f92672">&#34;error&#34;</span>: { <span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;N_A&#34;</span>, <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;Imported content is empty.&#34;</span> }
-}
-</code></pre></div><p>The error message from the formula can be retrieve the method of spreadsheets.get in Sheets API.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ curl -L <span style="color:#e6db74">&#39;https://script.google.com/macros/s/###/exec?url=https://tanaikech.github.io/index.xml&amp;xpath=//channel/title&#39;</span>
+</span></span></code></pre></div><p>In this case, the value from the formula of <code>=IMPORTXML(&quot;https://tanaikech.github.io/index.xml&quot;,&quot;//channel/title&quot;)</code> is returned. When the following result can be seen, it means that above setting works.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;url&#34;</span>: <span style="color:#e6db74">&#34;https://tanaikech.github.io/index.xml&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;xpath&#34;</span>: <span style="color:#e6db74">&#34;//channel/title&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;values&#34;</span>: [[<span style="color:#e6db74">&#34;tanaike&#34;</span>]]
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>For example, when the xpath occurs an error, the following result is returned.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ curl -L <span style="color:#e6db74">&#39;https://script.google.com/macros/s/###/exec?url=https://tanaikech.github.io/index.xml&amp;xpath=//channel/sample&#39;</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;url&#34;</span>: <span style="color:#e6db74">&#34;https://tanaikech.github.io/index.xml&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;xpath&#34;</span>: <span style="color:#e6db74">&#34;//channel/sample&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;values&#34;</span>: [[<span style="color:#e6db74">&#34;#N/A&#34;</span>]],
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;error&#34;</span>: { <span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;N_A&#34;</span>, <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;Imported content is empty.&#34;</span> }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>The error message from the formula can be retrieve the method of spreadsheets.get in Sheets API.</p>
 <h2 id="note">Note</h2>
 <ul>
 <li>When you want to use this at other languages, the values of query parameter of <code>url</code> and <code>xpath</code> might be required to be URL encoded. Please be careful this.</li>
@@ -466,15 +465,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -500,15 +490,6 @@
   <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
   
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

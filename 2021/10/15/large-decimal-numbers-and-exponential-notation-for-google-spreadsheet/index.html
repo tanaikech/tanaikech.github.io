@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Large Decimal Numbers and Exponential Notation for Google Spreadsheet &middot; tanaike</title>
 
@@ -288,44 +287,44 @@
 <p>In this report, it has investigated the large decimal numbers and the exponential notation for Google Spreadsheet. When the large decimal numbers are put to the Spreadsheet, the Spreadsheet automatically sets the display value using the exponential notation. In this report, the result when the values are retrieved by Spreadsheet service and Sheets API is shown.</p>
 <h2 id="sample-script">Sample script</h2>
 <p>At first, please create new Spreadsheet and open the script editor. And please copy and paste the following script. And, <a href="https://developers.google.com/apps-script/guides/services/advanced#enable_advanced_services">please enable Sheets API at Advanced Google services</a>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheetName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Sheet1&#34;</span>;
-
-  <span style="color:#75715e">// Set values to Spreadsheet.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>();
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#a6e22e">sheetName</span>);
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">maxDigit</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">30</span>;
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> Array(<span style="color:#a6e22e">maxDigit</span>)
-    .<span style="color:#a6e22e">fill</span>(<span style="color:#e6db74">&#34;&#34;</span>)
-    .<span style="color:#a6e22e">map</span>((<span style="color:#ae81ff">_</span>, <span style="color:#a6e22e">i</span>) =&gt; {
-      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">v</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">+</span> Array(<span style="color:#a6e22e">i</span>).<span style="color:#a6e22e">fill</span>(<span style="color:#ae81ff">0</span>).<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;&#34;</span>);
-      <span style="color:#66d9ef">return</span> [<span style="color:#a6e22e">v</span>, <span style="color:#a6e22e">v</span>.<span style="color:#a6e22e">length</span>];
-    });
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>
-    .<span style="color:#a6e22e">getRange</span>(<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">length</span>, <span style="color:#a6e22e">values</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">length</span>)
-    .<span style="color:#a6e22e">setValues</span>(<span style="color:#a6e22e">values</span>);
-  <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">flush</span>();
-
-  <span style="color:#75715e">// Retrieve the values using Spreadsheet service and Sheets API.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">valuesFromSpreadsheetService1</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getValues</span>();
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">valuesFromSpreadsheetService2</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getDisplayValues</span>();
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">valuesFromSheetsAPI1</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">Values</span>.<span style="color:#a6e22e">get</span>(
-    <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getId</span>(),
-    <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">sheetName</span><span style="color:#e6db74">}</span><span style="color:#e6db74">!</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getA1Notation</span>()<span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>
-  ).<span style="color:#a6e22e">values</span>;
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">valuesFromSheetsAPI2</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">Values</span>.<span style="color:#a6e22e">get</span>(
-    <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getId</span>(),
-    <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">sheetName</span><span style="color:#e6db74">}</span><span style="color:#e6db74">!</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getA1Notation</span>()<span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
-    { <span style="color:#a6e22e">valueRenderOption</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;UNFORMATTED_VALUE&#34;</span> }
-  ).<span style="color:#a6e22e">values</span>;
-
-  <span style="color:#75715e">// Show the result.
-</span><span style="color:#75715e"></span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">valuesFromSpreadsheetService1</span>);
-  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">valuesFromSpreadsheetService2</span>);
-  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">valuesFromSheetsAPI1</span>);
-  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">valuesFromSheetsAPI2</span>);
-}
-</code></pre></div><p>When this script is run, the following values are put to the sheet &ldquo;Sheet1&rdquo;.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheetName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Sheet1&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Set values to Spreadsheet.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#a6e22e">sheetName</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">maxDigit</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">30</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> Array(<span style="color:#a6e22e">maxDigit</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">fill</span>(<span style="color:#e6db74">&#34;&#34;</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">i</span>) =&gt; {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">v</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">+</span> Array(<span style="color:#a6e22e">i</span>).<span style="color:#a6e22e">fill</span>(<span style="color:#ae81ff">0</span>).<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;&#34;</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> [<span style="color:#a6e22e">v</span>, <span style="color:#a6e22e">v</span>.<span style="color:#a6e22e">length</span>];
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">getRange</span>(<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">length</span>, <span style="color:#a6e22e">values</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">length</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">setValues</span>(<span style="color:#a6e22e">values</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">flush</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Retrieve the values using Spreadsheet service and Sheets API.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">valuesFromSpreadsheetService1</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getValues</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">valuesFromSpreadsheetService2</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getDisplayValues</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">valuesFromSheetsAPI1</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">Values</span>.<span style="color:#a6e22e">get</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getId</span>(),
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">sheetName</span><span style="color:#e6db74">}</span><span style="color:#e6db74">!</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getA1Notation</span>()<span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>
+</span></span><span style="display:flex;"><span>  ).<span style="color:#a6e22e">values</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">valuesFromSheetsAPI2</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">Values</span>.<span style="color:#a6e22e">get</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getId</span>(),
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">sheetName</span><span style="color:#e6db74">}</span><span style="color:#e6db74">!</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getA1Notation</span>()<span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
+</span></span><span style="display:flex;"><span>    { <span style="color:#a6e22e">valueRenderOption</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;UNFORMATTED_VALUE&#34;</span> }
+</span></span><span style="display:flex;"><span>  ).<span style="color:#a6e22e">values</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Show the result.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">valuesFromSpreadsheetService1</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">valuesFromSpreadsheetService2</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">valuesFromSheetsAPI1</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">valuesFromSheetsAPI2</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>When this script is run, the following values are put to the sheet &ldquo;Sheet1&rdquo;.</p>
 <p><img src="https://tanaikech.github.io/image-storage/20211015a/fig1.png" alt=""></p>
 <p>And, the put values are retrieved by Spreadsheet service and Sheets API.</p>
 <h2 id="result">Result</h2>
@@ -365,69 +364,69 @@
 </code></pre></li>
 <li>
 <p><code>console.log(valuesFromSpreadsheetService2);</code></p>
-<pre tabindex="0"><code>[ [ '1', '1' ],
-[ '10', '2' ],
-[ '100', '3' ],
-[ '1000', '4' ],
-[ '10000', '5' ],
-[ '100000', '6' ],
-[ '1000000', '7' ],
-[ '10000000', '8' ],
-[ '100000000', '9' ],
-[ '1000000000', '10' ],
-[ '10000000000', '11' ],
-[ '100000000000', '12' ],
-[ '1000000000000', '13' ],
-[ '10000000000000', '14' ],
-[ '100000000000000', '15' ],
-[ '1E+15', '16' ],
-[ '1E+16', '17' ],
-[ '1E+17', '18' ],
-[ '1E+18', '19' ],
-[ '1E+19', '20' ],
-[ '1E+20', '21' ],
-[ '1E+21', '22' ],
-[ '1E+22', '23' ],
-[ '1E+23', '24' ],
-[ '1E+24', '25' ],
-[ '1E+25', '26' ],
-[ '1E+26', '27' ],
-[ '1E+27', '28' ],
-[ '1E+28', '29' ],
-[ '1E+29', '30' ] ]
+<pre tabindex="0"><code>[ [ &#39;1&#39;, &#39;1&#39; ],
+[ &#39;10&#39;, &#39;2&#39; ],
+[ &#39;100&#39;, &#39;3&#39; ],
+[ &#39;1000&#39;, &#39;4&#39; ],
+[ &#39;10000&#39;, &#39;5&#39; ],
+[ &#39;100000&#39;, &#39;6&#39; ],
+[ &#39;1000000&#39;, &#39;7&#39; ],
+[ &#39;10000000&#39;, &#39;8&#39; ],
+[ &#39;100000000&#39;, &#39;9&#39; ],
+[ &#39;1000000000&#39;, &#39;10&#39; ],
+[ &#39;10000000000&#39;, &#39;11&#39; ],
+[ &#39;100000000000&#39;, &#39;12&#39; ],
+[ &#39;1000000000000&#39;, &#39;13&#39; ],
+[ &#39;10000000000000&#39;, &#39;14&#39; ],
+[ &#39;100000000000000&#39;, &#39;15&#39; ],
+[ &#39;1E+15&#39;, &#39;16&#39; ],
+[ &#39;1E+16&#39;, &#39;17&#39; ],
+[ &#39;1E+17&#39;, &#39;18&#39; ],
+[ &#39;1E+18&#39;, &#39;19&#39; ],
+[ &#39;1E+19&#39;, &#39;20&#39; ],
+[ &#39;1E+20&#39;, &#39;21&#39; ],
+[ &#39;1E+21&#39;, &#39;22&#39; ],
+[ &#39;1E+22&#39;, &#39;23&#39; ],
+[ &#39;1E+23&#39;, &#39;24&#39; ],
+[ &#39;1E+24&#39;, &#39;25&#39; ],
+[ &#39;1E+25&#39;, &#39;26&#39; ],
+[ &#39;1E+26&#39;, &#39;27&#39; ],
+[ &#39;1E+27&#39;, &#39;28&#39; ],
+[ &#39;1E+28&#39;, &#39;29&#39; ],
+[ &#39;1E+29&#39;, &#39;30&#39; ] ]
 </code></pre></li>
 <li>
 <p><code>console.log(valuesFromSheetsAPI1);</code></p>
-<pre tabindex="0"><code>[ [ '1', '1' ],
-[ '10', '2' ],
-[ '100', '3' ],
-[ '1000', '4' ],
-[ '10000', '5' ],
-[ '100000', '6' ],
-[ '1000000', '7' ],
-[ '10000000', '8' ],
-[ '100000000', '9' ],
-[ '1000000000', '10' ],
-[ '10000000000', '11' ],
-[ '100000000000', '12' ],
-[ '1000000000000', '13' ],
-[ '10000000000000', '14' ],
-[ '100000000000000', '15' ],
-[ '1E+15', '16' ],
-[ '1E+16', '17' ],
-[ '1E+17', '18' ],
-[ '1E+18', '19' ],
-[ '1E+19', '20' ],
-[ '1E+20', '21' ],
-[ '1E+21', '22' ],
-[ '1E+22', '23' ],
-[ '1E+23', '24' ],
-[ '1E+24', '25' ],
-[ '1E+25', '26' ],
-[ '1E+26', '27' ],
-[ '1E+27', '28' ],
-[ '1E+28', '29' ],
-[ '1E+29', '30' ] ]
+<pre tabindex="0"><code>[ [ &#39;1&#39;, &#39;1&#39; ],
+[ &#39;10&#39;, &#39;2&#39; ],
+[ &#39;100&#39;, &#39;3&#39; ],
+[ &#39;1000&#39;, &#39;4&#39; ],
+[ &#39;10000&#39;, &#39;5&#39; ],
+[ &#39;100000&#39;, &#39;6&#39; ],
+[ &#39;1000000&#39;, &#39;7&#39; ],
+[ &#39;10000000&#39;, &#39;8&#39; ],
+[ &#39;100000000&#39;, &#39;9&#39; ],
+[ &#39;1000000000&#39;, &#39;10&#39; ],
+[ &#39;10000000000&#39;, &#39;11&#39; ],
+[ &#39;100000000000&#39;, &#39;12&#39; ],
+[ &#39;1000000000000&#39;, &#39;13&#39; ],
+[ &#39;10000000000000&#39;, &#39;14&#39; ],
+[ &#39;100000000000000&#39;, &#39;15&#39; ],
+[ &#39;1E+15&#39;, &#39;16&#39; ],
+[ &#39;1E+16&#39;, &#39;17&#39; ],
+[ &#39;1E+17&#39;, &#39;18&#39; ],
+[ &#39;1E+18&#39;, &#39;19&#39; ],
+[ &#39;1E+19&#39;, &#39;20&#39; ],
+[ &#39;1E+20&#39;, &#39;21&#39; ],
+[ &#39;1E+21&#39;, &#39;22&#39; ],
+[ &#39;1E+22&#39;, &#39;23&#39; ],
+[ &#39;1E+23&#39;, &#39;24&#39; ],
+[ &#39;1E+24&#39;, &#39;25&#39; ],
+[ &#39;1E+25&#39;, &#39;26&#39; ],
+[ &#39;1E+26&#39;, &#39;27&#39; ],
+[ &#39;1E+27&#39;, &#39;28&#39; ],
+[ &#39;1E+28&#39;, &#39;29&#39; ],
+[ &#39;1E+29&#39;, &#39;30&#39; ] ]
 </code></pre></li>
 <li>
 <p><code>console.log(valuesFromSheetsAPI2);</code></p>
@@ -580,15 +579,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -614,15 +604,6 @@
   <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
   
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

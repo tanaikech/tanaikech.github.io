@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>File upload using doPost on Google Web Apps &middot; tanaike</title>
 
@@ -295,22 +294,22 @@
 <pre tabindex="0"><code>&lt;html&gt;
   &lt;body&gt;
     &lt;form&gt;
-      &lt;input type=&quot;file&quot; name=&quot;imageFile&quot;&gt;
-      &lt;input type=&quot;button&quot; value=&quot;ok&quot; onclick=&quot;google.script.run.upload(this.parentNode)&quot;&gt;
+      &lt;input type=&#34;file&#34; name=&#34;imageFile&#34;&gt;
+      &lt;input type=&#34;button&#34; value=&#34;ok&#34; onclick=&#34;google.script.run.upload(this.parentNode)&#34;&gt;
     &lt;/form&gt;
   &lt;/body&gt;
 &lt;/html&gt;
 </code></pre><p><strong>GAS :</strong></p>
 <pre tabindex="0"><code>function doGet() {
-  return HtmlService.createHtmlOutputFromFile('Form.html');
+  return HtmlService.createHtmlOutputFromFile(&#39;Form.html&#39;);
 }
 
 function upload(e) {
-  var destination_id = '#####'; // Folder ID of destination folder
+  var destination_id = &#39;#####&#39;; // Folder ID of destination folder
 
   // Reference : https://developers.google.com/apps-script/reference/base/blob#getAs(String)
-  // You can use 'application/pdf', 'image/bmp', 'image/gif', 'image/jpeg' and 'image/png'.
-  var contentType = 'image/jpeg';
+  // You can use &#39;application/pdf&#39;, &#39;image/bmp&#39;, &#39;image/gif&#39;, &#39;image/jpeg&#39; and &#39;image/png&#39;.
+  var contentType = &#39;image/jpeg&#39;;
   var img = e.imageFile;
 
   var destination = DriveApp.getFolderById(destination_id);
@@ -335,28 +334,28 @@ function upload(e) {
 <p><strong>GAS :</strong></p>
 <p>This script is very simple sample. It uploads image files of bmp, gif, jpeg, png and svg. When you want to upload other files, please change following script.</p>
 <pre tabindex="0"><code>function doGet(e) {
-  return message(&quot;Error: no parameters&quot;);
+  return message(&#34;Error: no parameters&#34;);
 }
 
 function doPost(e) {
   if (!e.parameters.filename || !e.parameters.file || !e.parameters.imageformat) {
-    return message(&quot;Error: Bad parameters&quot;);
+    return message(&#34;Error: Bad parameters&#34;);
   } else {
     var imgf = e.parameters.imageformat[0].toUpperCase();
     var mime =
-        (imgf == 'BMP')  ? MimeType.BMP
-      : (imgf == 'GIF')  ? MimeType.GIF
-      : (imgf == 'JPEG') ? MimeType.JPEG
-      : (imgf == 'PNG')  ? MimeType.PNG
-      : (imgf == 'SVG')  ? MimeType.SVG
+        (imgf == &#39;BMP&#39;)  ? MimeType.BMP
+      : (imgf == &#39;GIF&#39;)  ? MimeType.GIF
+      : (imgf == &#39;JPEG&#39;) ? MimeType.JPEG
+      : (imgf == &#39;PNG&#39;)  ? MimeType.PNG
+      : (imgf == &#39;SVG&#39;)  ? MimeType.SVG
       : false;
     if (mime) {
       var data = Utilities.base64Decode(e.parameters.file, Utilities.Charset.UTF_8);
       var blob = Utilities.newBlob(data, mime, e.parameters.filename);
-      DriveApp.getFolderById('FOLDER ID').createFile(blob);
-      return message(&quot;completed&quot;);
+      DriveApp.getFolderById(&#39;FOLDER ID&#39;).createFile(blob);
+      return message(&#34;completed&#34;);
     } else {
-      return message(&quot;Error: Bad image format&quot;);
+      return message(&#34;Error: Bad image format&#34;);
     }
   }
 }
@@ -366,48 +365,48 @@ function message(msg) {
 }
 </code></pre><p><strong>curl :</strong></p>
 <pre tabindex="0"><code>curl -L \
-    -F 'filename=[file name on Google Drive]' \
-    -F 'imageformat=[image format (bmp, gif, jpeg, png and svg)]' \
-    -F &quot;file=`base64 [upload file]`&quot; \
-    '[Current web app URL (https://script.google.com/macros/s/[Project ID]/exec)]'
+    -F &#39;filename=[file name on Google Drive]&#39; \
+    -F &#39;imageformat=[image format (bmp, gif, jpeg, png and svg)]&#39; \
+    -F &#34;file=`base64 [upload file]`&#34; \
+    &#39;[Current web app URL (https://script.google.com/macros/s/[Project ID]/exec)]&#39;
 </code></pre><p>Using &ldquo;doPost&rdquo; of <a href="https://developers.google.com/apps-script/guides/web">Google Web Apps</a>, files cannot be uploaded from local PC, while text data which isn&rsquo;t a file can be uploaded. So I thought that it converted from image data to base64 data, and upload it. By this, it was found that various files can be uploaded from local HTML form using &ldquo;doPost&rdquo; of Google Web Apps.</p>
 <p><strong>html form :</strong></p>
 <pre tabindex="0"><code>&lt;!DOCTYPE html&gt;
 &lt;html&gt;
 &lt;head&gt;
-    &lt;meta charset=&quot;UTF-8&quot;&gt;
-    &lt;script src=&quot;http://code.jquery.com/jquery-latest.js&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
+    &lt;meta charset=&#34;UTF-8&#34;&gt;
+    &lt;script src=&#34;http://code.jquery.com/jquery-latest.js&#34; type=&#34;text/javascript&#34;&gt;&lt;/script&gt;
 &lt;/head&gt;
 &lt;body&gt;
-    &lt;input type=&quot;file&quot; id=&quot;file&quot;&gt;
+    &lt;input type=&#34;file&#34; id=&#34;file&#34;&gt;
 
-    &lt;script type=&quot;text/javascript&quot;&gt;
+    &lt;script type=&#34;text/javascript&#34;&gt;
         $(function(){
-            var url = 'https://script.google.com/macros/s/[Project ID]/exec';
+            var url = &#39;https://script.google.com/macros/s/[Project ID]/exec&#39;;
             var params = {
-                filename: 'samplefile',
-                imageformat: 'PNG'
+                filename: &#39;samplefile&#39;,
+                imageformat: &#39;PNG&#39;
             };
 
-            $('#file').on(&quot;change&quot;, function() {
+            $(&#39;#file&#39;).on(&#34;change&#34;, function() {
                 var file = this.files[0];
                 var fr = new FileReader();
                 fr.onload = function(e) {
-                    params.file = e.target.result.replace(/^.*,/, '');
+                    params.file = e.target.result.replace(/^.*,/, &#39;&#39;);
                     postJump();
                 }
                 fr.readAsDataURL(file);
             });
 
             function postJump(){
-                var html = '&lt;form method=&quot;post&quot; action=&quot;'+url+'&quot; id=&quot;postjump&quot; style=&quot;display: none;&quot;&gt;';
+                var html = &#39;&lt;form method=&#34;post&#34; action=&#34;&#39;+url+&#39;&#34; id=&#34;postjump&#34; style=&#34;display: none;&#34;&gt;&#39;;
                 Object.keys(params).forEach(function (key) {
-                    html += '&lt;input type=&quot;hidden&quot; name=&quot;'+key+'&quot; value=&quot;'+params[key]+'&quot; &gt;';
+                    html += &#39;&lt;input type=&#34;hidden&#34; name=&#34;&#39;+key+&#39;&#34; value=&#34;&#39;+params[key]+&#39;&#34; &gt;&#39;;
                 });
-                html += '&lt;/form&gt;';
-                $(&quot;body&quot;).append(html);
-                $('#postjump').submit();
-                $('#postjump').remove();
+                html += &#39;&lt;/form&gt;&#39;;
+                $(&#34;body&#34;).append(html);
+                $(&#39;#postjump&#39;).submit();
+                $(&#39;#postjump&#39;).remove();
             }
         });
     &lt;/script&gt;
@@ -501,15 +500,6 @@ function message(msg) {
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -535,15 +525,6 @@ function message(msg) {
   <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
   
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Interconversion Between Google Docs and Microsoft Docs &middot; tanaike</title>
 
@@ -288,90 +287,90 @@
 <h2 id="script">Script</h2>
 <p>In order to use both script, please give file ID to each method. Each method creates the converted file and return the created file ID.</p>
 <p>If you want to give the file ID from the filename, please use following sample.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">filename</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;sample&#34;</span>;
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">fileId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFilesByName</span>(<span style="color:#a6e22e">filename</span>).<span style="color:#a6e22e">next</span>().<span style="color:#a6e22e">getId</span>();
-</code></pre></div><h3 id="from-google-docs-to-microsoft-docs">From Google Docs to Microsoft Docs</h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">convToMicrosoft</span>(<span style="color:#a6e22e">fileId</span>) {
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">fileId</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span>) <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">&#34;No file ID.&#34;</span>);
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">file</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">fileId</span>);
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">mime</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getMimeType</span>();
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">format</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ext</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
-  <span style="color:#66d9ef">switch</span> (<span style="color:#a6e22e">mime</span>) {
-    <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;application/vnd.google-apps.document&#34;</span><span style="color:#f92672">:</span>
-      <span style="color:#a6e22e">format</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;application/vnd.openxmlformats-officedocument.wordprocessingml.document&#34;</span>;
-      <span style="color:#a6e22e">ext</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;.docx&#34;</span>;
-      <span style="color:#66d9ef">break</span>;
-    <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;application/vnd.google-apps.spreadsheet&#34;</span><span style="color:#f92672">:</span>
-      <span style="color:#a6e22e">format</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&#34;</span>;
-      <span style="color:#a6e22e">ext</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;.xlsx&#34;</span>;
-      <span style="color:#66d9ef">break</span>;
-    <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;application/vnd.google-apps.presentation&#34;</span><span style="color:#f92672">:</span>
-      <span style="color:#a6e22e">format</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;application/vnd.openxmlformats-officedocument.presentationml.presentation&#34;</span>;
-      <span style="color:#a6e22e">ext</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;.pptx&#34;</span>;
-      <span style="color:#66d9ef">break</span>;
-    <span style="color:#66d9ef">default</span><span style="color:#f92672">:</span>
-      <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">null</span>;
-  }
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://www.googleapis.com/drive/v3/files/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">fileId</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/export?mimeType=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">format</span>;
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">blob</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, {
-    <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;get&#34;</span>,
-    <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {<span style="color:#e6db74">&#34;Authorization&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>()},
-    <span style="color:#a6e22e">muteHttpExceptions</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>
-  }).<span style="color:#a6e22e">getBlob</span>();
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">filename</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getName</span>();
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">id</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">createFile</span>(<span style="color:#a6e22e">blob</span>).<span style="color:#a6e22e">setName</span>(<span style="color:#f92672">~</span><span style="color:#a6e22e">filename</span>.<span style="color:#a6e22e">indexOf</span>(<span style="color:#a6e22e">ext</span>) <span style="color:#f92672">?</span> <span style="color:#a6e22e">filename</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">filename</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">ext</span>).<span style="color:#a6e22e">getId</span>();
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">id</span>;
-};
-</code></pre></div><h3 id="from--microsoft-docs-to-google-docs">From  Microsoft Docs to Google Docs</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">filename</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;sample&#34;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">fileId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFilesByName</span>(<span style="color:#a6e22e">filename</span>).<span style="color:#a6e22e">next</span>().<span style="color:#a6e22e">getId</span>();
+</span></span></code></pre></div><h3 id="from-google-docs-to-microsoft-docs">From Google Docs to Microsoft Docs</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">convToMicrosoft</span>(<span style="color:#a6e22e">fileId</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">fileId</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span>) <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">&#34;No file ID.&#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">file</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">fileId</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">mime</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getMimeType</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">format</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ext</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">switch</span> (<span style="color:#a6e22e">mime</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;application/vnd.google-apps.document&#34;</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">format</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;application/vnd.openxmlformats-officedocument.wordprocessingml.document&#34;</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">ext</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;.docx&#34;</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">break</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;application/vnd.google-apps.spreadsheet&#34;</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">format</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&#34;</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">ext</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;.xlsx&#34;</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">break</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;application/vnd.google-apps.presentation&#34;</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">format</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;application/vnd.openxmlformats-officedocument.presentationml.presentation&#34;</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">ext</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;.pptx&#34;</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">break</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">default</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://www.googleapis.com/drive/v3/files/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">fileId</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/export?mimeType=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">format</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">blob</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;get&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {<span style="color:#e6db74">&#34;Authorization&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>()},
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">muteHttpExceptions</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>  }).<span style="color:#a6e22e">getBlob</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">filename</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getName</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">id</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">createFile</span>(<span style="color:#a6e22e">blob</span>).<span style="color:#a6e22e">setName</span>(<span style="color:#f92672">~</span><span style="color:#a6e22e">filename</span>.<span style="color:#a6e22e">indexOf</span>(<span style="color:#a6e22e">ext</span>) <span style="color:#f92672">?</span> <span style="color:#a6e22e">filename</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">filename</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">ext</span>).<span style="color:#a6e22e">getId</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">id</span>;
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><h3 id="from--microsoft-docs-to-google-docs">From  Microsoft Docs to Google Docs</h3>
 <p>Here, <a href="https://gist.github.com/tanaikech/d595d30a592979bbf0c692d1193d260c">Multipart-POST Request Using Google Apps Script</a> was used for using Drive File Create.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">convToGoogle</span>(<span style="color:#a6e22e">fileId</span>) {
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">fileId</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span>) <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">&#34;No file ID.&#34;</span>);
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">file</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">fileId</span>);
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">filename</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getName</span>();
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">mime</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getMimeType</span>();
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ToMime</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
-  <span style="color:#66d9ef">switch</span> (<span style="color:#a6e22e">mime</span>) {
-    <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;application/vnd.openxmlformats-officedocument.wordprocessingml.document&#34;</span><span style="color:#f92672">:</span>
-      <span style="color:#a6e22e">ToMime</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;application/vnd.google-apps.document&#34;</span>;
-      <span style="color:#66d9ef">break</span>;
-    <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&#34;</span><span style="color:#f92672">:</span>
-      <span style="color:#a6e22e">ToMime</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;application/vnd.google-apps.spreadsheet&#34;</span>;
-      <span style="color:#66d9ef">break</span>;
-    <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;application/vnd.openxmlformats-officedocument.presentationml.presentation&#34;</span><span style="color:#f92672">:</span>
-      <span style="color:#a6e22e">ToMime</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;application/vnd.google-apps.presentation&#34;</span>;
-      <span style="color:#66d9ef">break</span>;
-    <span style="color:#66d9ef">default</span><span style="color:#f92672">:</span>
-      <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">null</span>;
-  }
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">metadata</span> <span style="color:#f92672">=</span> {
-    <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">filename</span>,
-    <span style="color:#a6e22e">mimeType</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">ToMime</span>
-  };
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">fields</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;id,mimeType,name&#34;</span>;
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&amp;fields=&#34;</span> <span style="color:#f92672">+</span> encodeURIComponent(<span style="color:#a6e22e">fields</span>);
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">boundary</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;xxxxxxxxxx&#34;</span>;
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;--&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">boundary</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;\r\n&#34;</span>;
-  <span style="color:#a6e22e">data</span> <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#34;Content-Disposition: form-data; name=\&#34;metadata\&#34;;\r\n&#34;</span>;
-  <span style="color:#a6e22e">data</span> <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#34;Content-Type: application/json; charset=UTF-8\r\n\r\n&#34;</span>;
-  <span style="color:#a6e22e">data</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">metadata</span>) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;\r\n&#34;</span>;
-  <span style="color:#a6e22e">data</span> <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#34;--&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">boundary</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;\r\n&#34;</span>;
-  <span style="color:#a6e22e">data</span> <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#34;Content-Disposition: form-data; name=\&#34;file\&#34;; filename=\&#34;&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">filename</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;\&#34;\r\n&#34;</span>;
-  <span style="color:#a6e22e">data</span> <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#34;Content-Type: &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">mime</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;\r\n\r\n&#34;</span>;
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">payload</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">newBlob</span>(<span style="color:#a6e22e">data</span>).<span style="color:#a6e22e">getBytes</span>().<span style="color:#a6e22e">concat</span>(<span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getBlob</span>().<span style="color:#a6e22e">getBytes</span>()).<span style="color:#a6e22e">concat</span>(<span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">newBlob</span>(<span style="color:#e6db74">&#34;\r\n--&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">boundary</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;\r\n&#34;</span>).<span style="color:#a6e22e">getBytes</span>());
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, {
-    <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;post&#34;</span>,
-    <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {
-      <span style="color:#e6db74">&#34;Authorization&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>(),
-      <span style="color:#e6db74">&#34;Content-Type&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;multipart/related; boundary=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">boundary</span>
-    },
-    <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">payload</span>,
-    <span style="color:#a6e22e">muteHttpExceptions</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>
-  }).<span style="color:#a6e22e">getContentText</span>();
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">id</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">res</span>).<span style="color:#a6e22e">id</span>;
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">id</span>;
-};
-</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">convToGoogle</span>(<span style="color:#a6e22e">fileId</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">fileId</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span>) <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">&#34;No file ID.&#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">file</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">fileId</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">filename</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getName</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">mime</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getMimeType</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ToMime</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">switch</span> (<span style="color:#a6e22e">mime</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;application/vnd.openxmlformats-officedocument.wordprocessingml.document&#34;</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">ToMime</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;application/vnd.google-apps.document&#34;</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">break</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&#34;</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">ToMime</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;application/vnd.google-apps.spreadsheet&#34;</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">break</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;application/vnd.openxmlformats-officedocument.presentationml.presentation&#34;</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">ToMime</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;application/vnd.google-apps.presentation&#34;</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">break</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">default</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">metadata</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">filename</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">mimeType</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">ToMime</span>
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">fields</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;id,mimeType,name&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&amp;fields=&#34;</span> <span style="color:#f92672">+</span> encodeURIComponent(<span style="color:#a6e22e">fields</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">boundary</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;xxxxxxxxxx&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;--&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">boundary</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;\r\n&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">data</span> <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#34;Content-Disposition: form-data; name=\&#34;metadata\&#34;;\r\n&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">data</span> <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#34;Content-Type: application/json; charset=UTF-8\r\n\r\n&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">data</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">metadata</span>) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;\r\n&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">data</span> <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#34;--&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">boundary</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;\r\n&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">data</span> <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#34;Content-Disposition: form-data; name=\&#34;file\&#34;; filename=\&#34;&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">filename</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;\&#34;\r\n&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">data</span> <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#34;Content-Type: &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">mime</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;\r\n\r\n&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">payload</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">newBlob</span>(<span style="color:#a6e22e">data</span>).<span style="color:#a6e22e">getBytes</span>().<span style="color:#a6e22e">concat</span>(<span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getBlob</span>().<span style="color:#a6e22e">getBytes</span>()).<span style="color:#a6e22e">concat</span>(<span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">newBlob</span>(<span style="color:#e6db74">&#34;\r\n--&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">boundary</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;\r\n&#34;</span>).<span style="color:#a6e22e">getBytes</span>());
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;post&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;Authorization&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>(),
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;Content-Type&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;multipart/related; boundary=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">boundary</span>
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">payload</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">muteHttpExceptions</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>  }).<span style="color:#a6e22e">getContentText</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">id</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">res</span>).<span style="color:#a6e22e">id</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">id</span>;
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div>
   
   <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
 <ul class="share-buttons">
@@ -459,15 +458,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -493,15 +483,6 @@
   <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
   
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

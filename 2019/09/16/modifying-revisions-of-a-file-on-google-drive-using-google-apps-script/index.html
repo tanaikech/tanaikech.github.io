@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Modifying Revisions of a File on Google Drive using Google Apps Script &middot; tanaike</title>
 
@@ -306,37 +305,37 @@
 <p>As an important point, when the Google Docs file is exported as the Microsoft Docs file, at the most cases, the overwritten Google Docs files are not changed from the original Google Docs for the version. But I&rsquo;m not sure that this workaround works perfectly for all cases. So please be careful this.</p>
 <h3 id="sample-script">Sample script:</h3>
 <p>The sample script is as follows. Before you run the script, <a href="https://developers.google.com/apps-script/guides/services/advanced#enabling_advanced_services">please enable Drive API at Advanced Google services</a>. And also, please set the variables of <code>revisionId</code> and <code>fileId</code>. <code>revisionId</code> can be retrieved by the method of <a href="https://developers.google.com/drive/api/v2/reference/revisions/list">Revisions: list of Drive API</a>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">revertRevision</span>() {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">revisionId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set the revision ID you want to revert.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">fileId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set the file ID.
-</span><span style="color:#75715e"></span>
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">endpoint</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">token</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>();
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Drive</span>.<span style="color:#a6e22e">Revisions</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">fileId</span>, <span style="color:#a6e22e">revisionId</span>);
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">mimeType</span>.<span style="color:#a6e22e">indexOf</span>(<span style="color:#e6db74">&#34;application/vnd.google-apps&#34;</span>) <span style="color:#f92672">&gt;</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">endpoints</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">exportLinks</span>;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">keys</span> <span style="color:#f92672">=</span> Object.<span style="color:#a6e22e">keys</span>(<span style="color:#a6e22e">endpoints</span>);
-    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">keys</span>.<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
-      <span style="color:#66d9ef">if</span> (
-        <span style="color:#a6e22e">keys</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">indexOf</span>(<span style="color:#e6db74">&#34;application/vnd.openxmlformats-officedocument&#34;</span>) <span style="color:#f92672">&gt;</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>
-      ) {
-        <span style="color:#a6e22e">endpoint</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">endpoints</span>[<span style="color:#a6e22e">keys</span>[<span style="color:#a6e22e">i</span>]] <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&amp;access_token=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">token</span>;
-        <span style="color:#66d9ef">break</span>;
-      }
-    }
-  } <span style="color:#66d9ef">else</span> {
-    <span style="color:#a6e22e">endpoint</span> <span style="color:#f92672">=</span>
-      <span style="color:#e6db74">&#34;https://www.googleapis.com/drive/v3/files/&#34;</span> <span style="color:#f92672">+</span>
-      <span style="color:#a6e22e">fileId</span> <span style="color:#f92672">+</span>
-      <span style="color:#e6db74">&#34;/revisions/&#34;</span> <span style="color:#f92672">+</span>
-      <span style="color:#a6e22e">revisionId</span> <span style="color:#f92672">+</span>
-      <span style="color:#e6db74">&#34;?alt=media&amp;access_token=&#34;</span> <span style="color:#f92672">+</span>
-      <span style="color:#a6e22e">token</span>;
-  }
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">mediaData</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">endpoint</span>).<span style="color:#a6e22e">getBlob</span>();
-  <span style="color:#a6e22e">Drive</span>.<span style="color:#a6e22e">Files</span>.<span style="color:#a6e22e">update</span>({}, <span style="color:#a6e22e">fileId</span>, <span style="color:#a6e22e">mediaData</span>);
-}
-</code></pre></div><h2 id="note">Note:</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">revertRevision</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">revisionId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set the revision ID you want to revert.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">fileId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set the file ID.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">endpoint</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">token</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Drive</span>.<span style="color:#a6e22e">Revisions</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">fileId</span>, <span style="color:#a6e22e">revisionId</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">mimeType</span>.<span style="color:#a6e22e">indexOf</span>(<span style="color:#e6db74">&#34;application/vnd.google-apps&#34;</span>) <span style="color:#f92672">&gt;</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">endpoints</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">exportLinks</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">keys</span> <span style="color:#f92672">=</span> Object.<span style="color:#a6e22e">keys</span>(<span style="color:#a6e22e">endpoints</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">keys</span>.<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">keys</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">indexOf</span>(<span style="color:#e6db74">&#34;application/vnd.openxmlformats-officedocument&#34;</span>) <span style="color:#f92672">&gt;</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>      ) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">endpoint</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">endpoints</span>[<span style="color:#a6e22e">keys</span>[<span style="color:#a6e22e">i</span>]] <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&amp;access_token=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">token</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">break</span>;
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">endpoint</span> <span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;https://www.googleapis.com/drive/v3/files/&#34;</span> <span style="color:#f92672">+</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">fileId</span> <span style="color:#f92672">+</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;/revisions/&#34;</span> <span style="color:#f92672">+</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">revisionId</span> <span style="color:#f92672">+</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;?alt=media&amp;access_token=&#34;</span> <span style="color:#f92672">+</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">token</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">mediaData</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">endpoint</span>).<span style="color:#a6e22e">getBlob</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">Drive</span>.<span style="color:#a6e22e">Files</span>.<span style="color:#a6e22e">update</span>({}, <span style="color:#a6e22e">fileId</span>, <span style="color:#a6e22e">mediaData</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="note">Note:</h2>
 <ul>
 <li>If you want to revert perfectly to the previous version for Google Docs file, in the current stage, I recommend to manually revert.</li>
 </ul>
@@ -435,15 +434,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -466,15 +456,6 @@
 
 
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

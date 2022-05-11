@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Copying Protections for Spreadsheet using Google Apps Script &middot; tanaike</title>
 
@@ -289,47 +288,47 @@
 <p>In this post, I would like to introduce a sample script for copying all protection conditions.</p>
 <h2 id="sample-script">Sample script</h2>
 <p>Please add the following function to your script. And, <a href="https://developers.google.com/apps-script/guides/services/advanced#enable_advanced_services">please enable Sheets API at Advanced Google services</a>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">copyProtectedRanges_</span>(<span style="color:#a6e22e">srcId</span>, <span style="color:#a6e22e">dstId</span>) {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">dstId</span>, {
-    <span style="color:#a6e22e">fields</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sheets(properties(sheetId),protectedRanges(protectedRangeId))&#34;</span>,
-  }).<span style="color:#a6e22e">sheets</span>.<span style="color:#a6e22e">reduce</span>(
-    (<span style="color:#a6e22e">o</span>, <span style="color:#a6e22e">s</span>) =&gt; {
-      <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">sheetIds</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">properties</span>.<span style="color:#a6e22e">sheetId</span>);
-      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">protectedRanges</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">protectedRanges</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
-        <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">protectedRanges</span>.<span style="color:#a6e22e">forEach</span>(({ <span style="color:#a6e22e">protectedRangeId</span> }) =&gt;
-          <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">protectedRangeIds</span>.<span style="color:#a6e22e">push</span>({
-            <span style="color:#a6e22e">deleteProtectedRange</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">protectedRangeId</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">protectedRangeId</span> },
-          })
-        );
-      }
-      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
-    },
-    { <span style="color:#a6e22e">sheetIds</span><span style="color:#f92672">:</span> [], <span style="color:#a6e22e">protectedRangeIds</span><span style="color:#f92672">:</span> [] }
-  );
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">requests</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">srcId</span>, {
-    <span style="color:#a6e22e">fields</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sheets/protectedRanges&#34;</span>,
-  }).<span style="color:#a6e22e">sheets</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">ar</span>, <span style="color:#a6e22e">s</span>, <span style="color:#a6e22e">i</span>) =&gt; {
-    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">protectedRanges</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">protectedRanges</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
-      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">protectedRanges</span>.<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">e</span>) =&gt; {
-        <span style="color:#66d9ef">delete</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">protectedRangeId</span>;
-        <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">sheetId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">sheetIds</span>[<span style="color:#a6e22e">i</span>];
-        <span style="color:#66d9ef">return</span> { <span style="color:#a6e22e">addProtectedRange</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">protectedRange</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span> } };
-      });
-      <span style="color:#a6e22e">ar</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">concat</span>(<span style="color:#a6e22e">temp</span>);
-    }
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ar</span>;
-  }, <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">protectedRangeIds</span>);
-  <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">batchUpdate</span>({ <span style="color:#a6e22e">requests</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">requests</span> }, <span style="color:#a6e22e">dstId</span>);
-}
-
-<span style="color:#75715e">// Please run this script.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>();
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">srcId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getId</span>();
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">dstId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">copy</span>(<span style="color:#e6db74">&#34;destSpreadsheet&#34;</span>).<span style="color:#a6e22e">getId</span>();
-  <span style="color:#a6e22e">copyProtectedRanges_</span>(<span style="color:#a6e22e">srcId</span>, <span style="color:#a6e22e">dstId</span>);
-}
-</code></pre></div><ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">copyProtectedRanges_</span>(<span style="color:#a6e22e">srcId</span>, <span style="color:#a6e22e">dstId</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">dstId</span>, {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fields</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sheets(properties(sheetId),protectedRanges(protectedRangeId))&#34;</span>,
+</span></span><span style="display:flex;"><span>  }).<span style="color:#a6e22e">sheets</span>.<span style="color:#a6e22e">reduce</span>(
+</span></span><span style="display:flex;"><span>    (<span style="color:#a6e22e">o</span>, <span style="color:#a6e22e">s</span>) =&gt; {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">sheetIds</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">properties</span>.<span style="color:#a6e22e">sheetId</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">protectedRanges</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">protectedRanges</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">protectedRanges</span>.<span style="color:#a6e22e">forEach</span>(({ <span style="color:#a6e22e">protectedRangeId</span> }) =&gt;
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">protectedRangeIds</span>.<span style="color:#a6e22e">push</span>({
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">deleteProtectedRange</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">protectedRangeId</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">protectedRangeId</span> },
+</span></span><span style="display:flex;"><span>          })
+</span></span><span style="display:flex;"><span>        );
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    { <span style="color:#a6e22e">sheetIds</span><span style="color:#f92672">:</span> [], <span style="color:#a6e22e">protectedRangeIds</span><span style="color:#f92672">:</span> [] }
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">requests</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">srcId</span>, {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fields</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sheets/protectedRanges&#34;</span>,
+</span></span><span style="display:flex;"><span>  }).<span style="color:#a6e22e">sheets</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">ar</span>, <span style="color:#a6e22e">s</span>, <span style="color:#a6e22e">i</span>) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">protectedRanges</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">protectedRanges</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">protectedRanges</span>.<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">e</span>) =&gt; {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">delete</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">protectedRangeId</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">sheetId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">sheetIds</span>[<span style="color:#a6e22e">i</span>];
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> { <span style="color:#a6e22e">addProtectedRange</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">protectedRange</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span> } };
+</span></span><span style="display:flex;"><span>      });
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">ar</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">concat</span>(<span style="color:#a6e22e">temp</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ar</span>;
+</span></span><span style="display:flex;"><span>  }, <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">protectedRangeIds</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">batchUpdate</span>({ <span style="color:#a6e22e">requests</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">requests</span> }, <span style="color:#a6e22e">dstId</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Please run this script.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">srcId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getId</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">dstId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">copy</span>(<span style="color:#e6db74">&#34;destSpreadsheet&#34;</span>).<span style="color:#a6e22e">getId</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">copyProtectedRanges_</span>(<span style="color:#a6e22e">srcId</span>, <span style="color:#a6e22e">dstId</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><ul>
 <li><code>srcId</code> and <code>dstId</code> are the source Spreadsheet ID including the protected condistions and the destination Spreadsheet ID, respectively.</li>
 <li>This sample script copies the protected conditions for sheets and ranges. When the editor emails have been included in the protected conditions, please share the Spreadsheet with the users. This sample script doesn&rsquo;t automatically share the destination Spreadsheet with he users. Please be careful this.</li>
 </ul>
@@ -425,15 +424,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -456,15 +446,6 @@
 
 
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

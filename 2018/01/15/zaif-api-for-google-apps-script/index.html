@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Zaif API for Google Apps Script &middot; tanaike</title>
 
@@ -290,37 +289,37 @@
 <pre tabindex="0"><code>package main
 
 import (
-    &quot;fmt&quot;
-    &quot;time&quot;
-    &quot;strconv&quot;
-    &quot;crypto/hmac&quot;
-    &quot;crypto/sha512&quot;
-    &quot;io/ioutil&quot;
-    &quot;net/http&quot;
-    &quot;encoding/hex&quot;
-    &quot;net/url&quot;
-    &quot;strings&quot;
+    &#34;fmt&#34;
+    &#34;time&#34;
+    &#34;strconv&#34;
+    &#34;crypto/hmac&#34;
+    &#34;crypto/sha512&#34;
+    &#34;io/ioutil&#34;
+    &#34;net/http&#34;
+    &#34;encoding/hex&#34;
+    &#34;net/url&#34;
+    &#34;strings&#34;
 )
 
-var key = &quot;&lt;your_key&gt;&quot;
-var secret = &quot;&lt;your_secret&gt;&quot;
+var key = &#34;&lt;your_key&gt;&#34;
+var secret = &#34;&lt;your_secret&gt;&#34;
 
 func main() {
 
-    uri := &quot;https://api.zaif.jp/tapi&quot;
+    uri := &#34;https://api.zaif.jp/tapi&#34;
     values := url.Values{}
-    values.Add(&quot;method&quot;, &quot;get_info&quot;)
-    values.Add(&quot;nonce&quot;, strconv.FormatInt(time.Now().Unix(), 10))
+    values.Add(&#34;method&#34;, &#34;get_info&#34;)
+    values.Add(&#34;nonce&#34;, strconv.FormatInt(time.Now().Unix(), 10))
 
     encodedParams := values.Encode()
-    req, _ := http.NewRequest(&quot;POST&quot;, uri, strings.NewReader(encodedParams))
+    req, _ := http.NewRequest(&#34;POST&#34;, uri, strings.NewReader(encodedParams))
 
     hash := hmac.New(sha512.New, []byte(secret))
     hash.Write([]byte(encodedParams))
     signature := hex.EncodeToString(hash.Sum(nil))
 
-    req.Header.Add(&quot;Key&quot;, key)
-    req.Header.Add(&quot;Sign&quot;, signature)
+    req.Header.Add(&#34;Key&#34;, key)
+    req.Header.Add(&#34;Sign&#34;, signature)
     client := new(http.Client)
     resp, _ := client.Do(req)
     defer resp.Body.Close()
@@ -329,26 +328,26 @@ func main() {
     fmt.Println(string(byteArray))
 }
 </code></pre><p>When this is converted to GAS, the script is as follows.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>(){
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">key</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;### your key ###&#34;</span>;
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">secret</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;### your secret ###&#34;</span>;
-
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">nonce</span> <span style="color:#f92672">=</span> (<span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>() <span style="color:#f92672">/</span> <span style="color:#ae81ff">1000</span>).<span style="color:#a6e22e">toFixed</span>(<span style="color:#ae81ff">0</span>);
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;method=get_info&amp;nonce=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">nonce</span>;
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sign</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">computeHmacSignature</span>(<span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">MacAlgorithm</span>.<span style="color:#a6e22e">HMAC_SHA_512</span>, <span style="color:#a6e22e">params</span>, <span style="color:#a6e22e">secret</span>);
-  <span style="color:#a6e22e">sign</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sign</span>.<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {<span style="color:#66d9ef">return</span> (<span style="color:#e6db74">&#34;0&#34;</span> <span style="color:#f92672">+</span> (<span style="color:#a6e22e">e</span> <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0xFF</span>).<span style="color:#a6e22e">toString</span>(<span style="color:#ae81ff">16</span>)).<span style="color:#a6e22e">slice</span>(<span style="color:#f92672">-</span><span style="color:#ae81ff">2</span>)}).<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;&#34;</span>);
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">options</span> <span style="color:#f92672">=</span> {
-    <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;post&#34;</span>,
-    <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {
-      <span style="color:#e6db74">&#34;key&#34;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">key</span>,
-      <span style="color:#e6db74">&#34;sign&#34;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">sign</span>
-    },
-    <span style="color:#a6e22e">muteHttpExceptions</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>
-  };
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#e6db74">&#34;https://api.zaif.jp/tapi&#34;</span>, <span style="color:#a6e22e">options</span>);
-  <span style="color:#a6e22e">Logger</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getContentText</span>())
-}
-</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>(){
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">key</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;### your key ###&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">secret</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;### your secret ###&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">nonce</span> <span style="color:#f92672">=</span> (<span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>() <span style="color:#f92672">/</span> <span style="color:#ae81ff">1000</span>).<span style="color:#a6e22e">toFixed</span>(<span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;method=get_info&amp;nonce=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">nonce</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sign</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">computeHmacSignature</span>(<span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">MacAlgorithm</span>.<span style="color:#a6e22e">HMAC_SHA_512</span>, <span style="color:#a6e22e">params</span>, <span style="color:#a6e22e">secret</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">sign</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sign</span>.<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {<span style="color:#66d9ef">return</span> (<span style="color:#e6db74">&#34;0&#34;</span> <span style="color:#f92672">+</span> (<span style="color:#a6e22e">e</span> <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0xFF</span>).<span style="color:#a6e22e">toString</span>(<span style="color:#ae81ff">16</span>)).<span style="color:#a6e22e">slice</span>(<span style="color:#f92672">-</span><span style="color:#ae81ff">2</span>)}).<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;&#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">options</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;post&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;key&#34;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">key</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;sign&#34;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">sign</span>
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">muteHttpExceptions</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#e6db74">&#34;https://api.zaif.jp/tapi&#34;</span>, <span style="color:#a6e22e">options</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">Logger</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getContentText</span>())
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div>
   
   <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
 <ul class="share-buttons">
@@ -436,15 +435,6 @@ func main() {
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -467,15 +457,6 @@ func main() {
 
 
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

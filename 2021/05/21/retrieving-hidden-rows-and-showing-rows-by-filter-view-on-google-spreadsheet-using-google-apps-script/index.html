@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Retrieving Hidden Rows and Showing Rows by Filter View on Google Spreadsheet using Google Apps Script &middot; tanaike</title>
 
@@ -310,65 +309,65 @@
 <p>When this flow is reflected to Google Apps Script, it becomes as follows.</p>
 <h2 id="sample-script">Sample script</h2>
 <p>Before you use this script, <a href="https://developers.google.com/apps-script/guides/services/advanced#enable_advanced_services">please enable Sheets API at Advanced Google services</a>. And, please manually set the filter view and set the filter view name. This script uses this filter view.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">spreadsheetId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set the Spreadsheet ID.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheetName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Sheet1&#34;</span>; <span style="color:#75715e">// Please set the sheet name.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">filterViewName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;sampleFilter1&#34;</span>; <span style="color:#75715e">// Please set the filter view name.
-</span><span style="color:#75715e"></span>
-  <span style="color:#75715e">// 1. Retrieve the settings of the filter view (`filterViews`) you want to use.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res1</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">spreadsheetId</span>, { <span style="color:#a6e22e">ranges</span><span style="color:#f92672">:</span> [<span style="color:#a6e22e">sheetName</span>] });
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheetId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">res1</span>.<span style="color:#a6e22e">sheets</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">properties</span>.<span style="color:#a6e22e">sheetId</span>;
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">filterViews</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">res1</span>.<span style="color:#a6e22e">sheets</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">filterViews</span>.<span style="color:#a6e22e">filter</span>(
-    (<span style="color:#a6e22e">e</span>) =&gt; <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">title</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">filterViewName</span>
-  );
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">filterViews</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) {
-    <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">&#34;Filter view cannot be found.&#34;</span>);
-  }
-
-  <span style="color:#75715e">// 2. Create new basic filter to the sheet you want to use using the retrieved settings of the filter view.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">filterViews</span>[<span style="color:#ae81ff">0</span>];
-  <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">sheetId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheetId</span>;
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">reqs</span> <span style="color:#f92672">=</span> [
-    { <span style="color:#a6e22e">clearBasicFilter</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">sheetId</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">sheetId</span> } },
-    {
-      <span style="color:#a6e22e">setBasicFilter</span><span style="color:#f92672">:</span> {
-        <span style="color:#a6e22e">filter</span><span style="color:#f92672">:</span> {
-          <span style="color:#a6e22e">criteria</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">criteria</span>,
-          <span style="color:#a6e22e">filterSpecs</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">filterSpecs</span>,
-          <span style="color:#a6e22e">range</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">range</span>,
-          <span style="color:#a6e22e">sortSpecs</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">sortSpecs</span>,
-        },
-      },
-    },
-  ];
-  <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">batchUpdate</span>({ <span style="color:#a6e22e">requests</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">reqs</span> }, <span style="color:#a6e22e">spreadsheetId</span>);
-
-  <span style="color:#75715e">// 3. Retrieve the values of `rowMetadata` of the sheet.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res2</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">spreadsheetId</span>, {
-    <span style="color:#a6e22e">ranges</span><span style="color:#f92672">:</span> [<span style="color:#a6e22e">sheetName</span>],
-    <span style="color:#a6e22e">fields</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sheets&#34;</span>,
-  });
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">res2</span>.<span style="color:#a6e22e">sheets</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">data</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">rowMetadata</span>.<span style="color:#a6e22e">reduce</span>(
-    (<span style="color:#a6e22e">o</span>, <span style="color:#a6e22e">r</span>, <span style="color:#a6e22e">i</span>) =&gt; {
-      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">hiddenByFilter</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">hiddenByFilter</span> <span style="color:#f92672">===</span> <span style="color:#66d9ef">true</span>) {
-        <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">hiddenRows</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>);
-      } <span style="color:#66d9ef">else</span> {
-        <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">showingRows</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>);
-      }
-      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
-    },
-    { <span style="color:#a6e22e">hiddenRows</span><span style="color:#f92672">:</span> [], <span style="color:#a6e22e">showingRows</span><span style="color:#f92672">:</span> [] }
-  );
-
-  <span style="color:#75715e">// 4. Delete the created basic filter.
-</span><span style="color:#75715e"></span>  <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">batchUpdate</span>(
-    { <span style="color:#a6e22e">requests</span><span style="color:#f92672">:</span> [{ <span style="color:#a6e22e">clearBasicFilter</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">sheetId</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">sheetId</span> } }] },
-    <span style="color:#a6e22e">spreadsheetId</span>
-  );
-
-  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">values</span>);
-}
-</code></pre></div><h2 id="result">Result</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">spreadsheetId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set the Spreadsheet ID.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheetName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Sheet1&#34;</span>; <span style="color:#75715e">// Please set the sheet name.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">filterViewName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;sampleFilter1&#34;</span>; <span style="color:#75715e">// Please set the filter view name.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 1. Retrieve the settings of the filter view (`filterViews`) you want to use.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res1</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">spreadsheetId</span>, { <span style="color:#a6e22e">ranges</span><span style="color:#f92672">:</span> [<span style="color:#a6e22e">sheetName</span>] });
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheetId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">res1</span>.<span style="color:#a6e22e">sheets</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">properties</span>.<span style="color:#a6e22e">sheetId</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">filterViews</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">res1</span>.<span style="color:#a6e22e">sheets</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">filterViews</span>.<span style="color:#a6e22e">filter</span>(
+</span></span><span style="display:flex;"><span>    (<span style="color:#a6e22e">e</span>) =&gt; <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">title</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">filterViewName</span>
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">filterViews</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">&#34;Filter view cannot be found.&#34;</span>);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 2. Create new basic filter to the sheet you want to use using the retrieved settings of the filter view.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">filterViews</span>[<span style="color:#ae81ff">0</span>];
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">sheetId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheetId</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">reqs</span> <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    { <span style="color:#a6e22e">clearBasicFilter</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">sheetId</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">sheetId</span> } },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">setBasicFilter</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">filter</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">criteria</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">criteria</span>,
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">filterSpecs</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">filterSpecs</span>,
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">range</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">range</span>,
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">sortSpecs</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">sortSpecs</span>,
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>  ];
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">batchUpdate</span>({ <span style="color:#a6e22e">requests</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">reqs</span> }, <span style="color:#a6e22e">spreadsheetId</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 3. Retrieve the values of `rowMetadata` of the sheet.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res2</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">spreadsheetId</span>, {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">ranges</span><span style="color:#f92672">:</span> [<span style="color:#a6e22e">sheetName</span>],
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fields</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sheets&#34;</span>,
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">res2</span>.<span style="color:#a6e22e">sheets</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">data</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">rowMetadata</span>.<span style="color:#a6e22e">reduce</span>(
+</span></span><span style="display:flex;"><span>    (<span style="color:#a6e22e">o</span>, <span style="color:#a6e22e">r</span>, <span style="color:#a6e22e">i</span>) =&gt; {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">hiddenByFilter</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">hiddenByFilter</span> <span style="color:#f92672">===</span> <span style="color:#66d9ef">true</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">hiddenRows</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>      } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">showingRows</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    { <span style="color:#a6e22e">hiddenRows</span><span style="color:#f92672">:</span> [], <span style="color:#a6e22e">showingRows</span><span style="color:#f92672">:</span> [] }
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 4. Delete the created basic filter.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">batchUpdate</span>(
+</span></span><span style="display:flex;"><span>    { <span style="color:#a6e22e">requests</span><span style="color:#f92672">:</span> [{ <span style="color:#a6e22e">clearBasicFilter</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">sheetId</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">sheetId</span> } }] },
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">spreadsheetId</span>
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">values</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="result">Result</h2>
 <p>When above script is used for the following sample Spreadsheet,</p>
 <h3 id="before-filter-view-is-not-set">Before filter view is not set.</h3>
 <p><img src="https://tanaikech.github.io/img/20210521a-fig1.png" alt=""></p>
@@ -376,11 +375,11 @@
 <p><img src="https://tanaikech.github.io/img/20210521a-fig2.png" alt=""></p>
 <h3 id="result-value">Result value</h3>
 <p>From above Spreadsheet, the following result is obtained.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
-  <span style="color:#f92672">&#34;hiddenRows&#34;</span>: [<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">6</span>, <span style="color:#ae81ff">8</span>, <span style="color:#ae81ff">9</span>],
-  <span style="color:#f92672">&#34;showingRows&#34;</span>: [<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">7</span>, <span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">11</span>, <span style="color:#ae81ff">12</span>, <span style="color:#ae81ff">13</span>, <span style="color:#ae81ff">14</span>, <span style="color:#ae81ff">15</span>]
-}
-</code></pre></div><ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;hiddenRows&#34;</span>: [<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">6</span>, <span style="color:#ae81ff">8</span>, <span style="color:#ae81ff">9</span>],
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;showingRows&#34;</span>: [<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">7</span>, <span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">11</span>, <span style="color:#ae81ff">12</span>, <span style="color:#ae81ff">13</span>, <span style="color:#ae81ff">14</span>, <span style="color:#ae81ff">15</span>]
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><ul>
 <li><code>hiddenRows</code> is the hidden row numbers.</li>
 <li><code>showingRows</code> is the showingRows row numbers.</li>
 </ul>
@@ -492,15 +491,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -523,15 +513,6 @@
 
 
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

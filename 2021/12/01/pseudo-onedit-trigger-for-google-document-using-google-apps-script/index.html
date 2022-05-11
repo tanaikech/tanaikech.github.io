@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Pseudo OnEdit Trigger for Google Document using Google Apps Script &middot; tanaike</title>
 
@@ -307,76 +306,76 @@
 <h3 id="1-sample-script">1. Sample script.</h3>
 <h4 id="google-apps-script-side-codegs">Google Apps Script side: <code>Code.gs</code></h4>
 <p>Please copy and paste the following script to the script editor of Document as a script.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// Please run this function.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">openSidebar</span>() {
-  <span style="color:#a6e22e">DocumentApp</span>.<span style="color:#a6e22e">getUi</span>().<span style="color:#a6e22e">showSidebar</span>(
-    <span style="color:#a6e22e">HtmlService</span>.<span style="color:#a6e22e">createHtmlOutputFromFile</span>(<span style="color:#e6db74">&#34;index&#34;</span>).<span style="color:#a6e22e">setTitle</span>(<span style="color:#e6db74">&#34;Sample&#34;</span>)
-  );
-}
-
-<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
-  <span style="color:#75715e">//
-</span><span style="color:#75715e"></span>  <span style="color:#75715e">// do something
-</span><span style="color:#75715e"></span>  <span style="color:#75715e">//
-</span><span style="color:#75715e"></span>  <span style="color:#75715e">// Here, as a sample script, the background color of text of &#34;sample&#34; is changed.
-</span><span style="color:#75715e"></span>  <span style="color:#75715e">// This is a simple sample script for explaining this workaround. So please change this for your actual situation.
-</span><span style="color:#75715e"></span>  <span style="color:#75715e">//
-</span><span style="color:#75715e"></span>
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">search</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;sample&#34;</span>;
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">color</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#5DF957&#34;</span>;
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">doc</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DocumentApp</span>.<span style="color:#a6e22e">getActiveDocument</span>();
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">body</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">doc</span>.<span style="color:#a6e22e">getBody</span>();
-  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">s</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">findText</span>(<span style="color:#a6e22e">search</span>);
-  <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">s</span>) <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Search value was not found.&#34;</span>;
-  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">n</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
-  <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">s</span>) {
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getElement</span>().<span style="color:#a6e22e">asText</span>();
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">offset</span> <span style="color:#f92672">=</span> [<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getStartOffset</span>(), <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getEndOffsetInclusive</span>()];
-    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getBackgroundColor</span>(<span style="color:#a6e22e">offset</span>[<span style="color:#ae81ff">0</span>]) <span style="color:#f92672">!=</span> <span style="color:#a6e22e">color</span>) {
-      <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">setBackgroundColor</span>(...<span style="color:#a6e22e">offset</span>, <span style="color:#a6e22e">color</span>);
-      <span style="color:#a6e22e">n</span><span style="color:#f92672">++</span>;
-    }
-    <span style="color:#a6e22e">s</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">findText</span>(<span style="color:#a6e22e">search</span>, <span style="color:#a6e22e">s</span>);
-  }
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">n</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#34;New value was not found.&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Done.&#34;</span>;
-}
-</code></pre></div><h4 id="html-and-javascript-side-indexhtml">HTML and Javascript side: <code>index.html</code></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">// Please run this function.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">openSidebar</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">DocumentApp</span>.<span style="color:#a6e22e">getUi</span>().<span style="color:#a6e22e">showSidebar</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">HtmlService</span>.<span style="color:#a6e22e">createHtmlOutputFromFile</span>(<span style="color:#e6db74">&#34;index&#34;</span>).<span style="color:#a6e22e">setTitle</span>(<span style="color:#e6db74">&#34;Sample&#34;</span>)
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">//
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">// do something
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">//
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">// Here, as a sample script, the background color of text of &#34;sample&#34; is changed.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">// This is a simple sample script for explaining this workaround. So please change this for your actual situation.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">//
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">search</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;sample&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">color</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#5DF957&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">doc</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DocumentApp</span>.<span style="color:#a6e22e">getActiveDocument</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">body</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">doc</span>.<span style="color:#a6e22e">getBody</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">s</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">findText</span>(<span style="color:#a6e22e">search</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">s</span>) <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Search value was not found.&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">n</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">s</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getElement</span>().<span style="color:#a6e22e">asText</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">offset</span> <span style="color:#f92672">=</span> [<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getStartOffset</span>(), <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getEndOffsetInclusive</span>()];
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getBackgroundColor</span>(<span style="color:#a6e22e">offset</span>[<span style="color:#ae81ff">0</span>]) <span style="color:#f92672">!=</span> <span style="color:#a6e22e">color</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">setBackgroundColor</span>(...<span style="color:#a6e22e">offset</span>, <span style="color:#a6e22e">color</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">n</span><span style="color:#f92672">++</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">s</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">findText</span>(<span style="color:#a6e22e">search</span>, <span style="color:#a6e22e">s</span>);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">n</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#34;New value was not found.&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Done.&#34;</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="html-and-javascript-side-indexhtml">HTML and Javascript side: <code>index.html</code></h4>
 <p>Please copy and paste the following script to the script editor of the Document as HTML.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;button&#34;</span> <span style="color:#a6e22e">onclick</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;start()&#34;</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;b1&#34;</span> <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;start&#34;</span> /&gt;
-&lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;button&#34;</span> <span style="color:#a6e22e">onclick</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;stop()&#34;</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;b2&#34;</span> <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;stop&#34;</span> <span style="color:#a6e22e">disabled</span> /&gt;
-&lt;<span style="color:#f92672">script</span>&gt;
-  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">run</span>;
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">runGoogleScript</span> <span style="color:#f92672">=</span> (<span style="color:#ae81ff">_</span>) =&gt;
-    <span style="color:#66d9ef">new</span> Promise((<span style="color:#a6e22e">resolve</span>, <span style="color:#a6e22e">reject</span>) =&gt;
-      <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">script</span>.<span style="color:#a6e22e">run</span>
-        .<span style="color:#a6e22e">withFailureHandler</span>(<span style="color:#a6e22e">reject</span>)
-        .<span style="color:#a6e22e">withSuccessHandler</span>(<span style="color:#a6e22e">resolve</span>)
-        .<span style="color:#a6e22e">main</span>()
-    );
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">main</span> <span style="color:#f92672">=</span> (<span style="color:#ae81ff">_</span>) =&gt;
-    <span style="color:#66d9ef">new</span> Promise((<span style="color:#a6e22e">resolve</span>, <span style="color:#a6e22e">reject</span>) =&gt;
-      <span style="color:#a6e22e">setTimeout</span>(
-        <span style="color:#66d9ef">async</span> () =&gt; <span style="color:#66d9ef">await</span> <span style="color:#a6e22e">runGoogleScript</span>().<span style="color:#a6e22e">then</span>(<span style="color:#a6e22e">resolve</span>).<span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">reject</span>),
-        <span style="color:#ae81ff">1000</span>
-      )
-    );
-
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">start</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">async</span> () =&gt; {
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">b1</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">getElementById</span>(<span style="color:#e6db74">&#34;b1&#34;</span>);
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">b2</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">getElementById</span>(<span style="color:#e6db74">&#34;b2&#34;</span>);
-    <span style="color:#a6e22e">b1</span>.<span style="color:#a6e22e">disabled</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
-    <span style="color:#a6e22e">b2</span>.<span style="color:#a6e22e">disabled</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>;
-    <span style="color:#a6e22e">run</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
-    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Start.&#34;</span>);
-    <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">run</span>) <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#66d9ef">await</span> <span style="color:#a6e22e">main</span>());
-    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;End.&#34;</span>);
-    <span style="color:#a6e22e">b1</span>.<span style="color:#a6e22e">disabled</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>;
-    <span style="color:#a6e22e">b2</span>.<span style="color:#a6e22e">disabled</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
-  };
-
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">stop</span> <span style="color:#f92672">=</span> (<span style="color:#ae81ff">_</span>) =&gt; (<span style="color:#a6e22e">run</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>);
-&lt;/<span style="color:#f92672">script</span>&gt;
-</code></pre></div><h3 id="2-testing">2. Testing.</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-html" data-lang="html"><span style="display:flex;"><span>&lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;button&#34;</span> <span style="color:#a6e22e">onclick</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;start()&#34;</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;b1&#34;</span> <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;start&#34;</span> /&gt;
+</span></span><span style="display:flex;"><span>&lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;button&#34;</span> <span style="color:#a6e22e">onclick</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;stop()&#34;</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;b2&#34;</span> <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;stop&#34;</span> <span style="color:#a6e22e">disabled</span> /&gt;
+</span></span><span style="display:flex;"><span>&lt;<span style="color:#f92672">script</span>&gt;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">run</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">runGoogleScript</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">_</span>) =&gt;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">new</span> Promise((<span style="color:#a6e22e">resolve</span>, <span style="color:#a6e22e">reject</span>) =&gt;
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">script</span>.<span style="color:#a6e22e">run</span>
+</span></span><span style="display:flex;"><span>        .<span style="color:#a6e22e">withFailureHandler</span>(<span style="color:#a6e22e">reject</span>)
+</span></span><span style="display:flex;"><span>        .<span style="color:#a6e22e">withSuccessHandler</span>(<span style="color:#a6e22e">resolve</span>)
+</span></span><span style="display:flex;"><span>        .<span style="color:#a6e22e">main</span>()
+</span></span><span style="display:flex;"><span>    );
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">main</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">_</span>) =&gt;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">new</span> Promise((<span style="color:#a6e22e">resolve</span>, <span style="color:#a6e22e">reject</span>) =&gt;
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">setTimeout</span>(
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">async</span> () =&gt; <span style="color:#66d9ef">await</span> <span style="color:#a6e22e">runGoogleScript</span>().<span style="color:#a6e22e">then</span>(<span style="color:#a6e22e">resolve</span>).<span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">reject</span>),
+</span></span><span style="display:flex;"><span>        <span style="color:#ae81ff">1000</span>
+</span></span><span style="display:flex;"><span>      )
+</span></span><span style="display:flex;"><span>    );
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">start</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">async</span> () =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">b1</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">getElementById</span>(<span style="color:#e6db74">&#34;b1&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">b2</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">getElementById</span>(<span style="color:#e6db74">&#34;b2&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">b1</span>.<span style="color:#a6e22e">disabled</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">b2</span>.<span style="color:#a6e22e">disabled</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">run</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Start.&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">run</span>) <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#66d9ef">await</span> <span style="color:#a6e22e">main</span>());
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;End.&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">b1</span>.<span style="color:#a6e22e">disabled</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">b2</span>.<span style="color:#a6e22e">disabled</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">stop</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">_</span>) =&gt; (<span style="color:#a6e22e">run</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>);
+</span></span><span style="display:flex;"><span>&lt;/<span style="color:#f92672">script</span>&gt;
+</span></span></code></pre></div><h3 id="2-testing">2. Testing.</h3>
 <p>When you run <code>openSidebar</code>, a sidebar is opened on Google Document. And, when you click &ldquo;start&rdquo; button, the script is run.</p>
 <p>In this sample script, the background color of text of &ldquo;sample&rdquo; is changed. <strong>This is a simple sample script for explaining this workaround. So please change this for your actual situation.</strong></p>
 <h2 id="references">References</h2>
@@ -476,15 +475,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -507,15 +497,6 @@
 
 
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Creating a Table to Google Document by Retrieving Values from Google Spreadsheet for Node.js &middot; tanaike</title>
 
@@ -293,65 +292,65 @@
   <p><a href="https://gist.github.com/tanaikech/e64342de7011228f5fb639d7d1123ebb">Gists</a></p>
 <p>This is a sample script for creating a table to Google Document by retrieving values from Google Spreadsheet for Node.js.</p>
 <p>Before you use this script, please install Node.js module of <a href="https://github.com/tanaikech/node-gdoctableapp">node-gdoctableapp</a>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ npm install --save-dev gdoctableapp
-</code></pre></div><p>or</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ npm install --global gdoctableapp
-</code></pre></div><h2 id="sample-script">Sample script:</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ npm install --save-dev gdoctableapp
+</span></span></code></pre></div><p>or</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ npm install --global gdoctableapp
+</span></span></code></pre></div><h2 id="sample-script">Sample script:</h2>
 <p>This sample script uses Service Account.</p>
 <p>In this sample script, the values are retrieved from <code>Sheet1!A1:C5</code> of Spreadsheet, and new table is created to the Document using the values.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">google</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;googleapis&#34;</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">gdoctableapp</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;gdoctableapp&#34;</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">key</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;credential.json&#34;</span>); <span style="color:#75715e">// Please set the json file of Service account.
-</span><span style="color:#75715e"></span>
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">jwtClient</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">auth</span>.<span style="color:#a6e22e">JWT</span>(
-  <span style="color:#a6e22e">key</span>.<span style="color:#a6e22e">client_email</span>,
-  <span style="color:#66d9ef">null</span>,
-  <span style="color:#a6e22e">key</span>.<span style="color:#a6e22e">private_key</span>,
-  [
-    <span style="color:#e6db74">&#34;https://www.googleapis.com/auth/documents&#34;</span>,
-    <span style="color:#e6db74">&#34;https://www.googleapis.com/auth/spreadsheets&#34;</span>
-  ],
-  <span style="color:#66d9ef">null</span>
-);
-
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheets</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">sheets</span>({ <span style="color:#a6e22e">version</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;v4&#34;</span>, <span style="color:#a6e22e">auth</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">jwtClient</span> });
-
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">spreadsheetId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set here
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">documentId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set here
-</span><span style="color:#75715e"></span>
-<span style="color:#a6e22e">sheets</span>.<span style="color:#a6e22e">spreadsheets</span>.<span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">get</span>(
-  {
-    <span style="color:#a6e22e">spreadsheetId</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">spreadsheetId</span>,
-    <span style="color:#a6e22e">range</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Sheet1!A1:C5&#34;</span>
-  },
-  (<span style="color:#a6e22e">err</span>, <span style="color:#a6e22e">res</span>) =&gt; {
-    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">err</span>) {
-      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">err</span>.<span style="color:#a6e22e">errors</span>);
-      <span style="color:#66d9ef">return</span>;
-    }
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">values</span>;
-    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">length</span>) {
-      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">resource</span> <span style="color:#f92672">=</span> {
-        <span style="color:#a6e22e">auth</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">jwtClient</span>,
-        <span style="color:#a6e22e">documentId</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">documentId</span>,
-        <span style="color:#a6e22e">rows</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">length</span>,
-        <span style="color:#a6e22e">columns</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">values</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">length</span>,
-        <span style="color:#a6e22e">append</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>,
-        <span style="color:#a6e22e">values</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">values</span>
-      };
-      <span style="color:#a6e22e">gdoctableapp</span>.<span style="color:#a6e22e">CreateTable</span>(<span style="color:#a6e22e">resource</span>, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">er</span>, <span style="color:#a6e22e">re</span>) {
-        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">er</span>) {
-          <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">er</span>.<span style="color:#a6e22e">errors</span>);
-          <span style="color:#66d9ef">return</span>;
-        }
-        <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">re</span>);
-      });
-    } <span style="color:#66d9ef">else</span> {
-      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;No data was found.&#34;</span>);
-    }
-  }
-);
-</code></pre></div><h2 id="references">References:</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">google</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;googleapis&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">gdoctableapp</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;gdoctableapp&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">key</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;credential.json&#34;</span>); <span style="color:#75715e">// Please set the json file of Service account.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">jwtClient</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">auth</span>.<span style="color:#a6e22e">JWT</span>(
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">key</span>.<span style="color:#a6e22e">client_email</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">null</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">key</span>.<span style="color:#a6e22e">private_key</span>,
+</span></span><span style="display:flex;"><span>  [
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;https://www.googleapis.com/auth/documents&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;https://www.googleapis.com/auth/spreadsheets&#34;</span>
+</span></span><span style="display:flex;"><span>  ],
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">null</span>
+</span></span><span style="display:flex;"><span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheets</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">sheets</span>({ <span style="color:#a6e22e">version</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;v4&#34;</span>, <span style="color:#a6e22e">auth</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">jwtClient</span> });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">spreadsheetId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set here
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">documentId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set here
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">sheets</span>.<span style="color:#a6e22e">spreadsheets</span>.<span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">get</span>(
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">spreadsheetId</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">spreadsheetId</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">range</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Sheet1!A1:C5&#34;</span>
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>  (<span style="color:#a6e22e">err</span>, <span style="color:#a6e22e">res</span>) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">err</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">err</span>.<span style="color:#a6e22e">errors</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">values</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">length</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">resource</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">auth</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">jwtClient</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">documentId</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">documentId</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">rows</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">length</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">columns</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">values</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">length</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">append</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">values</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">values</span>
+</span></span><span style="display:flex;"><span>      };
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">gdoctableapp</span>.<span style="color:#a6e22e">CreateTable</span>(<span style="color:#a6e22e">resource</span>, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">er</span>, <span style="color:#a6e22e">re</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">er</span>) {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">er</span>.<span style="color:#a6e22e">errors</span>);
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">re</span>);
+</span></span><span style="display:flex;"><span>      });
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;No data was found.&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>);
+</span></span></code></pre></div><h2 id="references">References:</h2>
 <ul>
 <li><a href="https://github.com/tanaikech/node-gdoctableapp">node-gdoctableapp</a></li>
 <li><a href="https://developers.google.com/identity/protocols/OAuth2ServiceAccount">Service account</a></li>
@@ -444,15 +443,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -478,15 +468,6 @@
   <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
   
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

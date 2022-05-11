@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>[Fixed] Google Apps Script Web App HTML form file-input fields not in blob compatible format &middot; tanaike</title>
 
@@ -283,17 +282,17 @@
   <p>After V8 runtime was released, there was a bug that when the file is sent from HTML form to Google Apps Script side using google.script.run, the file blob was the invalid data.</p>
 <p>From <a href="https://pulse.appsscript.info/p/2021/12/fixed-google-apps-script-web-app-html-form-file-input-fields-not-in-blob-compatible-format/">Apps Script Pulse by Martin Hawksey</a>, it was found that the invalid blob of sending the file of HTML form to Google Apps Script side using google.script.run has finally been resolved. In this case, this script can be used with V8 runtime.</p>
 <h3 id="html--javascript-side-indexhtml">HTML &amp; Javascript side: <code>index.html</code></h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">form</span>&gt;
-  &lt;<span style="color:#f92672">input</span>
-    <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;file&#34;</span>
-    <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;file&#34;</span>
-    <span style="color:#a6e22e">onchange</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;google.script.run.withSuccessHandler(console.log).upload(this.parentNode)&#34;</span>
-  /&gt;
-&lt;/<span style="color:#f92672">form</span>&gt;
-</code></pre></div><h3 id="google-apps-script-side-codegs">Google Apps Script side: <code>Code.gs</code></h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">doGet</span> <span style="color:#f92672">=</span> (<span style="color:#ae81ff">_</span>) =&gt; <span style="color:#a6e22e">HtmlService</span>.<span style="color:#a6e22e">createHtmlOutputFromFile</span>(<span style="color:#e6db74">&#34;index.html&#34;</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">upload</span> <span style="color:#f92672">=</span> ({ <span style="color:#a6e22e">file</span> }) =&gt; <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">createFile</span>(<span style="color:#a6e22e">file</span>).<span style="color:#a6e22e">getId</span>();
-</code></pre></div><h3 id="important">IMPORTANT:</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-html" data-lang="html"><span style="display:flex;"><span>&lt;<span style="color:#f92672">form</span>&gt;
+</span></span><span style="display:flex;"><span>  &lt;<span style="color:#f92672">input</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;file&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;file&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">onchange</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;google.script.run.withSuccessHandler(console.log).upload(this.parentNode)&#34;</span>
+</span></span><span style="display:flex;"><span>  /&gt;
+</span></span><span style="display:flex;"><span>&lt;/<span style="color:#f92672">form</span>&gt;
+</span></span></code></pre></div><h3 id="google-apps-script-side-codegs">Google Apps Script side: <code>Code.gs</code></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">doGet</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">_</span>) =&gt; <span style="color:#a6e22e">HtmlService</span>.<span style="color:#a6e22e">createHtmlOutputFromFile</span>(<span style="color:#e6db74">&#34;index.html&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">upload</span> <span style="color:#f92672">=</span> ({ <span style="color:#a6e22e">file</span> }) =&gt; <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">createFile</span>(<span style="color:#a6e22e">file</span>).<span style="color:#a6e22e">getId</span>();
+</span></span></code></pre></div><h3 id="important">IMPORTANT:</h3>
 <p><strong>As an important point, in the current stage, when the above HTML is accessed as Web Apps (<code>doGet</code>), this script works. But when the above HTML is accessed as a dialog and a sidebar, <code>file</code> at the Google Apps Script side is <code>undefined</code>. By this, it seems that in the current stage, this HTML can be used with only Web Apps. Please be careful about this. I would like to believe that this situation is resolved in the future update.</strong></p>
 
   
@@ -383,15 +382,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -414,15 +404,6 @@
 
 
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

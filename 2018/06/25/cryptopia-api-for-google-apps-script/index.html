@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Cryptopia API for Google Apps Script &middot; tanaike</title>
 
@@ -288,40 +287,40 @@
 <p><a href="https://developers.google.com/apps-script/releases/#june_19_2018">By the Google’s update at June 19, 2018</a>, finally, Utilities.computeDigest(), Utilities.computeHmacSha256Signature() and Utilities.computeHmacSignature() got to be able to use the byte arrays. By this, using only native Google Apps Script, the result can be retrieved without using jsSHA. So <a href="https://www.cryptopia.co.nz/Home">Cryptopia API</a> can be created using only Google Apps Script. If this is useful for you, I&rsquo;m glad.</p>
 <h2 id="sample-script-">Sample script :</h2>
 <p>When you use this, at first, please input the requiring values. Now the sample values are used.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// Values inputted by users
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">key</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#####&#34;</span>;
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">secret</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#####&#34;</span>;
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;Currency&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;BTC&#34;</span>};
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">command</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;GetBalance&#34;</span>;
-
-<span style="color:#75715e">// main
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">baseUrl</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;https://www.cryptopia.co.nz/api/&#39;</span>;
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">baseUrl</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">command</span>;
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">nonce</span> <span style="color:#f92672">=</span> Math.<span style="color:#a6e22e">floor</span>(<span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>() <span style="color:#f92672">/</span> <span style="color:#ae81ff">1000</span>);
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">reqB64</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(
-  <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">computeDigest</span>(
-    <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">DigestAlgorithm</span>.<span style="color:#a6e22e">MD5</span>,
-    <span style="color:#a6e22e">params</span>,
-    <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">Charset</span>.<span style="color:#a6e22e">UTF_8</span>
-  )
-);
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sig</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">key</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;POST&#34;</span> <span style="color:#f92672">+</span> encodeURIComponent(<span style="color:#a6e22e">url</span>).<span style="color:#a6e22e">toLowerCase</span>() <span style="color:#f92672">+</span> <span style="color:#a6e22e">nonce</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">reqB64</span>;
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">hmacSig</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(
-  <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">computeHmacSignature</span>(
-    <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">MacAlgorithm</span>.<span style="color:#a6e22e">HMAC_SHA_256</span>,
-    <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Decode</span>(<span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(<span style="color:#a6e22e">sig</span>)),
-    <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Decode</span>(<span style="color:#a6e22e">secret</span>)
-  )
-);
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">options</span> <span style="color:#f92672">=</span> {
-  <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;post&#39;</span>,
-  <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {
-    <span style="color:#e6db74">&#34;Authorization&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;amx &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">key</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;:&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">hmacSig</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;:&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">nonce</span>,
-    <span style="color:#e6db74">&#34;Content-Type&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/json; charset=utf-8&#34;</span>,
-  },
-};
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">options</span>);
-</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">// Values inputted by users
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">key</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#####&#34;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">secret</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#####&#34;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;Currency&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;BTC&#34;</span>};
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">command</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;GetBalance&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// main
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">baseUrl</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;https://www.cryptopia.co.nz/api/&#39;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">baseUrl</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">command</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">nonce</span> <span style="color:#f92672">=</span> Math.<span style="color:#a6e22e">floor</span>(<span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>() <span style="color:#f92672">/</span> <span style="color:#ae81ff">1000</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">reqB64</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">computeDigest</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">DigestAlgorithm</span>.<span style="color:#a6e22e">MD5</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">params</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">Charset</span>.<span style="color:#a6e22e">UTF_8</span>
+</span></span><span style="display:flex;"><span>  )
+</span></span><span style="display:flex;"><span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sig</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">key</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;POST&#34;</span> <span style="color:#f92672">+</span> encodeURIComponent(<span style="color:#a6e22e">url</span>).<span style="color:#a6e22e">toLowerCase</span>() <span style="color:#f92672">+</span> <span style="color:#a6e22e">nonce</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">reqB64</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">hmacSig</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">computeHmacSignature</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">MacAlgorithm</span>.<span style="color:#a6e22e">HMAC_SHA_256</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Decode</span>(<span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(<span style="color:#a6e22e">sig</span>)),
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Decode</span>(<span style="color:#a6e22e">secret</span>)
+</span></span><span style="display:flex;"><span>  )
+</span></span><span style="display:flex;"><span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">options</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;post&#39;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;Authorization&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;amx &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">key</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;:&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">hmacSig</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;:&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">nonce</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;Content-Type&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/json; charset=utf-8&#34;</span>,
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">options</span>);
+</span></span></code></pre></div>
   
   <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
 <ul class="share-buttons">
@@ -409,15 +408,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -440,15 +430,6 @@
 
 
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

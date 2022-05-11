@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Pseudo OnEdit Trigger for Google Spreadsheet without Simple and Installable Triggers using Google Apps Script &middot; tanaike</title>
 
@@ -336,82 +335,82 @@
 </ul>
 <h3 id="2-sample-script">2. Sample script:</h3>
 <p>Please copy and paste the following script to the script editor of Spreadsheet &ldquo;B&rdquo;.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">targetSpreadsheetId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set the target Spreadsheet created by the service account.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheetName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Sheet1&#34;</span>; <span style="color:#75715e">// In this sample, both sheet names of target and storage are the same.
-</span><span style="color:#75715e"></span>
-<span style="color:#75715e">// This function is used as the pseudo OnEdit trigger.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">doGet</span>(<span style="color:#a6e22e">e</span>) {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">response</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">v</span>) =&gt;
-    <span style="color:#a6e22e">ContentService</span>.<span style="color:#a6e22e">createTextOutput</span>(
-      <span style="color:#e6db74">`&lt;result&gt;Edited at </span><span style="color:#e6db74">${</span><span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">toISOString</span>()<span style="color:#e6db74">}</span><span style="color:#e6db74">. </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">v</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&lt;/result&gt;`</span>
-    ).<span style="color:#a6e22e">setMimeType</span>(<span style="color:#a6e22e">ContentService</span>.<span style="color:#a6e22e">MimeType</span>.<span style="color:#a6e22e">XML</span>);
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameter</span>.<span style="color:#a6e22e">key</span> <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#34;sample&#34;</span>) <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">response</span>(<span style="color:#e6db74">&#34;Wrong key.&#34;</span>);
-  <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">range</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameter</span>;
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">lock</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">LockService</span>.<span style="color:#a6e22e">getDocumentLock</span>();
-  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">res</span>;
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">lock</span>.<span style="color:#a6e22e">tryLock</span>(<span style="color:#ae81ff">350000</span>)) {
-    <span style="color:#66d9ef">try</span> {
-      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">targetSheet</span> <span style="color:#f92672">=</span>
-        <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">targetSpreadsheetId</span>).<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#a6e22e">sheetName</span>);
-      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">targetValues</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">targetSheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">range</span>).<span style="color:#a6e22e">getDisplayValues</span>();
-      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">storageSheet</span> <span style="color:#f92672">=</span>
-        <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>().<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#a6e22e">sheetName</span>);
-      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">storageValues</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">storageSheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">range</span>).<span style="color:#a6e22e">getDisplayValues</span>();
-      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">check</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">targetValues</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">ar</span>, <span style="color:#a6e22e">r</span>, <span style="color:#a6e22e">i</span>) =&gt; {
-        <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">forEach</span>((<span style="color:#a6e22e">c</span>, <span style="color:#a6e22e">j</span>) =&gt; {
-          <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">c</span> <span style="color:#f92672">!=</span> <span style="color:#a6e22e">storageValues</span>[<span style="color:#a6e22e">i</span>][<span style="color:#a6e22e">j</span>]) {
-            <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">push</span>({
-              <span style="color:#a6e22e">newValue</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">c</span>,
-              <span style="color:#a6e22e">oldValue</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">storageValues</span>[<span style="color:#a6e22e">i</span>][<span style="color:#a6e22e">j</span>],
-              <span style="color:#a6e22e">row</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>,
-              <span style="color:#a6e22e">col</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">j</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>,
-            });
-          }
-        });
-        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ar</span>;
-      }, []);
-      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">check</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
-        <span style="color:#a6e22e">targetSheet</span>
-          .<span style="color:#a6e22e">getRangeList</span>(
-            <span style="color:#a6e22e">check</span>.<span style="color:#a6e22e">map</span>(({ <span style="color:#a6e22e">row</span>, <span style="color:#a6e22e">col</span> }) =&gt;
-              <span style="color:#a6e22e">targetSheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">row</span>, <span style="color:#a6e22e">col</span>).<span style="color:#a6e22e">getA1Notation</span>()
-            )
-          )
-          .<span style="color:#a6e22e">setBackground</span>(<span style="color:#e6db74">&#34;red&#34;</span>);
-        <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">check</span>;
-        <span style="color:#a6e22e">storageSheet</span>.<span style="color:#a6e22e">clear</span>();
-        <span style="color:#a6e22e">storageSheet</span>
-          .<span style="color:#a6e22e">getRange</span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">targetValues</span>.<span style="color:#a6e22e">length</span>, <span style="color:#a6e22e">targetValues</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">length</span>)
-          .<span style="color:#a6e22e">setValues</span>(<span style="color:#a6e22e">targetValues</span>);
-      } <span style="color:#66d9ef">else</span> {
-        <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;No change.&#34;</span>;
-      }
-    } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">err</span>) {
-      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">response</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">err</span>));
-    } <span style="color:#66d9ef">finally</span> {
-      <span style="color:#a6e22e">lock</span>.<span style="color:#a6e22e">releaseLock</span>();
-      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">response</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">res</span>));
-    }
-  } <span style="color:#66d9ef">else</span> {
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">response</span>(<span style="color:#e6db74">&#34;timeout&#34;</span>);
-  }
-}
-
-<span style="color:#75715e">// At first, please run this script. By this, the current target sheet is saved.
-</span><span style="color:#75715e">// This workaround uses this saved sheet.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">copyCurrentSheet</span>() {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">targetValues</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">targetSpreadsheetId</span>)
-    .<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#a6e22e">sheetName</span>)
-    .<span style="color:#a6e22e">getDataRange</span>()
-    .<span style="color:#a6e22e">getDisplayValues</span>();
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">storageSheet</span> <span style="color:#f92672">=</span>
-    <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>().<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#a6e22e">sheetName</span>);
-  <span style="color:#a6e22e">storageSheet</span>.<span style="color:#a6e22e">clear</span>();
-  <span style="color:#a6e22e">storageSheet</span>
-    .<span style="color:#a6e22e">getRange</span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">targetValues</span>.<span style="color:#a6e22e">length</span>, <span style="color:#a6e22e">targetValues</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">length</span>)
-    .<span style="color:#a6e22e">setValues</span>(<span style="color:#a6e22e">targetValues</span>);
-}
-</code></pre></div><h3 id="3-deploy-web-apps">3. Deploy Web Apps.</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">targetSpreadsheetId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set the target Spreadsheet created by the service account.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheetName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Sheet1&#34;</span>; <span style="color:#75715e">// In this sample, both sheet names of target and storage are the same.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// This function is used as the pseudo OnEdit trigger.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">doGet</span>(<span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">response</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">v</span>) =&gt;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">ContentService</span>.<span style="color:#a6e22e">createTextOutput</span>(
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`&lt;result&gt;Edited at </span><span style="color:#e6db74">${</span><span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">toISOString</span>()<span style="color:#e6db74">}</span><span style="color:#e6db74">. </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">v</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&lt;/result&gt;`</span>
+</span></span><span style="display:flex;"><span>    ).<span style="color:#a6e22e">setMimeType</span>(<span style="color:#a6e22e">ContentService</span>.<span style="color:#a6e22e">MimeType</span>.<span style="color:#a6e22e">XML</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameter</span>.<span style="color:#a6e22e">key</span> <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#34;sample&#34;</span>) <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">response</span>(<span style="color:#e6db74">&#34;Wrong key.&#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">range</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameter</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">lock</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">LockService</span>.<span style="color:#a6e22e">getDocumentLock</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">res</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">lock</span>.<span style="color:#a6e22e">tryLock</span>(<span style="color:#ae81ff">350000</span>)) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">targetSheet</span> <span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">targetSpreadsheetId</span>).<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#a6e22e">sheetName</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">targetValues</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">targetSheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">range</span>).<span style="color:#a6e22e">getDisplayValues</span>();
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">storageSheet</span> <span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>().<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#a6e22e">sheetName</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">storageValues</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">storageSheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">range</span>).<span style="color:#a6e22e">getDisplayValues</span>();
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">check</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">targetValues</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">ar</span>, <span style="color:#a6e22e">r</span>, <span style="color:#a6e22e">i</span>) =&gt; {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">forEach</span>((<span style="color:#a6e22e">c</span>, <span style="color:#a6e22e">j</span>) =&gt; {
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">c</span> <span style="color:#f92672">!=</span> <span style="color:#a6e22e">storageValues</span>[<span style="color:#a6e22e">i</span>][<span style="color:#a6e22e">j</span>]) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">push</span>({
+</span></span><span style="display:flex;"><span>              <span style="color:#a6e22e">newValue</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">c</span>,
+</span></span><span style="display:flex;"><span>              <span style="color:#a6e22e">oldValue</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">storageValues</span>[<span style="color:#a6e22e">i</span>][<span style="color:#a6e22e">j</span>],
+</span></span><span style="display:flex;"><span>              <span style="color:#a6e22e">row</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>,
+</span></span><span style="display:flex;"><span>              <span style="color:#a6e22e">col</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">j</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>,
+</span></span><span style="display:flex;"><span>            });
+</span></span><span style="display:flex;"><span>          }
+</span></span><span style="display:flex;"><span>        });
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ar</span>;
+</span></span><span style="display:flex;"><span>      }, []);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">check</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">targetSheet</span>
+</span></span><span style="display:flex;"><span>          .<span style="color:#a6e22e">getRangeList</span>(
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">check</span>.<span style="color:#a6e22e">map</span>(({ <span style="color:#a6e22e">row</span>, <span style="color:#a6e22e">col</span> }) =&gt;
+</span></span><span style="display:flex;"><span>              <span style="color:#a6e22e">targetSheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">row</span>, <span style="color:#a6e22e">col</span>).<span style="color:#a6e22e">getA1Notation</span>()
+</span></span><span style="display:flex;"><span>            )
+</span></span><span style="display:flex;"><span>          )
+</span></span><span style="display:flex;"><span>          .<span style="color:#a6e22e">setBackground</span>(<span style="color:#e6db74">&#34;red&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">check</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">storageSheet</span>.<span style="color:#a6e22e">clear</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">storageSheet</span>
+</span></span><span style="display:flex;"><span>          .<span style="color:#a6e22e">getRange</span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">targetValues</span>.<span style="color:#a6e22e">length</span>, <span style="color:#a6e22e">targetValues</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">length</span>)
+</span></span><span style="display:flex;"><span>          .<span style="color:#a6e22e">setValues</span>(<span style="color:#a6e22e">targetValues</span>);
+</span></span><span style="display:flex;"><span>      } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;No change.&#34;</span>;
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">err</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">response</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">err</span>));
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">finally</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">lock</span>.<span style="color:#a6e22e">releaseLock</span>();
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">response</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">res</span>));
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">response</span>(<span style="color:#e6db74">&#34;timeout&#34;</span>);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// At first, please run this script. By this, the current target sheet is saved.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// This workaround uses this saved sheet.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">copyCurrentSheet</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">targetValues</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">targetSpreadsheetId</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#a6e22e">sheetName</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">getDataRange</span>()
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">getDisplayValues</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">storageSheet</span> <span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>().<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#a6e22e">sheetName</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">storageSheet</span>.<span style="color:#a6e22e">clear</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">storageSheet</span>
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">getRange</span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">targetValues</span>.<span style="color:#a6e22e">length</span>, <span style="color:#a6e22e">targetValues</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">length</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">setValues</span>(<span style="color:#a6e22e">targetValues</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="3-deploy-web-apps">3. Deploy Web Apps.</h3>
 <p>The detailed information can be seen at <a href="https://developers.google.com/apps-script/guides/web#deploy_a_script_as_a_web_app">the official document</a>.</p>
 <ol>
 <li>On the script editor, at the top right of the script editor, please click &ldquo;click Deploy&rdquo; -&gt; &ldquo;New deployment&rdquo;.</li>
@@ -440,7 +439,7 @@
 <ol>
 <li>
 <p>In this sample script, please put the following formula to a cell &ldquo;D1&rdquo;. In this case, please use your Web Apps URL. If this cannot be done, please check the above flow again.</p>
-<pre tabindex="0"><code>=IMPORTXML(&quot;https://script.google.com/macros/s/###/exec?key=sample&amp;values=&quot;&amp;TEXTJOIN(&quot;,&quot;,TRUE,Sheet1!A1:C5)&amp;&quot;&amp;range=A1:C5&quot;,&quot;/result&quot;)
+<pre tabindex="0"><code>=IMPORTXML(&#34;https://script.google.com/macros/s/###/exec?key=sample&amp;values=&#34;&amp;TEXTJOIN(&#34;,&#34;,TRUE,Sheet1!A1:C5)&amp;&#34;&amp;range=A1:C5&#34;,&#34;/result&#34;)
 </code></pre><ul>
 <li>This sample OnEdit trigger uses the cells &ldquo;A1:C5&rdquo; of &ldquo;Sheet1&rdquo;.</li>
 <li>This formula is a sample formula. So, please modify the range and formula for your actual situation.</li>
@@ -557,15 +556,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -591,15 +581,6 @@
   <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
   
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

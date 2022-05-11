@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Achieving Search of Files by &#39;is:unorganized owner:me&#39; using Google Apps Script &middot; tanaike</title>
 
@@ -283,36 +282,36 @@
 <p>In the current stage, unfortunately, the files cannot be directly retrieved by searching <code>is:unorganized owner:me</code> with Drive API and Drive service. So as the current workaround, all files are retrieved using the method of &ldquo;Files: list&rdquo; of Drive API with <code>'me' in owners and trashed = false</code>, and the file list is retrieved from all file list using a script.</p>
 <h2 id="sample-script">Sample script</h2>
 <p>Before you use this script, <a href="https://developers.google.com/apps-script/guides/services/advanced#enabling_advanced_services">please enable Drive API at Advanced Google services</a>. And please run <code>main()</code> function.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// Retrieve the file list by searching with &#34;is:unorganized owner:me&#34;.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getFileList</span>(<span style="color:#a6e22e">token</span>) {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">fields</span> <span style="color:#f92672">=</span> decodeURIComponent(
-    <span style="color:#e6db74">&#34;nextPageToken,files(name,id,mimeType,parents)&#34;</span>
-  );
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">q</span> <span style="color:#f92672">=</span> decodeURIComponent(<span style="color:#e6db74">&#34;&#39;me&#39; in owners and trashed = false&#34;</span>);
-  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">allFiles</span> <span style="color:#f92672">=</span> [];
-  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">pageToken</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
-  <span style="color:#66d9ef">do</span> {
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(
-      <span style="color:#e6db74">`https://www.googleapis.com/drive/v3/files?pageSize=1000&amp;fields=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">fields</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&amp;q=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">q</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&amp;pageToken=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">pageToken</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
-      { <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">`Bearer </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">token</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span> } }
-    );
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">res</span>);
-    <span style="color:#a6e22e">allFiles</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">allFiles</span>.<span style="color:#a6e22e">concat</span>(<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">files</span>);
-    <span style="color:#a6e22e">pageToken</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">nextPageToken</span>;
-  } <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">pageToken</span>);
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">allFiles</span>.<span style="color:#a6e22e">filter</span>(({ <span style="color:#a6e22e">parents</span> }) =&gt; <span style="color:#f92672">!</span><span style="color:#a6e22e">parents</span>);
-}
-
-<span style="color:#75715e">// Please run this function.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">token</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>();
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">fileList</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">getFileList</span>(<span style="color:#a6e22e">token</span>);
-  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">fileList</span>.<span style="color:#a6e22e">length</span>);
-  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">fileList</span>);
-
-  <span style="color:#75715e">// DriveApp.getFiles(); // This is used for automatically adding a scope of &#34;https://www.googleapis.com/auth/drive.readonly&#34;.
-</span><span style="color:#75715e"></span>}
-</code></pre></div><ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">// Retrieve the file list by searching with &#34;is:unorganized owner:me&#34;.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getFileList</span>(<span style="color:#a6e22e">token</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">fields</span> <span style="color:#f92672">=</span> decodeURIComponent(
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;nextPageToken,files(name,id,mimeType,parents)&#34;</span>
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">q</span> <span style="color:#f92672">=</span> decodeURIComponent(<span style="color:#e6db74">&#34;&#39;me&#39; in owners and trashed = false&#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">allFiles</span> <span style="color:#f92672">=</span> [];
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">pageToken</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">do</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`https://www.googleapis.com/drive/v3/files?pageSize=1000&amp;fields=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">fields</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&amp;q=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">q</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&amp;pageToken=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">pageToken</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
+</span></span><span style="display:flex;"><span>      { <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">`Bearer </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">token</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span> } }
+</span></span><span style="display:flex;"><span>    );
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">res</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">allFiles</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">allFiles</span>.<span style="color:#a6e22e">concat</span>(<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">files</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">pageToken</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">nextPageToken</span>;
+</span></span><span style="display:flex;"><span>  } <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">pageToken</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">allFiles</span>.<span style="color:#a6e22e">filter</span>(({ <span style="color:#a6e22e">parents</span> }) =&gt; <span style="color:#f92672">!</span><span style="color:#a6e22e">parents</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Please run this function.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">token</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">fileList</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">getFileList</span>(<span style="color:#a6e22e">token</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">fileList</span>.<span style="color:#a6e22e">length</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">fileList</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// DriveApp.getFiles(); // This is used for automatically adding a scope of &#34;https://www.googleapis.com/auth/drive.readonly&#34;.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><ul>
 <li>In order to retrieve all files, when Drive API v3 using UrlFetchApp is used, the process cost is much lowere than that using Drive API of Advanced Google services. So I used Drive API v3 using UrlFetchApp instead of Drive API of Advanced Google services.</li>
 </ul>
 <h2 id="references">References</h2>
@@ -412,15 +411,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -446,15 +436,6 @@
   <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
   
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

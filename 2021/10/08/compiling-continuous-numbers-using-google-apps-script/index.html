@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Compiling Continuous Numbers using Google Apps Script &middot; tanaike</title>
 
@@ -289,88 +288,88 @@
   <p><a href="https://gist.github.com/tanaikech/5a43281964b739ead2b7ae2401400630">Gists</a></p>
 <p>This is a sample script for compiling the continuous numbers using Google Apps Script. For example, the values of <code>[4, 5, 9, 3, 10, 5, 11, 7, 7, 13, 1]</code> are converted to <code>[&quot;1&quot;,&quot;3-5&quot;,&quot;7&quot;,&quot;9-11&quot;,&quot;13&quot;]</code>.</p>
 <h2 id="sample-script">Sample script</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">compilingNumbers</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">ar</span>) =&gt; {
-  <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">values</span> } <span style="color:#f92672">=</span> [...<span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Set</span>(<span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">sort</span>((<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">b</span>) =&gt; <span style="color:#a6e22e">a</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">b</span>))].<span style="color:#a6e22e">reduce</span>(
-    (<span style="color:#a6e22e">o</span>, <span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">a</span>) =&gt; {
-      <span style="color:#66d9ef">if</span> (
-        <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">||</span>
-        (<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">e</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>[<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>] <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>)
-      ) {
-        <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">e</span>);
-      } <span style="color:#66d9ef">else</span> {
-        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
-          <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">push</span>({ <span style="color:#a6e22e">start</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>[<span style="color:#ae81ff">0</span>], <span style="color:#a6e22e">end</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>[<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>] });
-        }
-        <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> [<span style="color:#a6e22e">e</span>];
-      }
-      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">i</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) {
-        <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">push</span>(
-          <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">1</span>
-            <span style="color:#f92672">?</span> { <span style="color:#a6e22e">start</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>[<span style="color:#ae81ff">0</span>], <span style="color:#a6e22e">end</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>[<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>] }
-            <span style="color:#f92672">:</span> { <span style="color:#a6e22e">start</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">end</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span> }
-        );
-      }
-      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
-    },
-    { <span style="color:#a6e22e">temp</span><span style="color:#f92672">:</span> [], <span style="color:#a6e22e">values</span><span style="color:#f92672">:</span> [] }
-  );
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">values</span>;
-};
-
-<span style="color:#75715e">// Please run this function.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ar</span> <span style="color:#f92672">=</span> [<span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">9</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">11</span>, <span style="color:#ae81ff">7</span>, <span style="color:#ae81ff">7</span>, <span style="color:#ae81ff">13</span>, <span style="color:#ae81ff">1</span>]; <span style="color:#75715e">// This is sample values.
-</span><span style="color:#75715e"></span>
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">compilingNumbers</span>(<span style="color:#a6e22e">ar</span>);
-  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">values</span>);
-
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">map</span>(({ <span style="color:#a6e22e">start</span>, <span style="color:#a6e22e">end</span> }) =&gt;
-    <span style="color:#a6e22e">start</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">end</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">start</span>.<span style="color:#a6e22e">toString</span>() <span style="color:#f92672">:</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">start</span><span style="color:#e6db74">}</span><span style="color:#e6db74">-</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">end</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>
-  );
-  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>);
-}
-</code></pre></div><p>When this script is run, <code>console.log(values)</code> and <code>console.log(res)</code> show <code>[{&quot;start&quot;:1,&quot;end&quot;:1},{&quot;start&quot;:3,&quot;end&quot;:5},{&quot;start&quot;:7,&quot;end&quot;:7},{&quot;start&quot;:9,&quot;end&quot;:11},{&quot;start&quot;:13,&quot;end&quot;:13}]</code> and <code>[&quot;1&quot;,&quot;3-5&quot;,&quot;7&quot;,&quot;9-11&quot;,&quot;13&quot;]</code>, respectively. From this result, it is found that the continuous numbers were compiled.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">compilingNumbers</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">ar</span>) =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">values</span> } <span style="color:#f92672">=</span> [...<span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Set</span>(<span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">sort</span>((<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">b</span>) =&gt; <span style="color:#a6e22e">a</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">b</span>))].<span style="color:#a6e22e">reduce</span>(
+</span></span><span style="display:flex;"><span>    (<span style="color:#a6e22e">o</span>, <span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">a</span>) =&gt; {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">||</span>
+</span></span><span style="display:flex;"><span>        (<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">e</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>[<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>] <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>      ) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">e</span>);
+</span></span><span style="display:flex;"><span>      } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">push</span>({ <span style="color:#a6e22e">start</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>[<span style="color:#ae81ff">0</span>], <span style="color:#a6e22e">end</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>[<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>] });
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> [<span style="color:#a6e22e">e</span>];
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">i</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">push</span>(
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">?</span> { <span style="color:#a6e22e">start</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>[<span style="color:#ae81ff">0</span>], <span style="color:#a6e22e">end</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>[<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>] }
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">:</span> { <span style="color:#a6e22e">start</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">end</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span> }
+</span></span><span style="display:flex;"><span>        );
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    { <span style="color:#a6e22e">temp</span><span style="color:#f92672">:</span> [], <span style="color:#a6e22e">values</span><span style="color:#f92672">:</span> [] }
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">values</span>;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Please run this function.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ar</span> <span style="color:#f92672">=</span> [<span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">9</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">11</span>, <span style="color:#ae81ff">7</span>, <span style="color:#ae81ff">7</span>, <span style="color:#ae81ff">13</span>, <span style="color:#ae81ff">1</span>]; <span style="color:#75715e">// This is sample values.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">compilingNumbers</span>(<span style="color:#a6e22e">ar</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">values</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">map</span>(({ <span style="color:#a6e22e">start</span>, <span style="color:#a6e22e">end</span> }) =&gt;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">start</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">end</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">start</span>.<span style="color:#a6e22e">toString</span>() <span style="color:#f92672">:</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">start</span><span style="color:#e6db74">}</span><span style="color:#e6db74">-</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">end</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>When this script is run, <code>console.log(values)</code> and <code>console.log(res)</code> show <code>[{&quot;start&quot;:1,&quot;end&quot;:1},{&quot;start&quot;:3,&quot;end&quot;:5},{&quot;start&quot;:7,&quot;end&quot;:7},{&quot;start&quot;:9,&quot;end&quot;:11},{&quot;start&quot;:13,&quot;end&quot;:13}]</code> and <code>[&quot;1&quot;,&quot;3-5&quot;,&quot;7&quot;,&quot;9-11&quot;,&quot;13&quot;]</code>, respectively. From this result, it is found that the continuous numbers were compiled.</p>
 <h2 id="sample-situation">Sample situation</h2>
 <p>As a sample situation using this sample script, I would like to introduce the following situation.</p>
 <p>The column numbers of <code>[4, 5, 9, 3, 10, 5, 11, 7, 7, 13, 1]</code> on an active sheet of Spreadsheet are hidden.</p>
 <h3 id="sample-script-1">Sample script</h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">compilingNumbers</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">ar</span>) =&gt; {
-  <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">values</span> } <span style="color:#f92672">=</span> [...<span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Set</span>(<span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">sort</span>((<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">b</span>) =&gt; <span style="color:#a6e22e">a</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">b</span>))].<span style="color:#a6e22e">reduce</span>(
-    (<span style="color:#a6e22e">o</span>, <span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">a</span>) =&gt; {
-      <span style="color:#66d9ef">if</span> (
-        <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">||</span>
-        (<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">e</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>[<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>] <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>)
-      ) {
-        <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">e</span>);
-      } <span style="color:#66d9ef">else</span> {
-        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
-          <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">push</span>({ <span style="color:#a6e22e">start</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>[<span style="color:#ae81ff">0</span>], <span style="color:#a6e22e">end</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>[<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>] });
-        }
-        <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> [<span style="color:#a6e22e">e</span>];
-      }
-      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">i</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) {
-        <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">push</span>(
-          <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">1</span>
-            <span style="color:#f92672">?</span> { <span style="color:#a6e22e">start</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>[<span style="color:#ae81ff">0</span>], <span style="color:#a6e22e">end</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>[<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>] }
-            <span style="color:#f92672">:</span> { <span style="color:#a6e22e">start</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">end</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span> }
-        );
-      }
-      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
-    },
-    { <span style="color:#a6e22e">temp</span><span style="color:#f92672">:</span> [], <span style="color:#a6e22e">values</span><span style="color:#f92672">:</span> [] }
-  );
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">values</span>;
-};
-
-<span style="color:#75715e">// Please run this function.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ar</span> <span style="color:#f92672">=</span> [<span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">9</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">11</span>, <span style="color:#ae81ff">7</span>, <span style="color:#ae81ff">7</span>, <span style="color:#ae81ff">13</span>, <span style="color:#ae81ff">1</span>]; <span style="color:#75715e">// It supposes that these values are the column numbers for Spreadsheet.
-</span><span style="color:#75715e"></span>
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">compilingNumbers</span>(<span style="color:#a6e22e">ar</span>);
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSheet</span>();
-  <span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">forEach</span>(({ <span style="color:#a6e22e">start</span>, <span style="color:#a6e22e">end</span> }) =&gt; <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">hideColumns</span>(<span style="color:#a6e22e">start</span>, <span style="color:#a6e22e">end</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">start</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>));
-}
-</code></pre></div><p>In this sample situation, the columns &ldquo;A&rdquo;, &ldquo;C-E&rdquo;, &ldquo;F-G&rdquo;, &ldquo;I-K&rdquo;, &ldquo;M&rdquo; of the active sheet are hidden. When this sample script <code>compilingNumbers()</code> is used, <a href="https://developers.google.com/apps-script/reference/spreadsheet/sheet#hidecolumnscolumnindex,-numcolumns">the method of <code>hideColumns(columnIndex, numColumns)</code></a> can be used effectively. Of course, when this situation can be achieved by Sheets API, the process cost will be the lowest. But when Sheets API cannot be used, I think that this method will be useful.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">compilingNumbers</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">ar</span>) =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">values</span> } <span style="color:#f92672">=</span> [...<span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Set</span>(<span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">sort</span>((<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">b</span>) =&gt; <span style="color:#a6e22e">a</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">b</span>))].<span style="color:#a6e22e">reduce</span>(
+</span></span><span style="display:flex;"><span>    (<span style="color:#a6e22e">o</span>, <span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">a</span>) =&gt; {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">||</span>
+</span></span><span style="display:flex;"><span>        (<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">e</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>[<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>] <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>      ) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">e</span>);
+</span></span><span style="display:flex;"><span>      } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">push</span>({ <span style="color:#a6e22e">start</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>[<span style="color:#ae81ff">0</span>], <span style="color:#a6e22e">end</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>[<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>] });
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> [<span style="color:#a6e22e">e</span>];
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">i</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">push</span>(
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">?</span> { <span style="color:#a6e22e">start</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>[<span style="color:#ae81ff">0</span>], <span style="color:#a6e22e">end</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>[<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>] }
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">:</span> { <span style="color:#a6e22e">start</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">end</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span> }
+</span></span><span style="display:flex;"><span>        );
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    { <span style="color:#a6e22e">temp</span><span style="color:#f92672">:</span> [], <span style="color:#a6e22e">values</span><span style="color:#f92672">:</span> [] }
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">values</span>;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Please run this function.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ar</span> <span style="color:#f92672">=</span> [<span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">9</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">11</span>, <span style="color:#ae81ff">7</span>, <span style="color:#ae81ff">7</span>, <span style="color:#ae81ff">13</span>, <span style="color:#ae81ff">1</span>]; <span style="color:#75715e">// It supposes that these values are the column numbers for Spreadsheet.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">compilingNumbers</span>(<span style="color:#a6e22e">ar</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSheet</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">forEach</span>(({ <span style="color:#a6e22e">start</span>, <span style="color:#a6e22e">end</span> }) =&gt; <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">hideColumns</span>(<span style="color:#a6e22e">start</span>, <span style="color:#a6e22e">end</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">start</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>));
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>In this sample situation, the columns &ldquo;A&rdquo;, &ldquo;C-E&rdquo;, &ldquo;F-G&rdquo;, &ldquo;I-K&rdquo;, &ldquo;M&rdquo; of the active sheet are hidden. When this sample script <code>compilingNumbers()</code> is used, <a href="https://developers.google.com/apps-script/reference/spreadsheet/sheet#hidecolumnscolumnindex,-numcolumns">the method of <code>hideColumns(columnIndex, numColumns)</code></a> can be used effectively. Of course, when this situation can be achieved by Sheets API, the process cost will be the lowest. But when Sheets API cannot be used, I think that this method will be useful.</p>
 
   
   <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
@@ -459,15 +458,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -493,15 +483,6 @@
   <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
   
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

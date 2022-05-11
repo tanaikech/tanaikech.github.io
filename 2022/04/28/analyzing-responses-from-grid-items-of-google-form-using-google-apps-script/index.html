@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Analyzing Responses from Grid Items of Google Form using Google Apps Script &middot; tanaike</title>
 
@@ -296,50 +295,50 @@
 <p><img src="https://tanaikech.github.io/image-storage/20220428a/fig2.png" alt=""></p>
 <p>The average values of each row of Grid Items of each question are calculated and put to the Spreadsheet.</p>
 <h2 id="sample-script">Sample script</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">formId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set your Form ID.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheetName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Sheet1&#34;</span>; <span style="color:#75715e">// Please set the sheet name.
-</span><span style="color:#75715e"></span>
-  <span style="color:#75715e">// Retrieve responses from the grid items.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">form</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">FormApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">formId</span>);
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">formResponses</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">form</span>.<span style="color:#a6e22e">getResponses</span>();
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">formResponses</span>.<span style="color:#a6e22e">reduce</span>(
-    (<span style="color:#a6e22e">o</span>, <span style="color:#a6e22e">e</span>) =&gt; {
-      <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getItemResponses</span>().<span style="color:#a6e22e">forEach</span>((<span style="color:#a6e22e">f</span>) =&gt; {
-        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">item</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">getItem</span>();
-        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">item</span>.<span style="color:#a6e22e">getType</span>() <span style="color:#f92672">==</span> <span style="color:#a6e22e">FormApp</span>.<span style="color:#a6e22e">ItemType</span>.<span style="color:#a6e22e">GRID</span>) {
-          <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">title</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">item</span>.<span style="color:#a6e22e">getTitle</span>();
-          <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">res</span>[<span style="color:#a6e22e">title</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">res</span>[<span style="color:#a6e22e">title</span>] <span style="color:#f92672">||</span> {};
-          <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">response</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">getResponse</span>();
-          <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">rows</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">item</span>.<span style="color:#a6e22e">asGridItem</span>().<span style="color:#a6e22e">getRows</span>();
-          <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">head</span> <span style="color:#f92672">=</span> [...<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">head</span>, ...<span style="color:#a6e22e">rows</span>];
-          <span style="color:#a6e22e">rows</span>.<span style="color:#a6e22e">forEach</span>((<span style="color:#a6e22e">g</span>, <span style="color:#a6e22e">k</span>) =&gt; {
-            <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">v</span> <span style="color:#f92672">=</span> Number(<span style="color:#a6e22e">response</span>[<span style="color:#a6e22e">k</span>]) <span style="color:#f92672">||</span> <span style="color:#ae81ff">0</span>;
-            <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">res</span>[<span style="color:#a6e22e">title</span>][<span style="color:#a6e22e">g</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">res</span>[<span style="color:#a6e22e">title</span>][<span style="color:#a6e22e">g</span>] <span style="color:#f92672">?</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">res</span>[<span style="color:#a6e22e">title</span>][<span style="color:#a6e22e">g</span>] <span style="color:#f92672">+</span> <span style="color:#a6e22e">v</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">v</span>;
-          });
-        }
-      });
-      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
-    },
-    { <span style="color:#a6e22e">res</span><span style="color:#f92672">:</span> {}, <span style="color:#a6e22e">head</span><span style="color:#f92672">:</span> [] }
-  );
-
-  <span style="color:#75715e">// Create an array for putting the values to Spreadsheet.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">header</span> <span style="color:#f92672">=</span> [...<span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Set</span>(<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">head</span>)];
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">len</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">formResponses</span>.<span style="color:#a6e22e">length</span>;
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> [
-    [<span style="color:#e6db74">&#34;Title of question&#34;</span>, ...<span style="color:#a6e22e">header</span>],
-    ...Object.<span style="color:#a6e22e">entries</span>(<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">res</span>).<span style="color:#a6e22e">map</span>(([<span style="color:#a6e22e">k1</span>, <span style="color:#a6e22e">v1</span>]) =&gt; [
-      <span style="color:#a6e22e">k1</span>,
-      ...<span style="color:#a6e22e">header</span>.<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">h</span>) =&gt; (<span style="color:#a6e22e">v1</span>[<span style="color:#a6e22e">h</span>] <span style="color:#f92672">?</span> <span style="color:#a6e22e">v1</span>[<span style="color:#a6e22e">h</span>] <span style="color:#f92672">/</span> <span style="color:#a6e22e">len</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">null</span>)),
-    ]),
-  ];
-
-  <span style="color:#75715e">// Put the values to Spreadsheet.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>().<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#a6e22e">sheetName</span>);
-  <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">length</span>, <span style="color:#a6e22e">values</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">length</span>).<span style="color:#a6e22e">setValues</span>(<span style="color:#a6e22e">values</span>);
-}
-</code></pre></div><h2 id="reference">Reference</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">formId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set your Form ID.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheetName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Sheet1&#34;</span>; <span style="color:#75715e">// Please set the sheet name.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Retrieve responses from the grid items.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">form</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">FormApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">formId</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">formResponses</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">form</span>.<span style="color:#a6e22e">getResponses</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">formResponses</span>.<span style="color:#a6e22e">reduce</span>(
+</span></span><span style="display:flex;"><span>    (<span style="color:#a6e22e">o</span>, <span style="color:#a6e22e">e</span>) =&gt; {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getItemResponses</span>().<span style="color:#a6e22e">forEach</span>((<span style="color:#a6e22e">f</span>) =&gt; {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">item</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">getItem</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">item</span>.<span style="color:#a6e22e">getType</span>() <span style="color:#f92672">==</span> <span style="color:#a6e22e">FormApp</span>.<span style="color:#a6e22e">ItemType</span>.<span style="color:#a6e22e">GRID</span>) {
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">title</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">item</span>.<span style="color:#a6e22e">getTitle</span>();
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">res</span>[<span style="color:#a6e22e">title</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">res</span>[<span style="color:#a6e22e">title</span>] <span style="color:#f92672">||</span> {};
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">response</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">getResponse</span>();
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">rows</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">item</span>.<span style="color:#a6e22e">asGridItem</span>().<span style="color:#a6e22e">getRows</span>();
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">head</span> <span style="color:#f92672">=</span> [...<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">head</span>, ...<span style="color:#a6e22e">rows</span>];
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">rows</span>.<span style="color:#a6e22e">forEach</span>((<span style="color:#a6e22e">g</span>, <span style="color:#a6e22e">k</span>) =&gt; {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">v</span> <span style="color:#f92672">=</span> Number(<span style="color:#a6e22e">response</span>[<span style="color:#a6e22e">k</span>]) <span style="color:#f92672">||</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">res</span>[<span style="color:#a6e22e">title</span>][<span style="color:#a6e22e">g</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">res</span>[<span style="color:#a6e22e">title</span>][<span style="color:#a6e22e">g</span>] <span style="color:#f92672">?</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">res</span>[<span style="color:#a6e22e">title</span>][<span style="color:#a6e22e">g</span>] <span style="color:#f92672">+</span> <span style="color:#a6e22e">v</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">v</span>;
+</span></span><span style="display:flex;"><span>          });
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>      });
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    { <span style="color:#a6e22e">res</span><span style="color:#f92672">:</span> {}, <span style="color:#a6e22e">head</span><span style="color:#f92672">:</span> [] }
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Create an array for putting the values to Spreadsheet.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">header</span> <span style="color:#f92672">=</span> [...<span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Set</span>(<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">head</span>)];
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">len</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">formResponses</span>.<span style="color:#a6e22e">length</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    [<span style="color:#e6db74">&#34;Title of question&#34;</span>, ...<span style="color:#a6e22e">header</span>],
+</span></span><span style="display:flex;"><span>    ...Object.<span style="color:#a6e22e">entries</span>(<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">res</span>).<span style="color:#a6e22e">map</span>(([<span style="color:#a6e22e">k1</span>, <span style="color:#a6e22e">v1</span>]) =&gt; [
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">k1</span>,
+</span></span><span style="display:flex;"><span>      ...<span style="color:#a6e22e">header</span>.<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">h</span>) =&gt; (<span style="color:#a6e22e">v1</span>[<span style="color:#a6e22e">h</span>] <span style="color:#f92672">?</span> <span style="color:#a6e22e">v1</span>[<span style="color:#a6e22e">h</span>] <span style="color:#f92672">/</span> <span style="color:#a6e22e">len</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">null</span>)),
+</span></span><span style="display:flex;"><span>    ]),
+</span></span><span style="display:flex;"><span>  ];
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Put the values to Spreadsheet.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>().<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#a6e22e">sheetName</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">length</span>, <span style="color:#a6e22e">values</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">length</span>).<span style="color:#a6e22e">setValues</span>(<span style="color:#a6e22e">values</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="reference">Reference</h2>
 <ul>
 <li>This sample script was answered to <a href="https://stackoverflow.com/q/72022245/7108653">this thread at Stackoverflow</a>.</li>
 </ul>
@@ -431,15 +430,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -462,15 +452,6 @@
 
 
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

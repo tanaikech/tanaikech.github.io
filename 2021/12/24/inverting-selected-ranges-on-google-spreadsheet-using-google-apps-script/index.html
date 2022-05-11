@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Inverting Selected Ranges on Google Spreadsheet using Google Apps Script &middot; tanaike</title>
 
@@ -288,116 +287,116 @@
 <p>I have the case that I want to invert the selected ranges on Google Spreadsheet. This sample script can be achieved this goal using Google Apps Script.</p>
 <h2 id="sample-script">Sample script</h2>
 <p>Please copy and paste the following script to the script editor of Google Spreadsheet, and save the script. And, please select the cells and run the function <code>main()</code>. By this, the selected ranges are inverted.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// Ref: https://stackoverflow.com/a/21231012/7108653
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">columnToLetter_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">column</span>) =&gt; {
-  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">temp</span>,
-    <span style="color:#a6e22e">letter</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
-  <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">column</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
-    <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">column</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">%</span> <span style="color:#ae81ff">26</span>;
-    <span style="color:#a6e22e">letter</span> <span style="color:#f92672">=</span> String.<span style="color:#a6e22e">fromCharCode</span>(<span style="color:#a6e22e">temp</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">65</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">letter</span>;
-    <span style="color:#a6e22e">column</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">column</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">/</span> <span style="color:#ae81ff">26</span>;
-  }
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">letter</span>;
-};
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">letterToColumn_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">letter</span>) =&gt; {
-  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">column</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>,
-    <span style="color:#a6e22e">length</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">letter</span>.<span style="color:#a6e22e">length</span>;
-  <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
-    <span style="color:#a6e22e">column</span> <span style="color:#f92672">+=</span> (<span style="color:#a6e22e">letter</span>.<span style="color:#a6e22e">charCodeAt</span>(<span style="color:#a6e22e">i</span>) <span style="color:#f92672">-</span> <span style="color:#ae81ff">64</span>) <span style="color:#f92672">*</span> Math.<span style="color:#a6e22e">pow</span>(<span style="color:#ae81ff">26</span>, <span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>);
-  }
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">column</span>;
-};
-
-<span style="color:#75715e">// This is from https://tanaikech.github.io/2020/04/04/updated-expanding-a1notations-using-google-apps-script/
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">expandA1Notations_</span>(<span style="color:#a6e22e">a1Notations</span>, <span style="color:#a6e22e">maxRow</span>, <span style="color:#a6e22e">maxColumn</span>) {
-  <span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">||</span> <span style="color:#e6db74">&#34;1000&#34;</span>;
-  <span style="color:#a6e22e">maxColumn</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">maxColumn</span> <span style="color:#f92672">||</span> <span style="color:#e6db74">&#34;Z&#34;</span>;
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">reg1</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> RegExp(<span style="color:#e6db74">&#34;^([A-Z]+)([0-9]+)$&#34;</span>);
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">reg2</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> RegExp(<span style="color:#e6db74">&#34;^([A-Z]+)$&#34;</span>);
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">reg3</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> RegExp(<span style="color:#e6db74">&#34;^([0-9]+)$&#34;</span>);
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">a1Notations</span>.<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">e</span>) =&gt; {
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">a1</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;!&#34;</span>);
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">a1</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">a1</span>[<span style="color:#ae81ff">1</span>] <span style="color:#f92672">:</span> <span style="color:#a6e22e">a1</span>[<span style="color:#ae81ff">0</span>];
-    <span style="color:#66d9ef">const</span> [<span style="color:#a6e22e">r1</span>, <span style="color:#a6e22e">r2</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;:&#34;</span>);
-    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">r2</span>) <span style="color:#66d9ef">return</span> [<span style="color:#a6e22e">r1</span>];
-    <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">rr</span>;
-    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">reg1</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">r1</span>) <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">reg1</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">r2</span>)) {
-      <span style="color:#a6e22e">rr</span> <span style="color:#f92672">=</span> [<span style="color:#a6e22e">r1</span>.<span style="color:#a6e22e">toUpperCase</span>().<span style="color:#a6e22e">match</span>(<span style="color:#a6e22e">reg1</span>), <span style="color:#a6e22e">r2</span>.<span style="color:#a6e22e">toUpperCase</span>().<span style="color:#a6e22e">match</span>(<span style="color:#a6e22e">reg1</span>)];
-    } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">reg2</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">r1</span>) <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">reg2</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">r2</span>)) {
-      <span style="color:#a6e22e">rr</span> <span style="color:#f92672">=</span> [
-        [<span style="color:#66d9ef">null</span>, <span style="color:#a6e22e">r1</span>, <span style="color:#ae81ff">1</span>],
-        [<span style="color:#66d9ef">null</span>, <span style="color:#a6e22e">r2</span>, <span style="color:#a6e22e">maxRow</span>],
-      ];
-    } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">reg1</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">r1</span>) <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">reg2</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">r2</span>)) {
-      <span style="color:#a6e22e">rr</span> <span style="color:#f92672">=</span> [<span style="color:#a6e22e">r1</span>.<span style="color:#a6e22e">toUpperCase</span>().<span style="color:#a6e22e">match</span>(<span style="color:#a6e22e">reg1</span>), [<span style="color:#66d9ef">null</span>, <span style="color:#a6e22e">r2</span>, <span style="color:#a6e22e">maxRow</span>]];
-    } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">reg2</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">r1</span>) <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">reg1</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">r2</span>)) {
-      <span style="color:#a6e22e">rr</span> <span style="color:#f92672">=</span> [[<span style="color:#66d9ef">null</span>, <span style="color:#a6e22e">r1</span>, <span style="color:#a6e22e">maxRow</span>], <span style="color:#a6e22e">r2</span>.<span style="color:#a6e22e">toUpperCase</span>().<span style="color:#a6e22e">match</span>(<span style="color:#a6e22e">reg1</span>)];
-    } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">reg3</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">r1</span>) <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">reg3</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">r2</span>)) {
-      <span style="color:#a6e22e">rr</span> <span style="color:#f92672">=</span>
-        Number(<span style="color:#a6e22e">r1</span>) <span style="color:#f92672">&gt;</span> Number(<span style="color:#a6e22e">r2</span>)
-          <span style="color:#f92672">?</span> [
-              [<span style="color:#66d9ef">null</span>, <span style="color:#e6db74">&#34;A&#34;</span>, <span style="color:#a6e22e">r2</span>],
-              [<span style="color:#66d9ef">null</span>, <span style="color:#a6e22e">maxColumn</span>, <span style="color:#a6e22e">r1</span>],
-            ]
-          <span style="color:#f92672">:</span> [
-              [<span style="color:#66d9ef">null</span>, <span style="color:#e6db74">&#34;A&#34;</span>, <span style="color:#a6e22e">r1</span>],
-              [<span style="color:#66d9ef">null</span>, <span style="color:#a6e22e">maxColumn</span>, <span style="color:#a6e22e">r2</span>],
-            ];
-    } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">reg1</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">r1</span>) <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">reg3</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">r2</span>)) {
-      <span style="color:#a6e22e">rr</span> <span style="color:#f92672">=</span> [<span style="color:#a6e22e">r1</span>.<span style="color:#a6e22e">toUpperCase</span>().<span style="color:#a6e22e">match</span>(<span style="color:#a6e22e">reg1</span>), [<span style="color:#66d9ef">null</span>, <span style="color:#a6e22e">maxColumn</span>, <span style="color:#a6e22e">r2</span>]];
-    } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">reg3</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">r1</span>) <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">reg1</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">r2</span>)) {
-      <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">r2</span>.<span style="color:#a6e22e">toUpperCase</span>().<span style="color:#a6e22e">match</span>(<span style="color:#a6e22e">reg1</span>);
-      <span style="color:#a6e22e">rr</span> <span style="color:#f92672">=</span>
-        Number(<span style="color:#a6e22e">temp</span>[<span style="color:#ae81ff">2</span>]) <span style="color:#f92672">&gt;</span> Number(<span style="color:#a6e22e">r1</span>)
-          <span style="color:#f92672">?</span> [
-              [<span style="color:#66d9ef">null</span>, <span style="color:#a6e22e">temp</span>[<span style="color:#ae81ff">1</span>], <span style="color:#a6e22e">r1</span>],
-              [<span style="color:#66d9ef">null</span>, <span style="color:#a6e22e">maxColumn</span>, <span style="color:#a6e22e">temp</span>[<span style="color:#ae81ff">2</span>]],
-            ]
-          <span style="color:#f92672">:</span> [<span style="color:#a6e22e">temp</span>, [<span style="color:#66d9ef">null</span>, <span style="color:#a6e22e">maxColumn</span>, <span style="color:#a6e22e">r1</span>]];
-    } <span style="color:#66d9ef">else</span> {
-      <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">`Wrong a1Notation: </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">r</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
-    }
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> {
-      <span style="color:#a6e22e">startRowIndex</span><span style="color:#f92672">:</span> Number(<span style="color:#a6e22e">rr</span>[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">2</span>]),
-      <span style="color:#a6e22e">endRowIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">rr</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">?</span> Number(<span style="color:#a6e22e">rr</span>[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">2</span>]) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">:</span> Number(<span style="color:#a6e22e">rr</span>[<span style="color:#ae81ff">1</span>][<span style="color:#ae81ff">2</span>]) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>,
-      <span style="color:#a6e22e">startColumnIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">letterToColumn_</span>(<span style="color:#a6e22e">rr</span>[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">1</span>]),
-      <span style="color:#a6e22e">endColumnIndex</span><span style="color:#f92672">:</span>
-        <span style="color:#a6e22e">rr</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>
-          <span style="color:#f92672">?</span> <span style="color:#a6e22e">letterToColumn_</span>(<span style="color:#a6e22e">rr</span>[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">1</span>]) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
-          <span style="color:#f92672">:</span> <span style="color:#a6e22e">letterToColumn_</span>(<span style="color:#a6e22e">rr</span>[<span style="color:#ae81ff">1</span>][<span style="color:#ae81ff">1</span>]) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>,
-    };
-    <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> [];
-    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">startRowIndex</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">endRowIndex</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
-      <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">j</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">startColumnIndex</span>; <span style="color:#a6e22e">j</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">endColumnIndex</span>; <span style="color:#a6e22e">j</span><span style="color:#f92672">++</span>) {
-        <span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">columnToLetter_</span>(<span style="color:#a6e22e">j</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">i</span>);
-      }
-    }
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">temp</span>;
-  });
-}
-
-<span style="color:#75715e">// Please run this function after the cells were selected.
-</span><span style="color:#75715e">// By this, the selected cells are reversed.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">activeRanges</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveRangeList</span>().<span style="color:#a6e22e">getRanges</span>();
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">activeRanges</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) <span style="color:#66d9ef">return</span>;
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">a1Notations</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">activeRanges</span>.<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">e</span>) =&gt; <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getA1Notation</span>());
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">expandA1Notations_</span>(<span style="color:#a6e22e">a1Notations</span>);
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">o</span>, <span style="color:#a6e22e">r</span>) =&gt; {
-    <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">forEach</span>((<span style="color:#a6e22e">c</span>) =&gt; (<span style="color:#a6e22e">o</span>[<span style="color:#a6e22e">c</span>] <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>));
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
-  }, {});
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSheet</span>();
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">rows</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getMaxRows</span>();
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">cols</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getMaxColumns</span>();
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">allA1Notations</span> <span style="color:#f92672">=</span> [...Array(<span style="color:#a6e22e">rows</span>)].<span style="color:#a6e22e">flatMap</span>((<span style="color:#ae81ff">_</span>, <span style="color:#a6e22e">r</span>) =&gt;
-    [...Array(<span style="color:#a6e22e">cols</span>)].<span style="color:#a6e22e">map</span>((<span style="color:#ae81ff">_</span>, <span style="color:#a6e22e">c</span>) =&gt; <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">columnToLetter_</span>(<span style="color:#a6e22e">c</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>)<span style="color:#e6db74">}${</span><span style="color:#a6e22e">r</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>)
-  );
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">reverseA1Notations</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">allA1Notations</span>.<span style="color:#a6e22e">filter</span>((<span style="color:#a6e22e">r</span>) =&gt; <span style="color:#f92672">!</span><span style="color:#a6e22e">obj</span>[<span style="color:#a6e22e">r</span>]);
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">reverseA1Notations</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) <span style="color:#66d9ef">return</span>;
-  <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRangeList</span>(<span style="color:#a6e22e">reverseA1Notations</span>).<span style="color:#a6e22e">activate</span>();
-}
-</code></pre></div><h2 id="note">Note</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">// Ref: https://stackoverflow.com/a/21231012/7108653
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">columnToLetter_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">column</span>) =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">temp</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">letter</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">column</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">column</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">%</span> <span style="color:#ae81ff">26</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">letter</span> <span style="color:#f92672">=</span> String.<span style="color:#a6e22e">fromCharCode</span>(<span style="color:#a6e22e">temp</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">65</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">letter</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">column</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">column</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">/</span> <span style="color:#ae81ff">26</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">letter</span>;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">letterToColumn_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">letter</span>) =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">column</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">length</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">letter</span>.<span style="color:#a6e22e">length</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">column</span> <span style="color:#f92672">+=</span> (<span style="color:#a6e22e">letter</span>.<span style="color:#a6e22e">charCodeAt</span>(<span style="color:#a6e22e">i</span>) <span style="color:#f92672">-</span> <span style="color:#ae81ff">64</span>) <span style="color:#f92672">*</span> Math.<span style="color:#a6e22e">pow</span>(<span style="color:#ae81ff">26</span>, <span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">column</span>;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// This is from https://tanaikech.github.io/2020/04/04/updated-expanding-a1notations-using-google-apps-script/
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">expandA1Notations_</span>(<span style="color:#a6e22e">a1Notations</span>, <span style="color:#a6e22e">maxRow</span>, <span style="color:#a6e22e">maxColumn</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">||</span> <span style="color:#e6db74">&#34;1000&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">maxColumn</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">maxColumn</span> <span style="color:#f92672">||</span> <span style="color:#e6db74">&#34;Z&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">reg1</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> RegExp(<span style="color:#e6db74">&#34;^([A-Z]+)([0-9]+)$&#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">reg2</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> RegExp(<span style="color:#e6db74">&#34;^([A-Z]+)$&#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">reg3</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> RegExp(<span style="color:#e6db74">&#34;^([0-9]+)$&#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">a1Notations</span>.<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">e</span>) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">a1</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;!&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">a1</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">a1</span>[<span style="color:#ae81ff">1</span>] <span style="color:#f92672">:</span> <span style="color:#a6e22e">a1</span>[<span style="color:#ae81ff">0</span>];
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> [<span style="color:#a6e22e">r1</span>, <span style="color:#a6e22e">r2</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;:&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">r2</span>) <span style="color:#66d9ef">return</span> [<span style="color:#a6e22e">r1</span>];
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">rr</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">reg1</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">r1</span>) <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">reg1</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">r2</span>)) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">rr</span> <span style="color:#f92672">=</span> [<span style="color:#a6e22e">r1</span>.<span style="color:#a6e22e">toUpperCase</span>().<span style="color:#a6e22e">match</span>(<span style="color:#a6e22e">reg1</span>), <span style="color:#a6e22e">r2</span>.<span style="color:#a6e22e">toUpperCase</span>().<span style="color:#a6e22e">match</span>(<span style="color:#a6e22e">reg1</span>)];
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">reg2</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">r1</span>) <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">reg2</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">r2</span>)) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">rr</span> <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>        [<span style="color:#66d9ef">null</span>, <span style="color:#a6e22e">r1</span>, <span style="color:#ae81ff">1</span>],
+</span></span><span style="display:flex;"><span>        [<span style="color:#66d9ef">null</span>, <span style="color:#a6e22e">r2</span>, <span style="color:#a6e22e">maxRow</span>],
+</span></span><span style="display:flex;"><span>      ];
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">reg1</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">r1</span>) <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">reg2</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">r2</span>)) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">rr</span> <span style="color:#f92672">=</span> [<span style="color:#a6e22e">r1</span>.<span style="color:#a6e22e">toUpperCase</span>().<span style="color:#a6e22e">match</span>(<span style="color:#a6e22e">reg1</span>), [<span style="color:#66d9ef">null</span>, <span style="color:#a6e22e">r2</span>, <span style="color:#a6e22e">maxRow</span>]];
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">reg2</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">r1</span>) <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">reg1</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">r2</span>)) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">rr</span> <span style="color:#f92672">=</span> [[<span style="color:#66d9ef">null</span>, <span style="color:#a6e22e">r1</span>, <span style="color:#a6e22e">maxRow</span>], <span style="color:#a6e22e">r2</span>.<span style="color:#a6e22e">toUpperCase</span>().<span style="color:#a6e22e">match</span>(<span style="color:#a6e22e">reg1</span>)];
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">reg3</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">r1</span>) <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">reg3</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">r2</span>)) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">rr</span> <span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span>        Number(<span style="color:#a6e22e">r1</span>) <span style="color:#f92672">&gt;</span> Number(<span style="color:#a6e22e">r2</span>)
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">?</span> [
+</span></span><span style="display:flex;"><span>              [<span style="color:#66d9ef">null</span>, <span style="color:#e6db74">&#34;A&#34;</span>, <span style="color:#a6e22e">r2</span>],
+</span></span><span style="display:flex;"><span>              [<span style="color:#66d9ef">null</span>, <span style="color:#a6e22e">maxColumn</span>, <span style="color:#a6e22e">r1</span>],
+</span></span><span style="display:flex;"><span>            ]
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">:</span> [
+</span></span><span style="display:flex;"><span>              [<span style="color:#66d9ef">null</span>, <span style="color:#e6db74">&#34;A&#34;</span>, <span style="color:#a6e22e">r1</span>],
+</span></span><span style="display:flex;"><span>              [<span style="color:#66d9ef">null</span>, <span style="color:#a6e22e">maxColumn</span>, <span style="color:#a6e22e">r2</span>],
+</span></span><span style="display:flex;"><span>            ];
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">reg1</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">r1</span>) <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">reg3</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">r2</span>)) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">rr</span> <span style="color:#f92672">=</span> [<span style="color:#a6e22e">r1</span>.<span style="color:#a6e22e">toUpperCase</span>().<span style="color:#a6e22e">match</span>(<span style="color:#a6e22e">reg1</span>), [<span style="color:#66d9ef">null</span>, <span style="color:#a6e22e">maxColumn</span>, <span style="color:#a6e22e">r2</span>]];
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">reg3</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">r1</span>) <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">reg1</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">r2</span>)) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">r2</span>.<span style="color:#a6e22e">toUpperCase</span>().<span style="color:#a6e22e">match</span>(<span style="color:#a6e22e">reg1</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">rr</span> <span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span>        Number(<span style="color:#a6e22e">temp</span>[<span style="color:#ae81ff">2</span>]) <span style="color:#f92672">&gt;</span> Number(<span style="color:#a6e22e">r1</span>)
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">?</span> [
+</span></span><span style="display:flex;"><span>              [<span style="color:#66d9ef">null</span>, <span style="color:#a6e22e">temp</span>[<span style="color:#ae81ff">1</span>], <span style="color:#a6e22e">r1</span>],
+</span></span><span style="display:flex;"><span>              [<span style="color:#66d9ef">null</span>, <span style="color:#a6e22e">maxColumn</span>, <span style="color:#a6e22e">temp</span>[<span style="color:#ae81ff">2</span>]],
+</span></span><span style="display:flex;"><span>            ]
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">:</span> [<span style="color:#a6e22e">temp</span>, [<span style="color:#66d9ef">null</span>, <span style="color:#a6e22e">maxColumn</span>, <span style="color:#a6e22e">r1</span>]];
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">`Wrong a1Notation: </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">r</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">startRowIndex</span><span style="color:#f92672">:</span> Number(<span style="color:#a6e22e">rr</span>[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">2</span>]),
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">endRowIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">rr</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">?</span> Number(<span style="color:#a6e22e">rr</span>[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">2</span>]) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">:</span> Number(<span style="color:#a6e22e">rr</span>[<span style="color:#ae81ff">1</span>][<span style="color:#ae81ff">2</span>]) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">startColumnIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">letterToColumn_</span>(<span style="color:#a6e22e">rr</span>[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">1</span>]),
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">endColumnIndex</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">rr</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">?</span> <span style="color:#a6e22e">letterToColumn_</span>(<span style="color:#a6e22e">rr</span>[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">1</span>]) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">:</span> <span style="color:#a6e22e">letterToColumn_</span>(<span style="color:#a6e22e">rr</span>[<span style="color:#ae81ff">1</span>][<span style="color:#ae81ff">1</span>]) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>,
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> [];
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">startRowIndex</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">endRowIndex</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">j</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">startColumnIndex</span>; <span style="color:#a6e22e">j</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">endColumnIndex</span>; <span style="color:#a6e22e">j</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">columnToLetter_</span>(<span style="color:#a6e22e">j</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">i</span>);
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">temp</span>;
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Please run this function after the cells were selected.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// By this, the selected cells are reversed.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">activeRanges</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveRangeList</span>().<span style="color:#a6e22e">getRanges</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">activeRanges</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">a1Notations</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">activeRanges</span>.<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">e</span>) =&gt; <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getA1Notation</span>());
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">expandA1Notations_</span>(<span style="color:#a6e22e">a1Notations</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">o</span>, <span style="color:#a6e22e">r</span>) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">forEach</span>((<span style="color:#a6e22e">c</span>) =&gt; (<span style="color:#a6e22e">o</span>[<span style="color:#a6e22e">c</span>] <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>));
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
+</span></span><span style="display:flex;"><span>  }, {});
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSheet</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">rows</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getMaxRows</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">cols</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getMaxColumns</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">allA1Notations</span> <span style="color:#f92672">=</span> [...Array(<span style="color:#a6e22e">rows</span>)].<span style="color:#a6e22e">flatMap</span>((<span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">r</span>) =&gt;
+</span></span><span style="display:flex;"><span>    [...Array(<span style="color:#a6e22e">cols</span>)].<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">c</span>) =&gt; <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">columnToLetter_</span>(<span style="color:#a6e22e">c</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>)<span style="color:#e6db74">}${</span><span style="color:#a6e22e">r</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>)
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">reverseA1Notations</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">allA1Notations</span>.<span style="color:#a6e22e">filter</span>((<span style="color:#a6e22e">r</span>) =&gt; <span style="color:#f92672">!</span><span style="color:#a6e22e">obj</span>[<span style="color:#a6e22e">r</span>]);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">reverseA1Notations</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRangeList</span>(<span style="color:#a6e22e">reverseA1Notations</span>).<span style="color:#a6e22e">activate</span>();
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="note">Note</h2>
 <p>In the current stage, each A1Notation cannot be merged. For example, the A1Notations of &ldquo;A1&rdquo;, &ldquo;A2&rdquo;, &ldquo;B1&rdquo;, &ldquo;B2&rdquo;, &ldquo;C1&rdquo;, &ldquo;C2&rdquo; are used as the individual A1Notation instead of &ldquo;A1:C2&rdquo;. By this, when a large area of Spreadsheet is used, the process cost of this script become high. Please be careful this. I would like to try to think of the method for merging A1Notations.</p>
 
   
@@ -487,15 +486,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -521,15 +511,6 @@
   <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
   
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Report: Handling 10,000,000 cells in Google Spreadsheet using Google Apps Script &middot; tanaike</title>
 
@@ -481,153 +480,153 @@
 <p>These are the sample scripts for measuring process costs for each experiment.</p>
 <h2 id="1-retrieve-the-metadata-from-spreadsheet-1">1. Retrieve the metadata from Spreadsheet</h2>
 <p>For Spreadsheet service</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>).<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getMaxRows</span>();
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">maxCol</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getMaxColumns</span>();
-</code></pre></div><p>For Sheets API</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">rowCount</span>, <span style="color:#a6e22e">columnCount</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">ssId</span>, {
-  <span style="color:#a6e22e">fields</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sheets(properties)&#34;</span>,
-}).<span style="color:#a6e22e">sheets</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">properties</span>.<span style="color:#a6e22e">gridProperties</span>;
-</code></pre></div><h2 id="2-retrieve-a-value-from-a-cell-a1-and-a-cell-j1000000-1">2. Retrieve a value from a cell &ldquo;A1&rdquo; and a cell &ldquo;J1000000&rdquo;</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>).<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getMaxRows</span>();
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">maxCol</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getMaxColumns</span>();
+</span></span></code></pre></div><p>For Sheets API</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">rowCount</span>, <span style="color:#a6e22e">columnCount</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">ssId</span>, {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">fields</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sheets(properties)&#34;</span>,
+</span></span><span style="display:flex;"><span>}).<span style="color:#a6e22e">sheets</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">properties</span>.<span style="color:#a6e22e">gridProperties</span>;
+</span></span></code></pre></div><h2 id="2-retrieve-a-value-from-a-cell-a1-and-a-cell-j1000000-1">2. Retrieve a value from a cell &ldquo;A1&rdquo; and a cell &ldquo;J1000000&rdquo;</h2>
 <p>For Spreadsheet service</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>)
-  .<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>)
-  .<span style="color:#a6e22e">getRange</span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>) <span style="color:#75715e">// and .getRange(1000000, 10)
-</span><span style="color:#75715e"></span>  .<span style="color:#a6e22e">getValue</span>();
-</code></pre></div><p>For Sheets API</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;A1&#34;</span>; <span style="color:#75715e">// and &#34;J1000000&#34;
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">Values</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">ssId</span>, <span style="color:#e6db74">`Sheet1!</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">range</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>)
-  .<span style="color:#a6e22e">values</span>[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">0</span>];
-</code></pre></div><h2 id="3-retrieve-all-values-from-10000000-cells-1">3. Retrieve all values from 10,000,000 cells</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>)
+</span></span><span style="display:flex;"><span>  .<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>)
+</span></span><span style="display:flex;"><span>  .<span style="color:#a6e22e">getRange</span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>) <span style="color:#75715e">// and .getRange(1000000, 10)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  .<span style="color:#a6e22e">getValue</span>();
+</span></span></code></pre></div><p>For Sheets API</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;A1&#34;</span>; <span style="color:#75715e">// and &#34;J1000000&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">Values</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">ssId</span>, <span style="color:#e6db74">`Sheet1!</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">range</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>)
+</span></span><span style="display:flex;"><span>  .<span style="color:#a6e22e">values</span>[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">0</span>];
+</span></span></code></pre></div><h2 id="3-retrieve-all-values-from-10000000-cells-1">3. Retrieve all values from 10,000,000 cells</h2>
 <p>For Spreadsheet service</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">limit</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">200000</span>; <span style="color:#75715e">// Number of rows per one request of getValues().
-</span><span style="color:#75715e"></span>
-<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">start</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> [...Array(Math.<span style="color:#a6e22e">ceil</span>(<span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">limit</span>))].<span style="color:#a6e22e">flatMap</span>((<span style="color:#ae81ff">_</span>) =&gt; {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">last</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">start</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">limit</span>;
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`&#39;Sheet1&#39;!A</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">start</span><span style="color:#e6db74">}</span><span style="color:#e6db74">:</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">last</span> <span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">last</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>;
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">range</span>).<span style="color:#a6e22e">getValues</span>();
-  <span style="color:#a6e22e">start</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">limit</span>;
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">temp</span>;
-});
-</code></pre></div><p>For Sheets API</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">limit</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">200000</span>; <span style="color:#75715e">// Number of rows per one API call.
-</span><span style="color:#75715e"></span>
-<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">start</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> [...Array(Math.<span style="color:#a6e22e">ceil</span>(<span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">limit</span>))].<span style="color:#a6e22e">flatMap</span>((<span style="color:#ae81ff">_</span>) =&gt; {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">last</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">start</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">limit</span>;
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`&#39;Sheet1&#39;!A</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">start</span><span style="color:#e6db74">}</span><span style="color:#e6db74">:</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">last</span> <span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">last</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>;
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">Values</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">ssId</span>, <span style="color:#a6e22e">range</span>).<span style="color:#a6e22e">values</span>;
-  <span style="color:#a6e22e">start</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">limit</span>;
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">temp</span>;
-});
-</code></pre></div><h2 id="4-search-a-value-from-a-cell-a1-and-a-cell-j1000000-1">4. Search a value from a cell &ldquo;A1&rdquo; and a cell &ldquo;J1000000&rdquo;.</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">limit</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">200000</span>; <span style="color:#75715e">// Number of rows per one request of getValues().
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> <span style="color:#a6e22e">start</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> [...Array(Math.<span style="color:#a6e22e">ceil</span>(<span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">limit</span>))].<span style="color:#a6e22e">flatMap</span>((<span style="color:#a6e22e">_</span>) =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">last</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">start</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">limit</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`&#39;Sheet1&#39;!A</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">start</span><span style="color:#e6db74">}</span><span style="color:#e6db74">:</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">last</span> <span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">last</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">range</span>).<span style="color:#a6e22e">getValues</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">start</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">limit</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">temp</span>;
+</span></span><span style="display:flex;"><span>});
+</span></span></code></pre></div><p>For Sheets API</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">limit</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">200000</span>; <span style="color:#75715e">// Number of rows per one API call.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> <span style="color:#a6e22e">start</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> [...Array(Math.<span style="color:#a6e22e">ceil</span>(<span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">limit</span>))].<span style="color:#a6e22e">flatMap</span>((<span style="color:#a6e22e">_</span>) =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">last</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">start</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">limit</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`&#39;Sheet1&#39;!A</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">start</span><span style="color:#e6db74">}</span><span style="color:#e6db74">:</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">last</span> <span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">last</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">Values</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">ssId</span>, <span style="color:#a6e22e">range</span>).<span style="color:#a6e22e">values</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">start</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">limit</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">temp</span>;
+</span></span><span style="display:flex;"><span>});
+</span></span></code></pre></div><h2 id="4-search-a-value-from-a-cell-a1-and-a-cell-j1000000-1">4. Search a value from a cell &ldquo;A1&rdquo; and a cell &ldquo;J1000000&rdquo;.</h2>
 <p>For searching a value from a cell &ldquo;A1&rdquo;</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>)
-  .<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>)
-  .<span style="color:#a6e22e">createTextFinder</span>(<span style="color:#e6db74">&#34;#0000000A1&#34;</span>)
-  .<span style="color:#a6e22e">matchEntireCell</span>(<span style="color:#66d9ef">true</span>)
-  .<span style="color:#a6e22e">findNext</span>(); <span style="color:#75715e">// and findAll()
-</span></code></pre></div><p>For searching a value from a cell &ldquo;J1000000&rdquo;</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>)
-  .<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>)
-  .<span style="color:#a6e22e">createTextFinder</span>(<span style="color:#e6db74">&#34;#0J1000000&#34;</span>)
-  .<span style="color:#a6e22e">matchEntireCell</span>(<span style="color:#66d9ef">true</span>)
-  .<span style="color:#a6e22e">findNext</span>(); <span style="color:#75715e">// and findAll()
-</span></code></pre></div><h2 id="5-put-a-value-to-a-cell-a1-and-a-cell-j1000000-1">5. Put a value to a cell &ldquo;A1&rdquo; and a cell &ldquo;J1000000&rdquo;</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>)
+</span></span><span style="display:flex;"><span>  .<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>)
+</span></span><span style="display:flex;"><span>  .<span style="color:#a6e22e">createTextFinder</span>(<span style="color:#e6db74">&#34;#0000000A1&#34;</span>)
+</span></span><span style="display:flex;"><span>  .<span style="color:#a6e22e">matchEntireCell</span>(<span style="color:#66d9ef">true</span>)
+</span></span><span style="display:flex;"><span>  .<span style="color:#a6e22e">findNext</span>(); <span style="color:#75715e">// and findAll()
+</span></span></span></code></pre></div><p>For searching a value from a cell &ldquo;J1000000&rdquo;</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>)
+</span></span><span style="display:flex;"><span>  .<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>)
+</span></span><span style="display:flex;"><span>  .<span style="color:#a6e22e">createTextFinder</span>(<span style="color:#e6db74">&#34;#0J1000000&#34;</span>)
+</span></span><span style="display:flex;"><span>  .<span style="color:#a6e22e">matchEntireCell</span>(<span style="color:#66d9ef">true</span>)
+</span></span><span style="display:flex;"><span>  .<span style="color:#a6e22e">findNext</span>(); <span style="color:#75715e">// and findAll()
+</span></span></span></code></pre></div><h2 id="5-put-a-value-to-a-cell-a1-and-a-cell-j1000000-1">5. Put a value to a cell &ldquo;A1&rdquo; and a cell &ldquo;J1000000&rdquo;</h2>
 <p>For Spreadsheet service</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>)
-  .<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>)
-  .<span style="color:#a6e22e">getRange</span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>) <span style="color:#75715e">// and .getRange(1000000, 10)
-</span><span style="color:#75715e"></span>  .<span style="color:#a6e22e">setValue</span>(<span style="color:#e6db74">&#34;sample&#34;</span>);
-</code></pre></div><p>For Sheets API</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">Values</span>.<span style="color:#a6e22e">update</span>(
-  { <span style="color:#a6e22e">values</span><span style="color:#f92672">:</span> [[<span style="color:#e6db74">&#34;sample&#34;</span>]] },
-  <span style="color:#a6e22e">ssId</span>,
-  <span style="color:#e6db74">&#34;Sheet1!A1&#34;</span>, <span style="color:#75715e">// and &#34;Sheet1!J1000000&#34;
-</span><span style="color:#75715e"></span>  { <span style="color:#a6e22e">valueInputOption</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;USER_ENTERED&#34;</span> }
-);
-</code></pre></div><h2 id="6-embed-all-10000000-cells-by-a-value-1">6. Embed all 10,000,000 cells by a value</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>)
+</span></span><span style="display:flex;"><span>  .<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>)
+</span></span><span style="display:flex;"><span>  .<span style="color:#a6e22e">getRange</span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>) <span style="color:#75715e">// and .getRange(1000000, 10)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  .<span style="color:#a6e22e">setValue</span>(<span style="color:#e6db74">&#34;sample&#34;</span>);
+</span></span></code></pre></div><p>For Sheets API</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">Values</span>.<span style="color:#a6e22e">update</span>(
+</span></span><span style="display:flex;"><span>  { <span style="color:#a6e22e">values</span><span style="color:#f92672">:</span> [[<span style="color:#e6db74">&#34;sample&#34;</span>]] },
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">ssId</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;Sheet1!A1&#34;</span>, <span style="color:#75715e">// and &#34;Sheet1!J1000000&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  { <span style="color:#a6e22e">valueInputOption</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;USER_ENTERED&#34;</span> }
+</span></span><span style="display:flex;"><span>);
+</span></span></code></pre></div><h2 id="6-embed-all-10000000-cells-by-a-value-1">6. Embed all 10,000,000 cells by a value</h2>
 <p>For Spreadsheet service</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>)
-  .<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>)
-  .<span style="color:#a6e22e">getRange</span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1000000</span>, <span style="color:#ae81ff">10</span>)
-  .<span style="color:#a6e22e">setValue</span>(<span style="color:#e6db74">&#34;sample&#34;</span>);
-</code></pre></div><p>For Sheets API</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">requests</span> <span style="color:#f92672">=</span> [
-  {
-    <span style="color:#a6e22e">repeatCell</span><span style="color:#f92672">:</span> {
-      <span style="color:#a6e22e">range</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">sheetId</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">0</span> },
-      <span style="color:#a6e22e">cell</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">userEnteredValue</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">stringValue</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sample&#34;</span> } },
-      <span style="color:#a6e22e">fields</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;userEnteredValue&#34;</span>,
-    },
-  },
-];
-<span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">batchUpdate</span>({ <span style="color:#a6e22e">requests</span> }, <span style="color:#a6e22e">ssId</span>);
-</code></pre></div><h2 id="7-embed-all-10000000-cells-by-the-difference-values-1">7. Embed all 10,000,000 cells by the difference values</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>)
+</span></span><span style="display:flex;"><span>  .<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>)
+</span></span><span style="display:flex;"><span>  .<span style="color:#a6e22e">getRange</span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1000000</span>, <span style="color:#ae81ff">10</span>)
+</span></span><span style="display:flex;"><span>  .<span style="color:#a6e22e">setValue</span>(<span style="color:#e6db74">&#34;sample&#34;</span>);
+</span></span></code></pre></div><p>For Sheets API</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">requests</span> <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">repeatCell</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">range</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">sheetId</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">0</span> },
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">cell</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">userEnteredValue</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">stringValue</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sample&#34;</span> } },
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">fields</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;userEnteredValue&#34;</span>,
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>];
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">batchUpdate</span>({ <span style="color:#a6e22e">requests</span> }, <span style="color:#a6e22e">ssId</span>);
+</span></span></code></pre></div><h2 id="7-embed-all-10000000-cells-by-the-difference-values-1">7. Embed all 10,000,000 cells by the difference values</h2>
 <p>For Spreadsheet service</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">limit</span> <span style="color:#f92672">=</span> <span style="color:#960050;background-color:#1e0010">###</span>; <span style="color:#75715e">// Number of rows per one request of getValues().
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> [[]]; <span style="color:#75715e">// Please set the array including 10 columns and 1,000,000 rows.
-</span><span style="color:#75715e"></span>
-<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">start</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>).<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>);
-Array.<span style="color:#a6e22e">from</span>(Array(Math.<span style="color:#a6e22e">ceil</span>(<span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">limit</span>))).<span style="color:#a6e22e">forEach</span>((<span style="color:#ae81ff">_</span>) =&gt; {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">v</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">splice</span>(<span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">limit</span>);
-  <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">start</span>, <span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">v</span>.<span style="color:#a6e22e">length</span>, <span style="color:#a6e22e">v</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">length</span>).<span style="color:#a6e22e">setValues</span>(<span style="color:#a6e22e">v</span>);
-  <span style="color:#a6e22e">start</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">limit</span>;
-});
-</code></pre></div><ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">limit</span> <span style="color:#f92672">=</span> <span style="color:#960050;background-color:#1e0010">###</span>; <span style="color:#75715e">// Number of rows per one request of getValues().
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> [[]]; <span style="color:#75715e">// Please set the array including 10 columns and 1,000,000 rows.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> <span style="color:#a6e22e">start</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>).<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>);
+</span></span><span style="display:flex;"><span>Array.<span style="color:#a6e22e">from</span>(Array(Math.<span style="color:#a6e22e">ceil</span>(<span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">limit</span>))).<span style="color:#a6e22e">forEach</span>((<span style="color:#a6e22e">_</span>) =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">v</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">splice</span>(<span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">limit</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">start</span>, <span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">v</span>.<span style="color:#a6e22e">length</span>, <span style="color:#a6e22e">v</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">length</span>).<span style="color:#a6e22e">setValues</span>(<span style="color:#a6e22e">v</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">start</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">limit</span>;
+</span></span><span style="display:flex;"><span>});
+</span></span></code></pre></div><ul>
 <li>In this case, all 10,000,000 cells couldn&rsquo;t be embedded using <code>setValues</code>.</li>
 </ul>
 <p>For Sheets API</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">limit</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">200000</span>; <span style="color:#75715e">// Number of rows per one API call.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> [[]]; <span style="color:#75715e">// Please set the array including 10 columns and 1,000,000 rows.
-</span><span style="color:#75715e"></span>
-<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">start</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
-Array.<span style="color:#a6e22e">from</span>(Array(Math.<span style="color:#a6e22e">ceil</span>(<span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">limit</span>))).<span style="color:#a6e22e">forEach</span>((<span style="color:#ae81ff">_</span>) =&gt; {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">v</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">splice</span>(<span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">limit</span>);
-  <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">Values</span>.<span style="color:#a6e22e">update</span>({ <span style="color:#a6e22e">values</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">v</span> }, <span style="color:#a6e22e">ssId</span>, <span style="color:#e6db74">`Sheet1!A</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">start</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>, {
-    <span style="color:#a6e22e">valueInputOption</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;USER_ENTERED&#34;</span>,
-  });
-  <span style="color:#a6e22e">start</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">limit</span>;
-});
-</code></pre></div><p>A sample script for retrieving the sample array of <code>values</code> is as follows.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// Ref: https://stackoverflow.com/a/21231012/7108653
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">columnToLetter</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">column</span>) =&gt; {
-  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">temp</span>,
-    <span style="color:#a6e22e">letter</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
-  <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">column</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
-    <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">column</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">%</span> <span style="color:#ae81ff">26</span>;
-    <span style="color:#a6e22e">letter</span> <span style="color:#f92672">=</span> String.<span style="color:#a6e22e">fromCharCode</span>(<span style="color:#a6e22e">temp</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">65</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">letter</span>;
-    <span style="color:#a6e22e">column</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">column</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">/</span> <span style="color:#ae81ff">26</span>;
-  }
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">letter</span>;
-};
-
-<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getSampleValues</span>() {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">cols</span> <span style="color:#f92672">=</span> [...Array(<span style="color:#a6e22e">maxCol</span>)].<span style="color:#a6e22e">map</span>((<span style="color:#ae81ff">_</span>, <span style="color:#a6e22e">i</span>) =&gt; <span style="color:#a6e22e">columnToLetter</span>(<span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>));
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> [...Array(<span style="color:#a6e22e">maxRow</span>)].<span style="color:#a6e22e">map</span>((<span style="color:#ae81ff">_</span>, <span style="color:#a6e22e">i</span>) =&gt;
-    [...Array(<span style="color:#a6e22e">maxCol</span>)].<span style="color:#a6e22e">map</span>(
-      (<span style="color:#ae81ff">_</span>, <span style="color:#a6e22e">j</span>) =&gt; <span style="color:#e6db74">&#34;#&#34;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">cols</span>[<span style="color:#a6e22e">j</span>]<span style="color:#e6db74">}${</span><span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>.<span style="color:#a6e22e">padStart</span>(<span style="color:#ae81ff">9</span>, <span style="color:#e6db74">&#34;0&#34;</span>)
-    )
-  );
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">values</span>;
-}
-</code></pre></div><h2 id="8-export-spreadsheet-with-10000000-cells-1">8. Export Spreadsheet with 10,000,000 cells</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> {
-  <span style="color:#a6e22e">xlsx</span><span style="color:#f92672">:</span> <span style="color:#e6db74">`https://docs.google.com/spreadsheets/export?id=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">ssId</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&amp;exportFormat=xlsx`</span>,
-  <span style="color:#a6e22e">csv</span><span style="color:#f92672">:</span> <span style="color:#e6db74">`https://docs.google.com/spreadsheets/export?id=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">ssId</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&amp;exportFormat=csv`</span>,
-  <span style="color:#a6e22e">pdf</span><span style="color:#f92672">:</span> <span style="color:#e6db74">`https://docs.google.com/spreadsheets/export?id=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">ssId</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&amp;exportFormat=pdf`</span>,
-};
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">token</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>();
-Object.<span style="color:#a6e22e">entries</span>(<span style="color:#a6e22e">obj</span>).<span style="color:#a6e22e">forEach</span>(([<span style="color:#a6e22e">k</span>, <span style="color:#a6e22e">v</span>], <span style="color:#a6e22e">i</span>) =&gt; {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">blob</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">v</span>, {
-    <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer ###your access token###&#34;</span> },
-  }).<span style="color:#a6e22e">getBlob</span>();
-  <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">createFile</span>(<span style="color:#a6e22e">blob</span>.<span style="color:#a6e22e">setName</span>(<span style="color:#a6e22e">k</span>));
-});
-</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">limit</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">200000</span>; <span style="color:#75715e">// Number of rows per one API call.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> [[]]; <span style="color:#75715e">// Please set the array including 10 columns and 1,000,000 rows.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> <span style="color:#a6e22e">start</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>Array.<span style="color:#a6e22e">from</span>(Array(Math.<span style="color:#a6e22e">ceil</span>(<span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">limit</span>))).<span style="color:#a6e22e">forEach</span>((<span style="color:#a6e22e">_</span>) =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">v</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">splice</span>(<span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">limit</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">Values</span>.<span style="color:#a6e22e">update</span>({ <span style="color:#a6e22e">values</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">v</span> }, <span style="color:#a6e22e">ssId</span>, <span style="color:#e6db74">`Sheet1!A</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">start</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>, {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">valueInputOption</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;USER_ENTERED&#34;</span>,
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">start</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">limit</span>;
+</span></span><span style="display:flex;"><span>});
+</span></span></code></pre></div><p>A sample script for retrieving the sample array of <code>values</code> is as follows.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">// Ref: https://stackoverflow.com/a/21231012/7108653
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">columnToLetter</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">column</span>) =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">temp</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">letter</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">column</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">column</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">%</span> <span style="color:#ae81ff">26</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">letter</span> <span style="color:#f92672">=</span> String.<span style="color:#a6e22e">fromCharCode</span>(<span style="color:#a6e22e">temp</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">65</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">letter</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">column</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">column</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">/</span> <span style="color:#ae81ff">26</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">letter</span>;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getSampleValues</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">cols</span> <span style="color:#f92672">=</span> [...Array(<span style="color:#a6e22e">maxCol</span>)].<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">i</span>) =&gt; <span style="color:#a6e22e">columnToLetter</span>(<span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>));
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> [...Array(<span style="color:#a6e22e">maxRow</span>)].<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">i</span>) =&gt;
+</span></span><span style="display:flex;"><span>    [...Array(<span style="color:#a6e22e">maxCol</span>)].<span style="color:#a6e22e">map</span>(
+</span></span><span style="display:flex;"><span>      (<span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">j</span>) =&gt; <span style="color:#e6db74">&#34;#&#34;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">cols</span>[<span style="color:#a6e22e">j</span>]<span style="color:#e6db74">}${</span><span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>.<span style="color:#a6e22e">padStart</span>(<span style="color:#ae81ff">9</span>, <span style="color:#e6db74">&#34;0&#34;</span>)
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">values</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="8-export-spreadsheet-with-10000000-cells-1">8. Export Spreadsheet with 10,000,000 cells</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">xlsx</span><span style="color:#f92672">:</span> <span style="color:#e6db74">`https://docs.google.com/spreadsheets/export?id=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">ssId</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&amp;exportFormat=xlsx`</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">csv</span><span style="color:#f92672">:</span> <span style="color:#e6db74">`https://docs.google.com/spreadsheets/export?id=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">ssId</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&amp;exportFormat=csv`</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">pdf</span><span style="color:#f92672">:</span> <span style="color:#e6db74">`https://docs.google.com/spreadsheets/export?id=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">ssId</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&amp;exportFormat=pdf`</span>,
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">token</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>();
+</span></span><span style="display:flex;"><span>Object.<span style="color:#a6e22e">entries</span>(<span style="color:#a6e22e">obj</span>).<span style="color:#a6e22e">forEach</span>(([<span style="color:#a6e22e">k</span>, <span style="color:#a6e22e">v</span>], <span style="color:#a6e22e">i</span>) =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">blob</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">v</span>, {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer ###your access token###&#34;</span> },
+</span></span><span style="display:flex;"><span>  }).<span style="color:#a6e22e">getBlob</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">createFile</span>(<span style="color:#a6e22e">blob</span>.<span style="color:#a6e22e">setName</span>(<span style="color:#a6e22e">k</span>));
+</span></span><span style="display:flex;"><span>});
+</span></span></code></pre></div>
   
   <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
 <ul class="share-buttons">
@@ -715,15 +714,6 @@ Object.<span style="color:#a6e22e">entries</span>(<span style="color:#a6e22e">ob
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -749,15 +739,6 @@ Object.<span style="color:#a6e22e">entries</span>(<span style="color:#a6e22e">ob
   <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
   
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

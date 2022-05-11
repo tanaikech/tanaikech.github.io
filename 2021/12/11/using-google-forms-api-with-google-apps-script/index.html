@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Using Google Forms API with Google Apps Script &middot; tanaike</title>
 
@@ -296,87 +295,87 @@
 <h3 id="4-sample-script">4. Sample script.</h3>
 <p>This script also uses Drive API. So <a href="https://developers.google.com/apps-script/guides/services/advanced#enable_advanced_services">please enable Drive API at Advanced Google services</a> before you use this script.</p>
 <p>Please copy and paste the script editor of Google Apps Script lining with Google Cloud Platform Project.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// 1. Create new Google Form.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">createNewGoogleForm_</span>(<span style="color:#a6e22e">title</span>) {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#e6db74">&#34;https://forms.googleapis.com/v1beta/forms&#34;</span>, {
-    <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;post&#34;</span>,
-    <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>() },
-    <span style="color:#a6e22e">contentType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/json&#34;</span>,
-    <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>({ <span style="color:#a6e22e">info</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">title</span> } }),
-  });
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getContentText</span>());
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">formId</span>;
-}
-
-<span style="color:#75715e">// 2. Add questions.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">addQuestions_</span>(<span style="color:#a6e22e">formId</span>) {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">imageFileIds</span> <span style="color:#f92672">=</span> [
-    <span style="color:#e6db74">&#34;### FileId1 of image file on Google Drive ###&#34;</span>,
-    <span style="color:#e6db74">&#34;### FileId2 of image file on Google Drive ###&#34;</span>,
-  ];
-  <span style="color:#66d9ef">const</span> [<span style="color:#a6e22e">imageUrl1</span>, <span style="color:#a6e22e">imageUrl2</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">imageFileIds</span>.<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">id</span>) =&gt;
-    <span style="color:#a6e22e">Drive</span>.<span style="color:#a6e22e">Files</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">id</span>, { <span style="color:#a6e22e">fields</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;thumbnailLink&#34;</span> }).<span style="color:#a6e22e">thumbnailLink</span>.<span style="color:#a6e22e">replace</span>(
-      <span style="color:#e6db74">&#34;=s220&#34;</span>,
-      <span style="color:#e6db74">&#34;=s500&#34;</span>
-    )
-  );
-
-  <span style="color:#75715e">// Dropdown list.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">question1</span> <span style="color:#f92672">=</span> {
-    <span style="color:#a6e22e">createItem</span><span style="color:#f92672">:</span> {
-      <span style="color:#a6e22e">item</span><span style="color:#f92672">:</span> {
-        <span style="color:#a6e22e">title</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Sample Choice Question&#34;</span>,
-        <span style="color:#a6e22e">questionItem</span><span style="color:#f92672">:</span> {
-          <span style="color:#a6e22e">question</span><span style="color:#f92672">:</span> {
-            <span style="color:#a6e22e">choiceQuestion</span><span style="color:#f92672">:</span> {
-              <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;DROP_DOWN&#34;</span>,
-              <span style="color:#a6e22e">options</span><span style="color:#f92672">:</span> [<span style="color:#e6db74">&#34;value1&#34;</span>, <span style="color:#e6db74">&#34;value2&#34;</span>, <span style="color:#e6db74">&#34;value3&#34;</span>].<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">e</span>) =&gt; ({
-                <span style="color:#a6e22e">value</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>,
-              })),
-            },
-          },
-          <span style="color:#a6e22e">image</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">altText</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sample&#34;</span>, <span style="color:#a6e22e">sourceUri</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">imageUrl1</span> },
-        },
-      },
-      <span style="color:#a6e22e">location</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">index</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">0</span> },
-    },
-  };
-
-  <span style="color:#75715e">// Text input.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">question2</span> <span style="color:#f92672">=</span> {
-    <span style="color:#a6e22e">createItem</span><span style="color:#f92672">:</span> {
-      <span style="color:#a6e22e">item</span><span style="color:#f92672">:</span> {
-        <span style="color:#a6e22e">title</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Sample Text Question&#34;</span>,
-        <span style="color:#a6e22e">questionItem</span><span style="color:#f92672">:</span> {
-          <span style="color:#a6e22e">question</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">textQuestion</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">paragraph</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">false</span> } },
-          <span style="color:#a6e22e">image</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">altText</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sample&#34;</span>, <span style="color:#a6e22e">sourceUri</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">imageUrl2</span> },
-        },
-      },
-      <span style="color:#a6e22e">location</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">index</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">1</span> },
-    },
-  };
-
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`https://forms.googleapis.com/v1beta/forms/</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">formId</span><span style="color:#e6db74">}</span><span style="color:#e6db74">:batchUpdate`</span>;
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, {
-    <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;post&#34;</span>,
-    <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>() },
-    <span style="color:#a6e22e">contentType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/json&#34;</span>,
-    <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>({ <span style="color:#a6e22e">requests</span><span style="color:#f92672">:</span> [<span style="color:#a6e22e">question1</span>, <span style="color:#a6e22e">question2</span>] }),
-  });
-}
-
-<span style="color:#75715e">// Please run this function.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
-  <span style="color:#75715e">// 1. Create new Google Form.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">formId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">createNewGoogleForm_</span>(<span style="color:#e6db74">&#34;sample form&#34;</span>);
-
-  <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">formId</span>).<span style="color:#a6e22e">setName</span>(<span style="color:#e6db74">&#34;sample form&#34;</span>); <span style="color:#75715e">// In the current stage, the created Google Form has no filename. So it is required to use this line. I have already reported this. https://issuetracker.google.com/issues/207158296
-</span><span style="color:#75715e"></span>
-  <span style="color:#75715e">// 2. Add questions.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">addQuestions_</span>(<span style="color:#a6e22e">formId</span>);
-  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getContentText</span>());
-}
-</code></pre></div><ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">// 1. Create new Google Form.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">createNewGoogleForm_</span>(<span style="color:#a6e22e">title</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#e6db74">&#34;https://forms.googleapis.com/v1beta/forms&#34;</span>, {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;post&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>() },
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">contentType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/json&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>({ <span style="color:#a6e22e">info</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">title</span> } }),
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getContentText</span>());
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">formId</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 2. Add questions.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">addQuestions_</span>(<span style="color:#a6e22e">formId</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">imageFileIds</span> <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;### FileId1 of image file on Google Drive ###&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;### FileId2 of image file on Google Drive ###&#34;</span>,
+</span></span><span style="display:flex;"><span>  ];
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> [<span style="color:#a6e22e">imageUrl1</span>, <span style="color:#a6e22e">imageUrl2</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">imageFileIds</span>.<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">id</span>) =&gt;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Drive</span>.<span style="color:#a6e22e">Files</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">id</span>, { <span style="color:#a6e22e">fields</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;thumbnailLink&#34;</span> }).<span style="color:#a6e22e">thumbnailLink</span>.<span style="color:#a6e22e">replace</span>(
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;=s220&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;=s500&#34;</span>
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Dropdown list.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">question1</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">createItem</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">item</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">title</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Sample Choice Question&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">questionItem</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">question</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">choiceQuestion</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>              <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;DROP_DOWN&#34;</span>,
+</span></span><span style="display:flex;"><span>              <span style="color:#a6e22e">options</span><span style="color:#f92672">:</span> [<span style="color:#e6db74">&#34;value1&#34;</span>, <span style="color:#e6db74">&#34;value2&#34;</span>, <span style="color:#e6db74">&#34;value3&#34;</span>].<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">e</span>) =&gt; ({
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">value</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>,
+</span></span><span style="display:flex;"><span>              })),
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>          },
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">image</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">altText</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sample&#34;</span>, <span style="color:#a6e22e">sourceUri</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">imageUrl1</span> },
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">location</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">index</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">0</span> },
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Text input.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">question2</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">createItem</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">item</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">title</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Sample Text Question&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">questionItem</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">question</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">textQuestion</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">paragraph</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">false</span> } },
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">image</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">altText</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sample&#34;</span>, <span style="color:#a6e22e">sourceUri</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">imageUrl2</span> },
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">location</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">index</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">1</span> },
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`https://forms.googleapis.com/v1beta/forms/</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">formId</span><span style="color:#e6db74">}</span><span style="color:#e6db74">:batchUpdate`</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;post&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>() },
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">contentType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/json&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>({ <span style="color:#a6e22e">requests</span><span style="color:#f92672">:</span> [<span style="color:#a6e22e">question1</span>, <span style="color:#a6e22e">question2</span>] }),
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Please run this function.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 1. Create new Google Form.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">formId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">createNewGoogleForm_</span>(<span style="color:#e6db74">&#34;sample form&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">formId</span>).<span style="color:#a6e22e">setName</span>(<span style="color:#e6db74">&#34;sample form&#34;</span>); <span style="color:#75715e">// In the current stage, the created Google Form has no filename. So it is required to use this line. I have already reported this. https://issuetracker.google.com/issues/207158296
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 2. Add questions.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">addQuestions_</span>(<span style="color:#a6e22e">formId</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getContentText</span>());
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><ul>
 <li>
 <p>In this sample script, a new Google Form is created by <a href="https://developers.google.com/forms/api/reference/rest/v1beta/forms/create">&ldquo;Method: forms.create&rdquo;</a>, and then, 2 questions are added by <a href="https://developers.google.com/forms/api/reference/rest/v1beta/forms/batchUpdate">&ldquo;Method: forms.batchUpdate&rdquo;</a>.</p>
 </li>
@@ -484,15 +483,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -518,15 +508,6 @@
   <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
   
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

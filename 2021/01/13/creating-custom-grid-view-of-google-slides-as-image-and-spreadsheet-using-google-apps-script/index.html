@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Creating Custom Grid View of Google Slides as Image and Spreadsheet using Google Apps Script &middot; tanaike</title>
 
@@ -294,96 +293,96 @@
 <p>This sample script uses 2 APIs of Drive API and Slides API. So please enable them at Advanced Google services. <a href="https://developers.google.com/apps-script/guides/services/advanced#enable_advanced_services">Ref</a></p>
 <h3 id="3-sample-script">3. Sample script</h3>
 <p>Please copy and paste the following script and set the variable of <code>obj</code>. And, please run <code>main()</code> at the script editor. By this, all slides in the Google Slides of <code>obj.presentationId</code> are retrieved and create the custom grid view, and it is saved as an PNG image to the root folder.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
-  <span style="color:#75715e">// Please set object for creating image.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> {
-    <span style="color:#a6e22e">filename</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sample.png&#34;</span>, <span style="color:#75715e">// Filename of output file. In the current stage, the file is saved as PNG format.
-</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">width</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">1000</span>, <span style="color:#75715e">// Image width of output image. The unit is pixel. The height is automatically set by the number of slides.
-</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">horizontalSlides</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">3</span>, <span style="color:#75715e">// Number of slides for one row.
-</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">margin</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">50</span>, <span style="color:#75715e">// Margin of each slide. The unit is pixel. If you are not required to use the margin, please remove this property.
-</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">presentationId</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;###&#34;</span>, <span style="color:#75715e">// Google Slides ID you want to use.
-</span><span style="color:#75715e"></span>  };
-
-  <span style="color:#75715e">// 1. Retrieve all slides from the Google Slides as images.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">s</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SlidesApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">presentationId</span>);
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">slidesAsImageObj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getSlides</span>().<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">e</span>) =&gt;
-    <span style="color:#a6e22e">Slides</span>.<span style="color:#a6e22e">Presentations</span>.<span style="color:#a6e22e">Pages</span>.<span style="color:#a6e22e">getThumbnail</span>(
-      <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">presentationId</span>,
-      <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getObjectId</span>(),
-      {
-        <span style="color:#e6db74">&#34;thumbnailProperties.mimeType&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;PNG&#34;</span>,
-        <span style="color:#e6db74">&#34;thumbnailProperties.thumbnailSize&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;LARGE&#34;</span>,
-      }
-    )
-  );
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">imageObj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetchAll</span>(
-    <span style="color:#a6e22e">slidesAsImageObj</span>.<span style="color:#a6e22e">map</span>(({ <span style="color:#a6e22e">contentUrl</span> }) =&gt; <span style="color:#a6e22e">contentUrl</span>)
-  ).<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">i</span>) =&gt;
-    <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getResponseCode</span>() <span style="color:#f92672">==</span> <span style="color:#ae81ff">200</span>
-      <span style="color:#f92672">?</span> {
-          <span style="color:#a6e22e">blob</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getBlob</span>(),
-          <span style="color:#a6e22e">width</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">slidesAsImageObj</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">width</span>,
-          <span style="color:#a6e22e">height</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">slidesAsImageObj</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">height</span>,
-        }
-      <span style="color:#f92672">:</span> <span style="color:#66d9ef">null</span>
-  );
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">imageObj</span>.<span style="color:#a6e22e">some</span>((<span style="color:#a6e22e">e</span>) =&gt; <span style="color:#a6e22e">e</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span>))
-    <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">&#34;Slide cannot be retrieved as the image.&#34;</span>);
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ar</span> <span style="color:#f92672">=</span> [];
-  <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">imageObj</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
-    <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">imageObj</span>.<span style="color:#a6e22e">splice</span>(<span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">horizontalSlides</span>));
-  }
-  <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">hasOwnProperty</span>(<span style="color:#e6db74">&#34;margin&#34;</span>)) <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">margin</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">maxWidth</span> <span style="color:#f92672">=</span> Math.<span style="color:#a6e22e">max</span>(
-    ...<span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">map</span>(
-      (<span style="color:#a6e22e">r</span>) =&gt;
-        <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">w</span>, { <span style="color:#a6e22e">width</span> }) =&gt; (<span style="color:#a6e22e">w</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">width</span>), <span style="color:#ae81ff">0</span>) <span style="color:#f92672">+</span>
-        <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">margin</span> <span style="color:#f92672">*</span> (<span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>)
-    )
-  );
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">maxHeight</span> <span style="color:#f92672">=</span>
-    <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">h</span>, <span style="color:#a6e22e">r</span>) =&gt; (<span style="color:#a6e22e">h</span> <span style="color:#f92672">+=</span> Math.<span style="color:#a6e22e">max</span>(...<span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">map</span>(({ <span style="color:#a6e22e">height</span> }) =&gt; <span style="color:#a6e22e">height</span>))), <span style="color:#ae81ff">0</span>) <span style="color:#f92672">+</span>
-    <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">margin</span> <span style="color:#f92672">*</span> (<span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>);
-
-  <span style="color:#75715e">// 2. Create new Google Slides with the custom page size using DocsServiceApp. This is used as the temporal Slides.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">object</span> <span style="color:#f92672">=</span> {
-    <span style="color:#a6e22e">title</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sample title&#34;</span>, <span style="color:#75715e">// Title of created Slides.
-</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">width</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">unit</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;pixel&#34;</span>, <span style="color:#a6e22e">size</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">maxWidth</span> },
-    <span style="color:#a6e22e">height</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">unit</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;pixel&#34;</span>, <span style="color:#a6e22e">size</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">maxHeight</span> },
-  };
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">presentationId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DocsServiceApp</span>.<span style="color:#a6e22e">createNewSlidesWithPageSize</span>(<span style="color:#a6e22e">object</span>);
-
-  <span style="color:#75715e">// 3. Arrange each slide image to the 1st slide.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">temps</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SlidesApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">presentationId</span>);
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">slide</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">temps</span>.<span style="color:#a6e22e">getSlides</span>()[<span style="color:#ae81ff">0</span>];
-  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">top</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
-  <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">forEach</span>((<span style="color:#a6e22e">r</span>) =&gt; {
-    <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">left</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
-    <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">maxH</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
-    <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">forEach</span>(({ <span style="color:#a6e22e">blob</span>, <span style="color:#a6e22e">width</span>, <span style="color:#a6e22e">height</span> }) =&gt; {
-      <span style="color:#a6e22e">slide</span>.<span style="color:#a6e22e">insertImage</span>(<span style="color:#a6e22e">blob</span>, <span style="color:#a6e22e">left</span>, <span style="color:#a6e22e">top</span>, <span style="color:#a6e22e">width</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">0.75</span>, <span style="color:#a6e22e">height</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">0.75</span>);
-      <span style="color:#a6e22e">left</span> <span style="color:#f92672">+=</span> (<span style="color:#a6e22e">width</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">margin</span>) <span style="color:#f92672">*</span> <span style="color:#ae81ff">0.75</span>;
-      <span style="color:#a6e22e">maxH</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">height</span> <span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">maxH</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">height</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">maxH</span>;
-    });
-    <span style="color:#a6e22e">top</span> <span style="color:#f92672">+=</span> (<span style="color:#a6e22e">maxH</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">margin</span>) <span style="color:#f92672">*</span> <span style="color:#ae81ff">0.75</span>;
-  });
-  <span style="color:#a6e22e">temps</span>.<span style="color:#a6e22e">saveAndClose</span>();
-
-  <span style="color:#75715e">// 4. Output the image file.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">tempObj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Slides</span>.<span style="color:#a6e22e">Presentations</span>.<span style="color:#a6e22e">Pages</span>.<span style="color:#a6e22e">getThumbnail</span>(
-    <span style="color:#a6e22e">presentationId</span>,
-    <span style="color:#a6e22e">slide</span>.<span style="color:#a6e22e">getObjectId</span>(),
-    {
-      <span style="color:#e6db74">&#34;thumbnailProperties.thumbnailSize&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;LARGE&#34;</span>,
-      <span style="color:#e6db74">&#34;thumbnailProperties.mimeType&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;PNG&#34;</span>,
-    }
-  );
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">tempObj</span>.<span style="color:#a6e22e">contentUrl</span>.<span style="color:#a6e22e">replace</span>(<span style="color:#e6db74">/=s\d+/</span>, <span style="color:#e6db74">&#34;=s&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">width</span>);
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">resultBlob</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>).<span style="color:#a6e22e">getBlob</span>().<span style="color:#a6e22e">setName</span>(<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">filename</span>);
-  <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">createFile</span>(<span style="color:#a6e22e">resultBlob</span>);
-  <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">presentationId</span>).<span style="color:#a6e22e">setTrashed</span>(<span style="color:#66d9ef">true</span>);
-}
-</code></pre></div><h2 id="another-sample-script">Another sample script</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Please set object for creating image.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">filename</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sample.png&#34;</span>, <span style="color:#75715e">// Filename of output file. In the current stage, the file is saved as PNG format.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">width</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">1000</span>, <span style="color:#75715e">// Image width of output image. The unit is pixel. The height is automatically set by the number of slides.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">horizontalSlides</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">3</span>, <span style="color:#75715e">// Number of slides for one row.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">margin</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">50</span>, <span style="color:#75715e">// Margin of each slide. The unit is pixel. If you are not required to use the margin, please remove this property.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">presentationId</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;###&#34;</span>, <span style="color:#75715e">// Google Slides ID you want to use.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 1. Retrieve all slides from the Google Slides as images.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">s</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SlidesApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">presentationId</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">slidesAsImageObj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getSlides</span>().<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">e</span>) =&gt;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Slides</span>.<span style="color:#a6e22e">Presentations</span>.<span style="color:#a6e22e">Pages</span>.<span style="color:#a6e22e">getThumbnail</span>(
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">presentationId</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getObjectId</span>(),
+</span></span><span style="display:flex;"><span>      {
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;thumbnailProperties.mimeType&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;PNG&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;thumbnailProperties.thumbnailSize&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;LARGE&#34;</span>,
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">imageObj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetchAll</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">slidesAsImageObj</span>.<span style="color:#a6e22e">map</span>(({ <span style="color:#a6e22e">contentUrl</span> }) =&gt; <span style="color:#a6e22e">contentUrl</span>)
+</span></span><span style="display:flex;"><span>  ).<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">i</span>) =&gt;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getResponseCode</span>() <span style="color:#f92672">==</span> <span style="color:#ae81ff">200</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">?</span> {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">blob</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getBlob</span>(),
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">width</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">slidesAsImageObj</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">width</span>,
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">height</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">slidesAsImageObj</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">height</span>,
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">:</span> <span style="color:#66d9ef">null</span>
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">imageObj</span>.<span style="color:#a6e22e">some</span>((<span style="color:#a6e22e">e</span>) =&gt; <span style="color:#a6e22e">e</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span>))
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">&#34;Slide cannot be retrieved as the image.&#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ar</span> <span style="color:#f92672">=</span> [];
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">imageObj</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">imageObj</span>.<span style="color:#a6e22e">splice</span>(<span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">horizontalSlides</span>));
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">hasOwnProperty</span>(<span style="color:#e6db74">&#34;margin&#34;</span>)) <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">margin</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">maxWidth</span> <span style="color:#f92672">=</span> Math.<span style="color:#a6e22e">max</span>(
+</span></span><span style="display:flex;"><span>    ...<span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">map</span>(
+</span></span><span style="display:flex;"><span>      (<span style="color:#a6e22e">r</span>) =&gt;
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">w</span>, { <span style="color:#a6e22e">width</span> }) =&gt; (<span style="color:#a6e22e">w</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">width</span>), <span style="color:#ae81ff">0</span>) <span style="color:#f92672">+</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">margin</span> <span style="color:#f92672">*</span> (<span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">maxHeight</span> <span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">h</span>, <span style="color:#a6e22e">r</span>) =&gt; (<span style="color:#a6e22e">h</span> <span style="color:#f92672">+=</span> Math.<span style="color:#a6e22e">max</span>(...<span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">map</span>(({ <span style="color:#a6e22e">height</span> }) =&gt; <span style="color:#a6e22e">height</span>))), <span style="color:#ae81ff">0</span>) <span style="color:#f92672">+</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">margin</span> <span style="color:#f92672">*</span> (<span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 2. Create new Google Slides with the custom page size using DocsServiceApp. This is used as the temporal Slides.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">object</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">title</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sample title&#34;</span>, <span style="color:#75715e">// Title of created Slides.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">width</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">unit</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;pixel&#34;</span>, <span style="color:#a6e22e">size</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">maxWidth</span> },
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">height</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">unit</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;pixel&#34;</span>, <span style="color:#a6e22e">size</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">maxHeight</span> },
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">presentationId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DocsServiceApp</span>.<span style="color:#a6e22e">createNewSlidesWithPageSize</span>(<span style="color:#a6e22e">object</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 3. Arrange each slide image to the 1st slide.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">temps</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SlidesApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">presentationId</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">slide</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">temps</span>.<span style="color:#a6e22e">getSlides</span>()[<span style="color:#ae81ff">0</span>];
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">top</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">forEach</span>((<span style="color:#a6e22e">r</span>) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">left</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">maxH</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">forEach</span>(({ <span style="color:#a6e22e">blob</span>, <span style="color:#a6e22e">width</span>, <span style="color:#a6e22e">height</span> }) =&gt; {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">slide</span>.<span style="color:#a6e22e">insertImage</span>(<span style="color:#a6e22e">blob</span>, <span style="color:#a6e22e">left</span>, <span style="color:#a6e22e">top</span>, <span style="color:#a6e22e">width</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">0.75</span>, <span style="color:#a6e22e">height</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">0.75</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">left</span> <span style="color:#f92672">+=</span> (<span style="color:#a6e22e">width</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">margin</span>) <span style="color:#f92672">*</span> <span style="color:#ae81ff">0.75</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">maxH</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">height</span> <span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">maxH</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">height</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">maxH</span>;
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">top</span> <span style="color:#f92672">+=</span> (<span style="color:#a6e22e">maxH</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">margin</span>) <span style="color:#f92672">*</span> <span style="color:#ae81ff">0.75</span>;
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">temps</span>.<span style="color:#a6e22e">saveAndClose</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 4. Output the image file.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">tempObj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Slides</span>.<span style="color:#a6e22e">Presentations</span>.<span style="color:#a6e22e">Pages</span>.<span style="color:#a6e22e">getThumbnail</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">presentationId</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">slide</span>.<span style="color:#a6e22e">getObjectId</span>(),
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;thumbnailProperties.thumbnailSize&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;LARGE&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;thumbnailProperties.mimeType&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;PNG&#34;</span>,
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">tempObj</span>.<span style="color:#a6e22e">contentUrl</span>.<span style="color:#a6e22e">replace</span>(<span style="color:#e6db74">/=s\d+/</span>, <span style="color:#e6db74">&#34;=s&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">width</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">resultBlob</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>).<span style="color:#a6e22e">getBlob</span>().<span style="color:#a6e22e">setName</span>(<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">filename</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">createFile</span>(<span style="color:#a6e22e">resultBlob</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">presentationId</span>).<span style="color:#a6e22e">setTrashed</span>(<span style="color:#66d9ef">true</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="another-sample-script">Another sample script</h2>
 <p>This is a sample script for creating the custom grid view of Google Slides as a Spreadsheet using Google Apps Script. In this sample script, all slides in a Google Slides are put to the cells on Google Spreadsheet as the images using Google Apps Script.</p>
 <h3 id="demo-1">Demo</h3>
 <p><img src="https://tanaikech.github.io/img/20210113a-fig2.png" alt=""></p>
@@ -394,53 +393,53 @@
 <h4 id="2-enable-apis-1">2. Enable APIs</h4>
 <p>This sample script uses 3 APIs of Drive API, Slides API and Sheets API. So please enable them at Advanced Google services. <a href="https://developers.google.com/apps-script/guides/services/advanced#enable_advanced_services">Ref</a></p>
 <h4 id="3-sample-script-1">3. Sample script</h4>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
-  <span style="color:#75715e">// Please set object for creating image.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> {
-    <span style="color:#a6e22e">spreadsheetId</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;###&#34;</span>, <span style="color:#75715e">// Spreadsheet ID of Spreadsheet that the each slide image is put.
-</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">horizontalSlides</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">3</span>, <span style="color:#75715e">// Number of slides for one row.
-</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">presentationId</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;###&#34;</span>, <span style="color:#75715e">// Google Slides ID you want to use.
-</span><span style="color:#75715e"></span>  };
-
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">s</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SlidesApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">presentationId</span>);
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">slidesAsImageObj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getSlides</span>().<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">e</span>) =&gt;
-    <span style="color:#a6e22e">Slides</span>.<span style="color:#a6e22e">Presentations</span>.<span style="color:#a6e22e">Pages</span>.<span style="color:#a6e22e">getThumbnail</span>(
-      <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">presentationId</span>,
-      <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getObjectId</span>(),
-      {
-        <span style="color:#e6db74">&#34;thumbnailProperties.mimeType&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;PNG&#34;</span>,
-        <span style="color:#e6db74">&#34;thumbnailProperties.thumbnailSize&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;MEDIUM&#34;</span>,
-      }
-    )
-  );
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">imageObj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetchAll</span>(
-    <span style="color:#a6e22e">slidesAsImageObj</span>.<span style="color:#a6e22e">map</span>(({ <span style="color:#a6e22e">contentUrl</span> }) =&gt; <span style="color:#a6e22e">contentUrl</span>)
-  ).<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">i</span>) =&gt;
-    <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getResponseCode</span>() <span style="color:#f92672">==</span> <span style="color:#ae81ff">200</span>
-      <span style="color:#f92672">?</span> {
-          <span style="color:#a6e22e">blob</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getBlob</span>(),
-          <span style="color:#a6e22e">width</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">slidesAsImageObj</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">width</span>,
-          <span style="color:#a6e22e">height</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">slidesAsImageObj</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">height</span>,
-        }
-      <span style="color:#f92672">:</span> <span style="color:#66d9ef">null</span>
-  );
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">imageObj</span>.<span style="color:#a6e22e">some</span>((<span style="color:#a6e22e">e</span>) =&gt; <span style="color:#a6e22e">e</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span>))
-    <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">&#34;Slide cannot be retrieved as the image.&#34;</span>);
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ar</span> <span style="color:#f92672">=</span> [];
-  <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">imageObj</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
-    <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">imageObj</span>.<span style="color:#a6e22e">splice</span>(<span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">horizontalSlides</span>));
-  }
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">object</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">flatMap</span>((<span style="color:#a6e22e">r</span>, <span style="color:#a6e22e">i</span>) =&gt;
-    <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">map</span>(({ <span style="color:#a6e22e">blob</span> }, <span style="color:#a6e22e">j</span>) =&gt; ({
-      <span style="color:#a6e22e">blob</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">blob</span>,
-      <span style="color:#a6e22e">range</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">row</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">column</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">j</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span> },
-    }))
-  );
-  <span style="color:#a6e22e">DocsServiceApp</span>.<span style="color:#a6e22e">openBySpreadsheetId</span>(<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">spreadsheetId</span>)
-    .<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>)
-    .<span style="color:#a6e22e">insertImage</span>(<span style="color:#a6e22e">object</span>);
-}
-</code></pre></div><h2 id="note">Note</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Please set object for creating image.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">spreadsheetId</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;###&#34;</span>, <span style="color:#75715e">// Spreadsheet ID of Spreadsheet that the each slide image is put.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">horizontalSlides</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">3</span>, <span style="color:#75715e">// Number of slides for one row.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">presentationId</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;###&#34;</span>, <span style="color:#75715e">// Google Slides ID you want to use.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">s</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SlidesApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">presentationId</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">slidesAsImageObj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getSlides</span>().<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">e</span>) =&gt;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Slides</span>.<span style="color:#a6e22e">Presentations</span>.<span style="color:#a6e22e">Pages</span>.<span style="color:#a6e22e">getThumbnail</span>(
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">presentationId</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getObjectId</span>(),
+</span></span><span style="display:flex;"><span>      {
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;thumbnailProperties.mimeType&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;PNG&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;thumbnailProperties.thumbnailSize&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;MEDIUM&#34;</span>,
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">imageObj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetchAll</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">slidesAsImageObj</span>.<span style="color:#a6e22e">map</span>(({ <span style="color:#a6e22e">contentUrl</span> }) =&gt; <span style="color:#a6e22e">contentUrl</span>)
+</span></span><span style="display:flex;"><span>  ).<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">i</span>) =&gt;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getResponseCode</span>() <span style="color:#f92672">==</span> <span style="color:#ae81ff">200</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">?</span> {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">blob</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getBlob</span>(),
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">width</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">slidesAsImageObj</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">width</span>,
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">height</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">slidesAsImageObj</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">height</span>,
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">:</span> <span style="color:#66d9ef">null</span>
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">imageObj</span>.<span style="color:#a6e22e">some</span>((<span style="color:#a6e22e">e</span>) =&gt; <span style="color:#a6e22e">e</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span>))
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">&#34;Slide cannot be retrieved as the image.&#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ar</span> <span style="color:#f92672">=</span> [];
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">imageObj</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">imageObj</span>.<span style="color:#a6e22e">splice</span>(<span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">horizontalSlides</span>));
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">object</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">flatMap</span>((<span style="color:#a6e22e">r</span>, <span style="color:#a6e22e">i</span>) =&gt;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">map</span>(({ <span style="color:#a6e22e">blob</span> }, <span style="color:#a6e22e">j</span>) =&gt; ({
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">blob</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">blob</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">range</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">row</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">column</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">j</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span> },
+</span></span><span style="display:flex;"><span>    }))
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">DocsServiceApp</span>.<span style="color:#a6e22e">openBySpreadsheetId</span>(<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">spreadsheetId</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">insertImage</span>(<span style="color:#a6e22e">object</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="note">Note</h2>
 <ul>
 <li>The important point of this sample script is to create new Google Slides by giving the page size. But in the current stage, this cannot be directly achieved using Slides service and Slides API. So I created <a href="https://github.com/tanaikech/DocsServiceApp">DocsServiceApp</a>.</li>
 </ul>
@@ -536,15 +535,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -570,15 +560,6 @@
   <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
   
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

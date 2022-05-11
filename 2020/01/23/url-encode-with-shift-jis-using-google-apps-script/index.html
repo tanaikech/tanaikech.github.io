@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>URL Encode with Shift-JIS using Google Apps Script &middot; tanaike</title>
 
@@ -286,38 +285,38 @@
 <p>This is a sample script for achieving the URL encode with Shift-JIS using Google Apps Script.</p>
 <p>Unfortunately, there are no methods for directly achieving above in the methods of Google Apps Script. So it is required to prepare it as the script. In order to use <code>Shift-JIS</code> of the character set at Google Apps Script, it is required to use it as the binary data. Because, when the value of <code>Shift-JIS</code> is retrieved as the string by Google Apps Script, the character set is automatically changed to <code>UTF-8</code>. Please be careful this.</p>
 <h2 id="sample-script">Sample script</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">urlEncodeBySJIS</span>(<span style="color:#a6e22e">str</span>) {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">forAsciiConvert</span> <span style="color:#f92672">=</span>
-    <span style="color:#e6db74">&#34;0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz*-.@_&#34;</span>;
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">conv</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">newBlob</span>(<span style="color:#a6e22e">forAsciiConvert</span>)
-    .<span style="color:#a6e22e">getBytes</span>()
-    .<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
-      <span style="color:#66d9ef">return</span> (<span style="color:#e6db74">&#34;0&#34;</span> <span style="color:#f92672">+</span> (<span style="color:#a6e22e">e</span> <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0xff</span>).<span style="color:#a6e22e">toString</span>(<span style="color:#ae81ff">16</span>)).<span style="color:#a6e22e">slice</span>(<span style="color:#f92672">-</span><span style="color:#ae81ff">2</span>);
-    });
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">bytes</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">newBlob</span>(<span style="color:#e6db74">&#34;&#34;</span>)
-    .<span style="color:#a6e22e">setDataFromString</span>(<span style="color:#a6e22e">str</span>, <span style="color:#e6db74">&#34;Shift_JIS&#34;</span>)
-    .<span style="color:#a6e22e">getBytes</span>();
-  <span style="color:#66d9ef">return</span> (<span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">bytes</span>
-    .<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#66d9ef">byte</span>) {
-      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">n</span> <span style="color:#f92672">=</span> (<span style="color:#e6db74">&#34;0&#34;</span> <span style="color:#f92672">+</span> (<span style="color:#66d9ef">byte</span> <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0xff</span>).<span style="color:#a6e22e">toString</span>(<span style="color:#ae81ff">16</span>)).<span style="color:#a6e22e">slice</span>(<span style="color:#f92672">-</span><span style="color:#ae81ff">2</span>);
-      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">conv</span>.<span style="color:#a6e22e">indexOf</span>(<span style="color:#a6e22e">n</span>) <span style="color:#f92672">!=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>
-        <span style="color:#f92672">?</span> String.<span style="color:#a6e22e">fromCharCode</span>(
-            parseInt(<span style="color:#a6e22e">n</span>[<span style="color:#ae81ff">0</span>], <span style="color:#ae81ff">16</span>).<span style="color:#a6e22e">toString</span>(<span style="color:#ae81ff">2</span>).<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">4</span>
-              <span style="color:#f92672">?</span> parseInt(<span style="color:#a6e22e">n</span>, <span style="color:#ae81ff">16</span>) <span style="color:#f92672">-</span> <span style="color:#ae81ff">256</span>
-              <span style="color:#f92672">:</span> parseInt(<span style="color:#a6e22e">n</span>, <span style="color:#ae81ff">16</span>)
-          )
-        <span style="color:#f92672">:</span> (<span style="color:#e6db74">&#34;%&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">n</span>).<span style="color:#a6e22e">toUpperCase</span>();
-    })
-    .<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;&#34;</span>));
-}
-
-<span style="color:#75715e">// Please run this function.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">str</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;本日は晴天なり&#34;</span>;
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">urlEncodeBySJIS</span>(<span style="color:#a6e22e">str</span>);
-  <span style="color:#a6e22e">Logger</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>); <span style="color:#75715e">// %96%7B%93%FA%82%CD%90%B0%93V%82%C8%82%E8
-</span><span style="color:#75715e"></span>}
-</code></pre></div><h3 id="result">Result</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">urlEncodeBySJIS</span>(<span style="color:#a6e22e">str</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">forAsciiConvert</span> <span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz*-.@_&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">conv</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">newBlob</span>(<span style="color:#a6e22e">forAsciiConvert</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">getBytes</span>()
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> (<span style="color:#e6db74">&#34;0&#34;</span> <span style="color:#f92672">+</span> (<span style="color:#a6e22e">e</span> <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0xff</span>).<span style="color:#a6e22e">toString</span>(<span style="color:#ae81ff">16</span>)).<span style="color:#a6e22e">slice</span>(<span style="color:#f92672">-</span><span style="color:#ae81ff">2</span>);
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">bytes</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">newBlob</span>(<span style="color:#e6db74">&#34;&#34;</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">setDataFromString</span>(<span style="color:#a6e22e">str</span>, <span style="color:#e6db74">&#34;Shift_JIS&#34;</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">getBytes</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> (<span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">bytes</span>
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#66d9ef">byte</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">n</span> <span style="color:#f92672">=</span> (<span style="color:#e6db74">&#34;0&#34;</span> <span style="color:#f92672">+</span> (<span style="color:#66d9ef">byte</span> <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0xff</span>).<span style="color:#a6e22e">toString</span>(<span style="color:#ae81ff">16</span>)).<span style="color:#a6e22e">slice</span>(<span style="color:#f92672">-</span><span style="color:#ae81ff">2</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">conv</span>.<span style="color:#a6e22e">indexOf</span>(<span style="color:#a6e22e">n</span>) <span style="color:#f92672">!=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">?</span> String.<span style="color:#a6e22e">fromCharCode</span>(
+</span></span><span style="display:flex;"><span>            parseInt(<span style="color:#a6e22e">n</span>[<span style="color:#ae81ff">0</span>], <span style="color:#ae81ff">16</span>).<span style="color:#a6e22e">toString</span>(<span style="color:#ae81ff">2</span>).<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">4</span>
+</span></span><span style="display:flex;"><span>              <span style="color:#f92672">?</span> parseInt(<span style="color:#a6e22e">n</span>, <span style="color:#ae81ff">16</span>) <span style="color:#f92672">-</span> <span style="color:#ae81ff">256</span>
+</span></span><span style="display:flex;"><span>              <span style="color:#f92672">:</span> parseInt(<span style="color:#a6e22e">n</span>, <span style="color:#ae81ff">16</span>)
+</span></span><span style="display:flex;"><span>          )
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">:</span> (<span style="color:#e6db74">&#34;%&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">n</span>).<span style="color:#a6e22e">toUpperCase</span>();
+</span></span><span style="display:flex;"><span>    })
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;&#34;</span>));
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Please run this function.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">str</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;本日は晴天なり&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">urlEncodeBySJIS</span>(<span style="color:#a6e22e">str</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">Logger</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>); <span style="color:#75715e">// %96%7B%93%FA%82%CD%90%B0%93V%82%C8%82%E8
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><h3 id="result">Result</h3>
 <p>You can see the following result at the log.</p>
 <pre tabindex="0"><code>%96%7B%93%FA%82%CD%90%B0%93V%82%C8%82%E8
 </code></pre><h2 id="flow">Flow</h2>
@@ -439,15 +438,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -470,15 +460,6 @@
 
 
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

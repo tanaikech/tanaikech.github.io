@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Executing Function with Minutes timer in Specific Times using Google Apps Script &middot; tanaike</title>
 
@@ -320,141 +319,141 @@
 <h3 id="1-sample-script">1. Sample script</h3>
 <p>Please copy and paste the following script to the script editor of Google Apps Script. And, please set the variable of <code>runTime</code> and set your script in <code>main()</code>. And then, please run the function of <code>runOnlyOneTime</code>. By this, the trigger is run from 00:00 in tomorrow.</p>
 <p>And, when the day is Saturday and Sunday under <code>weekday: true</code>, the script is run on the weekday. When <code>weekday: false</code> is used, the script is run only Saturday and Sunday.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// Please set the condition of the triggers.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">runTimes</span> <span style="color:#f92672">=</span> {
-  <span style="color:#a6e22e">cycle</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">10</span>, <span style="color:#75715e">// Unit is minute.
-</span><span style="color:#75715e"></span>  <span style="color:#a6e22e">functionName</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;main&#34;</span>,
-  <span style="color:#a6e22e">weekday</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>, <span style="color:#75715e">// When this property is existing, you can run functionName at weekday or weekend. When this property is not used, the function is run every day.
-</span><span style="color:#75715e"></span>  <span style="color:#a6e22e">times</span><span style="color:#f92672">:</span> [
-    { <span style="color:#a6e22e">start</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;09:00&#34;</span>, <span style="color:#a6e22e">end</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;12:00&#34;</span> },
-    { <span style="color:#a6e22e">start</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;15:00&#34;</span>, <span style="color:#a6e22e">end</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;18:00&#34;</span> },
-  ],
-};
-
-<span style="color:#75715e">// Please set your Web Apps URL.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">webAppsUrl</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://script.google.com/macros/s/###/exec&#34;</span>; <span style="color:#75715e">// or https://script.google.com/macros/s/###/dev of developer mode
-</span><span style="color:#75715e"></span>
-<span style="color:#75715e">// Please set your script you want to execute with the minutes timer in the specific times.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
-  <span style="color:#75715e">//
-</span><span style="color:#75715e"></span>  <span style="color:#75715e">// do something
-</span><span style="color:#75715e"></span>  <span style="color:#75715e">//
-</span><span style="color:#75715e"></span>}
-
-<span style="color:#75715e">// When you run this function only one time, your main script will be run by the time-driven triggers.
-</span><span style="color:#75715e">// --- PLEASE RUN THIS FUNCTION ONLY ONE TIME! ---
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">runOnlyOneTime</span>() {
-  <span style="color:#a6e22e">fetchWebApps_</span>(<span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">webAppsUrl</span><span style="color:#e6db74">}</span><span style="color:#e6db74">?func=</span><span style="color:#e6db74">${</span><span style="color:#e6db74">&#34;setRunEveryDay&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
-}
-
-<span style="color:#75715e">//
-</span><span style="color:#75715e">// --- Script for installing the triggers --- Begin
-</span><span style="color:#75715e">//
-</span><span style="color:#75715e"></span>
-<span style="color:#75715e">// When v8 runtime is used, when the trigger is set from the function executing by a trigger, the trigger is disabled. This is the recognized bug. But unfortunately, this has still not been resolved. (September 21, 2021)
-</span><span style="color:#75715e">// https://issuetracker.google.com/issues/150756612
-</span><span style="color:#75715e">// https://issuetracker.google.com/issues/142405165
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">doGet</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">e</span>) =&gt; {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">func</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameter</span>.<span style="color:#a6e22e">func</span>;
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">func</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;setRunEveryDay&#34;</span>) {
-    <span style="color:#a6e22e">setRunEveryDay_</span>();
-  } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">func</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;initTrigger&#34;</span>) {
-    <span style="color:#a6e22e">initTriggers</span>();
-  } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">func</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;StartEndTriggers&#34;</span>) {
-    <span style="color:#66d9ef">if</span> (
-      <span style="color:#f92672">!</span><span style="color:#a6e22e">runTimes</span>.<span style="color:#a6e22e">hasOwnProperty</span>(<span style="color:#e6db74">&#34;weekday&#34;</span>) <span style="color:#f92672">||</span>
-      (<span style="color:#a6e22e">runTimes</span>.<span style="color:#a6e22e">hasOwnProperty</span>(<span style="color:#e6db74">&#34;weekday&#34;</span>) <span style="color:#f92672">&amp;&amp;</span>
-        <span style="color:#a6e22e">runTimes</span>.<span style="color:#a6e22e">weekday</span> <span style="color:#f92672">===</span> <span style="color:#66d9ef">true</span> <span style="color:#f92672">&amp;&amp;</span>
-        <span style="color:#a6e22e">checkWeekday_</span>()) <span style="color:#f92672">||</span>
-      (<span style="color:#a6e22e">runTimes</span>.<span style="color:#a6e22e">hasOwnProperty</span>(<span style="color:#e6db74">&#34;weekday&#34;</span>) <span style="color:#f92672">&amp;&amp;</span>
-        <span style="color:#a6e22e">runTimes</span>.<span style="color:#a6e22e">weekday</span> <span style="color:#f92672">===</span> <span style="color:#66d9ef">false</span> <span style="color:#f92672">&amp;&amp;</span>
-        <span style="color:#f92672">!</span><span style="color:#a6e22e">checkWeekday_</span>())
-    ) {
-      <span style="color:#a6e22e">convertStrToDateObj_</span>().<span style="color:#a6e22e">times</span>.<span style="color:#a6e22e">forEach</span>(({ <span style="color:#a6e22e">start</span>, <span style="color:#a6e22e">end</span> }) =&gt; {
-        <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">newTrigger</span>(<span style="color:#e6db74">&#34;startTrigger&#34;</span>).<span style="color:#a6e22e">timeBased</span>().<span style="color:#a6e22e">at</span>(<span style="color:#a6e22e">start</span>).<span style="color:#a6e22e">create</span>();
-        <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">newTrigger</span>(<span style="color:#e6db74">&#34;endTrigger&#34;</span>).<span style="color:#a6e22e">timeBased</span>().<span style="color:#a6e22e">at</span>(<span style="color:#a6e22e">end</span>).<span style="color:#a6e22e">create</span>();
-      });
-    }
-  } <span style="color:#66d9ef">else</span> {
-    <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">&#34;No query parameter.&#34;</span>);
-  }
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ContentService</span>.<span style="color:#a6e22e">createTextOutput</span>();
-
-  <span style="color:#75715e">// DriveApp.createFile() // This is used for automatically detecting the scopes for requesting to Web Apps. Please don&#39;t remove this comment line.
-</span><span style="color:#75715e"></span>};
-
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">fetchWebApps_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">url</span>) =&gt;
-  <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, {
-    <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>() },
-  });
-
-<span style="color:#75715e">// Below script is used for installing triggers.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">initTriggers</span> <span style="color:#f92672">=</span> (<span style="color:#ae81ff">_</span>) =&gt; {
-  <span style="color:#a6e22e">deleteTriggers_</span>([
-    <span style="color:#a6e22e">runTimes</span>.<span style="color:#a6e22e">functionName</span>,
-    <span style="color:#e6db74">&#34;startTrigger&#34;</span>,
-    <span style="color:#e6db74">&#34;endTrigger&#34;</span>,
-    <span style="color:#e6db74">&#34;initTriggers&#34;</span>,
-  ]);
-  <span style="color:#a6e22e">deleteTriggers_</span>([
-    <span style="color:#a6e22e">runTimes</span>.<span style="color:#a6e22e">functionName</span>,
-    <span style="color:#e6db74">&#34;startTrigger&#34;</span>,
-    <span style="color:#e6db74">&#34;endTrigger&#34;</span>,
-    <span style="color:#e6db74">&#34;initTriggers&#34;</span>,
-  ]);
-  <span style="color:#a6e22e">fetchWebApps_</span>(<span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">webAppsUrl</span><span style="color:#e6db74">}</span><span style="color:#e6db74">?func=</span><span style="color:#e6db74">${</span><span style="color:#e6db74">&#34;StartEndTriggers&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
-  <span style="color:#a6e22e">fetchWebApps_</span>(<span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">webAppsUrl</span><span style="color:#e6db74">}</span><span style="color:#e6db74">?func=</span><span style="color:#e6db74">${</span><span style="color:#e6db74">&#34;setRunEveryDay&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
-};
-
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">setRunEveryDay_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">t</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date()) =&gt; {
-  <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">setDate</span>(<span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">getDate</span>() <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>);
-  <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">setHours</span>(<span style="color:#ae81ff">0</span>);
-  <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">setMinutes</span>(<span style="color:#ae81ff">0</span>);
-  <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">setSeconds</span>(<span style="color:#ae81ff">0</span>);
-  <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">newTrigger</span>(<span style="color:#e6db74">&#34;initTriggers&#34;</span>).<span style="color:#a6e22e">timeBased</span>().<span style="color:#a6e22e">at</span>(<span style="color:#a6e22e">t</span>).<span style="color:#a6e22e">create</span>();
-};
-
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">startTrigger</span> <span style="color:#f92672">=</span> (<span style="color:#ae81ff">_</span>) =&gt; {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">convertStrToDateObj_</span>();
-  <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">newTrigger</span>(<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">functionName</span>)
-    .<span style="color:#a6e22e">timeBased</span>()
-    .<span style="color:#a6e22e">everyMinutes</span>(<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">cycle</span>)
-    .<span style="color:#a6e22e">create</span>();
-};
-
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">endTrigger</span> <span style="color:#f92672">=</span> (<span style="color:#ae81ff">_</span>) =&gt; <span style="color:#a6e22e">deleteTriggers_</span>([<span style="color:#a6e22e">runTimes</span>.<span style="color:#a6e22e">functionName</span>]);
-
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">convertStrToDateObj_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">now</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date()) =&gt; {
-  <span style="color:#a6e22e">now</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">now</span>.<span style="color:#a6e22e">toISOString</span>();
-  <span style="color:#a6e22e">runTimes</span>.<span style="color:#a6e22e">times</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">runTimes</span>.<span style="color:#a6e22e">times</span>.<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">obj</span>) =&gt; {
-    <span style="color:#66d9ef">const</span> [<span style="color:#a6e22e">sh</span>, <span style="color:#a6e22e">sm</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">start</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;:&#34;</span>);
-    <span style="color:#66d9ef">const</span> [<span style="color:#a6e22e">eh</span>, <span style="color:#a6e22e">em</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">end</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;:&#34;</span>);
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">d1</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date(<span style="color:#a6e22e">now</span>);
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">d2</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date(<span style="color:#a6e22e">now</span>);
-    <span style="color:#a6e22e">d1</span>.<span style="color:#a6e22e">setHours</span>(<span style="color:#a6e22e">sh</span>);
-    <span style="color:#a6e22e">d1</span>.<span style="color:#a6e22e">setMinutes</span>(<span style="color:#a6e22e">sm</span>);
-    <span style="color:#a6e22e">d1</span>.<span style="color:#a6e22e">setSeconds</span>(<span style="color:#ae81ff">0</span>);
-    <span style="color:#a6e22e">d2</span>.<span style="color:#a6e22e">setHours</span>(<span style="color:#a6e22e">eh</span>);
-    <span style="color:#a6e22e">d2</span>.<span style="color:#a6e22e">setMinutes</span>(<span style="color:#a6e22e">em</span>);
-    <span style="color:#a6e22e">d2</span>.<span style="color:#a6e22e">setSeconds</span>(<span style="color:#ae81ff">0</span>);
-    <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">start</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date(<span style="color:#a6e22e">d1</span>.<span style="color:#a6e22e">getTime</span>() <span style="color:#f92672">-</span> <span style="color:#a6e22e">runTimes</span>.<span style="color:#a6e22e">cycle</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">60</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1000</span>);
-    <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">end</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date(<span style="color:#a6e22e">d2</span>.<span style="color:#a6e22e">getTime</span>() <span style="color:#f92672">+</span> <span style="color:#a6e22e">runTimes</span>.<span style="color:#a6e22e">cycle</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">60</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1000</span>);
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">obj</span>;
-  });
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">runTimes</span>;
-};
-
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">deleteTriggers_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">functions</span>) =&gt;
-  <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getScriptTriggers</span>().<span style="color:#a6e22e">forEach</span>((<span style="color:#a6e22e">t</span>) =&gt; {
-    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">functions</span>.<span style="color:#a6e22e">includes</span>(<span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">getHandlerFunction</span>())) <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">deleteTrigger</span>(<span style="color:#a6e22e">t</span>);
-  });
-
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">checkWeekday_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">d</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date()) =&gt; <span style="color:#f92672">!</span>[<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">6</span>].<span style="color:#a6e22e">includes</span>(<span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">getDay</span>());
-
-<span style="color:#75715e">//
-</span><span style="color:#75715e">// --- Script for installing the triggers --- End
-</span><span style="color:#75715e">//
-</span></code></pre></div><h3 id="2-deploy-web-apps">2. Deploy Web Apps</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">// Please set the condition of the triggers.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">runTimes</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">cycle</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">10</span>, <span style="color:#75715e">// Unit is minute.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#a6e22e">functionName</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;main&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">weekday</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>, <span style="color:#75715e">// When this property is existing, you can run functionName at weekday or weekend. When this property is not used, the function is run every day.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#a6e22e">times</span><span style="color:#f92672">:</span> [
+</span></span><span style="display:flex;"><span>    { <span style="color:#a6e22e">start</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;09:00&#34;</span>, <span style="color:#a6e22e">end</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;12:00&#34;</span> },
+</span></span><span style="display:flex;"><span>    { <span style="color:#a6e22e">start</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;15:00&#34;</span>, <span style="color:#a6e22e">end</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;18:00&#34;</span> },
+</span></span><span style="display:flex;"><span>  ],
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Please set your Web Apps URL.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">webAppsUrl</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://script.google.com/macros/s/###/exec&#34;</span>; <span style="color:#75715e">// or https://script.google.com/macros/s/###/dev of developer mode
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Please set your script you want to execute with the minutes timer in the specific times.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">//
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">// do something
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">//
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// When you run this function only one time, your main script will be run by the time-driven triggers.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// --- PLEASE RUN THIS FUNCTION ONLY ONE TIME! ---
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">runOnlyOneTime</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">fetchWebApps_</span>(<span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">webAppsUrl</span><span style="color:#e6db74">}</span><span style="color:#e6db74">?func=</span><span style="color:#e6db74">${</span><span style="color:#e6db74">&#34;setRunEveryDay&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">//
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// --- Script for installing the triggers --- Begin
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">//
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// When v8 runtime is used, when the trigger is set from the function executing by a trigger, the trigger is disabled. This is the recognized bug. But unfortunately, this has still not been resolved. (September 21, 2021)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// https://issuetracker.google.com/issues/150756612
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// https://issuetracker.google.com/issues/142405165
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">doGet</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">e</span>) =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">func</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameter</span>.<span style="color:#a6e22e">func</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">func</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;setRunEveryDay&#34;</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">setRunEveryDay_</span>();
+</span></span><span style="display:flex;"><span>  } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">func</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;initTrigger&#34;</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">initTriggers</span>();
+</span></span><span style="display:flex;"><span>  } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">func</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;StartEndTriggers&#34;</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">!</span><span style="color:#a6e22e">runTimes</span>.<span style="color:#a6e22e">hasOwnProperty</span>(<span style="color:#e6db74">&#34;weekday&#34;</span>) <span style="color:#f92672">||</span>
+</span></span><span style="display:flex;"><span>      (<span style="color:#a6e22e">runTimes</span>.<span style="color:#a6e22e">hasOwnProperty</span>(<span style="color:#e6db74">&#34;weekday&#34;</span>) <span style="color:#f92672">&amp;&amp;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">runTimes</span>.<span style="color:#a6e22e">weekday</span> <span style="color:#f92672">===</span> <span style="color:#66d9ef">true</span> <span style="color:#f92672">&amp;&amp;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">checkWeekday_</span>()) <span style="color:#f92672">||</span>
+</span></span><span style="display:flex;"><span>      (<span style="color:#a6e22e">runTimes</span>.<span style="color:#a6e22e">hasOwnProperty</span>(<span style="color:#e6db74">&#34;weekday&#34;</span>) <span style="color:#f92672">&amp;&amp;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">runTimes</span>.<span style="color:#a6e22e">weekday</span> <span style="color:#f92672">===</span> <span style="color:#66d9ef">false</span> <span style="color:#f92672">&amp;&amp;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">!</span><span style="color:#a6e22e">checkWeekday_</span>())
+</span></span><span style="display:flex;"><span>    ) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">convertStrToDateObj_</span>().<span style="color:#a6e22e">times</span>.<span style="color:#a6e22e">forEach</span>(({ <span style="color:#a6e22e">start</span>, <span style="color:#a6e22e">end</span> }) =&gt; {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">newTrigger</span>(<span style="color:#e6db74">&#34;startTrigger&#34;</span>).<span style="color:#a6e22e">timeBased</span>().<span style="color:#a6e22e">at</span>(<span style="color:#a6e22e">start</span>).<span style="color:#a6e22e">create</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">newTrigger</span>(<span style="color:#e6db74">&#34;endTrigger&#34;</span>).<span style="color:#a6e22e">timeBased</span>().<span style="color:#a6e22e">at</span>(<span style="color:#a6e22e">end</span>).<span style="color:#a6e22e">create</span>();
+</span></span><span style="display:flex;"><span>      });
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">&#34;No query parameter.&#34;</span>);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ContentService</span>.<span style="color:#a6e22e">createTextOutput</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// DriveApp.createFile() // This is used for automatically detecting the scopes for requesting to Web Apps. Please don&#39;t remove this comment line.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">fetchWebApps_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">url</span>) =&gt;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>() },
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Below script is used for installing triggers.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">initTriggers</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">_</span>) =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">deleteTriggers_</span>([
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">runTimes</span>.<span style="color:#a6e22e">functionName</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;startTrigger&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;endTrigger&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;initTriggers&#34;</span>,
+</span></span><span style="display:flex;"><span>  ]);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">deleteTriggers_</span>([
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">runTimes</span>.<span style="color:#a6e22e">functionName</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;startTrigger&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;endTrigger&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;initTriggers&#34;</span>,
+</span></span><span style="display:flex;"><span>  ]);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">fetchWebApps_</span>(<span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">webAppsUrl</span><span style="color:#e6db74">}</span><span style="color:#e6db74">?func=</span><span style="color:#e6db74">${</span><span style="color:#e6db74">&#34;StartEndTriggers&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">fetchWebApps_</span>(<span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">webAppsUrl</span><span style="color:#e6db74">}</span><span style="color:#e6db74">?func=</span><span style="color:#e6db74">${</span><span style="color:#e6db74">&#34;setRunEveryDay&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">setRunEveryDay_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">t</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date()) =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">setDate</span>(<span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">getDate</span>() <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">setHours</span>(<span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">setMinutes</span>(<span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">setSeconds</span>(<span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">newTrigger</span>(<span style="color:#e6db74">&#34;initTriggers&#34;</span>).<span style="color:#a6e22e">timeBased</span>().<span style="color:#a6e22e">at</span>(<span style="color:#a6e22e">t</span>).<span style="color:#a6e22e">create</span>();
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">startTrigger</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">_</span>) =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">convertStrToDateObj_</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">newTrigger</span>(<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">functionName</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">timeBased</span>()
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">everyMinutes</span>(<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">cycle</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">create</span>();
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">endTrigger</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">_</span>) =&gt; <span style="color:#a6e22e">deleteTriggers_</span>([<span style="color:#a6e22e">runTimes</span>.<span style="color:#a6e22e">functionName</span>]);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">convertStrToDateObj_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">now</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date()) =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">now</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">now</span>.<span style="color:#a6e22e">toISOString</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">runTimes</span>.<span style="color:#a6e22e">times</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">runTimes</span>.<span style="color:#a6e22e">times</span>.<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">obj</span>) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> [<span style="color:#a6e22e">sh</span>, <span style="color:#a6e22e">sm</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">start</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;:&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> [<span style="color:#a6e22e">eh</span>, <span style="color:#a6e22e">em</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">end</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;:&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">d1</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date(<span style="color:#a6e22e">now</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">d2</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date(<span style="color:#a6e22e">now</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">d1</span>.<span style="color:#a6e22e">setHours</span>(<span style="color:#a6e22e">sh</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">d1</span>.<span style="color:#a6e22e">setMinutes</span>(<span style="color:#a6e22e">sm</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">d1</span>.<span style="color:#a6e22e">setSeconds</span>(<span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">d2</span>.<span style="color:#a6e22e">setHours</span>(<span style="color:#a6e22e">eh</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">d2</span>.<span style="color:#a6e22e">setMinutes</span>(<span style="color:#a6e22e">em</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">d2</span>.<span style="color:#a6e22e">setSeconds</span>(<span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">start</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date(<span style="color:#a6e22e">d1</span>.<span style="color:#a6e22e">getTime</span>() <span style="color:#f92672">-</span> <span style="color:#a6e22e">runTimes</span>.<span style="color:#a6e22e">cycle</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">60</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1000</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">end</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date(<span style="color:#a6e22e">d2</span>.<span style="color:#a6e22e">getTime</span>() <span style="color:#f92672">+</span> <span style="color:#a6e22e">runTimes</span>.<span style="color:#a6e22e">cycle</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">60</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1000</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">obj</span>;
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">runTimes</span>;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">deleteTriggers_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">functions</span>) =&gt;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getScriptTriggers</span>().<span style="color:#a6e22e">forEach</span>((<span style="color:#a6e22e">t</span>) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">functions</span>.<span style="color:#a6e22e">includes</span>(<span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">getHandlerFunction</span>())) <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">deleteTrigger</span>(<span style="color:#a6e22e">t</span>);
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">checkWeekday_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">d</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date()) =&gt; <span style="color:#f92672">!</span>[<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">6</span>].<span style="color:#a6e22e">includes</span>(<span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">getDay</span>());
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">//
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// --- Script for installing the triggers --- End
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">//
+</span></span></span></code></pre></div><h3 id="2-deploy-web-apps">2. Deploy Web Apps</h3>
 <p>This sample script used Web Apps. Because when v8 runtime is used, when the trigger is set from the function executing by a trigger, the trigger is disabled. This is the recognized bug. But unfortunately, this has still not been resolved. (September 21, 2021) <strong>But, when the trigger is installed by Web Apps, no issue occurs.</strong> So, please deploy Web Apps.</p>
 <p>The detail information can be seen at <a href="https://developers.google.com/apps-script/guides/web#deploy_a_script_as_a_web_app">the official document</a> and <a href="https://github.com/tanaikech/taking-advantage-of-Web-Apps-with-google-apps-script">my report</a>.</p>
 <ol>
@@ -573,15 +572,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -607,15 +597,6 @@
   <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
   
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

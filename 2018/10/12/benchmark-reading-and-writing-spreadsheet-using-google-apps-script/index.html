@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Benchmark: Reading and Writing Spreadsheet using Google Apps Script &middot; tanaike</title>
 
@@ -414,90 +413,90 @@ In order to compare with Advanced Google Service, a result of Sheets API by UrlF
 <h2 id="scripts">Scripts</h2>
 <p>In this measurements, for example, <code>range</code> and <code>val</code> were declared like <code>var range = &quot;Sheet1!A1:B3&quot;</code> and <code>var val = [[&quot;a1&quot;, &quot;b1&quot;], [&quot;a2&quot;, &quot;b2&quot;], [&quot;a3&quot;, &quot;b3&quot;]]</code>, respectively.</p>
 <h3 id="for-reading-values">For reading values</h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// getValues()
-</span><span style="color:#75715e"></span><span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">spreadsheetId</span>).<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">range</span>).<span style="color:#a6e22e">getValues</span>();
-
-<span style="color:#75715e">// getSheetValues()
-</span><span style="color:#75715e"></span><span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">spreadsheetId</span>).<span style="color:#a6e22e">getSheetValues</span>(<span style="color:#a6e22e">startRow</span>, <span style="color:#a6e22e">startColumn</span>, <span style="color:#a6e22e">numRows</span>, <span style="color:#a6e22e">numColumns</span>);
-
-<span style="color:#75715e">// Values.get()
-</span><span style="color:#75715e"></span><span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">Values</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">spreadsheetId</span>, <span style="color:#a6e22e">range</span>).<span style="color:#a6e22e">values</span>;
-
-<span style="color:#75715e">// Values.batchGet()
-</span><span style="color:#75715e"></span><span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">Values</span>.<span style="color:#a6e22e">batchGet</span>(<span style="color:#a6e22e">spreadsheetId</span>, {<span style="color:#a6e22e">ranges</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">range</span>}).<span style="color:#a6e22e">valueRanges</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">values</span>;
-</code></pre></div><h4 id="using-urlfetchapp">Using UrlFetchApp</h4>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// Values.get()
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://sheets.googleapis.com/v4/spreadsheets/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">spreadsheetId</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/values/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;?fields=values&#34;</span>;
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> {
-  <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;get&#34;</span>,
-  <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {<span style="color:#a6e22e">Authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">token</span>},
-};
-<span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">params</span>);
-
-<span style="color:#75715e">// Values.batchGet()
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://sheets.googleapis.com/v4/spreadsheets/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">spreadsheetId</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/values:batchGet?ranges=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&amp;fields=valueRanges%2Fvalues&#34;</span>;
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> {
-  <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;get&#34;</span>,
-  <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {<span style="color:#a6e22e">Authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">token</span>},
-};
-<span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">params</span>);
-</code></pre></div><h3 id="for-writing-values">For writing values</h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// setValue()
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">spreadsheetId</span>).<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>);
-<span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">val</span>.<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
-  <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">j</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">j</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">val</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">j</span><span style="color:#f92672">++</span>) {
-    <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">j</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>).<span style="color:#a6e22e">setValue</span>(<span style="color:#a6e22e">val</span>[<span style="color:#a6e22e">i</span>][<span style="color:#a6e22e">j</span>]);
-  }
-}
-
-<span style="color:#75715e">// appendRow()
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">spreadsheetId</span>).<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>);
-<span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">val</span>.<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
-  <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">appendRow</span>(<span style="color:#a6e22e">val</span>[<span style="color:#a6e22e">i</span>]);
-}
-
-<span style="color:#75715e">// setValues()
-</span><span style="color:#75715e"></span><span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">spreadsheetId</span>).<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">range</span>).<span style="color:#a6e22e">setValues</span>(<span style="color:#a6e22e">val</span>);
-
-<span style="color:#75715e">// Values.update()
-</span><span style="color:#75715e"></span><span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">Values</span>.<span style="color:#a6e22e">update</span>({<span style="color:#a6e22e">values</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">val</span>}, <span style="color:#a6e22e">spreadsheetId</span>, <span style="color:#a6e22e">range</span>, {<span style="color:#a6e22e">valueInputOption</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;USER_ENTERED&#34;</span>});
-
-<span style="color:#75715e">// Values.batchUpdate()
-</span><span style="color:#75715e"></span><span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">Values</span>.<span style="color:#a6e22e">batchUpdate</span>({<span style="color:#a6e22e">valueInputOption</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;USER_ENTERED&#34;</span>, <span style="color:#a6e22e">data</span><span style="color:#f92672">:</span> [{<span style="color:#a6e22e">range</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">range</span>, <span style="color:#a6e22e">values</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">val</span>}]}, <span style="color:#a6e22e">spreadsheetId</span>);
-
-<span style="color:#75715e">// Values.append()
-</span><span style="color:#75715e"></span><span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">Values</span>.<span style="color:#a6e22e">append</span>({<span style="color:#a6e22e">values</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">val</span>}, <span style="color:#a6e22e">spreadsheetId</span>, <span style="color:#a6e22e">range</span>, {<span style="color:#a6e22e">valueInputOption</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;USER_ENTERED&#34;</span>});
-</code></pre></div><h4 id="using-urlfetchapp-1">Using UrlFetchApp</h4>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// Values.update()
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://sheets.googleapis.com/v4/spreadsheets/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">spreadsheetId</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/values/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;?valueInputOption=USER_ENTERED&#34;</span>;
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> {
-  <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;put&#34;</span>,
-  <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {<span style="color:#a6e22e">Authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">token</span>},
-  <span style="color:#a6e22e">contentType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/json&#34;</span>,
-  <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">values</span>,
-};
-<span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">params</span>);
-
-<span style="color:#75715e">// Values.batchUpdate()
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://sheets.googleapis.com/v4/spreadsheets/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">spreadsheetId</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/values:batchUpdate&#34;</span>;
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> {
-  <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;post&#34;</span>,
-  <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {<span style="color:#a6e22e">Authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">token</span>},
-  <span style="color:#a6e22e">contentType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/json&#34;</span>,
-  <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">values</span>,
-};
-<span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">params</span>);
-
-<span style="color:#75715e">// Values.append()
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://sheets.googleapis.com/v4/spreadsheets/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">spreadsheetId</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/values/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;:append?valueInputOption=USER_ENTERED&#34;</span>;
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> {
-  <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;post&#34;</span>,
-  <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {<span style="color:#a6e22e">Authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">token</span>},
-  <span style="color:#a6e22e">contentType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/json&#34;</span>,
-  <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">values</span>,
-};
-<span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">params</span>);
-</code></pre></div><h3 id="note">Note:</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">// getValues()
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">spreadsheetId</span>).<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">range</span>).<span style="color:#a6e22e">getValues</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// getSheetValues()
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">spreadsheetId</span>).<span style="color:#a6e22e">getSheetValues</span>(<span style="color:#a6e22e">startRow</span>, <span style="color:#a6e22e">startColumn</span>, <span style="color:#a6e22e">numRows</span>, <span style="color:#a6e22e">numColumns</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Values.get()
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">Values</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">spreadsheetId</span>, <span style="color:#a6e22e">range</span>).<span style="color:#a6e22e">values</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Values.batchGet()
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">Values</span>.<span style="color:#a6e22e">batchGet</span>(<span style="color:#a6e22e">spreadsheetId</span>, {<span style="color:#a6e22e">ranges</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">range</span>}).<span style="color:#a6e22e">valueRanges</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">values</span>;
+</span></span></code></pre></div><h4 id="using-urlfetchapp">Using UrlFetchApp</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">// Values.get()
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://sheets.googleapis.com/v4/spreadsheets/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">spreadsheetId</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/values/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;?fields=values&#34;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;get&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {<span style="color:#a6e22e">Authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">token</span>},
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">params</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Values.batchGet()
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://sheets.googleapis.com/v4/spreadsheets/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">spreadsheetId</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/values:batchGet?ranges=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&amp;fields=valueRanges%2Fvalues&#34;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;get&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {<span style="color:#a6e22e">Authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">token</span>},
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">params</span>);
+</span></span></code></pre></div><h3 id="for-writing-values">For writing values</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">// setValue()
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">spreadsheetId</span>).<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">val</span>.<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">j</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">j</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">val</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">j</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">j</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>).<span style="color:#a6e22e">setValue</span>(<span style="color:#a6e22e">val</span>[<span style="color:#a6e22e">i</span>][<span style="color:#a6e22e">j</span>]);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// appendRow()
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">spreadsheetId</span>).<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">val</span>.<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">appendRow</span>(<span style="color:#a6e22e">val</span>[<span style="color:#a6e22e">i</span>]);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// setValues()
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">spreadsheetId</span>).<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">range</span>).<span style="color:#a6e22e">setValues</span>(<span style="color:#a6e22e">val</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Values.update()
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">Values</span>.<span style="color:#a6e22e">update</span>({<span style="color:#a6e22e">values</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">val</span>}, <span style="color:#a6e22e">spreadsheetId</span>, <span style="color:#a6e22e">range</span>, {<span style="color:#a6e22e">valueInputOption</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;USER_ENTERED&#34;</span>});
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Values.batchUpdate()
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">Values</span>.<span style="color:#a6e22e">batchUpdate</span>({<span style="color:#a6e22e">valueInputOption</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;USER_ENTERED&#34;</span>, <span style="color:#a6e22e">data</span><span style="color:#f92672">:</span> [{<span style="color:#a6e22e">range</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">range</span>, <span style="color:#a6e22e">values</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">val</span>}]}, <span style="color:#a6e22e">spreadsheetId</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Values.append()
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">Values</span>.<span style="color:#a6e22e">append</span>({<span style="color:#a6e22e">values</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">val</span>}, <span style="color:#a6e22e">spreadsheetId</span>, <span style="color:#a6e22e">range</span>, {<span style="color:#a6e22e">valueInputOption</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;USER_ENTERED&#34;</span>});
+</span></span></code></pre></div><h4 id="using-urlfetchapp-1">Using UrlFetchApp</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">// Values.update()
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://sheets.googleapis.com/v4/spreadsheets/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">spreadsheetId</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/values/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;?valueInputOption=USER_ENTERED&#34;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;put&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {<span style="color:#a6e22e">Authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">token</span>},
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">contentType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/json&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">values</span>,
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">params</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Values.batchUpdate()
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://sheets.googleapis.com/v4/spreadsheets/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">spreadsheetId</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/values:batchUpdate&#34;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;post&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {<span style="color:#a6e22e">Authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">token</span>},
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">contentType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/json&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">values</span>,
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">params</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Values.append()
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://sheets.googleapis.com/v4/spreadsheets/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">spreadsheetId</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/values/&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;:append?valueInputOption=USER_ENTERED&#34;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;post&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {<span style="color:#a6e22e">Authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">token</span>},
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">contentType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/json&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">values</span>,
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">params</span>);
+</span></span></code></pre></div><h3 id="note">Note:</h3>
 <p>When you measure the process cost for Spreadsheet service, please be careful the following point.</p>
 <ul>
 <li>If the process cost is continuously measured in a for loop, it was found that the 1st of the for loop and others show the difference costs. I think that when the spreadsheet is opened using <code>SpreadsheetApp.getActiveSheet()</code> and <code>SpreadsheetApp.openById(ID)</code> for the first time, this might be cached. By this, it becomes the difference costs. In order to avoid this, please run Spreadsheet service for measuring under the isolate execution.</li>
@@ -591,15 +590,6 @@ In order to compare with Advanced Google Service, a result of Sheets API by UrlF
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -622,15 +612,6 @@ In order to compare with Advanced Google Service, a result of Sheets API by UrlF
 
 
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

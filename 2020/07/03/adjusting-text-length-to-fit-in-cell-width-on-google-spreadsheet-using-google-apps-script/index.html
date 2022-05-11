@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Adjusting Text Length to Fit in Cell Width on Google Spreadsheet using Google Apps Script &middot; tanaike</title>
 
@@ -294,48 +293,48 @@
 </ol>
 <p>By this flow, the text length to fit in the cell width can be automatically adjusted.</p>
 <h2 id="sample-script">Sample script:</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">autoResizeFont</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">range</span>, <span style="color:#a6e22e">toLarge</span>) =&gt; {
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getSheet</span>();
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getParent</span>();
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">startColumn</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getColumn</span>();
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">endColumn</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getColumn</span>() <span style="color:#f92672">+</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getNumColumns</span>();
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">startRow</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getRow</span>();
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">endRow</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getRow</span>() <span style="color:#f92672">+</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getNumRows</span>();
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">columnObj</span> <span style="color:#f92672">=</span> [];
-    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">c</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">startColumn</span>; <span style="color:#a6e22e">c</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">endColumn</span>; <span style="color:#a6e22e">c</span><span style="color:#f92672">++</span>) {
-      <span style="color:#a6e22e">columnObj</span>.<span style="color:#a6e22e">push</span>({
-        <span style="color:#a6e22e">column</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">c</span>,
-        <span style="color:#a6e22e">width</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getColumnWidth</span>(<span style="color:#a6e22e">c</span>),
-      });
-    }
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">tempSheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">insertSheet</span>(<span style="color:#e6db74">&#34;tempForAutoresizeFont&#34;</span>);
-    <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">activate</span>();
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">tempRange</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">tempSheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#e6db74">&#34;A1&#34;</span>);
-    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">startRow</span>; <span style="color:#a6e22e">r</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">endRow</span>; <span style="color:#a6e22e">r</span><span style="color:#f92672">++</span>) {
-      <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">c</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">c</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">columnObj</span>.<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">c</span><span style="color:#f92672">++</span>) {
-        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">srcRange</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">r</span>, <span style="color:#a6e22e">columnObj</span>[<span style="color:#a6e22e">c</span>].<span style="color:#a6e22e">column</span>);
-        <span style="color:#a6e22e">tempSheet</span>.<span style="color:#a6e22e">setColumnWidth</span>(<span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">columnObj</span>[<span style="color:#a6e22e">c</span>].<span style="color:#a6e22e">width</span>);
-        <span style="color:#a6e22e">srcRange</span>.<span style="color:#a6e22e">copyTo</span>(<span style="color:#a6e22e">tempRange</span>);
-        <span style="color:#a6e22e">tempSheet</span>.<span style="color:#a6e22e">autoResizeColumn</span>(<span style="color:#ae81ff">1</span>);
-        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">resizedWidth</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">tempSheet</span>.<span style="color:#a6e22e">getColumnWidth</span>(<span style="color:#ae81ff">1</span>);
-        <span style="color:#a6e22e">tempSheet</span>.<span style="color:#a6e22e">setColumnWidth</span>(<span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">columnObj</span>[<span style="color:#a6e22e">c</span>].<span style="color:#a6e22e">width</span>);
-        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ratio</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">columnObj</span>[<span style="color:#a6e22e">c</span>].<span style="color:#a6e22e">width</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">resizedWidth</span>;
-        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">ratio</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#f92672">!</span><span style="color:#a6e22e">toLarge</span>) <span style="color:#66d9ef">continue</span>;
-        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">fontSize</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">srcRange</span>.<span style="color:#a6e22e">getFontSize</span>();
-        <span style="color:#a6e22e">srcRange</span>.<span style="color:#a6e22e">setFontSize</span>(Math.<span style="color:#a6e22e">ceil</span>(<span style="color:#a6e22e">fontSize</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">ratio</span>));
-      }
-    }
-    <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">deleteSheet</span>(<span style="color:#a6e22e">tempSheet</span>);
-  };
-
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>();
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>);
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">targetRange</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;A1:A6&#34;</span>;
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">toLarge</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
-  <span style="color:#a6e22e">autoResizeFont</span>(<span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">targetRange</span>), <span style="color:#a6e22e">toLarge</span>);
-}
-</code></pre></div><ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">autoResizeFont</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">range</span>, <span style="color:#a6e22e">toLarge</span>) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getSheet</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getParent</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">startColumn</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getColumn</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">endColumn</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getColumn</span>() <span style="color:#f92672">+</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getNumColumns</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">startRow</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getRow</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">endRow</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getRow</span>() <span style="color:#f92672">+</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getNumRows</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">columnObj</span> <span style="color:#f92672">=</span> [];
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">c</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">startColumn</span>; <span style="color:#a6e22e">c</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">endColumn</span>; <span style="color:#a6e22e">c</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">columnObj</span>.<span style="color:#a6e22e">push</span>({
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">column</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">c</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">width</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getColumnWidth</span>(<span style="color:#a6e22e">c</span>),
+</span></span><span style="display:flex;"><span>      });
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">tempSheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">insertSheet</span>(<span style="color:#e6db74">&#34;tempForAutoresizeFont&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">activate</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">tempRange</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">tempSheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#e6db74">&#34;A1&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">startRow</span>; <span style="color:#a6e22e">r</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">endRow</span>; <span style="color:#a6e22e">r</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">c</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">c</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">columnObj</span>.<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">c</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">srcRange</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">r</span>, <span style="color:#a6e22e">columnObj</span>[<span style="color:#a6e22e">c</span>].<span style="color:#a6e22e">column</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">tempSheet</span>.<span style="color:#a6e22e">setColumnWidth</span>(<span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">columnObj</span>[<span style="color:#a6e22e">c</span>].<span style="color:#a6e22e">width</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">srcRange</span>.<span style="color:#a6e22e">copyTo</span>(<span style="color:#a6e22e">tempRange</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">tempSheet</span>.<span style="color:#a6e22e">autoResizeColumn</span>(<span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">resizedWidth</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">tempSheet</span>.<span style="color:#a6e22e">getColumnWidth</span>(<span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">tempSheet</span>.<span style="color:#a6e22e">setColumnWidth</span>(<span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">columnObj</span>[<span style="color:#a6e22e">c</span>].<span style="color:#a6e22e">width</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ratio</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">columnObj</span>[<span style="color:#a6e22e">c</span>].<span style="color:#a6e22e">width</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">resizedWidth</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">ratio</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#f92672">!</span><span style="color:#a6e22e">toLarge</span>) <span style="color:#66d9ef">continue</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">fontSize</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">srcRange</span>.<span style="color:#a6e22e">getFontSize</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">srcRange</span>.<span style="color:#a6e22e">setFontSize</span>(Math.<span style="color:#a6e22e">ceil</span>(<span style="color:#a6e22e">fontSize</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">ratio</span>));
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">deleteSheet</span>(<span style="color:#a6e22e">tempSheet</span>);
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">targetRange</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;A1:A6&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">toLarge</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">autoResizeFont</span>(<span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">targetRange</span>), <span style="color:#a6e22e">toLarge</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><ul>
 <li>Please set <code>targetRange</code>.</li>
 <li>In this sample script, a temporal sheet is created and the ratio of the original width and the resized width of the cell is calculated using the temporal sheet.</li>
 <li>When <code>toLarge</code> is <code>true</code>, when the text length is smaller than the cell width, the font size of the text becomes large. By this, the text length is matched to the cell width. When <code>toLarge</code> is <code>false</code>, when the text length is smaller than the cell width, the font size of the text not changed.</li>
@@ -442,15 +441,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -473,15 +463,6 @@
 
 
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

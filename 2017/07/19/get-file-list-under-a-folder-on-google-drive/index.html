@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Get File List Under a Folder on Google Drive &middot; tanaike</title>
 
@@ -283,83 +282,83 @@
 <p>If you want to retrieve file list with all files and folders on Google Drive, please use <code>DriveApp.getRootFolder().getId()</code> as <code>folderId</code>.</p>
 <p>When there are a lot of files in the folder, it may be over the limitation time to execute script.</p>
 <h3 id="script-">Script :</h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getFileList</span>(<span style="color:#a6e22e">folderId</span>) {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">folderlist</span> <span style="color:#f92672">=</span> (<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">folder</span>, <span style="color:#a6e22e">folderSt</span>, <span style="color:#a6e22e">results</span>) {
-        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ar</span> <span style="color:#f92672">=</span> [];
-        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">folders</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">folder</span>.<span style="color:#a6e22e">getFolders</span>();
-        <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">folders</span>.<span style="color:#a6e22e">hasNext</span>()) <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">folders</span>.<span style="color:#a6e22e">next</span>());
-        <span style="color:#a6e22e">folderSt</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">folder</span>.<span style="color:#a6e22e">getId</span>() <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;#_aabbccddee_#&#34;</span>;
-        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">array_folderSt</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">folderSt</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;#_aabbccddee_#&#34;</span>);
-        <span style="color:#a6e22e">array_folderSt</span>.<span style="color:#a6e22e">pop</span>()
-        <span style="color:#a6e22e">results</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">array_folderSt</span>);
-        <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> (<span style="color:#a6e22e">folderSt</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>);
-        <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">ar</span>) <span style="color:#a6e22e">arguments</span>.<span style="color:#a6e22e">callee</span>(<span style="color:#a6e22e">ar</span>[<span style="color:#a6e22e">i</span>], <span style="color:#a6e22e">folderSt</span>, <span style="color:#a6e22e">results</span>);
-        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">results</span>;
-    })(<span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFolderById</span>(<span style="color:#a6e22e">folderId</span>), <span style="color:#e6db74">&#34;&#34;</span>, []);
-
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">localTimeZone</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Session</span>.<span style="color:#a6e22e">getScriptTimeZone</span>();
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">filelist</span> <span style="color:#f92672">=</span> [];
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> {};
-    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">folderlist</span>) {
-        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">folderid</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">folderlist</span>[<span style="color:#a6e22e">i</span>][<span style="color:#a6e22e">folderlist</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>];
-        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">folder</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFolderById</span>(<span style="color:#a6e22e">folderid</span>);
-        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">files</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">folder</span>.<span style="color:#a6e22e">getFiles</span>();
-        <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">files</span>.<span style="color:#a6e22e">hasNext</span>()) {
-            <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">file</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">files</span>.<span style="color:#a6e22e">next</span>();
-            <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> {
-                <span style="color:#a6e22e">folder_tree</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">folderlist</span>, <span style="color:#a6e22e">i</span>) {
-                    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">i</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
-                        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;/&#34;</span> <span style="color:#f92672">+</span> [<span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFolderById</span>(<span style="color:#a6e22e">folderlist</span>[<span style="color:#a6e22e">i</span>][<span style="color:#a6e22e">j</span>]).<span style="color:#a6e22e">getName</span>() <span style="color:#66d9ef">for</span> (<span style="color:#a6e22e">j</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">folderlist</span>[<span style="color:#a6e22e">i</span>])
-                            <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">j</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>)].<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;/&#34;</span>) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/&#34;</span>;
-                    } <span style="color:#66d9ef">else</span> {
-                        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;/&#34;</span>;
-                    }
-                }(<span style="color:#a6e22e">folderlist</span>, <span style="color:#a6e22e">i</span>),
-                <span style="color:#a6e22e">file_id</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getId</span>(),
-                <span style="color:#a6e22e">file_name</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getName</span>(),
-                <span style="color:#a6e22e">file_mimetype</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getMimeType</span>(),
-                <span style="color:#a6e22e">file_created</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">formatDate</span>(<span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getDateCreated</span>(), <span style="color:#a6e22e">localTimeZone</span>, <span style="color:#e6db74">&#34;yyyy/MM/dd HH:mm:ss&#34;</span>),
-                <span style="color:#a6e22e">file_updated</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">formatDate</span>(<span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getLastUpdated</span>(), <span style="color:#a6e22e">localTimeZone</span>, <span style="color:#e6db74">&#34;yyyy/MM/dd HH:mm:ss&#34;</span>),
-            };
-            <span style="color:#a6e22e">filelist</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">temp</span>);
-            <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> {}
-        }
-    }
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sortedlist</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">filelist</span>.<span style="color:#a6e22e">sort</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e1</span>, <span style="color:#a6e22e">e2</span>) {
-        <span style="color:#66d9ef">return</span> (<span style="color:#a6e22e">e1</span>.<span style="color:#a6e22e">folder_tree</span> <span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">e2</span>.<span style="color:#a6e22e">folder_tree</span> <span style="color:#f92672">?</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">:</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) });
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">sortedlist</span>;
-}
-</code></pre></div><h3 id="result-">Result :</h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">[
-    {
-        <span style="color:#f92672">&#34;folder_tree&#34;</span>: <span style="color:#e6db74">&#34;/&#34;</span>,
-        <span style="color:#f92672">&#34;file_id&#34;</span>: <span style="color:#e6db74">&#34;#####&#34;</span>,
-        <span style="color:#f92672">&#34;file_name&#34;</span>: <span style="color:#e6db74">&#34;file name 1&#34;</span>,
-        <span style="color:#f92672">&#34;file_mimetype&#34;</span>: <span style="color:#e6db74">&#34;application/vnd.google-apps.spreadsheet&#34;</span>,
-        <span style="color:#f92672">&#34;file_created&#34;</span>: <span style="color:#e6db74">&#34;2010/01/01 00:00:00&#34;</span>,
-        <span style="color:#f92672">&#34;file_updated&#34;</span>: <span style="color:#e6db74">&#34;2010/01/01 01:00:00&#34;</span>
-    },
-    {
-        <span style="color:#f92672">&#34;folder_tree&#34;</span>: <span style="color:#e6db74">&#34;/folder1/&#34;</span>,
-        <span style="color:#f92672">&#34;file_id&#34;</span>: <span style="color:#e6db74">&#34;#####&#34;</span>,
-        <span style="color:#f92672">&#34;file_name&#34;</span>: <span style="color:#e6db74">&#34;file name 2&#34;</span>,
-        <span style="color:#f92672">&#34;file_mimetype&#34;</span>: <span style="color:#e6db74">&#34;image/png&#34;</span>,
-        <span style="color:#f92672">&#34;file_created&#34;</span>: <span style="color:#e6db74">&#34;2010/01/01 00:00:00&#34;</span>,
-        <span style="color:#f92672">&#34;file_updated&#34;</span>: <span style="color:#e6db74">&#34;2010/01/01 01:00:00&#34;</span>
-    },
-    {
-        <span style="color:#f92672">&#34;folder_tree&#34;</span>: <span style="color:#e6db74">&#34;/folder1/folder2/&#34;</span>,
-        <span style="color:#f92672">&#34;file_id&#34;</span>: <span style="color:#e6db74">&#34;#####&#34;</span>,
-        <span style="color:#f92672">&#34;file_name&#34;</span>: <span style="color:#e6db74">&#34;file name 3&#34;</span>,
-        <span style="color:#f92672">&#34;file_mimetype&#34;</span>: <span style="color:#e6db74">&#34;image/gif&#34;</span>,
-        <span style="color:#f92672">&#34;file_created&#34;</span>: <span style="color:#e6db74">&#34;2010/01/01 00:00:00&#34;</span>,
-        <span style="color:#f92672">&#34;file_updated&#34;</span>: <span style="color:#e6db74">&#34;2010/01/01 01:00:00&#34;</span>
-    },
-    ,
-    ,
-    ,
-]
-</code></pre></div><p>In this script, <a href="http://localhost:1313/2017/03/13/create-folder-tree-on-google-drive/">Create Folder Tree on Google Drive</a> that I submitted before was used.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getFileList</span>(<span style="color:#a6e22e">folderId</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">folderlist</span> <span style="color:#f92672">=</span> (<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">folder</span>, <span style="color:#a6e22e">folderSt</span>, <span style="color:#a6e22e">results</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ar</span> <span style="color:#f92672">=</span> [];
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">folders</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">folder</span>.<span style="color:#a6e22e">getFolders</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">folders</span>.<span style="color:#a6e22e">hasNext</span>()) <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">folders</span>.<span style="color:#a6e22e">next</span>());
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">folderSt</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">folder</span>.<span style="color:#a6e22e">getId</span>() <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;#_aabbccddee_#&#34;</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">array_folderSt</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">folderSt</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;#_aabbccddee_#&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">array_folderSt</span>.<span style="color:#a6e22e">pop</span>()
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">results</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">array_folderSt</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> (<span style="color:#a6e22e">folderSt</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">ar</span>) <span style="color:#a6e22e">arguments</span>.<span style="color:#a6e22e">callee</span>(<span style="color:#a6e22e">ar</span>[<span style="color:#a6e22e">i</span>], <span style="color:#a6e22e">folderSt</span>, <span style="color:#a6e22e">results</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">results</span>;
+</span></span><span style="display:flex;"><span>    })(<span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFolderById</span>(<span style="color:#a6e22e">folderId</span>), <span style="color:#e6db74">&#34;&#34;</span>, []);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">localTimeZone</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Session</span>.<span style="color:#a6e22e">getScriptTimeZone</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">filelist</span> <span style="color:#f92672">=</span> [];
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> {};
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">folderlist</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">folderid</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">folderlist</span>[<span style="color:#a6e22e">i</span>][<span style="color:#a6e22e">folderlist</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>];
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">folder</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFolderById</span>(<span style="color:#a6e22e">folderid</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">files</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">folder</span>.<span style="color:#a6e22e">getFiles</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">files</span>.<span style="color:#a6e22e">hasNext</span>()) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">file</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">files</span>.<span style="color:#a6e22e">next</span>();
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">folder_tree</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">folderlist</span>, <span style="color:#a6e22e">i</span>) {
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">i</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;/&#34;</span> <span style="color:#f92672">+</span> [<span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFolderById</span>(<span style="color:#a6e22e">folderlist</span>[<span style="color:#a6e22e">i</span>][<span style="color:#a6e22e">j</span>]).<span style="color:#a6e22e">getName</span>() <span style="color:#66d9ef">for</span> (<span style="color:#a6e22e">j</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">folderlist</span>[<span style="color:#a6e22e">i</span>])
+</span></span><span style="display:flex;"><span>                            <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">j</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>)].<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;/&#34;</span>) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/&#34;</span>;
+</span></span><span style="display:flex;"><span>                    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;/&#34;</span>;
+</span></span><span style="display:flex;"><span>                    }
+</span></span><span style="display:flex;"><span>                }(<span style="color:#a6e22e">folderlist</span>, <span style="color:#a6e22e">i</span>),
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">file_id</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getId</span>(),
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">file_name</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getName</span>(),
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">file_mimetype</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getMimeType</span>(),
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">file_created</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">formatDate</span>(<span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getDateCreated</span>(), <span style="color:#a6e22e">localTimeZone</span>, <span style="color:#e6db74">&#34;yyyy/MM/dd HH:mm:ss&#34;</span>),
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">file_updated</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">formatDate</span>(<span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getLastUpdated</span>(), <span style="color:#a6e22e">localTimeZone</span>, <span style="color:#e6db74">&#34;yyyy/MM/dd HH:mm:ss&#34;</span>),
+</span></span><span style="display:flex;"><span>            };
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">filelist</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">temp</span>);
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> {}
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sortedlist</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">filelist</span>.<span style="color:#a6e22e">sort</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e1</span>, <span style="color:#a6e22e">e2</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> (<span style="color:#a6e22e">e1</span>.<span style="color:#a6e22e">folder_tree</span> <span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">e2</span>.<span style="color:#a6e22e">folder_tree</span> <span style="color:#f92672">?</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">:</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) });
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">sortedlist</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="result-">Result :</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>[
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;folder_tree&#34;</span>: <span style="color:#e6db74">&#34;/&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;file_id&#34;</span>: <span style="color:#e6db74">&#34;#####&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;file_name&#34;</span>: <span style="color:#e6db74">&#34;file name 1&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;file_mimetype&#34;</span>: <span style="color:#e6db74">&#34;application/vnd.google-apps.spreadsheet&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;file_created&#34;</span>: <span style="color:#e6db74">&#34;2010/01/01 00:00:00&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;file_updated&#34;</span>: <span style="color:#e6db74">&#34;2010/01/01 01:00:00&#34;</span>
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;folder_tree&#34;</span>: <span style="color:#e6db74">&#34;/folder1/&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;file_id&#34;</span>: <span style="color:#e6db74">&#34;#####&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;file_name&#34;</span>: <span style="color:#e6db74">&#34;file name 2&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;file_mimetype&#34;</span>: <span style="color:#e6db74">&#34;image/png&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;file_created&#34;</span>: <span style="color:#e6db74">&#34;2010/01/01 00:00:00&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;file_updated&#34;</span>: <span style="color:#e6db74">&#34;2010/01/01 01:00:00&#34;</span>
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;folder_tree&#34;</span>: <span style="color:#e6db74">&#34;/folder1/folder2/&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;file_id&#34;</span>: <span style="color:#e6db74">&#34;#####&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;file_name&#34;</span>: <span style="color:#e6db74">&#34;file name 3&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;file_mimetype&#34;</span>: <span style="color:#e6db74">&#34;image/gif&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;file_created&#34;</span>: <span style="color:#e6db74">&#34;2010/01/01 00:00:00&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;file_updated&#34;</span>: <span style="color:#e6db74">&#34;2010/01/01 01:00:00&#34;</span>
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    ,
+</span></span><span style="display:flex;"><span>    ,
+</span></span><span style="display:flex;"><span>    ,
+</span></span><span style="display:flex;"><span>]
+</span></span></code></pre></div><p>In this script, <a href="http://localhost:1313/2017/03/13/create-folder-tree-on-google-drive/">Create Folder Tree on Google Drive</a> that I submitted before was used.</p>
 <p>Also this script was used at <a href="https://gist.github.com/tanaikech/c5b2811bce01cbcc26ffa357df496379">Downloading Files From Google Drive Under No Authorization Using Browser</a>.</p>
 
   
@@ -449,15 +448,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -480,15 +470,6 @@
 
 
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

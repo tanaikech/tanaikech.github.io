@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Retrieving Size of Tables in Google Slides using Google Apps Script &middot; tanaike</title>
 
@@ -289,34 +288,34 @@
 </ul>
 <p>The modified script reflected this is as follows.</p>
 <p>In order to use this script, please enable Slides API at <a href="https://developers.google.com/apps-script/guides/services/advanced#enabling_advanced_services">Advanced Google Services</a> and <a href="https://console.cloud.google.com/apis/library/slides.googleapis.com/?q=slides">API console</a>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">s</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SlidesApp</span>.<span style="color:#a6e22e">getActivePresentation</span>();
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">presentationId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getId</span>();
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">pageObjectId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getSlides</span>()[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">getObjectId</span>(); <span style="color:#75715e">// In this sample, I use 1st page. But if you want to use other page, please get the &#34;getObjectId&#34;.
-</span><span style="color:#75715e"></span>
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">pageElements</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Slides</span>.<span style="color:#a6e22e">Presentations</span>.<span style="color:#a6e22e">Pages</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">presentationId</span>, <span style="color:#a6e22e">pageObjectId</span>).<span style="color:#a6e22e">pageElements</span>;
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> [];
-<span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">pageElements</span>) {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">rowHeight</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">rowWidth</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">pageElements</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">table</span>) {
-    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">j</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">pageElements</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">table</span>.<span style="color:#a6e22e">tableRows</span>) {
-      <span style="color:#a6e22e">rowHeight</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">pageElements</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">table</span>.<span style="color:#a6e22e">tableRows</span>[<span style="color:#a6e22e">j</span>].<span style="color:#a6e22e">rowHeight</span>.<span style="color:#a6e22e">magnitude</span> <span style="color:#f92672">/</span> <span style="color:#ae81ff">12700</span>;
-    }
-    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">k</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">pageElements</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">table</span>.<span style="color:#a6e22e">tableColumns</span>) {
-      <span style="color:#a6e22e">rowWidth</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">pageElements</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">table</span>.<span style="color:#a6e22e">tableColumns</span>[<span style="color:#a6e22e">k</span>].<span style="color:#a6e22e">columnWidth</span>.<span style="color:#a6e22e">magnitude</span> <span style="color:#f92672">/</span> <span style="color:#ae81ff">12700</span>;
-    }
-    <span style="color:#a6e22e">result</span>.<span style="color:#a6e22e">push</span>({<span style="color:#a6e22e">Height</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">rowHeight</span>, <span style="color:#a6e22e">Width</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">rowWidth</span>});
-  }
-}
-<span style="color:#a6e22e">Logger</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">result</span>)
-</code></pre></div><h2 id="result-">Result :</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">[
-    {
-        <span style="color:#f92672">&#34;Height&#34;</span>: <span style="color:#ae81ff">200</span>,
-        <span style="color:#f92672">&#34;Width&#34;</span>: <span style="color:#ae81ff">300</span>
-    }
-]
-</code></pre></div><h2 id="note-">Note :</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">s</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SlidesApp</span>.<span style="color:#a6e22e">getActivePresentation</span>();
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">presentationId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getId</span>();
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">pageObjectId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getSlides</span>()[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">getObjectId</span>(); <span style="color:#75715e">// In this sample, I use 1st page. But if you want to use other page, please get the &#34;getObjectId&#34;.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">pageElements</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Slides</span>.<span style="color:#a6e22e">Presentations</span>.<span style="color:#a6e22e">Pages</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">presentationId</span>, <span style="color:#a6e22e">pageObjectId</span>).<span style="color:#a6e22e">pageElements</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> [];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">pageElements</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">rowHeight</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">rowWidth</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">pageElements</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">table</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">j</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">pageElements</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">table</span>.<span style="color:#a6e22e">tableRows</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">rowHeight</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">pageElements</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">table</span>.<span style="color:#a6e22e">tableRows</span>[<span style="color:#a6e22e">j</span>].<span style="color:#a6e22e">rowHeight</span>.<span style="color:#a6e22e">magnitude</span> <span style="color:#f92672">/</span> <span style="color:#ae81ff">12700</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">k</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">pageElements</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">table</span>.<span style="color:#a6e22e">tableColumns</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">rowWidth</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">pageElements</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">table</span>.<span style="color:#a6e22e">tableColumns</span>[<span style="color:#a6e22e">k</span>].<span style="color:#a6e22e">columnWidth</span>.<span style="color:#a6e22e">magnitude</span> <span style="color:#f92672">/</span> <span style="color:#ae81ff">12700</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">result</span>.<span style="color:#a6e22e">push</span>({<span style="color:#a6e22e">Height</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">rowHeight</span>, <span style="color:#a6e22e">Width</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">rowWidth</span>});
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Logger</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">result</span>)
+</span></span></code></pre></div><h2 id="result-">Result :</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>[
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;Height&#34;</span>: <span style="color:#ae81ff">200</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;Width&#34;</span>: <span style="color:#ae81ff">300</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>]
+</span></span></code></pre></div><h2 id="note-">Note :</h2>
 <ul>
 <li>Unit of output values is point.</li>
 <li>Because 12,700 EMUs per point, each values retrieved by <code>pageElements[i].table.tableRows[j].rowHeight.magnitude</code> and <code>pageElements[i].table.tableColumns[k].columnWidth.magnitude</code> are required to be divided by 12,700.</li>
@@ -414,15 +413,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -445,15 +435,6 @@
 
 
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Retrieving User Information with Shared Spreadsheet &middot; tanaike</title>
 
@@ -309,71 +308,71 @@
 </ol>
 <p>By this flow, the user information which is editing the shared spreadsheet can be retrieved. Although I think that there may be also other solutions, I proposal this as one of solutions.</p>
 <p><strong>Script :</strong></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">showDialog</span>(<span style="color:#a6e22e">html</span>, <span style="color:#a6e22e">title</span>){
-  <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>().<span style="color:#a6e22e">show</span>(
-    <span style="color:#a6e22e">HtmlService</span>
-    .<span style="color:#a6e22e">createHtmlOutput</span>(<span style="color:#a6e22e">html</span>)
-    .<span style="color:#a6e22e">setTitle</span>(<span style="color:#a6e22e">title</span>)
-    .<span style="color:#a6e22e">setWidth</span>(<span style="color:#ae81ff">400</span>)
-    .<span style="color:#a6e22e">setHeight</span>(<span style="color:#ae81ff">100</span>)
-  );
-}
-
-<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getUser</span>(){
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">triggerId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">newTrigger</span>(<span style="color:#e6db74">&#39;getUser&#39;</span>)
-    .<span style="color:#a6e22e">forSpreadsheet</span>(<span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActive</span>())
-    .<span style="color:#a6e22e">onEdit</span>()
-    .<span style="color:#a6e22e">create</span>()
-    .<span style="color:#a6e22e">getUniqueId</span>();
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">userInf</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Session</span>.<span style="color:#a6e22e">getEffectiveUser</span>();
-  <span style="color:#a6e22e">CacheService</span>.<span style="color:#a6e22e">getUserCache</span>().<span style="color:#a6e22e">putAll</span>({
-    <span style="color:#e6db74">&#34;username&#34;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">userInf</span>.<span style="color:#a6e22e">getUsername</span>(),
-    <span style="color:#e6db74">&#34;usermail&#34;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">userInf</span>.<span style="color:#a6e22e">getEmail</span>()
-  }, <span style="color:#ae81ff">7200</span>);
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">triggers</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getProjectTriggers</span>();
-  [<span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">deleteTrigger</span>(<span style="color:#a6e22e">i</span>) <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">each</span> (<span style="color:#a6e22e">i</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">triggers</span>) <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">i</span>.<span style="color:#a6e22e">getUniqueId</span>() <span style="color:#f92672">==</span> <span style="color:#a6e22e">triggerId</span>)];
-}
-
-<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">dialogForGetUser</span>(){
-  <span style="color:#a6e22e">showDialog</span>(<span style="color:#e6db74">&#39;&lt;input type=&#34;button&#34;\
-</span><span style="color:#e6db74">      value=&#34;OK&#34;\
-</span><span style="color:#e6db74">      onclick=&#34;google.script.run.withSuccessHandler(function(){google.script.host.close()})\
-</span><span style="color:#e6db74">      .getUser()&#34;&gt;&#39;</span>,
-      <span style="color:#e6db74">&#39;Push OK button.&#39;</span>
-  );
-}
-
-<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">dialogForAuth</span>(){
-  <span style="color:#a6e22e">showDialog</span>(<span style="color:#e6db74">&#39;&lt;input type=&#34;button&#34;\
-</span><span style="color:#e6db74">      value=&#34;OK&#34;\
-</span><span style="color:#e6db74">      onclick=&#34;google.script.host.close()&#34;&gt;&#39;</span>,
-      <span style="color:#e6db74">&#39;Please authorize at &#34;Authorization&#34; of menu bar.&#39;</span>
-  );
-}
-
-<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getAuth</span>() {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>();
-  <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">removeMenu</span>(<span style="color:#e6db74">&#34;Authorization&#34;</span>);
-  <span style="color:#a6e22e">getUser</span>();
-  <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">toast</span>(<span style="color:#e6db74">&#34;Done.&#34;</span>, <span style="color:#e6db74">&#34;Authorization&#34;</span>, <span style="color:#ae81ff">3</span>);
-}
-
-<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">onOpen</span>(){
-  <span style="color:#66d9ef">try</span> {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>().<span style="color:#a6e22e">getId</span>())
-    <span style="color:#a6e22e">dialogForGetUser</span>();
-  } <span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">e</span>) {
-    <span style="color:#a6e22e">dialogForAuth</span>();
-    <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>().<span style="color:#a6e22e">addMenu</span>(
-      <span style="color:#e6db74">&#34;Authorization&#34;</span>,
-      [{
-        <span style="color:#a6e22e">functionName</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;getAuth&#34;</span>,
-        <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;Run this only when the first time&#34;</span>
-      }]
-    );
-  }
-}
-</code></pre></div><ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">showDialog</span>(<span style="color:#a6e22e">html</span>, <span style="color:#a6e22e">title</span>){
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>().<span style="color:#a6e22e">show</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">HtmlService</span>
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">createHtmlOutput</span>(<span style="color:#a6e22e">html</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">setTitle</span>(<span style="color:#a6e22e">title</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">setWidth</span>(<span style="color:#ae81ff">400</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">setHeight</span>(<span style="color:#ae81ff">100</span>)
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getUser</span>(){
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">triggerId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">newTrigger</span>(<span style="color:#e6db74">&#39;getUser&#39;</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">forSpreadsheet</span>(<span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActive</span>())
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">onEdit</span>()
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">create</span>()
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">getUniqueId</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">userInf</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Session</span>.<span style="color:#a6e22e">getEffectiveUser</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">CacheService</span>.<span style="color:#a6e22e">getUserCache</span>().<span style="color:#a6e22e">putAll</span>({
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;username&#34;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">userInf</span>.<span style="color:#a6e22e">getUsername</span>(),
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;usermail&#34;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">userInf</span>.<span style="color:#a6e22e">getEmail</span>()
+</span></span><span style="display:flex;"><span>  }, <span style="color:#ae81ff">7200</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">triggers</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getProjectTriggers</span>();
+</span></span><span style="display:flex;"><span>  [<span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">deleteTrigger</span>(<span style="color:#a6e22e">i</span>) <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">each</span> (<span style="color:#a6e22e">i</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">triggers</span>) <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">i</span>.<span style="color:#a6e22e">getUniqueId</span>() <span style="color:#f92672">==</span> <span style="color:#a6e22e">triggerId</span>)];
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">dialogForGetUser</span>(){
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">showDialog</span>(<span style="color:#e6db74">&#39;&lt;input type=&#34;button&#34;\
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      value=&#34;OK&#34;\
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      onclick=&#34;google.script.run.withSuccessHandler(function(){google.script.host.close()})\
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      .getUser()&#34;&gt;&#39;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#39;Push OK button.&#39;</span>
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">dialogForAuth</span>(){
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">showDialog</span>(<span style="color:#e6db74">&#39;&lt;input type=&#34;button&#34;\
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      value=&#34;OK&#34;\
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      onclick=&#34;google.script.host.close()&#34;&gt;&#39;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#39;Please authorize at &#34;Authorization&#34; of menu bar.&#39;</span>
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getAuth</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">removeMenu</span>(<span style="color:#e6db74">&#34;Authorization&#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">getUser</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">toast</span>(<span style="color:#e6db74">&#34;Done.&#34;</span>, <span style="color:#e6db74">&#34;Authorization&#34;</span>, <span style="color:#ae81ff">3</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">onOpen</span>(){
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>().<span style="color:#a6e22e">getId</span>())
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">dialogForGetUser</span>();
+</span></span><span style="display:flex;"><span>  } <span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">dialogForAuth</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>().<span style="color:#a6e22e">addMenu</span>(
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;Authorization&#34;</span>,
+</span></span><span style="display:flex;"><span>      [{
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">functionName</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;getAuth&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;Run this only when the first time&#34;</span>
+</span></span><span style="display:flex;"><span>      }]
+</span></span><span style="display:flex;"><span>    );
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><ol>
 <li>When the spreadsheet is opened, at first, <code>onOpen()</code> is executed. It is checked whether the user has already authorized. The dialog box is as follows.</li>
 </ol>
 <p><img src="https://tanaikech.github.io/img/20170427-1st.png" alt=""></p>
@@ -382,8 +381,8 @@
 </ol>
 <p><img src="https://tanaikech.github.io/img/20170427-2nd.png" alt=""></p>
 <p>The user information is retrieved as follows. You can use this by <code>onEdit()</code> and trigger.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">user</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">CacheService</span>.<span style="color:#a6e22e">getUserCache</span>().<span style="color:#a6e22e">getAll</span>([<span style="color:#e6db74">&#34;username&#34;</span>, <span style="color:#e6db74">&#34;usermail&#34;</span>]);
-</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">user</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">CacheService</span>.<span style="color:#a6e22e">getUserCache</span>().<span style="color:#a6e22e">getAll</span>([<span style="color:#e6db74">&#34;username&#34;</span>, <span style="color:#e6db74">&#34;usermail&#34;</span>]);
+</span></span></code></pre></div>
   
   <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
 <ul class="share-buttons">
@@ -471,15 +470,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -505,15 +495,6 @@
   <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
   
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

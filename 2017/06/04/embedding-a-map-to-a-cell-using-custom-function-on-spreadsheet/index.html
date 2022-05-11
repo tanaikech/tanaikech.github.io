@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Embedding a Map to a Cell using Custom Function on Spreadsheet &middot; tanaike</title>
 
@@ -311,39 +310,39 @@
 <p>When it deploys Web Apps, the approval required authorization can be done, simultaneously.</p>
 <h2 id="sample-script-">Sample Script :</h2>
 <p>Please copy and paste this script to a bound script of spreadsheet.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">folderId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;### Folder ID ###&#34;</span>;
-
-<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">embedMap</span>(<span style="color:#a6e22e">range</span>, <span style="color:#a6e22e">zoom</span>) {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ac</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSheet</span>().<span style="color:#a6e22e">getActiveCell</span>();
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">q1</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;?address=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">range</span>;
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">q2</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&amp;zoom=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">zoom</span>;
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">q3</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&amp;row=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">ac</span>.<span style="color:#a6e22e">getRow</span>();
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">q4</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&amp;col=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">ac</span>.<span style="color:#a6e22e">getColumn</span>();
-  <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getService</span>().<span style="color:#a6e22e">getUrl</span>() <span style="color:#f92672">+</span> <span style="color:#a6e22e">q1</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">q2</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">q3</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">q4</span>);
-}
-
-<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">doGet</span>(<span style="color:#a6e22e">e</span>) {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Maps</span>.<span style="color:#a6e22e">newGeocoder</span>().<span style="color:#a6e22e">geocode</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameters</span>.<span style="color:#a6e22e">address</span>).<span style="color:#a6e22e">results</span>[<span style="color:#ae81ff">0</span>];
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">file</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFolderById</span>(<span style="color:#a6e22e">folderId</span>).<span style="color:#a6e22e">createFile</span>(
-    <span style="color:#a6e22e">Maps</span>.<span style="color:#a6e22e">newStaticMap</span>()
-    .<span style="color:#a6e22e">setSize</span>(<span style="color:#ae81ff">800</span>, <span style="color:#ae81ff">600</span>)
-    .<span style="color:#a6e22e">setCenter</span>(<span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">geometry</span>.<span style="color:#a6e22e">location</span>.<span style="color:#a6e22e">lat</span>, <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">geometry</span>.<span style="color:#a6e22e">location</span>.<span style="color:#a6e22e">lng</span>)
-    .<span style="color:#a6e22e">setZoom</span>(parseInt(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameters</span>.<span style="color:#a6e22e">zoom</span>, <span style="color:#ae81ff">10</span>))
-    .<span style="color:#a6e22e">setLanguage</span>(<span style="color:#e6db74">&#34;en&#34;</span>)
-    .<span style="color:#a6e22e">getBlob</span>()
-    .<span style="color:#a6e22e">getAs</span>(<span style="color:#e6db74">&#39;image/png&#39;</span>)
-    .<span style="color:#a6e22e">setName</span>(<span style="color:#e6db74">&#34;map.png&#34;</span>)
-  );
-  <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">setSharing</span>(<span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">Access</span>.<span style="color:#a6e22e">ANYONE_WITH_LINK</span>, <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">Permission</span>.<span style="color:#a6e22e">VIEW</span>);
-  <span style="color:#a6e22e">SpreadsheetApp</span>
-  .<span style="color:#a6e22e">getActiveSheet</span>()
-  .<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameters</span>.<span style="color:#a6e22e">row</span>, <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameters</span>.<span style="color:#a6e22e">col</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>)
-  .<span style="color:#a6e22e">setFormulas</span>([[
-    <span style="color:#e6db74">&#39;=T(&#34;&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">formatted_address</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;&#34;)&#39;</span>,
-    <span style="color:#e6db74">&#39;=IMAGE(&#34;&#39;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;http://drive.google.com/uc?id=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getId</span>() <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;&#34;)&#39;</span>
-  ]]);
-}
-</code></pre></div><h3 id="flow-of-script-">Flow of Script :</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">folderId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;### Folder ID ###&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">embedMap</span>(<span style="color:#a6e22e">range</span>, <span style="color:#a6e22e">zoom</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ac</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSheet</span>().<span style="color:#a6e22e">getActiveCell</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">q1</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;?address=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">range</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">q2</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&amp;zoom=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">zoom</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">q3</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&amp;row=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">ac</span>.<span style="color:#a6e22e">getRow</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">q4</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&amp;col=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">ac</span>.<span style="color:#a6e22e">getColumn</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getService</span>().<span style="color:#a6e22e">getUrl</span>() <span style="color:#f92672">+</span> <span style="color:#a6e22e">q1</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">q2</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">q3</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">q4</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">doGet</span>(<span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Maps</span>.<span style="color:#a6e22e">newGeocoder</span>().<span style="color:#a6e22e">geocode</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameters</span>.<span style="color:#a6e22e">address</span>).<span style="color:#a6e22e">results</span>[<span style="color:#ae81ff">0</span>];
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">file</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFolderById</span>(<span style="color:#a6e22e">folderId</span>).<span style="color:#a6e22e">createFile</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Maps</span>.<span style="color:#a6e22e">newStaticMap</span>()
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">setSize</span>(<span style="color:#ae81ff">800</span>, <span style="color:#ae81ff">600</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">setCenter</span>(<span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">geometry</span>.<span style="color:#a6e22e">location</span>.<span style="color:#a6e22e">lat</span>, <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">geometry</span>.<span style="color:#a6e22e">location</span>.<span style="color:#a6e22e">lng</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">setZoom</span>(parseInt(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameters</span>.<span style="color:#a6e22e">zoom</span>, <span style="color:#ae81ff">10</span>))
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">setLanguage</span>(<span style="color:#e6db74">&#34;en&#34;</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">getBlob</span>()
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">getAs</span>(<span style="color:#e6db74">&#39;image/png&#39;</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">setName</span>(<span style="color:#e6db74">&#34;map.png&#34;</span>)
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">setSharing</span>(<span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">Access</span>.<span style="color:#a6e22e">ANYONE_WITH_LINK</span>, <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">Permission</span>.<span style="color:#a6e22e">VIEW</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">SpreadsheetApp</span>
+</span></span><span style="display:flex;"><span>  .<span style="color:#a6e22e">getActiveSheet</span>()
+</span></span><span style="display:flex;"><span>  .<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameters</span>.<span style="color:#a6e22e">row</span>, <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameters</span>.<span style="color:#a6e22e">col</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span>  .<span style="color:#a6e22e">setFormulas</span>([[
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;=T(&#34;&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">formatted_address</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;&#34;)&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;=IMAGE(&#34;&#39;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;http://drive.google.com/uc?id=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getId</span>() <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;&#34;)&#39;</span>
+</span></span><span style="display:flex;"><span>  ]]);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="flow-of-script-">Flow of Script :</h3>
 <p><strong>embedMap()</strong></p>
 <ol>
 <li>Input <code>=embedMap(&quot;Tokyo station&quot;, 16)</code> in cell <code>B3</code>. <code>&quot;Tokyo station&quot;</code> and <code>16</code> are a name of place and zoom, respectively.</li>
@@ -459,15 +458,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -490,15 +480,6 @@
 
 
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

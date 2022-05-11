@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Sending Multiple Emails using Batch Request with Gmail API using Google Apps Script &middot; tanaike</title>
 
@@ -289,129 +288,129 @@
 <p>This sample script uses <a href="https://github.com/tanaikech/BatchRequest">a Google Apps Script library of BatchRequest</a>. So, before you use this script, please install a Google Apps Script library of BatchRequest. You can see how to install this library at <a href="https://github.com/tanaikech/BatchRequest#how-to-install">here</a>.</p>
 <p>And, <a href="https://developers.google.com/apps-script/guides/services/advanced#enable_advanced_services">please enable Gmail API at Advanced Google services</a>.</p>
 <p>And please set <code>obj</code> and if you want to attachment files, please set the file IDs of <code>attachmentFileIds</code>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">convert_</span> <span style="color:#f92672">=</span> ({
-  <span style="color:#a6e22e">to</span>,
-  <span style="color:#a6e22e">cc</span>,
-  <span style="color:#a6e22e">bcc</span>,
-  <span style="color:#a6e22e">fromName</span>,
-  <span style="color:#a6e22e">fromEmail</span>,
-  <span style="color:#a6e22e">subject</span>,
-  <span style="color:#a6e22e">textBody</span>,
-  <span style="color:#a6e22e">htmlBody</span>,
-  <span style="color:#a6e22e">attachments</span>,
-}) =&gt; {
-  <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">to</span>) <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">&#34;Please set &#39;to&#39;.&#34;</span>);
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">`MIME-Version: 1.0`</span>, <span style="color:#e6db74">`To: </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">to</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>];
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">cc</span>) <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">push</span>(<span style="color:#e6db74">`CC: </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">cc</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">bcc</span>) <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">push</span>(<span style="color:#e6db74">`BCC: </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">bcc</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
-  <span style="color:#66d9ef">if</span> ((<span style="color:#a6e22e">fromName</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">fromEmail</span>) <span style="color:#f92672">||</span> <span style="color:#a6e22e">fromEmail</span>) {
-    <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">push</span>(
-      <span style="color:#a6e22e">fromName</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">fromEmail</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">`From: &#34;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">fromName</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34; &lt;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">fromEmail</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&gt;`</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">fromEmail</span>
-    );
-  }
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">boundary1</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;boundaryboundary001&#34;</span>;
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">boundary2</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;boundaryboundary002&#34;</span>;
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">attachments</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">attachments</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
-    <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">push</span>(
-      <span style="color:#e6db74">`Subject: =?UTF-8?B?</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(
-        <span style="color:#a6e22e">subject</span> <span style="color:#f92672">||</span> <span style="color:#e6db74">&#34;&#34;</span>,
-        <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">Charset</span>.<span style="color:#a6e22e">UTF_8</span>
-      )<span style="color:#e6db74">}</span><span style="color:#e6db74">?=`</span>,
-      <span style="color:#e6db74">`Content-Type: multipart/mixed; boundary=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
-      <span style="color:#e6db74">``</span>,
-      <span style="color:#e6db74">`--</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
-      <span style="color:#e6db74">`Content-Type: multipart/alternative; boundary=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary2</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
-      <span style="color:#e6db74">``</span>,
-      <span style="color:#e6db74">`--</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary2</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
-      <span style="color:#e6db74">`Content-Type: text/plain; charset=UTF-8`</span>,
-      <span style="color:#e6db74">``</span>,
-      <span style="color:#a6e22e">textBody</span> <span style="color:#f92672">||</span> <span style="color:#e6db74">&#34;&#34;</span>,
-      <span style="color:#e6db74">`--</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary2</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
-      <span style="color:#e6db74">`Content-Type: text/html; charset=UTF-8`</span>,
-      <span style="color:#e6db74">`Content-Transfer-Encoding: base64`</span>,
-      <span style="color:#e6db74">``</span>,
-      <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(<span style="color:#a6e22e">htmlBody</span> <span style="color:#f92672">||</span> <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">Charset</span>.<span style="color:#a6e22e">UTF_8</span>),
-      <span style="color:#e6db74">`--</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary2</span><span style="color:#e6db74">}</span><span style="color:#e6db74">--`</span>
-    );
-    <span style="color:#a6e22e">attachments</span>.<span style="color:#a6e22e">forEach</span>((<span style="color:#a6e22e">f</span>) =&gt; {
-      <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">push</span>(
-        <span style="color:#e6db74">`--</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
-        <span style="color:#e6db74">`Content-Type: </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">mimeType</span><span style="color:#e6db74">}</span><span style="color:#e6db74">; charset=UTF-8; name=&#34;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">filename</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;`</span>,
-        <span style="color:#e6db74">`Content-Transfer-Encoding: base64`</span>,
-        <span style="color:#e6db74">``</span>,
-        <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">data</span>,
-        <span style="color:#e6db74">`--</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>
-      );
-    });
-  } <span style="color:#66d9ef">else</span> {
-    <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">push</span>(
-      <span style="color:#e6db74">`Subject: =?UTF-8?B?</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(
-        <span style="color:#a6e22e">subject</span> <span style="color:#f92672">||</span> <span style="color:#e6db74">&#34;&#34;</span>,
-        <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">Charset</span>.<span style="color:#a6e22e">UTF_8</span>
-      )<span style="color:#e6db74">}</span><span style="color:#e6db74">?=`</span>,
-      <span style="color:#e6db74">`Content-Type: multipart/alternative; boundary=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
-      <span style="color:#e6db74">``</span>,
-      <span style="color:#e6db74">`--</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
-      <span style="color:#e6db74">`Content-Type: text/plain; charset=UTF-8`</span>,
-      <span style="color:#e6db74">``</span>,
-      <span style="color:#a6e22e">textBody</span> <span style="color:#f92672">||</span> <span style="color:#e6db74">&#34;&#34;</span>,
-      <span style="color:#e6db74">`--</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
-      <span style="color:#e6db74">`Content-Type: text/html; charset=UTF-8`</span>,
-      <span style="color:#e6db74">`Content-Transfer-Encoding: base64`</span>,
-      <span style="color:#e6db74">``</span>,
-      <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(<span style="color:#a6e22e">htmlBody</span> <span style="color:#f92672">||</span> <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">Charset</span>.<span style="color:#a6e22e">UTF_8</span>),
-      <span style="color:#e6db74">`--</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>
-    );
-  }
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64EncodeWebSafe</span>(<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;\r\n&#34;</span>) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;--&#34;</span>);
-};
-
-<span style="color:#75715e">// Please run this function.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">attachmentFileIds</span> <span style="color:#f92672">=</span> [
-    <span style="color:#e6db74">&#34;### file ID1 of attachment file ###&#34;</span>,
-    <span style="color:#e6db74">&#34;### file ID1 of attachment file ###&#34;</span>,
-  ];
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">attachmentFiles</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">attachmentFileIds</span>.<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">id</span>) =&gt; {
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">file</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">id</span>);
-    <span style="color:#66d9ef">return</span> {
-      <span style="color:#a6e22e">filename</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getName</span>(),
-      <span style="color:#a6e22e">mimeType</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getMimeType</span>(),
-      <span style="color:#a6e22e">data</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(<span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getBlob</span>().<span style="color:#a6e22e">getBytes</span>()),
-    };
-  });
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> [
-    {
-      <span style="color:#a6e22e">to</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;### email address 1 ###&#34;</span>,
-      <span style="color:#a6e22e">cc</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;###&#34;</span>,
-      <span style="color:#a6e22e">fromEmail</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;###&#34;</span>,
-      <span style="color:#a6e22e">fromName</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;###&#34;</span>,
-      <span style="color:#a6e22e">subject</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sample mail 1&#34;</span>,
-      <span style="color:#a6e22e">textBody</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Hello World&#34;</span>,
-      <span style="color:#a6e22e">htmlBody</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;&lt;p&gt;Hello World&lt;/p&gt;&#34;</span>,
-    },
-    {
-      <span style="color:#a6e22e">to</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;### email address 2 ###&#34;</span>,
-      <span style="color:#a6e22e">bcc</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;###&#34;</span>,
-      <span style="color:#a6e22e">subject</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sample mail 2&#34;</span>,
-      <span style="color:#a6e22e">textBody</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Hello World&#34;</span>,
-      <span style="color:#a6e22e">attachments</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">attachmentFiles</span>,
-    },
-  ];
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">raws</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">e</span>) =&gt; <span style="color:#a6e22e">convert_</span>(<span style="color:#a6e22e">e</span>));
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">requests</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">raws</span>.<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">raw</span>) =&gt; ({
-    <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;POST&#34;</span>,
-    <span style="color:#a6e22e">endpoint</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;https://gmail.googleapis.com/gmail/v1/users/me/messages/send&#34;</span>,
-    <span style="color:#a6e22e">requestBody</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">raw</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">raw</span> },
-  }));
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">BatchRequest</span>.<span style="color:#a6e22e">EDo</span>({
-    <span style="color:#a6e22e">batchPath</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;batch/gmail/v1&#34;</span>,
-    <span style="color:#a6e22e">accessToken</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>(),
-    <span style="color:#a6e22e">requests</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">requests</span>,
-  });
-  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>);
-}
-</code></pre></div><ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">convert_</span> <span style="color:#f92672">=</span> ({
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">to</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">cc</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">bcc</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">fromName</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">fromEmail</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">subject</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">textBody</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">htmlBody</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">attachments</span>,
+</span></span><span style="display:flex;"><span>}) =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">to</span>) <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">&#34;Please set &#39;to&#39;.&#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">`MIME-Version: 1.0`</span>, <span style="color:#e6db74">`To: </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">to</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>];
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">cc</span>) <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">push</span>(<span style="color:#e6db74">`CC: </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">cc</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">bcc</span>) <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">push</span>(<span style="color:#e6db74">`BCC: </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">bcc</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> ((<span style="color:#a6e22e">fromName</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">fromEmail</span>) <span style="color:#f92672">||</span> <span style="color:#a6e22e">fromEmail</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">push</span>(
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">fromName</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">fromEmail</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">`From: &#34;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">fromName</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34; &lt;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">fromEmail</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&gt;`</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">fromEmail</span>
+</span></span><span style="display:flex;"><span>    );
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">boundary1</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;boundaryboundary001&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">boundary2</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;boundaryboundary002&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">attachments</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">attachments</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">push</span>(
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`Subject: =?UTF-8?B?</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">subject</span> <span style="color:#f92672">||</span> <span style="color:#e6db74">&#34;&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">Charset</span>.<span style="color:#a6e22e">UTF_8</span>
+</span></span><span style="display:flex;"><span>      )<span style="color:#e6db74">}</span><span style="color:#e6db74">?=`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`Content-Type: multipart/mixed; boundary=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">``</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`--</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`Content-Type: multipart/alternative; boundary=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary2</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">``</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`--</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary2</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`Content-Type: text/plain; charset=UTF-8`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">``</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">textBody</span> <span style="color:#f92672">||</span> <span style="color:#e6db74">&#34;&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`--</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary2</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`Content-Type: text/html; charset=UTF-8`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`Content-Transfer-Encoding: base64`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">``</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(<span style="color:#a6e22e">htmlBody</span> <span style="color:#f92672">||</span> <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">Charset</span>.<span style="color:#a6e22e">UTF_8</span>),
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`--</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary2</span><span style="color:#e6db74">}</span><span style="color:#e6db74">--`</span>
+</span></span><span style="display:flex;"><span>    );
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">attachments</span>.<span style="color:#a6e22e">forEach</span>((<span style="color:#a6e22e">f</span>) =&gt; {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">push</span>(
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">`--</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">`Content-Type: </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">mimeType</span><span style="color:#e6db74">}</span><span style="color:#e6db74">; charset=UTF-8; name=&#34;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">filename</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;`</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">`Content-Transfer-Encoding: base64`</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">``</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">data</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">`--</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>
+</span></span><span style="display:flex;"><span>      );
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>  } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">push</span>(
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`Subject: =?UTF-8?B?</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">subject</span> <span style="color:#f92672">||</span> <span style="color:#e6db74">&#34;&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">Charset</span>.<span style="color:#a6e22e">UTF_8</span>
+</span></span><span style="display:flex;"><span>      )<span style="color:#e6db74">}</span><span style="color:#e6db74">?=`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`Content-Type: multipart/alternative; boundary=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">``</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`--</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`Content-Type: text/plain; charset=UTF-8`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">``</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">textBody</span> <span style="color:#f92672">||</span> <span style="color:#e6db74">&#34;&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`--</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`Content-Type: text/html; charset=UTF-8`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`Content-Transfer-Encoding: base64`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">``</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(<span style="color:#a6e22e">htmlBody</span> <span style="color:#f92672">||</span> <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">Charset</span>.<span style="color:#a6e22e">UTF_8</span>),
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`--</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>
+</span></span><span style="display:flex;"><span>    );
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64EncodeWebSafe</span>(<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;\r\n&#34;</span>) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;--&#34;</span>);
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Please run this function.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">attachmentFileIds</span> <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;### file ID1 of attachment file ###&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;### file ID1 of attachment file ###&#34;</span>,
+</span></span><span style="display:flex;"><span>  ];
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">attachmentFiles</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">attachmentFileIds</span>.<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">id</span>) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">file</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">id</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">filename</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getName</span>(),
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">mimeType</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getMimeType</span>(),
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">data</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(<span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getBlob</span>().<span style="color:#a6e22e">getBytes</span>()),
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">to</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;### email address 1 ###&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">cc</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;###&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">fromEmail</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;###&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">fromName</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;###&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">subject</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sample mail 1&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">textBody</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Hello World&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">htmlBody</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;&lt;p&gt;Hello World&lt;/p&gt;&#34;</span>,
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">to</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;### email address 2 ###&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">bcc</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;###&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">subject</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sample mail 2&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">textBody</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Hello World&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">attachments</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">attachmentFiles</span>,
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>  ];
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">raws</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">e</span>) =&gt; <span style="color:#a6e22e">convert_</span>(<span style="color:#a6e22e">e</span>));
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">requests</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">raws</span>.<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">raw</span>) =&gt; ({
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;POST&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">endpoint</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;https://gmail.googleapis.com/gmail/v1/users/me/messages/send&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">requestBody</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">raw</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">raw</span> },
+</span></span><span style="display:flex;"><span>  }));
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">BatchRequest</span>.<span style="color:#a6e22e">EDo</span>({
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">batchPath</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;batch/gmail/v1&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">accessToken</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>(),
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">requests</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">requests</span>,
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><ul>
 <li>When you run this script, 2 emails are sent.</li>
 </ul>
 <h2 id="note">Note</h2>
@@ -521,15 +520,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -555,15 +545,6 @@
   <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
   
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

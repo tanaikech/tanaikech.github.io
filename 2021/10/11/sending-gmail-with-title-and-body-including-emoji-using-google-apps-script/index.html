@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Sending Gmail with Title and Body Including Emoji using Google Apps Script &middot; tanaike</title>
 
@@ -285,47 +284,47 @@
 <p><img src="https://tanaikech.github.io/image-storage/20211011a/fig1.png" alt=""></p>
 <h2 id="sample-script">Sample script</h2>
 <p>This sample script uses Gmail API. So please enable Gmail API at Advanced Google services. <a href="https://developers.google.com/apps-script/guides/services/advanced#enable_advanced_services">Ref</a></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">convert_</span> <span style="color:#f92672">=</span> ({ <span style="color:#a6e22e">to</span>, <span style="color:#a6e22e">emailFrom</span>, <span style="color:#a6e22e">nameFrom</span>, <span style="color:#a6e22e">subject</span>, <span style="color:#a6e22e">textBody</span>, <span style="color:#a6e22e">htmlBody</span> }) =&gt; {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">boundary</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;boundaryboundary&#34;</span>;
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">mailData</span> <span style="color:#f92672">=</span> [
-    <span style="color:#e6db74">`MIME-Version: 1.0`</span>,
-    <span style="color:#e6db74">`To: </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">to</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
-    <span style="color:#a6e22e">nameFrom</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">emailFrom</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">`From: &#34;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">nameFrom</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34; &lt;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">emailFrom</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&gt;`</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;&#34;</span>,
-    <span style="color:#e6db74">`Subject: =?UTF-8?B?</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(
-      <span style="color:#a6e22e">subject</span>,
-      <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">Charset</span>.<span style="color:#a6e22e">UTF_8</span>
-    )<span style="color:#e6db74">}</span><span style="color:#e6db74">?=`</span>,
-    <span style="color:#e6db74">`Content-Type: multipart/alternative; boundary=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
-    <span style="color:#e6db74">``</span>,
-    <span style="color:#e6db74">`--</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
-    <span style="color:#e6db74">`Content-Type: text/plain; charset=UTF-8`</span>,
-    <span style="color:#e6db74">``</span>,
-    <span style="color:#a6e22e">textBody</span>,
-    <span style="color:#e6db74">``</span>,
-    <span style="color:#e6db74">`--</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
-    <span style="color:#e6db74">`Content-Type: text/html; charset=UTF-8`</span>,
-    <span style="color:#e6db74">`Content-Transfer-Encoding: base64`</span>,
-    <span style="color:#e6db74">``</span>,
-    <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(<span style="color:#a6e22e">htmlBody</span>, <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">Charset</span>.<span style="color:#a6e22e">UTF_8</span>),
-    <span style="color:#e6db74">``</span>,
-    <span style="color:#e6db74">`--</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary</span><span style="color:#e6db74">}</span><span style="color:#e6db74">--`</span>,
-  ].<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;\r\n&#34;</span>);
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64EncodeWebSafe</span>(<span style="color:#a6e22e">mailData</span>);
-};
-
-<span style="color:#75715e">// Please run this function.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> {
-    <span style="color:#a6e22e">to</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;###&#34;</span>, <span style="color:#75715e">// Please set the email for `to`.
-</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">emailFrom</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;###&#34;</span>, <span style="color:#75715e">// Please set the email for `from`.
-</span><span style="color:#75715e"></span>    <span style="color:#a6e22e">nameFrom</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sample name&#34;</span>,
-    <span style="color:#a6e22e">subject</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Hello World 😃⭐&#34;</span>,
-    <span style="color:#a6e22e">textBody</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sample text body 😃⭐&#34;</span>,
-    <span style="color:#a6e22e">htmlBody</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;&lt;p&gt;Hello World 😃⭐&lt;/p&gt;&#34;</span>,
-  };
-  <span style="color:#a6e22e">Gmail</span>.<span style="color:#a6e22e">Users</span>.<span style="color:#a6e22e">Messages</span>.<span style="color:#a6e22e">send</span>({ <span style="color:#a6e22e">raw</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">convert_</span>(<span style="color:#a6e22e">obj</span>) }, <span style="color:#e6db74">&#34;me&#34;</span>);
-}
-</code></pre></div><ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">convert_</span> <span style="color:#f92672">=</span> ({ <span style="color:#a6e22e">to</span>, <span style="color:#a6e22e">emailFrom</span>, <span style="color:#a6e22e">nameFrom</span>, <span style="color:#a6e22e">subject</span>, <span style="color:#a6e22e">textBody</span>, <span style="color:#a6e22e">htmlBody</span> }) =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">boundary</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;boundaryboundary&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">mailData</span> <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`MIME-Version: 1.0`</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`To: </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">to</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">nameFrom</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">emailFrom</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">`From: &#34;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">nameFrom</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34; &lt;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">emailFrom</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&gt;`</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`Subject: =?UTF-8?B?</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">subject</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">Charset</span>.<span style="color:#a6e22e">UTF_8</span>
+</span></span><span style="display:flex;"><span>    )<span style="color:#e6db74">}</span><span style="color:#e6db74">?=`</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`Content-Type: multipart/alternative; boundary=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">``</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`--</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`Content-Type: text/plain; charset=UTF-8`</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">``</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">textBody</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">``</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`--</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`Content-Type: text/html; charset=UTF-8`</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`Content-Transfer-Encoding: base64`</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">``</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(<span style="color:#a6e22e">htmlBody</span>, <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">Charset</span>.<span style="color:#a6e22e">UTF_8</span>),
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">``</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`--</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">boundary</span><span style="color:#e6db74">}</span><span style="color:#e6db74">--`</span>,
+</span></span><span style="display:flex;"><span>  ].<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;\r\n&#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64EncodeWebSafe</span>(<span style="color:#a6e22e">mailData</span>);
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Please run this function.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">to</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;###&#34;</span>, <span style="color:#75715e">// Please set the email for `to`.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">emailFrom</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;###&#34;</span>, <span style="color:#75715e">// Please set the email for `from`.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">nameFrom</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sample name&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">subject</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Hello World 😃⭐&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">textBody</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sample text body 😃⭐&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">htmlBody</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;&lt;p&gt;Hello World 😃⭐&lt;/p&gt;&#34;</span>,
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">Gmail</span>.<span style="color:#a6e22e">Users</span>.<span style="color:#a6e22e">Messages</span>.<span style="color:#a6e22e">send</span>({ <span style="color:#a6e22e">raw</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">convert_</span>(<span style="color:#a6e22e">obj</span>) }, <span style="color:#e6db74">&#34;me&#34;</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><ul>
 <li>In order to use Emoji in the subject, the subject value is converted to the base64 data. And, it is used as <code>=?UTF-8?B?###?=</code>. <a href="https://www.php.net/manual/en/function.mail.php#refsect1-function.mail-seealso">Ref</a></li>
 <li>About the method for including Emoji to the email body, I have answered it at <a href="https://stackoverflow.com/a/50883782/7108653">this thread of Stackoverflow</a>.</li>
 </ul>
@@ -421,15 +420,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -455,15 +445,6 @@
   <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
   
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

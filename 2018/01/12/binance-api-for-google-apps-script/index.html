@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Binance API for Google Apps Script &middot; tanaike</title>
 
@@ -286,29 +285,29 @@
 
   <p><a href="https://gist.github.com/tanaikech/175067567819577fd8eba9b82eabd1a6">Gists</a></p>
 <p>This sample script is for using <a href="https://www.binance.com/restapipub.html#user-content-signed-endpoint-security">Binance API</a> by Google Apps Script. This script encryptes &ldquo;signature&rdquo; like samples. In this script, &ldquo;Example 1: As a query string&rdquo; is used, and it retrieves &ldquo;All orders (SIGNED)&rdquo; by &ldquo;GET&rdquo;.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">key</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;#####&#39;</span>; <span style="color:#75715e">// Please input your key.
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">secret</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;#####&#39;</span>; <span style="color:#75715e">// Please input your secret.
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">api</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;/api/v3/allOrders&#34;</span>; <span style="color:#75715e">// Please input API Endpoint you want.
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">timestamp</span> <span style="color:#f92672">=</span> Number(<span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>()).<span style="color:#a6e22e">toFixed</span>(<span style="color:#ae81ff">0</span>);
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">string</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;symbol=LTCBTC&amp;timestamp=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">timestamp</span>; <span style="color:#75715e">// Please input query parameters for the inputterd API.
-</span><span style="color:#75715e"></span>
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">baseUrl</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://api.binance.com&#34;</span>;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">signature</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">computeHmacSha256Signature</span>(<span style="color:#a6e22e">string</span>, <span style="color:#a6e22e">secret</span>);
-    <span style="color:#a6e22e">signature</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">signature</span>.<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
-        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">v</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">e</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">e</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">256</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>).<span style="color:#a6e22e">toString</span>(<span style="color:#ae81ff">16</span>);
-        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">v</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#34;0&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">v</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">v</span>;
-    }).<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;&#34;</span>);
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">query</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;?&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">string</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&amp;signature=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">signature</span>;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> {
-        <span style="color:#e6db74">&#39;method&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;get&#39;</span>,
-        <span style="color:#e6db74">&#39;headers&#39;</span><span style="color:#f92672">:</span> {<span style="color:#e6db74">&#39;X-MBX-APIKEY&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">key</span>},
-        <span style="color:#e6db74">&#39;muteHttpExceptions&#39;</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>
-    };
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">baseUrl</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">api</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">query</span>, <span style="color:#a6e22e">params</span>);
-    <span style="color:#a6e22e">Logger</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">getContentText</span>())
-}
-</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">key</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;#####&#39;</span>; <span style="color:#75715e">// Please input your key.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">secret</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;#####&#39;</span>; <span style="color:#75715e">// Please input your secret.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">api</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;/api/v3/allOrders&#34;</span>; <span style="color:#75715e">// Please input API Endpoint you want.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">timestamp</span> <span style="color:#f92672">=</span> Number(<span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>()).<span style="color:#a6e22e">toFixed</span>(<span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">string</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;symbol=LTCBTC&amp;timestamp=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">timestamp</span>; <span style="color:#75715e">// Please input query parameters for the inputterd API.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">baseUrl</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://api.binance.com&#34;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">signature</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">computeHmacSha256Signature</span>(<span style="color:#a6e22e">string</span>, <span style="color:#a6e22e">secret</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">signature</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">signature</span>.<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">v</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">e</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">e</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">256</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>).<span style="color:#a6e22e">toString</span>(<span style="color:#ae81ff">16</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">v</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#34;0&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">v</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">v</span>;
+</span></span><span style="display:flex;"><span>    }).<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">query</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;?&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">string</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&amp;signature=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">signature</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#39;method&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;get&#39;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#39;headers&#39;</span><span style="color:#f92672">:</span> {<span style="color:#e6db74">&#39;X-MBX-APIKEY&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">key</span>},
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#39;muteHttpExceptions&#39;</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">baseUrl</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">api</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">query</span>, <span style="color:#a6e22e">params</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Logger</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">getContentText</span>())
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div>
   
   <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
 <ul class="share-buttons">
@@ -396,15 +395,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -427,15 +417,6 @@
 
 
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

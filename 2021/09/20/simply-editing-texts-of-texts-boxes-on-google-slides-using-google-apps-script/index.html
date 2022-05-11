@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Simply Editing Texts of Texts Boxes on Google Slides using Google Apps Script &middot; tanaike</title>
 
@@ -294,104 +293,104 @@
 <p>Please copy and paste the following script to the script editor of Google Slides and save the script. And then, please reopen the Google Slides. By this, the custom menu &ldquo;sample&rdquo; is created for the Google Slides. When &ldquo;RUN&rdquo; in the custom menu &ldquo;sample&rdquo; is opened, the script is run.</p>
 <h4 id="codegs">Code.gs</h4>
 <p>Please copy and paste this script as <code>Code.gs</code>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">onOpen</span>() {
-  <span style="color:#a6e22e">SlidesApp</span>.<span style="color:#a6e22e">getUi</span>()
-    .<span style="color:#a6e22e">createMenu</span>(<span style="color:#e6db74">&#34;sample&#34;</span>)
-    .<span style="color:#a6e22e">addItem</span>(<span style="color:#e6db74">&#34;RUN&#34;</span>, <span style="color:#e6db74">&#34;openSidebar&#34;</span>)
-    .<span style="color:#a6e22e">addToUi</span>();
-}
-
-<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">openSidebar</span>() {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">html</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">HtmlService</span>.<span style="color:#a6e22e">createHtmlOutputFromFile</span>(<span style="color:#e6db74">&#34;index&#34;</span>).<span style="color:#a6e22e">setTitle</span>(<span style="color:#e6db74">&#34;sample&#34;</span>);
-  <span style="color:#a6e22e">SlidesApp</span>.<span style="color:#a6e22e">getUi</span>().<span style="color:#a6e22e">showSidebar</span>(<span style="color:#a6e22e">html</span>);
-}
-
-<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getSelectedShapes</span>() {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">select</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SlidesApp</span>.<span style="color:#a6e22e">getActivePresentation</span>().<span style="color:#a6e22e">getSelection</span>();
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">pageElementRange</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">select</span>.<span style="color:#a6e22e">getPageElementRange</span>();
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">pageElementRange</span>) {
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">pageElementRange</span>
-      .<span style="color:#a6e22e">getPageElements</span>()
-      .<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">ar</span>, <span style="color:#a6e22e">e</span>) =&gt; {
-        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getPageElementType</span>() <span style="color:#f92672">==</span> <span style="color:#a6e22e">SlidesApp</span>.<span style="color:#a6e22e">PageElementType</span>.<span style="color:#a6e22e">SHAPE</span>) {
-          <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">shape</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">asShape</span>();
-          <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">push</span>({
-            <span style="color:#a6e22e">objectId</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">shape</span>.<span style="color:#a6e22e">getObjectId</span>(),
-            <span style="color:#a6e22e">text</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">shape</span>.<span style="color:#a6e22e">getText</span>().<span style="color:#a6e22e">asString</span>().<span style="color:#a6e22e">trim</span>(),
-          });
-        }
-        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ar</span>;
-      }, [])
-      .<span style="color:#a6e22e">reverse</span>();
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">obj</span>;
-  }
-  <span style="color:#66d9ef">return</span> [];
-}
-
-<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">updatedTexts</span>(<span style="color:#a6e22e">o</span>) {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">select</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SlidesApp</span>.<span style="color:#a6e22e">getActivePresentation</span>().<span style="color:#a6e22e">getSelection</span>();
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">slide</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">select</span>.<span style="color:#a6e22e">getCurrentPage</span>();
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">slide</span>.<span style="color:#a6e22e">getShapes</span>().<span style="color:#a6e22e">reduce</span>(
-    (<span style="color:#a6e22e">o</span>, <span style="color:#a6e22e">e</span>) =&gt;
-      Object.<span style="color:#a6e22e">assign</span>(<span style="color:#a6e22e">o</span>, {
-        [<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getObjectId</span>()]<span style="color:#f92672">:</span> { <span style="color:#a6e22e">shape</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">text</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getText</span>().<span style="color:#a6e22e">asString</span>().<span style="color:#a6e22e">trim</span>() },
-      }),
-    {}
-  );
-  <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">forEach</span>(({ <span style="color:#a6e22e">objectId</span>, <span style="color:#a6e22e">text</span> }) =&gt; {
-    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">obj</span>[<span style="color:#a6e22e">objectId</span>] <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">obj</span>[<span style="color:#a6e22e">objectId</span>].<span style="color:#a6e22e">text</span> <span style="color:#f92672">!=</span> <span style="color:#a6e22e">text</span>) {
-      <span style="color:#a6e22e">obj</span>[<span style="color:#a6e22e">objectId</span>].<span style="color:#a6e22e">shape</span>.<span style="color:#a6e22e">getText</span>().<span style="color:#a6e22e">setText</span>(<span style="color:#a6e22e">text</span>);
-    }
-  });
-  <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Done&#34;</span>;
-}
-</code></pre></div><h4 id="indexhtml">index.html</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">onOpen</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">SlidesApp</span>.<span style="color:#a6e22e">getUi</span>()
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">createMenu</span>(<span style="color:#e6db74">&#34;sample&#34;</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">addItem</span>(<span style="color:#e6db74">&#34;RUN&#34;</span>, <span style="color:#e6db74">&#34;openSidebar&#34;</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">addToUi</span>();
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">openSidebar</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">html</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">HtmlService</span>.<span style="color:#a6e22e">createHtmlOutputFromFile</span>(<span style="color:#e6db74">&#34;index&#34;</span>).<span style="color:#a6e22e">setTitle</span>(<span style="color:#e6db74">&#34;sample&#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">SlidesApp</span>.<span style="color:#a6e22e">getUi</span>().<span style="color:#a6e22e">showSidebar</span>(<span style="color:#a6e22e">html</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getSelectedShapes</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">select</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SlidesApp</span>.<span style="color:#a6e22e">getActivePresentation</span>().<span style="color:#a6e22e">getSelection</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">pageElementRange</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">select</span>.<span style="color:#a6e22e">getPageElementRange</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">pageElementRange</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">pageElementRange</span>
+</span></span><span style="display:flex;"><span>      .<span style="color:#a6e22e">getPageElements</span>()
+</span></span><span style="display:flex;"><span>      .<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">ar</span>, <span style="color:#a6e22e">e</span>) =&gt; {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getPageElementType</span>() <span style="color:#f92672">==</span> <span style="color:#a6e22e">SlidesApp</span>.<span style="color:#a6e22e">PageElementType</span>.<span style="color:#a6e22e">SHAPE</span>) {
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">shape</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">asShape</span>();
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">push</span>({
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">objectId</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">shape</span>.<span style="color:#a6e22e">getObjectId</span>(),
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">text</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">shape</span>.<span style="color:#a6e22e">getText</span>().<span style="color:#a6e22e">asString</span>().<span style="color:#a6e22e">trim</span>(),
+</span></span><span style="display:flex;"><span>          });
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ar</span>;
+</span></span><span style="display:flex;"><span>      }, [])
+</span></span><span style="display:flex;"><span>      .<span style="color:#a6e22e">reverse</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">obj</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> [];
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">updatedTexts</span>(<span style="color:#a6e22e">o</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">select</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SlidesApp</span>.<span style="color:#a6e22e">getActivePresentation</span>().<span style="color:#a6e22e">getSelection</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">slide</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">select</span>.<span style="color:#a6e22e">getCurrentPage</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">slide</span>.<span style="color:#a6e22e">getShapes</span>().<span style="color:#a6e22e">reduce</span>(
+</span></span><span style="display:flex;"><span>    (<span style="color:#a6e22e">o</span>, <span style="color:#a6e22e">e</span>) =&gt;
+</span></span><span style="display:flex;"><span>      Object.<span style="color:#a6e22e">assign</span>(<span style="color:#a6e22e">o</span>, {
+</span></span><span style="display:flex;"><span>        [<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getObjectId</span>()]<span style="color:#f92672">:</span> { <span style="color:#a6e22e">shape</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">text</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getText</span>().<span style="color:#a6e22e">asString</span>().<span style="color:#a6e22e">trim</span>() },
+</span></span><span style="display:flex;"><span>      }),
+</span></span><span style="display:flex;"><span>    {}
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">forEach</span>(({ <span style="color:#a6e22e">objectId</span>, <span style="color:#a6e22e">text</span> }) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">obj</span>[<span style="color:#a6e22e">objectId</span>] <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">obj</span>[<span style="color:#a6e22e">objectId</span>].<span style="color:#a6e22e">text</span> <span style="color:#f92672">!=</span> <span style="color:#a6e22e">text</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">obj</span>[<span style="color:#a6e22e">objectId</span>].<span style="color:#a6e22e">shape</span>.<span style="color:#a6e22e">getText</span>().<span style="color:#a6e22e">setText</span>(<span style="color:#a6e22e">text</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Done&#34;</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="indexhtml">index.html</h4>
 <p>Please copy and paste this script as <code>index.html</code>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;button&#34;</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;main&#34;</span> <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Get selected shapes&#34;</span> <span style="color:#a6e22e">onClick</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;main()&#34;</span>&gt;
-&lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;shapes&#34;</span>&gt;&lt;/<span style="color:#f92672">div</span>&gt;
-&lt;<span style="color:#f92672">input</span>
-  <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;button&#34;</span>
-  <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;update&#34;</span>
-  <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Updated texts&#34;</span>
-  <span style="color:#a6e22e">onClick</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;updatedTexts()&#34;</span>
-  <span style="color:#a6e22e">style</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;display:none&#34;</span>
-/&gt;
-&lt;<span style="color:#f92672">script</span>&gt;
-  <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
-    document.<span style="color:#a6e22e">getElementById</span>(<span style="color:#e6db74">&#34;main&#34;</span>).<span style="color:#a6e22e">disabled</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
-    document.<span style="color:#a6e22e">getElementById</span>(<span style="color:#e6db74">&#34;shapes&#34;</span>).<span style="color:#a6e22e">innerHTML</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
-    <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">script</span>.<span style="color:#a6e22e">run</span>
-      .<span style="color:#a6e22e">withSuccessHandler</span>((<span style="color:#a6e22e">o</span>) =&gt; {
-        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) {
-          document.<span style="color:#a6e22e">getElementById</span>(<span style="color:#e6db74">&#34;update&#34;</span>).<span style="color:#a6e22e">style</span>.<span style="color:#a6e22e">display</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;none&#34;</span>;
-          <span style="color:#66d9ef">return</span>;
-        }
-        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">div</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">getElementById</span>(<span style="color:#e6db74">&#34;shapes&#34;</span>);
-        <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">forEach</span>(({ <span style="color:#a6e22e">objectId</span>, <span style="color:#a6e22e">text</span> }) =&gt; {
-          <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">input</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">createElement</span>(<span style="color:#e6db74">&#34;input&#34;</span>);
-          <span style="color:#a6e22e">input</span>.<span style="color:#a6e22e">setAttribute</span>(<span style="color:#e6db74">&#34;type&#34;</span>, <span style="color:#e6db74">&#34;text&#34;</span>);
-          <span style="color:#a6e22e">input</span>.<span style="color:#a6e22e">setAttribute</span>(<span style="color:#e6db74">&#34;id&#34;</span>, <span style="color:#a6e22e">objectId</span>);
-          <span style="color:#a6e22e">input</span>.<span style="color:#a6e22e">setAttribute</span>(<span style="color:#e6db74">&#34;value&#34;</span>, <span style="color:#a6e22e">text</span>);
-          <span style="color:#a6e22e">div</span>.<span style="color:#a6e22e">appendChild</span>(<span style="color:#a6e22e">input</span>);
-        });
-        document.<span style="color:#a6e22e">getElementById</span>(<span style="color:#e6db74">&#34;update&#34;</span>).<span style="color:#a6e22e">style</span>.<span style="color:#a6e22e">display</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
-        document.<span style="color:#a6e22e">getElementById</span>(<span style="color:#e6db74">&#34;main&#34;</span>).<span style="color:#a6e22e">disabled</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>;
-      })
-      .<span style="color:#a6e22e">getSelectedShapes</span>();
-  }
-
-  <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">updatedTexts</span>() {
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">inputs</span> <span style="color:#f92672">=</span> document
-      .<span style="color:#a6e22e">getElementById</span>(<span style="color:#e6db74">&#34;shapes&#34;</span>)
-      .<span style="color:#a6e22e">getElementsByTagName</span>(<span style="color:#e6db74">&#34;input&#34;</span>);
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> [...<span style="color:#a6e22e">inputs</span>].<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">e</span>) =&gt; ({ <span style="color:#a6e22e">objectId</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">id</span>, <span style="color:#a6e22e">text</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">value</span> }));
-    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">obj</span>);
-    <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">script</span>.<span style="color:#a6e22e">run</span>
-      .<span style="color:#a6e22e">withSuccessHandler</span>((<span style="color:#a6e22e">e</span>) =&gt; <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">e</span>))
-      .<span style="color:#a6e22e">updatedTexts</span>(<span style="color:#a6e22e">obj</span>);
-  }
-&lt;/<span style="color:#f92672">script</span>&gt;
-</code></pre></div><p><strong>Please save the script after above scripts were copied.</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-html" data-lang="html"><span style="display:flex;"><span>&lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;button&#34;</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;main&#34;</span> <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Get selected shapes&#34;</span> <span style="color:#a6e22e">onClick</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;main()&#34;</span>&gt;
+</span></span><span style="display:flex;"><span>&lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;shapes&#34;</span>&gt;&lt;/<span style="color:#f92672">div</span>&gt;
+</span></span><span style="display:flex;"><span>&lt;<span style="color:#f92672">input</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;button&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;update&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Updated texts&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">onClick</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;updatedTexts()&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">style</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;display:none&#34;</span>
+</span></span><span style="display:flex;"><span>/&gt;
+</span></span><span style="display:flex;"><span>&lt;<span style="color:#f92672">script</span>&gt;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    document.<span style="color:#a6e22e">getElementById</span>(<span style="color:#e6db74">&#34;main&#34;</span>).<span style="color:#a6e22e">disabled</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
+</span></span><span style="display:flex;"><span>    document.<span style="color:#a6e22e">getElementById</span>(<span style="color:#e6db74">&#34;shapes&#34;</span>).<span style="color:#a6e22e">innerHTML</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">script</span>.<span style="color:#a6e22e">run</span>
+</span></span><span style="display:flex;"><span>      .<span style="color:#a6e22e">withSuccessHandler</span>((<span style="color:#a6e22e">o</span>) =&gt; {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>          document.<span style="color:#a6e22e">getElementById</span>(<span style="color:#e6db74">&#34;update&#34;</span>).<span style="color:#a6e22e">style</span>.<span style="color:#a6e22e">display</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;none&#34;</span>;
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">div</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">getElementById</span>(<span style="color:#e6db74">&#34;shapes&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">forEach</span>(({ <span style="color:#a6e22e">objectId</span>, <span style="color:#a6e22e">text</span> }) =&gt; {
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">input</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">createElement</span>(<span style="color:#e6db74">&#34;input&#34;</span>);
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">input</span>.<span style="color:#a6e22e">setAttribute</span>(<span style="color:#e6db74">&#34;type&#34;</span>, <span style="color:#e6db74">&#34;text&#34;</span>);
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">input</span>.<span style="color:#a6e22e">setAttribute</span>(<span style="color:#e6db74">&#34;id&#34;</span>, <span style="color:#a6e22e">objectId</span>);
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">input</span>.<span style="color:#a6e22e">setAttribute</span>(<span style="color:#e6db74">&#34;value&#34;</span>, <span style="color:#a6e22e">text</span>);
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">div</span>.<span style="color:#a6e22e">appendChild</span>(<span style="color:#a6e22e">input</span>);
+</span></span><span style="display:flex;"><span>        });
+</span></span><span style="display:flex;"><span>        document.<span style="color:#a6e22e">getElementById</span>(<span style="color:#e6db74">&#34;update&#34;</span>).<span style="color:#a6e22e">style</span>.<span style="color:#a6e22e">display</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
+</span></span><span style="display:flex;"><span>        document.<span style="color:#a6e22e">getElementById</span>(<span style="color:#e6db74">&#34;main&#34;</span>).<span style="color:#a6e22e">disabled</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>;
+</span></span><span style="display:flex;"><span>      })
+</span></span><span style="display:flex;"><span>      .<span style="color:#a6e22e">getSelectedShapes</span>();
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">updatedTexts</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">inputs</span> <span style="color:#f92672">=</span> document
+</span></span><span style="display:flex;"><span>      .<span style="color:#a6e22e">getElementById</span>(<span style="color:#e6db74">&#34;shapes&#34;</span>)
+</span></span><span style="display:flex;"><span>      .<span style="color:#a6e22e">getElementsByTagName</span>(<span style="color:#e6db74">&#34;input&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> [...<span style="color:#a6e22e">inputs</span>].<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">e</span>) =&gt; ({ <span style="color:#a6e22e">objectId</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">id</span>, <span style="color:#a6e22e">text</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">value</span> }));
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">obj</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">script</span>.<span style="color:#a6e22e">run</span>
+</span></span><span style="display:flex;"><span>      .<span style="color:#a6e22e">withSuccessHandler</span>((<span style="color:#a6e22e">e</span>) =&gt; <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">e</span>))
+</span></span><span style="display:flex;"><span>      .<span style="color:#a6e22e">updatedTexts</span>(<span style="color:#a6e22e">obj</span>);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>&lt;/<span style="color:#f92672">script</span>&gt;
+</span></span></code></pre></div><p><strong>Please save the script after above scripts were copied.</strong></p>
 <h3 id="2-testing">2. Testing:</h3>
 <p>Please reopen Google Slides. By this, the custom menu is created. Please open &ldquo;sample&rdquo; -&gt; &ldquo;RUN&rdquo;. By this, the sidebar is opened.</p>
 <ol>
@@ -506,15 +505,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -537,15 +527,6 @@
 
 
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

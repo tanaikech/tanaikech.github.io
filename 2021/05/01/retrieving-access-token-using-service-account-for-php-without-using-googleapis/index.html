@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Retrieving Access Token using Service Account for PHP without using googleapis &middot; tanaike</title>
 
@@ -285,52 +284,52 @@
   <p><a href="https://gist.github.com/tanaikech/1b47cfec588454963ee40c5a50943194">Gists</a></p>
 <p>This is a sample PHP script to retrieve the access token from Service Account of Google without using googleapis.</p>
 <h2 id="sample-script">Sample script</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
-
-$private_key <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;-----BEGIN PRIVATE KEY-----</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">###-----END PRIVATE KEY-----</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>; <span style="color:#75715e">// private_key of JSON file retrieved by creating Service Account
-</span><span style="color:#75715e"></span>$client_email <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// client_email of JSON file retrieved by creating Service Account
-</span><span style="color:#75715e"></span>$scopes <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;https://www.googleapis.com/auth/drive.readonly&#34;</span>]; <span style="color:#75715e">// Sample scope
-</span><span style="color:#75715e"></span>
-$url <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://www.googleapis.com/oauth2/v4/token&#34;</span>;
-$header <span style="color:#f92672">=</span> <span style="color:#66d9ef">array</span>(<span style="color:#e6db74">&#34;alg&#34;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#34;RS256&#34;</span>, <span style="color:#e6db74">&#34;typ&#34;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#34;JWT&#34;</span>);
-$now <span style="color:#f92672">=</span> <span style="color:#a6e22e">floor</span>(<span style="color:#a6e22e">time</span>());
-$claim <span style="color:#f92672">=</span> <span style="color:#66d9ef">array</span>(
-	<span style="color:#e6db74">&#34;iss&#34;</span> <span style="color:#f92672">=&gt;</span> $client_email,
-	<span style="color:#e6db74">&#34;sub&#34;</span> <span style="color:#f92672">=&gt;</span> $client_email,
-	<span style="color:#e6db74">&#34;scope&#34;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#a6e22e">implode</span>(<span style="color:#e6db74">&#34; &#34;</span>, $scopes),
-	<span style="color:#e6db74">&#34;aud&#34;</span> <span style="color:#f92672">=&gt;</span> $url,
-	<span style="color:#e6db74">&#34;exp&#34;</span> <span style="color:#f92672">=&gt;</span> (<span style="color:#a6e22e">string</span>)($now <span style="color:#f92672">+</span> <span style="color:#ae81ff">3600</span>),
-	<span style="color:#e6db74">&#34;iat&#34;</span> <span style="color:#f92672">=&gt;</span> (<span style="color:#a6e22e">string</span>)$now,
-);
-$signature <span style="color:#f92672">=</span> <span style="color:#a6e22e">base64_encode</span>(<span style="color:#a6e22e">json_encode</span>($header, <span style="color:#a6e22e">JSON_UNESCAPED_SLASHES</span>)) <span style="color:#f92672">.</span> <span style="color:#e6db74">&#34;.&#34;</span> <span style="color:#f92672">.</span> <span style="color:#a6e22e">base64_encode</span>(<span style="color:#a6e22e">json_encode</span>($claim, <span style="color:#a6e22e">JSON_UNESCAPED_SLASHES</span>));
-$b <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
-<span style="color:#a6e22e">openssl_sign</span>($signature, $b, $private_key, <span style="color:#e6db74">&#34;SHA256&#34;</span>);
-$jwt <span style="color:#f92672">=</span> $signature <span style="color:#f92672">.</span> <span style="color:#e6db74">&#34;.&#34;</span> <span style="color:#f92672">.</span> <span style="color:#a6e22e">base64_encode</span>($b);
-$curl_handle <span style="color:#f92672">=</span> <span style="color:#a6e22e">curl_init</span>();
-<span style="color:#a6e22e">curl_setopt_array</span>($curl_handle, [
-    <span style="color:#a6e22e">CURLOPT_URL</span> <span style="color:#f92672">=&gt;</span> $url,
-    <span style="color:#a6e22e">CURLOPT_RETURNTRANSFER</span> <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">true</span>,
-    <span style="color:#a6e22e">CURLOPT_POST</span> <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">true</span>,
-    <span style="color:#a6e22e">CURLOPT_POSTFIELDS</span> <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">array</span>(
-        <span style="color:#e6db74">&#34;assertion&#34;</span> <span style="color:#f92672">=&gt;</span> $jwt,
-        <span style="color:#e6db74">&#34;grant_type&#34;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#34;urn:ietf:params:oauth:grant-type:jwt-bearer&#34;</span>
-    ),
-]);
-$res <span style="color:#f92672">=</span> <span style="color:#a6e22e">curl_exec</span>($curl_handle);
-<span style="color:#a6e22e">curl_close</span>($curl_handle);
-$obj <span style="color:#f92672">=</span> <span style="color:#a6e22e">json_decode</span>($res);
-$accessToken <span style="color:#f92672">=</span> $obj <span style="color:#f92672">-&gt;</span> {<span style="color:#e6db74">&#39;access_token&#39;</span>};
-<span style="color:#66d9ef">print</span>($accessToken <span style="color:#f92672">.</span> <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
-
-<span style="color:#75715e">// This is the script for testing the access token. The file list of the service account&#39;s Drive is retrieved using Drive API.
-</span><span style="color:#75715e"></span>$curl_test <span style="color:#f92672">=</span> <span style="color:#a6e22e">curl_init</span>();
-<span style="color:#a6e22e">curl_setopt</span>($curl_test, <span style="color:#a6e22e">CURLOPT_URL</span>, <span style="color:#e6db74">&#39;https://www.googleapis.com/drive/v3/files?access_token=&#39;</span> <span style="color:#f92672">.</span> $accessToken);
-<span style="color:#a6e22e">curl_setopt</span>($curl_test, <span style="color:#a6e22e">CURLOPT_RETURNTRANSFER</span>, <span style="color:#66d9ef">true</span>);
-$response <span style="color:#f92672">=</span> <span style="color:#a6e22e">curl_exec</span>($curl_test);
-<span style="color:#66d9ef">print</span>($response);
-
-<span style="color:#75715e">?&gt;</span><span style="color:#960050;background-color:#1e0010">
-</span></code></pre></div><h2 id="references">References</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$private_key <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;-----BEGIN PRIVATE KEY-----</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">###-----END PRIVATE KEY-----</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>; <span style="color:#75715e">// private_key of JSON file retrieved by creating Service Account
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>$client_email <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// client_email of JSON file retrieved by creating Service Account
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>$scopes <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;https://www.googleapis.com/auth/drive.readonly&#34;</span>]; <span style="color:#75715e">// Sample scope
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>$url <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://www.googleapis.com/oauth2/v4/token&#34;</span>;
+</span></span><span style="display:flex;"><span>$header <span style="color:#f92672">=</span> <span style="color:#66d9ef">array</span>(<span style="color:#e6db74">&#34;alg&#34;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#34;RS256&#34;</span>, <span style="color:#e6db74">&#34;typ&#34;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#34;JWT&#34;</span>);
+</span></span><span style="display:flex;"><span>$now <span style="color:#f92672">=</span> <span style="color:#a6e22e">floor</span>(<span style="color:#a6e22e">time</span>());
+</span></span><span style="display:flex;"><span>$claim <span style="color:#f92672">=</span> <span style="color:#66d9ef">array</span>(
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;iss&#34;</span> <span style="color:#f92672">=&gt;</span> $client_email,
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;sub&#34;</span> <span style="color:#f92672">=&gt;</span> $client_email,
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;scope&#34;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#a6e22e">implode</span>(<span style="color:#e6db74">&#34; &#34;</span>, $scopes),
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;aud&#34;</span> <span style="color:#f92672">=&gt;</span> $url,
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;exp&#34;</span> <span style="color:#f92672">=&gt;</span> (<span style="color:#a6e22e">string</span>)($now <span style="color:#f92672">+</span> <span style="color:#ae81ff">3600</span>),
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;iat&#34;</span> <span style="color:#f92672">=&gt;</span> (<span style="color:#a6e22e">string</span>)$now,
+</span></span><span style="display:flex;"><span>);
+</span></span><span style="display:flex;"><span>$signature <span style="color:#f92672">=</span> <span style="color:#a6e22e">base64_encode</span>(<span style="color:#a6e22e">json_encode</span>($header, <span style="color:#a6e22e">JSON_UNESCAPED_SLASHES</span>)) <span style="color:#f92672">.</span> <span style="color:#e6db74">&#34;.&#34;</span> <span style="color:#f92672">.</span> <span style="color:#a6e22e">base64_encode</span>(<span style="color:#a6e22e">json_encode</span>($claim, <span style="color:#a6e22e">JSON_UNESCAPED_SLASHES</span>));
+</span></span><span style="display:flex;"><span>$b <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">openssl_sign</span>($signature, $b, $private_key, <span style="color:#e6db74">&#34;SHA256&#34;</span>);
+</span></span><span style="display:flex;"><span>$jwt <span style="color:#f92672">=</span> $signature <span style="color:#f92672">.</span> <span style="color:#e6db74">&#34;.&#34;</span> <span style="color:#f92672">.</span> <span style="color:#a6e22e">base64_encode</span>($b);
+</span></span><span style="display:flex;"><span>$curl_handle <span style="color:#f92672">=</span> <span style="color:#a6e22e">curl_init</span>();
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">curl_setopt_array</span>($curl_handle, [
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">CURLOPT_URL</span> <span style="color:#f92672">=&gt;</span> $url,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">CURLOPT_RETURNTRANSFER</span> <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">CURLOPT_POST</span> <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">CURLOPT_POSTFIELDS</span> <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">array</span>(
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;assertion&#34;</span> <span style="color:#f92672">=&gt;</span> $jwt,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;grant_type&#34;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#34;urn:ietf:params:oauth:grant-type:jwt-bearer&#34;</span>
+</span></span><span style="display:flex;"><span>    ),
+</span></span><span style="display:flex;"><span>]);
+</span></span><span style="display:flex;"><span>$res <span style="color:#f92672">=</span> <span style="color:#a6e22e">curl_exec</span>($curl_handle);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">curl_close</span>($curl_handle);
+</span></span><span style="display:flex;"><span>$obj <span style="color:#f92672">=</span> <span style="color:#a6e22e">json_decode</span>($res);
+</span></span><span style="display:flex;"><span>$accessToken <span style="color:#f92672">=</span> $obj <span style="color:#f92672">-&gt;</span> {<span style="color:#e6db74">&#39;access_token&#39;</span>};
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">print</span>($accessToken <span style="color:#f92672">.</span> <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// This is the script for testing the access token. The file list of the service account&#39;s Drive is retrieved using Drive API.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>$curl_test <span style="color:#f92672">=</span> <span style="color:#a6e22e">curl_init</span>();
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">curl_setopt</span>($curl_test, <span style="color:#a6e22e">CURLOPT_URL</span>, <span style="color:#e6db74">&#39;https://www.googleapis.com/drive/v3/files?access_token=&#39;</span> <span style="color:#f92672">.</span> $accessToken);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">curl_setopt</span>($curl_test, <span style="color:#a6e22e">CURLOPT_RETURNTRANSFER</span>, <span style="color:#66d9ef">true</span>);
+</span></span><span style="display:flex;"><span>$response <span style="color:#f92672">=</span> <span style="color:#a6e22e">curl_exec</span>($curl_test);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">print</span>($response);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">?&gt;</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><h2 id="references">References</h2>
 <ul>
 <li><a href="https://developers.google.com/identity/protocols/oauth2/service-account">Using OAuth 2.0 for Server to Server Applications</a></li>
 <li><a href="https://jwt.io/">jwt.io</a></li>
@@ -424,15 +423,6 @@ $response <span style="color:#f92672">=</span> <span style="color:#a6e22e">curl_
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -458,15 +448,6 @@ $response <span style="color:#f92672">=</span> <span style="color:#a6e22e">curl_
   <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
   
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

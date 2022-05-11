@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Modify Shading Color of Paragraph on Google Document using Google Apps Script &middot; tanaike</title>
 
@@ -314,55 +313,55 @@
 </ol>
 <h2 id="sample-script">Sample script:</h2>
 <p>The sample script is for the container-bound script with Google Document. Please copy and paste the following script to the script editor, and <strong>please select a text on Google Document run <code>myFunction()</code> after Google Docs API was enabled.</strong></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">color</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#39b966&#34;</span>; <span style="color:#75715e">// Please set a color with hex.
-</span><span style="color:#75715e"></span>
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">doc</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DocumentApp</span>.<span style="color:#a6e22e">getActiveDocument</span>();
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">selection</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">doc</span>.<span style="color:#a6e22e">getSelection</span>();
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">selection</span>) {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">hex2rgb</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">hex</span>) {
-      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">str</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">hex</span>[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;#&#34;</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">hex</span>.<span style="color:#a6e22e">slice</span>(<span style="color:#ae81ff">1</span>) <span style="color:#f92672">:</span> <span style="color:#a6e22e">hex</span>;
-      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">rgb</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">str</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">/(.{2})/</span>).<span style="color:#a6e22e">reduce</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">ar</span>, <span style="color:#a6e22e">e</span>) {
-        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">e</span>) <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">push</span>(Math.<span style="color:#a6e22e">round</span>(<span style="color:#ae81ff">1000</span> <span style="color:#f92672">*</span> parseInt(<span style="color:#a6e22e">e</span>, <span style="color:#ae81ff">16</span>) <span style="color:#f92672">/</span> <span style="color:#ae81ff">255</span>) <span style="color:#f92672">/</span> <span style="color:#ae81ff">1000</span>);
-        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ar</span>;
-      }, []);
-      <span style="color:#66d9ef">return</span> {<span style="color:#a6e22e">red</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">rgb</span>[<span style="color:#ae81ff">0</span>], <span style="color:#a6e22e">green</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">rgb</span>[<span style="color:#ae81ff">1</span>], <span style="color:#a6e22e">blue</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">rgb</span>[<span style="color:#ae81ff">2</span>]};
-    }(<span style="color:#a6e22e">color</span>);
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">body</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">doc</span>.<span style="color:#a6e22e">getBody</span>();
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">id</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">doc</span>.<span style="color:#a6e22e">getId</span>();
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">baseUrl</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://docs.googleapis.com/v1/documents/&#34;</span>;
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">headers</span> <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;Authorization&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>()};
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> {<span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">headers</span>};
-
-    <span style="color:#75715e">// Retrieve all contents from Google Document.
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">baseUrl</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">id</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;?fields=*&#34;</span>, <span style="color:#a6e22e">params</span>);
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getContentText</span>());
-
-    <span style="color:#75715e">// Retrieve selected content.
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">rangeElements</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">selection</span>.<span style="color:#a6e22e">getRangeElements</span>();
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">selectedContents</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">rangeElements</span>.<span style="color:#a6e22e">reduce</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">ar</span>, <span style="color:#a6e22e">e</span>) {
-      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">p</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getElement</span>();
-      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">getType</span>() <span style="color:#f92672">==</span> <span style="color:#a6e22e">DocumentApp</span>.<span style="color:#a6e22e">ElementType</span>.<span style="color:#a6e22e">TEXT</span>) <span style="color:#a6e22e">p</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">getParent</span>();
-      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">getType</span>() <span style="color:#f92672">==</span> <span style="color:#a6e22e">DocumentApp</span>.<span style="color:#a6e22e">ElementType</span>.<span style="color:#a6e22e">PARAGRAPH</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">getType</span>() <span style="color:#f92672">==</span> <span style="color:#a6e22e">DocumentApp</span>.<span style="color:#a6e22e">ElementType</span>.<span style="color:#a6e22e">LIST_ITEM</span>) <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">content</span>[<span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">getChildIndex</span>(<span style="color:#a6e22e">p</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>]);
-      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ar</span>;
-    }, []);
-
-    <span style="color:#75715e">// Modify shading of selected content.
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">selectedContents</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
-      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">selectedContents</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">?</span> {<span style="color:#a6e22e">startIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">selectedContents</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">startIndex</span>, <span style="color:#a6e22e">endIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">selectedContents</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">endIndex</span>} <span style="color:#f92672">:</span> {<span style="color:#a6e22e">startIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">selectedContents</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">startIndex</span>, <span style="color:#a6e22e">endIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">selectedContents</span>[<span style="color:#a6e22e">selectedContents</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>].<span style="color:#a6e22e">endIndex</span>};
-      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">resource</span> <span style="color:#f92672">=</span> {<span style="color:#a6e22e">requests</span><span style="color:#f92672">:</span> [{<span style="color:#a6e22e">updateParagraphStyle</span><span style="color:#f92672">:</span> {
-        <span style="color:#a6e22e">paragraphStyle</span><span style="color:#f92672">:</span> {<span style="color:#a6e22e">shading</span><span style="color:#f92672">:</span> {<span style="color:#a6e22e">backgroundColor</span><span style="color:#f92672">:</span> {<span style="color:#a6e22e">color</span><span style="color:#f92672">:</span> {<span style="color:#a6e22e">rgbColor</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">hex2rgb</span>}}}},
-        <span style="color:#a6e22e">range</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">range</span>,
-        <span style="color:#a6e22e">fields</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;shading.backgroundColor&#34;</span>,
-      }}]};
-      <span style="color:#a6e22e">params</span>.<span style="color:#a6e22e">method</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;post&#34;</span>;
-      <span style="color:#a6e22e">params</span>.<span style="color:#a6e22e">contentType</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;application/json&#34;</span>;
-      <span style="color:#a6e22e">params</span>.<span style="color:#a6e22e">payload</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">resource</span>);
-      <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">baseUrl</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">id</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;:batchUpdate&#34;</span>, <span style="color:#a6e22e">params</span>);
-    }
-  }
-}
-</code></pre></div><h2 id="result">Result:</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">color</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#39b966&#34;</span>; <span style="color:#75715e">// Please set a color with hex.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">doc</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DocumentApp</span>.<span style="color:#a6e22e">getActiveDocument</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">selection</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">doc</span>.<span style="color:#a6e22e">getSelection</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">selection</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">hex2rgb</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">hex</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">str</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">hex</span>[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;#&#34;</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">hex</span>.<span style="color:#a6e22e">slice</span>(<span style="color:#ae81ff">1</span>) <span style="color:#f92672">:</span> <span style="color:#a6e22e">hex</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">rgb</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">str</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">/(.{2})/</span>).<span style="color:#a6e22e">reduce</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">ar</span>, <span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">e</span>) <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">push</span>(Math.<span style="color:#a6e22e">round</span>(<span style="color:#ae81ff">1000</span> <span style="color:#f92672">*</span> parseInt(<span style="color:#a6e22e">e</span>, <span style="color:#ae81ff">16</span>) <span style="color:#f92672">/</span> <span style="color:#ae81ff">255</span>) <span style="color:#f92672">/</span> <span style="color:#ae81ff">1000</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ar</span>;
+</span></span><span style="display:flex;"><span>      }, []);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> {<span style="color:#a6e22e">red</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">rgb</span>[<span style="color:#ae81ff">0</span>], <span style="color:#a6e22e">green</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">rgb</span>[<span style="color:#ae81ff">1</span>], <span style="color:#a6e22e">blue</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">rgb</span>[<span style="color:#ae81ff">2</span>]};
+</span></span><span style="display:flex;"><span>    }(<span style="color:#a6e22e">color</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">body</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">doc</span>.<span style="color:#a6e22e">getBody</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">id</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">doc</span>.<span style="color:#a6e22e">getId</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">baseUrl</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://docs.googleapis.com/v1/documents/&#34;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">headers</span> <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;Authorization&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>()};
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> {<span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">headers</span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Retrieve all contents from Google Document.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">baseUrl</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">id</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;?fields=*&#34;</span>, <span style="color:#a6e22e">params</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getContentText</span>());
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Retrieve selected content.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">rangeElements</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">selection</span>.<span style="color:#a6e22e">getRangeElements</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">selectedContents</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">rangeElements</span>.<span style="color:#a6e22e">reduce</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">ar</span>, <span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">p</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">getElement</span>();
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">getType</span>() <span style="color:#f92672">==</span> <span style="color:#a6e22e">DocumentApp</span>.<span style="color:#a6e22e">ElementType</span>.<span style="color:#a6e22e">TEXT</span>) <span style="color:#a6e22e">p</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">getParent</span>();
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">getType</span>() <span style="color:#f92672">==</span> <span style="color:#a6e22e">DocumentApp</span>.<span style="color:#a6e22e">ElementType</span>.<span style="color:#a6e22e">PARAGRAPH</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">getType</span>() <span style="color:#f92672">==</span> <span style="color:#a6e22e">DocumentApp</span>.<span style="color:#a6e22e">ElementType</span>.<span style="color:#a6e22e">LIST_ITEM</span>) <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">content</span>[<span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">getChildIndex</span>(<span style="color:#a6e22e">p</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>]);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ar</span>;
+</span></span><span style="display:flex;"><span>    }, []);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Modify shading of selected content.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">selectedContents</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">selectedContents</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">?</span> {<span style="color:#a6e22e">startIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">selectedContents</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">startIndex</span>, <span style="color:#a6e22e">endIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">selectedContents</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">endIndex</span>} <span style="color:#f92672">:</span> {<span style="color:#a6e22e">startIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">selectedContents</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">startIndex</span>, <span style="color:#a6e22e">endIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">selectedContents</span>[<span style="color:#a6e22e">selectedContents</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>].<span style="color:#a6e22e">endIndex</span>};
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">resource</span> <span style="color:#f92672">=</span> {<span style="color:#a6e22e">requests</span><span style="color:#f92672">:</span> [{<span style="color:#a6e22e">updateParagraphStyle</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">paragraphStyle</span><span style="color:#f92672">:</span> {<span style="color:#a6e22e">shading</span><span style="color:#f92672">:</span> {<span style="color:#a6e22e">backgroundColor</span><span style="color:#f92672">:</span> {<span style="color:#a6e22e">color</span><span style="color:#f92672">:</span> {<span style="color:#a6e22e">rgbColor</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">hex2rgb</span>}}}},
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">range</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">range</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">fields</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;shading.backgroundColor&#34;</span>,
+</span></span><span style="display:flex;"><span>      }}]};
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">params</span>.<span style="color:#a6e22e">method</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;post&#34;</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">params</span>.<span style="color:#a6e22e">contentType</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;application/json&#34;</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">params</span>.<span style="color:#a6e22e">payload</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">resource</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">baseUrl</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">id</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;:batchUpdate&#34;</span>, <span style="color:#a6e22e">params</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="result">Result:</h2>
 <p><img src="https://tanaikech.github.io/img/20190316a-demo.gif" alt=""></p>
 <h2 id="scopes">Scopes:</h2>
 <p>In this sample script, the following 2 scopes are used. But when you copy and paste the above sample script to the script editor and save it, the following scopes are automatically detected. So you are not required to modify the Manifest file.</p>
@@ -466,15 +465,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -497,15 +487,6 @@
 
 
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

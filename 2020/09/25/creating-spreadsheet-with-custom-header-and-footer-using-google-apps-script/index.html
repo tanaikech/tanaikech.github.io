@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Creating Spreadsheet with Custom Header and Footer using Google Apps Script &middot; tanaike</title>
 
@@ -288,39 +287,39 @@
 <p>Before you use this script, please install <a href="https://github.com/tanaikech/DocsServiceApp">DocsServiceApp</a> and <a href="https://developers.google.com/apps-script/guides/services/advanced#enabling_advanced_services">enable Drive API at Advanced Google services</a>.</p>
 <h2 id="sample-script">Sample script:</h2>
 <p>Please put this script to the container-bound script of Spreadsheet you want to use.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
-  <span style="color:#75715e">// Source Spreadsheet.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">srcSS</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>();
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">copiedSheets</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">srcSS</span>.<span style="color:#a6e22e">getSheets</span>().<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">s</span>) =&gt; {
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">srcName</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getSheetName</span>();
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">cs</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">copyTo</span>(<span style="color:#a6e22e">srcSS</span>).<span style="color:#a6e22e">setName</span>(<span style="color:#e6db74">&#34;temp_&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">srcName</span>);
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">cr</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">cs</span>.<span style="color:#a6e22e">getDataRange</span>();
-    <span style="color:#a6e22e">cr</span>.<span style="color:#a6e22e">copyTo</span>(<span style="color:#a6e22e">cr</span>, { <span style="color:#a6e22e">contentsOnly</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span> });
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">cs</span>;
-  });
-
-  <span style="color:#75715e">// Destination Spreadsheet as temporal.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">object</span> <span style="color:#f92672">=</span> {
-    <span style="color:#a6e22e">title</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;newSpreadsheet&#34;</span>,
-    <span style="color:#a6e22e">header</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">l</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;left header&#34;</span>, <span style="color:#a6e22e">c</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;center header&#34;</span>, <span style="color:#a6e22e">r</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;right header&#34;</span> },
-    <span style="color:#a6e22e">footer</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">l</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;left footer&#34;</span>, <span style="color:#a6e22e">c</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;center footer&#34;</span>, <span style="color:#a6e22e">r</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;right footer&#34;</span> },
-  };
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">dstSpreadsheetId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DocsServiceApp</span>.<span style="color:#a6e22e">createNewSpreadsheetWithCustomHeaderFooter</span>(
-    <span style="color:#a6e22e">object</span>
-  );
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">dstSS</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">dstSpreadsheetId</span>);
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">topSheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">dstSS</span>.<span style="color:#a6e22e">getSheets</span>()[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">setName</span>(<span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">getUuid</span>());
-  <span style="color:#a6e22e">copiedSheets</span>.<span style="color:#a6e22e">forEach</span>((<span style="color:#a6e22e">s</span>) =&gt; {
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">srcName</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getSheetName</span>().<span style="color:#a6e22e">slice</span>(<span style="color:#ae81ff">5</span>);
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">src</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">copyTo</span>(<span style="color:#a6e22e">dstSS</span>);
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">dst</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">topSheet</span>.<span style="color:#a6e22e">copyTo</span>(<span style="color:#a6e22e">dstSS</span>).<span style="color:#a6e22e">setName</span>(<span style="color:#a6e22e">srcName</span>);
-    <span style="color:#a6e22e">src</span>.<span style="color:#a6e22e">getDataRange</span>().<span style="color:#a6e22e">copyTo</span>(<span style="color:#a6e22e">dst</span>.<span style="color:#a6e22e">getDataRange</span>());
-    <span style="color:#a6e22e">srcSS</span>.<span style="color:#a6e22e">deleteSheet</span>(<span style="color:#a6e22e">s</span>);
-    <span style="color:#a6e22e">dstSS</span>.<span style="color:#a6e22e">deleteSheet</span>(<span style="color:#a6e22e">src</span>);
-  });
-  <span style="color:#a6e22e">dstSS</span>.<span style="color:#a6e22e">deleteSheet</span>(<span style="color:#a6e22e">dstSS</span>.<span style="color:#a6e22e">getSheets</span>()[<span style="color:#ae81ff">0</span>]);
-}
-</code></pre></div><ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Source Spreadsheet.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">srcSS</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">copiedSheets</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">srcSS</span>.<span style="color:#a6e22e">getSheets</span>().<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">s</span>) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">srcName</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getSheetName</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">cs</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">copyTo</span>(<span style="color:#a6e22e">srcSS</span>).<span style="color:#a6e22e">setName</span>(<span style="color:#e6db74">&#34;temp_&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">srcName</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">cr</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">cs</span>.<span style="color:#a6e22e">getDataRange</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">cr</span>.<span style="color:#a6e22e">copyTo</span>(<span style="color:#a6e22e">cr</span>, { <span style="color:#a6e22e">contentsOnly</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span> });
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">cs</span>;
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Destination Spreadsheet as temporal.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">object</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">title</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;newSpreadsheet&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">header</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">l</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;left header&#34;</span>, <span style="color:#a6e22e">c</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;center header&#34;</span>, <span style="color:#a6e22e">r</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;right header&#34;</span> },
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">footer</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">l</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;left footer&#34;</span>, <span style="color:#a6e22e">c</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;center footer&#34;</span>, <span style="color:#a6e22e">r</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;right footer&#34;</span> },
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">dstSpreadsheetId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DocsServiceApp</span>.<span style="color:#a6e22e">createNewSpreadsheetWithCustomHeaderFooter</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">object</span>
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">dstSS</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">dstSpreadsheetId</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">topSheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">dstSS</span>.<span style="color:#a6e22e">getSheets</span>()[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">setName</span>(<span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">getUuid</span>());
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">copiedSheets</span>.<span style="color:#a6e22e">forEach</span>((<span style="color:#a6e22e">s</span>) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">srcName</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getSheetName</span>().<span style="color:#a6e22e">slice</span>(<span style="color:#ae81ff">5</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">src</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">copyTo</span>(<span style="color:#a6e22e">dstSS</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">dst</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">topSheet</span>.<span style="color:#a6e22e">copyTo</span>(<span style="color:#a6e22e">dstSS</span>).<span style="color:#a6e22e">setName</span>(<span style="color:#a6e22e">srcName</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">src</span>.<span style="color:#a6e22e">getDataRange</span>().<span style="color:#a6e22e">copyTo</span>(<span style="color:#a6e22e">dst</span>.<span style="color:#a6e22e">getDataRange</span>());
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">srcSS</span>.<span style="color:#a6e22e">deleteSheet</span>(<span style="color:#a6e22e">s</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">dstSS</span>.<span style="color:#a6e22e">deleteSheet</span>(<span style="color:#a6e22e">src</span>);
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">dstSS</span>.<span style="color:#a6e22e">deleteSheet</span>(<span style="color:#a6e22e">dstSS</span>.<span style="color:#a6e22e">getSheets</span>()[<span style="color:#ae81ff">0</span>]);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><ul>
 <li>When you run this script, new Spreadsheet is created to the root folder. And when you open the created Spreadsheet, you can see the custom header and footer. <a href="https://github.com/tanaikech/DocsServiceApp#4-createnewspreadsheetwithcustomheaderfooter">Ref</a></li>
 </ul>
 <h2 id="important">IMPORTANT</h2>
@@ -416,15 +415,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -447,15 +437,6 @@
 
 
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

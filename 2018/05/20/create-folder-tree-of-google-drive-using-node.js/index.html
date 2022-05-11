@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Create Folder Tree of Google Drive using Node.js &middot; tanaike</title>
 
@@ -301,116 +300,116 @@
 <p><img src="https://tanaikech.github.io/img/20180520a-fig1.png" alt=""></p>
 <p>This script creates the folder tree as follows.</p>
 <pre tabindex="0"><code>[
-  ['topFolderId'],
-  ['topFolderId','folderId_2a'],
-  ['topFolderId','folderId_2b'],
-  ['topFolderId','folderId_2b','folderId_3a'],
-  ['topFolderId','folderId_2b','folderId_3b']
+  [&#39;topFolderId&#39;],
+  [&#39;topFolderId&#39;,&#39;folderId_2a&#39;],
+  [&#39;topFolderId&#39;,&#39;folderId_2b&#39;],
+  [&#39;topFolderId&#39;,&#39;folderId_2b&#39;,&#39;folderId_3a&#39;],
+  [&#39;topFolderId&#39;,&#39;folderId_2b&#39;,&#39;folderId_3b&#39;]
 ]
 </code></pre><h2 id="sample-script-">Sample script :</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">fs</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;fs&#39;</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">readline</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;readline&#39;</span>);
-<span style="color:#66d9ef">const</span> {<span style="color:#a6e22e">google</span>} <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;googleapis&#39;</span>);
-
-<span style="color:#75715e">// If modifying these scopes, delete credentials.json.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">SCOPES</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;https://www.googleapis.com/auth/drive&#39;</span>];
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">TOKEN_PATH</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;credentials.json&#39;</span>;
-
-<span style="color:#75715e">// Load client secrets from a local file.
-</span><span style="color:#75715e"></span><span style="color:#a6e22e">fs</span>.<span style="color:#a6e22e">readFile</span>(<span style="color:#e6db74">&#39;client_secret.json&#39;</span>, (<span style="color:#a6e22e">err</span>, <span style="color:#a6e22e">content</span>) =&gt; {
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">err</span>) <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;Error loading client secret file:&#39;</span>, <span style="color:#a6e22e">err</span>);
-  <span style="color:#75715e">// Authorize a client with credentials, then call the Google Drive API.
-</span><span style="color:#75715e"></span>  <span style="color:#a6e22e">authorize</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">content</span>), <span style="color:#a6e22e">listFiles</span>);
-});
-
-<span style="color:#75715e">/**
-</span><span style="color:#75715e"> * Create an OAuth2 client with the given credentials, and then execute the
-</span><span style="color:#75715e"> * given callback function.
-</span><span style="color:#75715e"> * @param {Object} credentials The authorization client credentials.
-</span><span style="color:#75715e"> * @param {function} callback The callback to call with the authorized client.
-</span><span style="color:#75715e"> */</span>
-<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">authorize</span>(<span style="color:#a6e22e">credentials</span>, <span style="color:#a6e22e">callback</span>) {
-  <span style="color:#66d9ef">const</span> {<span style="color:#a6e22e">client_secret</span>, <span style="color:#a6e22e">client_id</span>, <span style="color:#a6e22e">redirect_uris</span>} <span style="color:#f92672">=</span> <span style="color:#a6e22e">credentials</span>.<span style="color:#a6e22e">installed</span>;
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">oAuth2Client</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">auth</span>.<span style="color:#a6e22e">OAuth2</span>(
-      <span style="color:#a6e22e">client_id</span>, <span style="color:#a6e22e">client_secret</span>, <span style="color:#a6e22e">redirect_uris</span>[<span style="color:#ae81ff">0</span>]);
-
-  <span style="color:#75715e">// Check if we have previously stored a token.
-</span><span style="color:#75715e"></span>  <span style="color:#a6e22e">fs</span>.<span style="color:#a6e22e">readFile</span>(<span style="color:#a6e22e">TOKEN_PATH</span>, (<span style="color:#a6e22e">err</span>, <span style="color:#a6e22e">token</span>) =&gt; {
-    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">err</span>) <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">getAccessToken</span>(<span style="color:#a6e22e">oAuth2Client</span>, <span style="color:#a6e22e">callback</span>);
-    <span style="color:#a6e22e">oAuth2Client</span>.<span style="color:#a6e22e">setCredentials</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">token</span>));
-    <span style="color:#a6e22e">callback</span>(<span style="color:#a6e22e">oAuth2Client</span>);
-  });
-}
-
-<span style="color:#75715e">/**
-</span><span style="color:#75715e"> * Get and store new token after prompting for user authorization, and then
-</span><span style="color:#75715e"> * execute the given callback with the authorized OAuth2 client.
-</span><span style="color:#75715e"> * @param {google.auth.OAuth2} oAuth2Client The OAuth2 client to get token for.
-</span><span style="color:#75715e"> * @param {getEventsCallback} callback The callback for the authorized client.
-</span><span style="color:#75715e"> */</span>
-<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getAccessToken</span>(<span style="color:#a6e22e">oAuth2Client</span>, <span style="color:#a6e22e">callback</span>) {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">authUrl</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">oAuth2Client</span>.<span style="color:#a6e22e">generateAuthUrl</span>({
-    <span style="color:#a6e22e">access_type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;offline&#39;</span>,
-    <span style="color:#a6e22e">scope</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">SCOPES</span>,
-  });
-  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;Authorize this app by visiting this url:&#39;</span>, <span style="color:#a6e22e">authUrl</span>);
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">rl</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">readline</span>.<span style="color:#a6e22e">createInterface</span>({
-    <span style="color:#a6e22e">input</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">process</span>.<span style="color:#a6e22e">stdin</span>,
-    <span style="color:#a6e22e">output</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">process</span>.<span style="color:#a6e22e">stdout</span>,
-  });
-  <span style="color:#a6e22e">rl</span>.<span style="color:#a6e22e">question</span>(<span style="color:#e6db74">&#39;Enter the code from that page here: &#39;</span>, (<span style="color:#a6e22e">code</span>) =&gt; {
-    <span style="color:#a6e22e">rl</span>.<span style="color:#a6e22e">close</span>();
-    <span style="color:#a6e22e">oAuth2Client</span>.<span style="color:#a6e22e">getToken</span>(<span style="color:#a6e22e">code</span>, (<span style="color:#a6e22e">err</span>, <span style="color:#a6e22e">token</span>) =&gt; {
-      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">err</span>) <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">callback</span>(<span style="color:#a6e22e">err</span>);
-      <span style="color:#a6e22e">oAuth2Client</span>.<span style="color:#a6e22e">setCredentials</span>(<span style="color:#a6e22e">token</span>);
-      <span style="color:#75715e">// Store the token to disk for later program executions
-</span><span style="color:#75715e"></span>      <span style="color:#a6e22e">fs</span>.<span style="color:#a6e22e">writeFile</span>(<span style="color:#a6e22e">TOKEN_PATH</span>, <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">token</span>), (<span style="color:#a6e22e">err</span>) =&gt; {
-        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">err</span>) <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">error</span>(<span style="color:#a6e22e">err</span>);
-        <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;Token stored to&#39;</span>, <span style="color:#a6e22e">TOKEN_PATH</span>);
-      });
-      <span style="color:#a6e22e">callback</span>(<span style="color:#a6e22e">oAuth2Client</span>);
-    });
-  });
-}
-
-<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">listFiles</span>(<span style="color:#a6e22e">auth</span>) {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">drive</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">drive</span>({<span style="color:#a6e22e">version</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;v3&#39;</span>, <span style="color:#a6e22e">auth</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">auth</span>});
-    <span style="color:#a6e22e">getFolderTree</span>(<span style="color:#a6e22e">drive</span>, <span style="color:#e6db74">&#34;&#34;</span>, []);
-}
-
-<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getFolderTree</span>(<span style="color:#a6e22e">drive</span>, <span style="color:#a6e22e">nextPageToken</span>, <span style="color:#a6e22e">folderList</span>) {
-    <span style="color:#a6e22e">drive</span>.<span style="color:#a6e22e">files</span>.<span style="color:#a6e22e">list</span>({
-        <span style="color:#a6e22e">pageToken</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">nextPageToken</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">nextPageToken</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;&#34;</span>,
-        <span style="color:#a6e22e">pageSize</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">1000</span>,
-        <span style="color:#a6e22e">q</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;mimeType=&#39;application/vnd.google-apps.folder&#39;&#34;</span>,
-        <span style="color:#a6e22e">fields</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;files(id,name,parents),nextPageToken&#34;</span>,
-    }, (<span style="color:#a6e22e">err</span>, {<span style="color:#a6e22e">data</span>}) =&gt; {
-        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">err</span>) <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;The API returned an error: &#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">err</span>);
-        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">token</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">nextPageToken</span>;
-        Array.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">push</span>.<span style="color:#a6e22e">apply</span>(<span style="color:#a6e22e">folderList</span>, <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">files</span>);
-        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">token</span>) {
-            <span style="color:#a6e22e">getFolderTree</span>(<span style="color:#a6e22e">drive</span>, <span style="color:#a6e22e">token</span>, <span style="color:#a6e22e">folderList</span>);
-        } <span style="color:#66d9ef">else</span> {
-            <span style="color:#75715e">// This script retrieves a folder tree under this folder ID.
-</span><span style="color:#75715e"></span>            <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">folderId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;### Top folder ID ###&#34;</span>;
-
-            <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">folderTree</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">c</span>(<span style="color:#a6e22e">folder</span>, <span style="color:#a6e22e">folderSt</span>, <span style="color:#a6e22e">res</span>) {
-                <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">ar</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">folderList</span>.<span style="color:#a6e22e">filter</span>(<span style="color:#a6e22e">e</span> =&gt; <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parents</span>[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">==</span> <span style="color:#a6e22e">folder</span>);
-                <span style="color:#a6e22e">folderSt</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">folder</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;#_aabbccddee_#&#34;</span>;
-                <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">arrayFolderSt</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">folderSt</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;#_aabbccddee_#&#34;</span>);
-                <span style="color:#a6e22e">arrayFolderSt</span>.<span style="color:#a6e22e">pop</span>();
-                <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">arrayFolderSt</span>);
-                <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> (<span style="color:#a6e22e">folderSt</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>);
-                <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">forEach</span>(<span style="color:#a6e22e">e</span> =&gt; <span style="color:#a6e22e">c</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">id</span>, <span style="color:#a6e22e">folderSt</span>, <span style="color:#a6e22e">res</span>));
-                <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">res</span>;
-            }(<span style="color:#a6e22e">folderId</span>, <span style="color:#e6db74">&#34;&#34;</span>, []);
-
-            <span style="color:#75715e">// Output the folder tree.
-</span><span style="color:#75715e"></span>            <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">folderTree</span>);
-        }
-    });
-}
-</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">fs</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;fs&#39;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">readline</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;readline&#39;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> {<span style="color:#a6e22e">google</span>} <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;googleapis&#39;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// If modifying these scopes, delete credentials.json.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">SCOPES</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;https://www.googleapis.com/auth/drive&#39;</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">TOKEN_PATH</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;credentials.json&#39;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Load client secrets from a local file.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">fs</span>.<span style="color:#a6e22e">readFile</span>(<span style="color:#e6db74">&#39;client_secret.json&#39;</span>, (<span style="color:#a6e22e">err</span>, <span style="color:#a6e22e">content</span>) =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">err</span>) <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;Error loading client secret file:&#39;</span>, <span style="color:#a6e22e">err</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Authorize a client with credentials, then call the Google Drive API.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#a6e22e">authorize</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">content</span>), <span style="color:#a6e22e">listFiles</span>);
+</span></span><span style="display:flex;"><span>});
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Create an OAuth2 client with the given credentials, and then execute the
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * given callback function.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param {Object} credentials The authorization client credentials.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param {function} callback The callback to call with the authorized client.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">authorize</span>(<span style="color:#a6e22e">credentials</span>, <span style="color:#a6e22e">callback</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> {<span style="color:#a6e22e">client_secret</span>, <span style="color:#a6e22e">client_id</span>, <span style="color:#a6e22e">redirect_uris</span>} <span style="color:#f92672">=</span> <span style="color:#a6e22e">credentials</span>.<span style="color:#a6e22e">installed</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">oAuth2Client</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">auth</span>.<span style="color:#a6e22e">OAuth2</span>(
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">client_id</span>, <span style="color:#a6e22e">client_secret</span>, <span style="color:#a6e22e">redirect_uris</span>[<span style="color:#ae81ff">0</span>]);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Check if we have previously stored a token.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#a6e22e">fs</span>.<span style="color:#a6e22e">readFile</span>(<span style="color:#a6e22e">TOKEN_PATH</span>, (<span style="color:#a6e22e">err</span>, <span style="color:#a6e22e">token</span>) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">err</span>) <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">getAccessToken</span>(<span style="color:#a6e22e">oAuth2Client</span>, <span style="color:#a6e22e">callback</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">oAuth2Client</span>.<span style="color:#a6e22e">setCredentials</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">token</span>));
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">callback</span>(<span style="color:#a6e22e">oAuth2Client</span>);
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Get and store new token after prompting for user authorization, and then
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * execute the given callback with the authorized OAuth2 client.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param {google.auth.OAuth2} oAuth2Client The OAuth2 client to get token for.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param {getEventsCallback} callback The callback for the authorized client.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getAccessToken</span>(<span style="color:#a6e22e">oAuth2Client</span>, <span style="color:#a6e22e">callback</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">authUrl</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">oAuth2Client</span>.<span style="color:#a6e22e">generateAuthUrl</span>({
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">access_type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;offline&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">scope</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">SCOPES</span>,
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;Authorize this app by visiting this url:&#39;</span>, <span style="color:#a6e22e">authUrl</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">rl</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">readline</span>.<span style="color:#a6e22e">createInterface</span>({
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">input</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">process</span>.<span style="color:#a6e22e">stdin</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">output</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">process</span>.<span style="color:#a6e22e">stdout</span>,
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">rl</span>.<span style="color:#a6e22e">question</span>(<span style="color:#e6db74">&#39;Enter the code from that page here: &#39;</span>, (<span style="color:#a6e22e">code</span>) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">rl</span>.<span style="color:#a6e22e">close</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">oAuth2Client</span>.<span style="color:#a6e22e">getToken</span>(<span style="color:#a6e22e">code</span>, (<span style="color:#a6e22e">err</span>, <span style="color:#a6e22e">token</span>) =&gt; {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">err</span>) <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">callback</span>(<span style="color:#a6e22e">err</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">oAuth2Client</span>.<span style="color:#a6e22e">setCredentials</span>(<span style="color:#a6e22e">token</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e">// Store the token to disk for later program executions
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>      <span style="color:#a6e22e">fs</span>.<span style="color:#a6e22e">writeFile</span>(<span style="color:#a6e22e">TOKEN_PATH</span>, <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">token</span>), (<span style="color:#a6e22e">err</span>) =&gt; {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">err</span>) <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">error</span>(<span style="color:#a6e22e">err</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;Token stored to&#39;</span>, <span style="color:#a6e22e">TOKEN_PATH</span>);
+</span></span><span style="display:flex;"><span>      });
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">callback</span>(<span style="color:#a6e22e">oAuth2Client</span>);
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">listFiles</span>(<span style="color:#a6e22e">auth</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">drive</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">drive</span>({<span style="color:#a6e22e">version</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;v3&#39;</span>, <span style="color:#a6e22e">auth</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">auth</span>});
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">getFolderTree</span>(<span style="color:#a6e22e">drive</span>, <span style="color:#e6db74">&#34;&#34;</span>, []);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getFolderTree</span>(<span style="color:#a6e22e">drive</span>, <span style="color:#a6e22e">nextPageToken</span>, <span style="color:#a6e22e">folderList</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">drive</span>.<span style="color:#a6e22e">files</span>.<span style="color:#a6e22e">list</span>({
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">pageToken</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">nextPageToken</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">nextPageToken</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">pageSize</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">1000</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">q</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;mimeType=&#39;application/vnd.google-apps.folder&#39;&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">fields</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;files(id,name,parents),nextPageToken&#34;</span>,
+</span></span><span style="display:flex;"><span>    }, (<span style="color:#a6e22e">err</span>, {<span style="color:#a6e22e">data</span>}) =&gt; {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">err</span>) <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;The API returned an error: &#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">err</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">token</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">nextPageToken</span>;
+</span></span><span style="display:flex;"><span>        Array.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">push</span>.<span style="color:#a6e22e">apply</span>(<span style="color:#a6e22e">folderList</span>, <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">files</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">token</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">getFolderTree</span>(<span style="color:#a6e22e">drive</span>, <span style="color:#a6e22e">token</span>, <span style="color:#a6e22e">folderList</span>);
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// This script retrieves a folder tree under this folder ID.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">folderId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;### Top folder ID ###&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">folderTree</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">c</span>(<span style="color:#a6e22e">folder</span>, <span style="color:#a6e22e">folderSt</span>, <span style="color:#a6e22e">res</span>) {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">ar</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">folderList</span>.<span style="color:#a6e22e">filter</span>(<span style="color:#a6e22e">e</span> =&gt; <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parents</span>[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">==</span> <span style="color:#a6e22e">folder</span>);
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">folderSt</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">folder</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;#_aabbccddee_#&#34;</span>;
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">arrayFolderSt</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">folderSt</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;#_aabbccddee_#&#34;</span>);
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">arrayFolderSt</span>.<span style="color:#a6e22e">pop</span>();
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">arrayFolderSt</span>);
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> (<span style="color:#a6e22e">folderSt</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>);
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">forEach</span>(<span style="color:#a6e22e">e</span> =&gt; <span style="color:#a6e22e">c</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">id</span>, <span style="color:#a6e22e">folderSt</span>, <span style="color:#a6e22e">res</span>));
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">res</span>;
+</span></span><span style="display:flex;"><span>            }(<span style="color:#a6e22e">folderId</span>, <span style="color:#e6db74">&#34;&#34;</span>, []);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Output the folder tree.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">folderTree</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div>
   
   <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
 <ul class="share-buttons">
@@ -498,15 +497,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -529,15 +519,6 @@
 
 
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

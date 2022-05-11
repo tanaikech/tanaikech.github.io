@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Music Streaming Player for Discord with Google Drive using Node.js &middot; tanaike</title>
 
@@ -296,71 +295,71 @@
 <p>At first, please register your BOT to Discord. And please retrieve the token.</p>
 <h3 id="2-sample-script">2. Sample script</h3>
 <p>When you use this, please set the variables of <code>auth</code>, <code>token</code> and <code>folderId</code>. And after you run the script, please input the text of <code>play</code> to the voice channel. By this, the files in the specific folder on Google Drive are loaded and are played at the voice channel on Discord.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">playFiles</span>(<span style="color:#a6e22e">obj</span>) {
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">files</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) {
-    <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">message</span>.<span style="color:#a6e22e">channel</span>.<span style="color:#a6e22e">send</span>(<span style="color:#e6db74">&#34;end&#34;</span>);
-    <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">channel</span>.<span style="color:#a6e22e">leave</span>(); <span style="color:#75715e">// &lt;--- Important
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span>;
-  }
-  <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">drive</span>.<span style="color:#a6e22e">files</span>.<span style="color:#a6e22e">get</span>(
-    {
-      <span style="color:#a6e22e">fileId</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">files</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">id</span>,
-      <span style="color:#a6e22e">alt</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;media&#34;</span>
-    },
-    { <span style="color:#a6e22e">responseType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;stream&#34;</span> },
-    (<span style="color:#a6e22e">err</span>, { <span style="color:#a6e22e">data</span> }) =&gt; {
-      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">err</span>) <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#a6e22e">err</span>);
-      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">files</span>[<span style="color:#ae81ff">0</span>]);
-      <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">message</span>.<span style="color:#a6e22e">channel</span>.<span style="color:#a6e22e">send</span>(<span style="color:#e6db74">`Playing </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">files</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">name</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
-      <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">connection</span>
-        .<span style="color:#a6e22e">playStream</span>(<span style="color:#a6e22e">data</span>)
-        .<span style="color:#a6e22e">on</span>(<span style="color:#e6db74">&#34;end&#34;</span>, () =&gt; {
-          <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">files</span>.<span style="color:#a6e22e">shift</span>();
-          <span style="color:#a6e22e">playFiles</span>(<span style="color:#a6e22e">obj</span>);
-        })
-        .<span style="color:#a6e22e">on</span>(<span style="color:#e6db74">&#34;error&#34;</span>, <span style="color:#a6e22e">err</span> =&gt; <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">err</span>));
-    }
-  );
-}
-
-<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>(<span style="color:#a6e22e">auth</span>) {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">token</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set your token for Discord.
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">folderId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set the folder ID of Google Drive.
-</span><span style="color:#75715e"></span>
-  <span style="color:#a6e22e">client</span>.<span style="color:#a6e22e">login</span>(<span style="color:#a6e22e">token</span>);
-  <span style="color:#a6e22e">client</span>.<span style="color:#a6e22e">on</span>(<span style="color:#e6db74">&#34;message&#34;</span>, <span style="color:#a6e22e">message</span> =&gt; {
-    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Passed0&#34;</span>);
-    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">channel</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">message</span>.<span style="color:#a6e22e">member</span>.<span style="color:#a6e22e">voiceChannel</span>;
-    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">channel</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">message</span>.<span style="color:#a6e22e">content</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;play&#34;</span>) {
-      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;start&#34;</span>);
-      <span style="color:#a6e22e">message</span>.<span style="color:#a6e22e">channel</span>.<span style="color:#a6e22e">send</span>(<span style="color:#e6db74">&#34;start&#34;</span>);
-      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">drive</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">drive</span>({ <span style="color:#a6e22e">version</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;v3&#34;</span>, <span style="color:#a6e22e">auth</span> });
-      <span style="color:#a6e22e">drive</span>.<span style="color:#a6e22e">files</span>.<span style="color:#a6e22e">list</span>(
-        {
-          <span style="color:#a6e22e">q</span><span style="color:#f92672">:</span> <span style="color:#e6db74">`&#39;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">folderId</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#39; in parents`</span>,
-          <span style="color:#a6e22e">fields</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;files(id,name)&#34;</span>
-        },
-        (<span style="color:#a6e22e">err</span>, { <span style="color:#a6e22e">data</span> }) =&gt; {
-          <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">err</span>) <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#a6e22e">err</span>);
-          <span style="color:#a6e22e">channel</span>
-            .<span style="color:#a6e22e">join</span>()
-            .<span style="color:#a6e22e">then</span>(<span style="color:#a6e22e">connection</span> =&gt; {
-              <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> {
-                <span style="color:#a6e22e">drive</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">drive</span>,
-                <span style="color:#a6e22e">channel</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">channel</span>,
-                <span style="color:#a6e22e">connection</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">connection</span>,
-                <span style="color:#a6e22e">message</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">message</span>,
-                <span style="color:#a6e22e">files</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">files</span>
-              };
-              <span style="color:#a6e22e">playFiles</span>(<span style="color:#a6e22e">obj</span>);
-            })
-            .<span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">err</span> =&gt; <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">err</span>));
-        }
-      );
-    }
-  });
-}
-</code></pre></div><h3 id="note">Note:</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">playFiles</span>(<span style="color:#a6e22e">obj</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">files</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">message</span>.<span style="color:#a6e22e">channel</span>.<span style="color:#a6e22e">send</span>(<span style="color:#e6db74">&#34;end&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">channel</span>.<span style="color:#a6e22e">leave</span>(); <span style="color:#75715e">// &lt;--- Important
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">drive</span>.<span style="color:#a6e22e">files</span>.<span style="color:#a6e22e">get</span>(
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">fileId</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">files</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">id</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">alt</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;media&#34;</span>
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    { <span style="color:#a6e22e">responseType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;stream&#34;</span> },
+</span></span><span style="display:flex;"><span>    (<span style="color:#a6e22e">err</span>, { <span style="color:#a6e22e">data</span> }) =&gt; {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">err</span>) <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#a6e22e">err</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">files</span>[<span style="color:#ae81ff">0</span>]);
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">message</span>.<span style="color:#a6e22e">channel</span>.<span style="color:#a6e22e">send</span>(<span style="color:#e6db74">`Playing </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">files</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">name</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">connection</span>
+</span></span><span style="display:flex;"><span>        .<span style="color:#a6e22e">playStream</span>(<span style="color:#a6e22e">data</span>)
+</span></span><span style="display:flex;"><span>        .<span style="color:#a6e22e">on</span>(<span style="color:#e6db74">&#34;end&#34;</span>, () =&gt; {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">files</span>.<span style="color:#a6e22e">shift</span>();
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">playFiles</span>(<span style="color:#a6e22e">obj</span>);
+</span></span><span style="display:flex;"><span>        })
+</span></span><span style="display:flex;"><span>        .<span style="color:#a6e22e">on</span>(<span style="color:#e6db74">&#34;error&#34;</span>, <span style="color:#a6e22e">err</span> =&gt; <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">err</span>));
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>(<span style="color:#a6e22e">auth</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">token</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set your token for Discord.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">folderId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set the folder ID of Google Drive.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">client</span>.<span style="color:#a6e22e">login</span>(<span style="color:#a6e22e">token</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">client</span>.<span style="color:#a6e22e">on</span>(<span style="color:#e6db74">&#34;message&#34;</span>, <span style="color:#a6e22e">message</span> =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Passed0&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">channel</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">message</span>.<span style="color:#a6e22e">member</span>.<span style="color:#a6e22e">voiceChannel</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">channel</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">message</span>.<span style="color:#a6e22e">content</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;play&#34;</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;start&#34;</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">message</span>.<span style="color:#a6e22e">channel</span>.<span style="color:#a6e22e">send</span>(<span style="color:#e6db74">&#34;start&#34;</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">drive</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">drive</span>({ <span style="color:#a6e22e">version</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;v3&#34;</span>, <span style="color:#a6e22e">auth</span> });
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">drive</span>.<span style="color:#a6e22e">files</span>.<span style="color:#a6e22e">list</span>(
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">q</span><span style="color:#f92672">:</span> <span style="color:#e6db74">`&#39;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">folderId</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#39; in parents`</span>,
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">fields</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;files(id,name)&#34;</span>
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>        (<span style="color:#a6e22e">err</span>, { <span style="color:#a6e22e">data</span> }) =&gt; {
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">err</span>) <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#a6e22e">err</span>);
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">channel</span>
+</span></span><span style="display:flex;"><span>            .<span style="color:#a6e22e">join</span>()
+</span></span><span style="display:flex;"><span>            .<span style="color:#a6e22e">then</span>(<span style="color:#a6e22e">connection</span> =&gt; {
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">drive</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">drive</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">channel</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">channel</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">connection</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">connection</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">message</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">message</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">files</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">files</span>
+</span></span><span style="display:flex;"><span>              };
+</span></span><span style="display:flex;"><span>              <span style="color:#a6e22e">playFiles</span>(<span style="color:#a6e22e">obj</span>);
+</span></span><span style="display:flex;"><span>            })
+</span></span><span style="display:flex;"><span>            .<span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">err</span> =&gt; <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">err</span>));
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>      );
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="note">Note:</h3>
 <ul>
 <li>
 <p>About the authorization for using Drive API, please check <a href="https://developers.google.com/drive/api/v3/quickstart/nodejs">the Quickstart of Node.js</a> at the official document. In this script, it supposes that the object of <code>auth</code> can be used for downloading the files from Google Drive.</p>
@@ -372,9 +371,9 @@
 <p>This script used <code>discord.js</code>. So please add the following script.</p>
 </li>
 </ul>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">Discord</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;discord.js&#34;</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">client</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Discord</span>.<span style="color:#a6e22e">Client</span>();
-</code></pre></div><h2 id="references">References</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">Discord</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;discord.js&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">client</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Discord</span>.<span style="color:#a6e22e">Client</span>();
+</span></span></code></pre></div><h2 id="references">References</h2>
 <ul>
 <li><a href="https://github.com/discordjs/discord.js">discord.js</a></li>
 <li><a href="https://discord.js.org/#/docs/main/stable/topics/voice">Introduction to Voice</a></li>
@@ -472,15 +471,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -506,15 +496,6 @@
   <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
   
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

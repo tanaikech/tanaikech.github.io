@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Benchmark: Retrieving Values from Deep Nested JSON at Golang &middot; tanaike</title>
 
@@ -285,15 +284,15 @@
 <pre tabindex="0"><code>package main
 
 import (
-    &quot;encoding/json&quot;
-    &quot;testing&quot;
+    &#34;encoding/json&#34;
+    &#34;testing&#34;
 )
 
 const (
     data = `{
-      &quot;A_key1&quot;: {
-        &quot;B_key1&quot;: {
-          &quot;C_key&quot;: &quot;value&quot;
+      &#34;A_key1&#34;: {
+        &#34;B_key1&#34;: {
+          &#34;C_key&#34;: &#34;value&#34;
         }
       }
     }`
@@ -304,9 +303,9 @@ func BenchmarkB1(b *testing.B) {
     for i := 0; i &lt; b.N; i++ {
         var p map[string]interface{}
         json.Unmarshal([]byte(data), &amp;p)
-        a1 := p[&quot;A_key1&quot;]
-        a2 := p[&quot;A_key1&quot;].(map[string]interface{})[&quot;B_key1&quot;]
-        a3 := p[&quot;A_key1&quot;].(map[string]interface{})[&quot;B_key1&quot;].(map[string]interface{})[&quot;C_key&quot;]
+        a1 := p[&#34;A_key1&#34;]
+        a2 := p[&#34;A_key1&#34;].(map[string]interface{})[&#34;B_key1&#34;]
+        a3 := p[&#34;A_key1&#34;].(map[string]interface{})[&#34;B_key1&#34;].(map[string]interface{})[&#34;C_key&#34;]
         _ = a1 // --&gt; map[B_key1:map[C_key:value]]
         _ = a2 // --&gt; map[C_key:value]
         _ = a3 // --&gt; value
@@ -318,24 +317,24 @@ func BenchmarkB2(b *testing.B) {
     for i := 0; i &lt; b.N; i++ {
         var p map[string]interface{}
         json.Unmarshal([]byte(data), &amp;p)
-        b1 := p[&quot;A_key1&quot;]
+        b1 := p[&#34;A_key1&#34;]
         temp, _ := json.Marshal(b1)
         json.Unmarshal(temp, &amp;p)
-        b2 := p[&quot;B_key1&quot;]
+        b2 := p[&#34;B_key1&#34;]
         temp, _ = json.Marshal(b2)
         json.Unmarshal(temp, &amp;p)
-        b3 := p[&quot;C_key&quot;]
+        b3 := p[&#34;C_key&#34;]
         _ = b1 // --&gt; map[B_key1:map[C_key:value]]
         _ = b2 // --&gt; map[C_key:value]
         _ = b3 // --&gt; value
     }
 }
 </code></pre><h2 id="result-">Result :</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ go test -bench .
-BenchmarkB1-4             <span style="color:#ae81ff">300000</span>              <span style="color:#ae81ff">4177</span> ns/op
-BenchmarkB2-4             <span style="color:#ae81ff">100000</span>             <span style="color:#ae81ff">13619</span> ns/op
-PASS
-</code></pre></div><p>It was found that the process cost of <code>json.Unmarshal()</code> was high. <code>json.Unmarshal()</code> for test 2 is 3 times larger than that for test 1.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ go test -bench .
+</span></span><span style="display:flex;"><span>BenchmarkB1-4             <span style="color:#ae81ff">300000</span>              <span style="color:#ae81ff">4177</span> ns/op
+</span></span><span style="display:flex;"><span>BenchmarkB2-4             <span style="color:#ae81ff">100000</span>             <span style="color:#ae81ff">13619</span> ns/op
+</span></span><span style="display:flex;"><span>PASS
+</span></span></code></pre></div><p>It was found that the process cost of <code>json.Unmarshal()</code> was high. <code>json.Unmarshal()</code> for test 2 is 3 times larger than that for test 1.</p>
 
   
   <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
@@ -424,15 +423,6 @@ PASS
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -458,15 +448,6 @@ PASS
   <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
   
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

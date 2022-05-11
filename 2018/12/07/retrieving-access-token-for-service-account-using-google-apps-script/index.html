@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Retrieving Access Token for Service Account using Google Apps Script &middot; tanaike</title>
 
@@ -289,39 +288,39 @@
 <li>Put Scopes, <code>private_key</code> and <code>client_email</code> to the script.</li>
 <li>Run the script.</li>
 </ol>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">private_key</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#####&#34;</span>; <span style="color:#75715e">// private_key of JSON file retrieved by creating Service Account
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">client_email</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#####&#34;</span>; <span style="color:#75715e">// client_email of JSON file retrieved by creating Service Account
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">scopes</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;https://www.googleapis.com/auth/drive.readonly&#34;</span>]; <span style="color:#75715e">// Scopes
-</span><span style="color:#75715e"></span>
-
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://www.googleapis.com/oauth2/v4/token&#34;</span>;
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">header</span> <span style="color:#f92672">=</span> {
-  <span style="color:#a6e22e">alg</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;RS256&#34;</span>,
-  <span style="color:#a6e22e">typ</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;JWT&#34;</span>,
-};
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">now</span> <span style="color:#f92672">=</span> Math.<span style="color:#a6e22e">floor</span>(Date.<span style="color:#a6e22e">now</span>() <span style="color:#f92672">/</span> <span style="color:#ae81ff">1000</span>);
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">claim</span> <span style="color:#f92672">=</span> {
-  <span style="color:#a6e22e">iss</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">client_email</span>,
-  <span style="color:#a6e22e">scope</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">scopes</span>.<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34; &#34;</span>),
-  <span style="color:#a6e22e">aud</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">url</span>,
-  <span style="color:#a6e22e">exp</span><span style="color:#f92672">:</span> (<span style="color:#a6e22e">now</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">3600</span>).<span style="color:#a6e22e">toString</span>(),
-  <span style="color:#a6e22e">iat</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">now</span>.<span style="color:#a6e22e">toString</span>(),
-};
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">signature</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">header</span>)) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;.&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">claim</span>));
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">jwt</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">signature</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;.&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(<span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">computeRsaSha256Signature</span>(<span style="color:#a6e22e">signature</span>, <span style="color:#a6e22e">private_key</span>));
-
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> {
-  <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;post&#34;</span>,
-  <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> {
-    <span style="color:#a6e22e">assertion</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">jwt</span>,
-    <span style="color:#a6e22e">grant_type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;urn:ietf:params:oauth:grant-type:jwt-bearer&#34;</span>,
-  },
-};
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">params</span>).<span style="color:#a6e22e">getContentText</span>();
-<span style="color:#a6e22e">Logger</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>);
-</code></pre></div><h2 id="sample-script">Sample script</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">private_key</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#####&#34;</span>; <span style="color:#75715e">// private_key of JSON file retrieved by creating Service Account
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">client_email</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#####&#34;</span>; <span style="color:#75715e">// client_email of JSON file retrieved by creating Service Account
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">scopes</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;https://www.googleapis.com/auth/drive.readonly&#34;</span>]; <span style="color:#75715e">// Scopes
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://www.googleapis.com/oauth2/v4/token&#34;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">header</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">alg</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;RS256&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">typ</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;JWT&#34;</span>,
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">now</span> <span style="color:#f92672">=</span> Math.<span style="color:#a6e22e">floor</span>(Date.<span style="color:#a6e22e">now</span>() <span style="color:#f92672">/</span> <span style="color:#ae81ff">1000</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">claim</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">iss</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">client_email</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">scope</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">scopes</span>.<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34; &#34;</span>),
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">aud</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">url</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">exp</span><span style="color:#f92672">:</span> (<span style="color:#a6e22e">now</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">3600</span>).<span style="color:#a6e22e">toString</span>(),
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">iat</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">now</span>.<span style="color:#a6e22e">toString</span>(),
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">signature</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">header</span>)) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;.&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">claim</span>));
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">jwt</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">signature</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;.&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(<span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">computeRsaSha256Signature</span>(<span style="color:#a6e22e">signature</span>, <span style="color:#a6e22e">private_key</span>));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;post&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">assertion</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">jwt</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">grant_type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;urn:ietf:params:oauth:grant-type:jwt-bearer&#34;</span>,
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">params</span>).<span style="color:#a6e22e">getContentText</span>();
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Logger</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>);
+</span></span></code></pre></div><h2 id="sample-script">Sample script</h2>
 <p>If the access token retrieved at above is used for retrieving file list, the sample script is as follows.</p>
-<pre tabindex="0"><code class="language-jabvascript" data-lang="jabvascript">var u = &quot;https://www.googleapis.com/drive/v3/files?access_token=&quot; + JSON.parse(res).access_token;
+<pre tabindex="0"><code class="language-jabvascript" data-lang="jabvascript">var u = &#34;https://www.googleapis.com/drive/v3/files?access_token=&#34; + JSON.parse(res).access_token;
 var r = UrlFetchApp.fetch(u);
 Logger.log(r)
 </code></pre><h2 id="references">References:</h2>
@@ -417,15 +416,6 @@ Logger.log(r)
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -448,15 +438,6 @@ Logger.log(r)
 
 
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

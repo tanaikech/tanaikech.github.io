@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Expanding A1Notations using Google Apps Script &middot; tanaike</title>
 
@@ -285,59 +284,59 @@
   <p><a href="https://gist.github.com/tanaikech/c59b90324c90935b13f9e7b26cbf436a">Gists</a></p>
 <p>This is a sample script for expanding a1Notations using Google Apps Script (GAS). In this script, for example, &ldquo;A1:E3&rdquo; is expanded to &ldquo;A1, B1, C1, D1, E1, A2, B2, C2, D2, E2, A3, B3, C3, D3, E3&rdquo;. When each cell in &ldquo;A1:E3&rdquo; is checked, this script might be able to be used. If this was useful for your situation, I&rsquo;m glad.</p>
 <h2 id="script">Script:</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">expandA1Notation</span>(<span style="color:#a6e22e">a1Notations</span>) {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">columnToLetter</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">column</span>) {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">temp</span>, <span style="color:#a6e22e">letter</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;</span>;
-    <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">column</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
-      <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">column</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">%</span> <span style="color:#ae81ff">26</span>;
-      <span style="color:#a6e22e">letter</span> <span style="color:#f92672">=</span> String.<span style="color:#a6e22e">fromCharCode</span>(<span style="color:#a6e22e">temp</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">65</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">letter</span>;
-      <span style="color:#a6e22e">column</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">column</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">/</span> <span style="color:#ae81ff">26</span>;
-    }
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">letter</span>;
-  };
-
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">letterToColumn</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">letter</span>) {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">column</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">length</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">letter</span>.<span style="color:#a6e22e">length</span>;
-    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
-      <span style="color:#a6e22e">column</span> <span style="color:#f92672">+=</span> (<span style="color:#a6e22e">letter</span>.<span style="color:#a6e22e">charCodeAt</span>(<span style="color:#a6e22e">i</span>) <span style="color:#f92672">-</span> <span style="color:#ae81ff">64</span>) <span style="color:#f92672">*</span> Math.<span style="color:#a6e22e">pow</span>(<span style="color:#ae81ff">26</span>, <span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>);
-    }
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">column</span>;
-  };
-
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">reg</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> RegExp(<span style="color:#e6db74">&#34;([A-Z]+)([0-9]+)&#34;</span>);
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">a1Notations</span>.<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">a1</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;!&#34;</span>);
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">a1</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">a1</span>[<span style="color:#ae81ff">1</span>] <span style="color:#f92672">:</span> <span style="color:#a6e22e">a1</span>[<span style="color:#ae81ff">0</span>];
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">rr</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;:&#34;</span>).<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">f</span>) {<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">toUpperCase</span>().<span style="color:#a6e22e">match</span>(<span style="color:#a6e22e">reg</span>)});
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> {
-      <span style="color:#a6e22e">startRowIndex</span><span style="color:#f92672">:</span> Number(<span style="color:#a6e22e">rr</span>[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">2</span>]),
-      <span style="color:#a6e22e">endRowIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">rr</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">?</span> Number(<span style="color:#a6e22e">rr</span>[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">2</span>]) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">:</span> Number(<span style="color:#a6e22e">rr</span>[<span style="color:#ae81ff">1</span>][<span style="color:#ae81ff">2</span>]) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>,
-      <span style="color:#a6e22e">startColumnIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">letterToColumn</span>(<span style="color:#a6e22e">rr</span>[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">1</span>]),
-      <span style="color:#a6e22e">endColumnIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">rr</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">letterToColumn</span>(<span style="color:#a6e22e">rr</span>[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">1</span>]) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">letterToColumn</span>(<span style="color:#a6e22e">rr</span>[<span style="color:#ae81ff">1</span>][<span style="color:#ae81ff">1</span>]) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>,
-    };
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> [];
-    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">startRowIndex</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">endRowIndex</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
-      <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">j</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">startColumnIndex</span>; <span style="color:#a6e22e">j</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">endColumnIndex</span>; <span style="color:#a6e22e">j</span><span style="color:#f92672">++</span>) {
-        <span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">columnToLetter</span>(<span style="color:#a6e22e">j</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">i</span>);
-      }
-    }
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">temp</span>;
-  });
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">res</span>;
-}
-
-<span style="color:#75715e">// When you use this script, please run main().
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">a1Notations</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;A1:E3&#34;</span>, <span style="color:#e6db74">&#34;B10:W13&#34;</span>, <span style="color:#e6db74">&#34;EZ5:FA8&#34;</span>, <span style="color:#e6db74">&#34;AAA1:AAB3&#34;</span>];
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">expandA1Notation</span>(<span style="color:#a6e22e">a1Notations</span>);
-  <span style="color:#a6e22e">Logger</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>);
-}
-</code></pre></div><h2 id="result">Result:</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">expandA1Notation</span>(<span style="color:#a6e22e">a1Notations</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">columnToLetter</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">column</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">temp</span>, <span style="color:#a6e22e">letter</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">column</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">column</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">%</span> <span style="color:#ae81ff">26</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">letter</span> <span style="color:#f92672">=</span> String.<span style="color:#a6e22e">fromCharCode</span>(<span style="color:#a6e22e">temp</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">65</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">letter</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">column</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">column</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">/</span> <span style="color:#ae81ff">26</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">letter</span>;
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">letterToColumn</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">letter</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">column</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">length</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">letter</span>.<span style="color:#a6e22e">length</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">column</span> <span style="color:#f92672">+=</span> (<span style="color:#a6e22e">letter</span>.<span style="color:#a6e22e">charCodeAt</span>(<span style="color:#a6e22e">i</span>) <span style="color:#f92672">-</span> <span style="color:#ae81ff">64</span>) <span style="color:#f92672">*</span> Math.<span style="color:#a6e22e">pow</span>(<span style="color:#ae81ff">26</span>, <span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">column</span>;
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">reg</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> RegExp(<span style="color:#e6db74">&#34;([A-Z]+)([0-9]+)&#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">a1Notations</span>.<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">a1</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;!&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">a1</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">a1</span>[<span style="color:#ae81ff">1</span>] <span style="color:#f92672">:</span> <span style="color:#a6e22e">a1</span>[<span style="color:#ae81ff">0</span>];
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">rr</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;:&#34;</span>).<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">f</span>) {<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">toUpperCase</span>().<span style="color:#a6e22e">match</span>(<span style="color:#a6e22e">reg</span>)});
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">startRowIndex</span><span style="color:#f92672">:</span> Number(<span style="color:#a6e22e">rr</span>[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">2</span>]),
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">endRowIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">rr</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">?</span> Number(<span style="color:#a6e22e">rr</span>[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">2</span>]) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">:</span> Number(<span style="color:#a6e22e">rr</span>[<span style="color:#ae81ff">1</span>][<span style="color:#ae81ff">2</span>]) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">startColumnIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">letterToColumn</span>(<span style="color:#a6e22e">rr</span>[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">1</span>]),
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">endColumnIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">rr</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">letterToColumn</span>(<span style="color:#a6e22e">rr</span>[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">1</span>]) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">letterToColumn</span>(<span style="color:#a6e22e">rr</span>[<span style="color:#ae81ff">1</span>][<span style="color:#ae81ff">1</span>]) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>,
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> [];
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">startRowIndex</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">endRowIndex</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">j</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">startColumnIndex</span>; <span style="color:#a6e22e">j</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">endColumnIndex</span>; <span style="color:#a6e22e">j</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">columnToLetter</span>(<span style="color:#a6e22e">j</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">i</span>);
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">temp</span>;
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">res</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// When you use this script, please run main().
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">a1Notations</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;A1:E3&#34;</span>, <span style="color:#e6db74">&#34;B10:W13&#34;</span>, <span style="color:#e6db74">&#34;EZ5:FA8&#34;</span>, <span style="color:#e6db74">&#34;AAA1:AAB3&#34;</span>];
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">expandA1Notation</span>(<span style="color:#a6e22e">a1Notations</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">Logger</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="result">Result:</h2>
 <pre tabindex="0"><code>[
-  [&quot;A1&quot;,&quot;B1&quot;,&quot;C1&quot;,&quot;D1&quot;,&quot;E1&quot;,&quot;A2&quot;,&quot;B2&quot;,&quot;C2&quot;,&quot;D2&quot;,&quot;E2&quot;,&quot;A3&quot;,&quot;B3&quot;,&quot;C3&quot;,&quot;D3&quot;,&quot;E3&quot;],
-  [&quot;B10&quot;,&quot;C10&quot;,&quot;D10&quot;,&quot;E10&quot;,&quot;F10&quot;,&quot;G10&quot;,&quot;H10&quot;,&quot;I10&quot;,&quot;J10&quot;,&quot;K10&quot;,&quot;L10&quot;,&quot;M10&quot;,&quot;N10&quot;,&quot;O10&quot;,&quot;P10&quot;,&quot;Q10&quot;,&quot;R10&quot;,&quot;S10&quot;,&quot;T10&quot;,&quot;U10&quot;,&quot;V10&quot;,&quot;W10&quot;,&quot;B11&quot;,&quot;C11&quot;,&quot;D11&quot;,&quot;E11&quot;,&quot;F11&quot;,&quot;G11&quot;,&quot;H11&quot;,&quot;I11&quot;,&quot;J11&quot;,&quot;K11&quot;,&quot;L11&quot;,&quot;M11&quot;,&quot;N11&quot;,&quot;O11&quot;,&quot;P11&quot;,&quot;Q11&quot;,&quot;R11&quot;,&quot;S11&quot;,&quot;T11&quot;,&quot;U11&quot;,&quot;V11&quot;,&quot;W11&quot;,&quot;B12&quot;,&quot;C12&quot;,&quot;D12&quot;,&quot;E12&quot;,&quot;F12&quot;,&quot;G12&quot;,&quot;H12&quot;,&quot;I12&quot;,&quot;J12&quot;,&quot;K12&quot;,&quot;L12&quot;,&quot;M12&quot;,&quot;N12&quot;,&quot;O12&quot;,&quot;P12&quot;,&quot;Q12&quot;,&quot;R12&quot;,&quot;S12&quot;,&quot;T12&quot;,&quot;U12&quot;,&quot;V12&quot;,&quot;W12&quot;,&quot;B13&quot;,&quot;C13&quot;,&quot;D13&quot;,&quot;E13&quot;,&quot;F13&quot;,&quot;G13&quot;,&quot;H13&quot;,&quot;I13&quot;,&quot;J13&quot;,&quot;K13&quot;,&quot;L13&quot;,&quot;M13&quot;,&quot;N13&quot;,&quot;O13&quot;,&quot;P13&quot;,&quot;Q13&quot;,&quot;R13&quot;,&quot;S13&quot;,&quot;T13&quot;,&quot;U13&quot;,&quot;V13&quot;,&quot;W13&quot;],
-  [&quot;EZ5&quot;,&quot;FA5&quot;,&quot;EZ6&quot;,&quot;FA6&quot;,&quot;EZ7&quot;,&quot;FA7&quot;,&quot;EZ8&quot;,&quot;FA8&quot;],
-  [&quot;AAA1&quot;,&quot;AAB1&quot;,&quot;AAA2&quot;,&quot;AAB2&quot;,&quot;AAA3&quot;,&quot;AAB3&quot;]
+  [&#34;A1&#34;,&#34;B1&#34;,&#34;C1&#34;,&#34;D1&#34;,&#34;E1&#34;,&#34;A2&#34;,&#34;B2&#34;,&#34;C2&#34;,&#34;D2&#34;,&#34;E2&#34;,&#34;A3&#34;,&#34;B3&#34;,&#34;C3&#34;,&#34;D3&#34;,&#34;E3&#34;],
+  [&#34;B10&#34;,&#34;C10&#34;,&#34;D10&#34;,&#34;E10&#34;,&#34;F10&#34;,&#34;G10&#34;,&#34;H10&#34;,&#34;I10&#34;,&#34;J10&#34;,&#34;K10&#34;,&#34;L10&#34;,&#34;M10&#34;,&#34;N10&#34;,&#34;O10&#34;,&#34;P10&#34;,&#34;Q10&#34;,&#34;R10&#34;,&#34;S10&#34;,&#34;T10&#34;,&#34;U10&#34;,&#34;V10&#34;,&#34;W10&#34;,&#34;B11&#34;,&#34;C11&#34;,&#34;D11&#34;,&#34;E11&#34;,&#34;F11&#34;,&#34;G11&#34;,&#34;H11&#34;,&#34;I11&#34;,&#34;J11&#34;,&#34;K11&#34;,&#34;L11&#34;,&#34;M11&#34;,&#34;N11&#34;,&#34;O11&#34;,&#34;P11&#34;,&#34;Q11&#34;,&#34;R11&#34;,&#34;S11&#34;,&#34;T11&#34;,&#34;U11&#34;,&#34;V11&#34;,&#34;W11&#34;,&#34;B12&#34;,&#34;C12&#34;,&#34;D12&#34;,&#34;E12&#34;,&#34;F12&#34;,&#34;G12&#34;,&#34;H12&#34;,&#34;I12&#34;,&#34;J12&#34;,&#34;K12&#34;,&#34;L12&#34;,&#34;M12&#34;,&#34;N12&#34;,&#34;O12&#34;,&#34;P12&#34;,&#34;Q12&#34;,&#34;R12&#34;,&#34;S12&#34;,&#34;T12&#34;,&#34;U12&#34;,&#34;V12&#34;,&#34;W12&#34;,&#34;B13&#34;,&#34;C13&#34;,&#34;D13&#34;,&#34;E13&#34;,&#34;F13&#34;,&#34;G13&#34;,&#34;H13&#34;,&#34;I13&#34;,&#34;J13&#34;,&#34;K13&#34;,&#34;L13&#34;,&#34;M13&#34;,&#34;N13&#34;,&#34;O13&#34;,&#34;P13&#34;,&#34;Q13&#34;,&#34;R13&#34;,&#34;S13&#34;,&#34;T13&#34;,&#34;U13&#34;,&#34;V13&#34;,&#34;W13&#34;],
+  [&#34;EZ5&#34;,&#34;FA5&#34;,&#34;EZ6&#34;,&#34;FA6&#34;,&#34;EZ7&#34;,&#34;FA7&#34;,&#34;EZ8&#34;,&#34;FA8&#34;],
+  [&#34;AAA1&#34;,&#34;AAB1&#34;,&#34;AAA2&#34;,&#34;AAB2&#34;,&#34;AAA3&#34;,&#34;AAB3&#34;]
 ]
 </code></pre><p>This script uses 2 methods (<a href="https://stackoverflow.com/a/21231012/7108653">https://stackoverflow.com/a/21231012/7108653</a>) for converting from index to letter and from letter to index.</p>
 
@@ -428,15 +427,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -459,15 +449,6 @@
 
 
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Benchmark: Process Costs under V8 using Google Apps Script &middot; tanaike</title>
 
@@ -310,78 +309,78 @@
 <p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
 <h2 id="1-with-and-without-arrow-function">1. With and without Arrow function</h2>
 <p>The sample script is as follows. The sample script retrieves the rows which include <code>searchText</code>. In this measurement, the array (<code>ar</code>) of 3,000,000 rows and 10 columns was used.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withArrowFunction</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt;
-  <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">filter</span>(<span style="color:#a6e22e">row</span> =&gt; <span style="color:#a6e22e">row</span>.<span style="color:#a6e22e">some</span>(<span style="color:#a6e22e">col</span> =&gt; <span style="color:#a6e22e">col</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span>));
-
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withoutArrowFunction</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt;
-  <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">filter</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">row</span>) {
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">row</span>.<span style="color:#a6e22e">some</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">col</span>) {
-      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">col</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span>;
-    });
-  });
-</code></pre></div><p>The result is as follows.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withArrowFunction</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">filter</span>(<span style="color:#a6e22e">row</span> =&gt; <span style="color:#a6e22e">row</span>.<span style="color:#a6e22e">some</span>(<span style="color:#a6e22e">col</span> =&gt; <span style="color:#a6e22e">col</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span>));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withoutArrowFunction</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">filter</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">row</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">row</span>.<span style="color:#a6e22e">some</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">col</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">col</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span>;
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>  });
+</span></span></code></pre></div><p>The result is as follows.</p>
 <p><img src="https://tanaikech.github.io/img/20200323a-fig1.png" alt=""></p>
 <p>From the result, it was found that the process cost with and without the arrow function was almost the same.</p>
 <p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
 <h2 id="2-includes-and-indexof">2. &ldquo;includes&rdquo; and &ldquo;indexOf&rdquo;</h2>
 <p>The sample script is as follows. The sample script retrieves the rows which include <code>searchText</code>. In this measurement, the array (<code>ar</code>) of 3,000,000 rows and 10 columns was used.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withIncludes</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt; <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">filter</span>(<span style="color:#a6e22e">row</span> =&gt; <span style="color:#a6e22e">row</span>.<span style="color:#a6e22e">includes</span>(<span style="color:#a6e22e">searchText</span>));
-
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withIndexOf</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt; <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">filter</span>(<span style="color:#a6e22e">row</span> =&gt; <span style="color:#a6e22e">row</span>.<span style="color:#a6e22e">indexOf</span>(<span style="color:#a6e22e">searchText</span>) <span style="color:#f92672">&gt;</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>);
-</code></pre></div><p>The result is as follows.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withIncludes</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt; <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">filter</span>(<span style="color:#a6e22e">row</span> =&gt; <span style="color:#a6e22e">row</span>.<span style="color:#a6e22e">includes</span>(<span style="color:#a6e22e">searchText</span>));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withIndexOf</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt; <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">filter</span>(<span style="color:#a6e22e">row</span> =&gt; <span style="color:#a6e22e">row</span>.<span style="color:#a6e22e">indexOf</span>(<span style="color:#a6e22e">searchText</span>) <span style="color:#f92672">&gt;</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>);
+</span></span></code></pre></div><p>The result is as follows.</p>
 <p><img src="https://tanaikech.github.io/img/20200323a-fig2.png" alt=""></p>
 <p>From the result, it was found that the process cost &ldquo;includes&rdquo; and &ldquo;indexOf&rdquo; was almost the same.</p>
 <p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
 <h2 id="3-with-and-without-destructuring-assignment">3. With and without Destructuring Assignment</h2>
 <p>The sample script is as follows. The sample script retrieves the rows when the values of columns &ldquo;A&rdquo;, &ldquo;E&rdquo; and &ldquo;J&rdquo; are <code>searchText</code>. In this measurement, the array (<code>ar</code>) of 3,000,000 rows and 10 columns was used.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withDestructuringAssignment</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt;
-  <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">filter</span>(
-    ([<span style="color:#a6e22e">a</span>, , , , <span style="color:#a6e22e">e</span>, , , , , <span style="color:#a6e22e">j</span>]) =&gt;
-      <span style="color:#a6e22e">a</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">e</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">j</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span>
-  );
-
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withoutDestructuringAssignment</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt;
-  <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">filter</span>(
-    <span style="color:#a6e22e">row</span> =&gt;
-      <span style="color:#a6e22e">row</span>[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">row</span>[<span style="color:#ae81ff">4</span>] <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">row</span>[<span style="color:#ae81ff">9</span>] <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span>
-  );
-</code></pre></div><p>The result is as follows.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withDestructuringAssignment</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">filter</span>(
+</span></span><span style="display:flex;"><span>    ([<span style="color:#a6e22e">a</span>, , , , <span style="color:#a6e22e">e</span>, , , , , <span style="color:#a6e22e">j</span>]) =&gt;
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">a</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">e</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">j</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span>
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withoutDestructuringAssignment</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">filter</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">row</span> =&gt;
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">row</span>[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">row</span>[<span style="color:#ae81ff">4</span>] <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">row</span>[<span style="color:#ae81ff">9</span>] <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span>
+</span></span><span style="display:flex;"><span>  );
+</span></span></code></pre></div><p>The result is as follows.</p>
 <p><img src="https://tanaikech.github.io/img/20200323a-fig3.png" alt=""></p>
 <p>From the result, it was found that when the destructuring assignment is used, the cost was about 15 % higher than that without the destructuring assignment.</p>
 <p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
 <h2 id="4-with-and-without-map-object">4. With and without Map object</h2>
 <p>The sample script is as follows. The sample script removes the duplicated rows. In this measurement, the array (<code>ar</code>) of 3,000,000 rows and 10 columns was used.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withMap</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt;
-  Object.<span style="color:#a6e22e">fromEntries</span>(
-    <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">m</span>, [<span style="color:#a6e22e">a</span>, , , , <span style="color:#a6e22e">e</span>, , , , , <span style="color:#a6e22e">j</span>]) =&gt; {
-      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">a</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">e</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">j</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span>)
-        <span style="color:#a6e22e">m</span>.<span style="color:#a6e22e">set</span>(<span style="color:#a6e22e">searchText</span>, <span style="color:#a6e22e">m</span>.<span style="color:#a6e22e">has</span>(<span style="color:#a6e22e">searchText</span>) <span style="color:#f92672">?</span> <span style="color:#a6e22e">m</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">searchText</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">:</span> <span style="color:#ae81ff">1</span>);
-      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">m</span>;
-    }, <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Map</span>())
-  );
-
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withoutMap</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt;
-  <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">o</span>, [<span style="color:#a6e22e">a</span>, , , , <span style="color:#a6e22e">e</span>, , , , , <span style="color:#a6e22e">j</span>]) =&gt; {
-    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">a</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">e</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">j</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span>)
-      <span style="color:#a6e22e">o</span>[<span style="color:#a6e22e">searchText</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">searchText</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">o</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">o</span>[<span style="color:#a6e22e">searchText</span>] <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">:</span> <span style="color:#ae81ff">1</span>;
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
-  }, {});
-</code></pre></div><p>The result is as follows.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withMap</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt;
+</span></span><span style="display:flex;"><span>  Object.<span style="color:#a6e22e">fromEntries</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">m</span>, [<span style="color:#a6e22e">a</span>, , , , <span style="color:#a6e22e">e</span>, , , , , <span style="color:#a6e22e">j</span>]) =&gt; {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">a</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">e</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">j</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">m</span>.<span style="color:#a6e22e">set</span>(<span style="color:#a6e22e">searchText</span>, <span style="color:#a6e22e">m</span>.<span style="color:#a6e22e">has</span>(<span style="color:#a6e22e">searchText</span>) <span style="color:#f92672">?</span> <span style="color:#a6e22e">m</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">searchText</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">:</span> <span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">m</span>;
+</span></span><span style="display:flex;"><span>    }, <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Map</span>())
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withoutMap</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">o</span>, [<span style="color:#a6e22e">a</span>, , , , <span style="color:#a6e22e">e</span>, , , , , <span style="color:#a6e22e">j</span>]) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">a</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">e</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">j</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">searchText</span>)
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">o</span>[<span style="color:#a6e22e">searchText</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">searchText</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">o</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">o</span>[<span style="color:#a6e22e">searchText</span>] <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">:</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
+</span></span><span style="display:flex;"><span>  }, {});
+</span></span></code></pre></div><p>The result is as follows.</p>
 <p><img src="https://tanaikech.github.io/img/20200323a-fig4.png" alt=""></p>
 <p>From the result, it was found that the process cost with and without Map object was almost the same. But in this case, the cost of <code>Object.fromEntries</code> is added. It was found that when <code>Object.fromEntries</code> is not used, the cost with Map object was about 20 % lower than that without Map object.</p>
 <p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
 <h2 id="5-arrayprototypepushapply-spread-syntax-and-concat">5. &ldquo;Array.prototype.push.apply&rdquo;, Spread syntax and &ldquo;concat&rdquo;</h2>
 <p>The sample script is as follows. The sample script merges all rows. The costs of <code>Array.prototype.push.apply</code>, Spread syntax and <code>concat</code> were measured. In this measurement, the array (<code>ar</code>) of 3,000 rows and 10 columns was used.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">arrayPrototypePushApply</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt;
-  <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">row</span>) =&gt; {
-    Array.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">push</span>.<span style="color:#a6e22e">apply</span>(<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">row</span>);
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">a</span>;
-  }, []);
-
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">spreadSyntax</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt; <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">row</span>) =&gt; [...<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">row</span>], []);
-
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">concat</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt; <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">row</span>) =&gt; <span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">concat</span>(<span style="color:#a6e22e">row</span>), []);
-</code></pre></div><p>The result is as follows.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">arrayPrototypePushApply</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">row</span>) =&gt; {
+</span></span><span style="display:flex;"><span>    Array.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">push</span>.<span style="color:#a6e22e">apply</span>(<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">row</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">a</span>;
+</span></span><span style="display:flex;"><span>  }, []);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">spreadSyntax</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt; <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">row</span>) =&gt; [...<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">row</span>], []);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">concat</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt; <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">row</span>) =&gt; <span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">concat</span>(<span style="color:#a6e22e">row</span>), []);
+</span></span></code></pre></div><p>The result is as follows.</p>
 <p><img src="https://tanaikech.github.io/img/20200323a-fig5.png" alt=""></p>
 <p>From the result, it was found that the process cost of <code>Array.prototype.push</code> was the lowest of 3 methods. The costs of Spread syntax and <code>concat</code> were about 3,040 % and 36,666 % higher than that of <code>Array.prototype.push</code>, respectively.</p>
 <h3 id="important-point">IMPORTANT POINT</h3>
@@ -389,35 +388,35 @@
 <p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
 <h2 id="6-only-reduce-objectassign-and-spread-syntax">6. only &ldquo;reduce&rdquo;, &ldquo;Object.assign&rdquo; and Spread syntax</h2>
 <p>The sample script is as follows. The sample script converts array to JSON object by removing duplicating. The costs of only reduce, <code>Object.assign</code> and the spread syntax were measured. In this measurement, the array (<code>ar</code>) of 3,000 rows and 10 columns was used.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withoutSpreadSyntax</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt;
-  <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">o</span>, <span style="color:#a6e22e">row</span>) =&gt; {
-    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">row</span>[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">!=</span> <span style="color:#a6e22e">searchText</span>) <span style="color:#a6e22e">o</span>[<span style="color:#a6e22e">row</span>[<span style="color:#ae81ff">0</span>]] <span style="color:#f92672">=</span> <span style="color:#a6e22e">row</span>;
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
-  }, {});
-
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withObjectAssign</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt;
-  <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">o</span>, <span style="color:#a6e22e">row</span>) =&gt; {
-    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">row</span>[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">!=</span> <span style="color:#a6e22e">searchText</span>) <span style="color:#66d9ef">return</span> Object.<span style="color:#a6e22e">assign</span>(<span style="color:#a6e22e">o</span>, { [<span style="color:#a6e22e">row</span>[<span style="color:#ae81ff">0</span>]]<span style="color:#f92672">:</span> <span style="color:#a6e22e">row</span> });
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
-  }, {});
-
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withSpreadSyntax</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt;
-  <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">o</span>, <span style="color:#a6e22e">row</span>) =&gt; {
-    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">row</span>[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">!=</span> <span style="color:#a6e22e">searchText</span>) <span style="color:#66d9ef">return</span> { ...<span style="color:#a6e22e">o</span>, [<span style="color:#a6e22e">row</span>[<span style="color:#ae81ff">0</span>]]<span style="color:#f92672">:</span> <span style="color:#a6e22e">row</span> };
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
-  }, {});
-</code></pre></div><p>The result is as follows.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withoutSpreadSyntax</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">o</span>, <span style="color:#a6e22e">row</span>) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">row</span>[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">!=</span> <span style="color:#a6e22e">searchText</span>) <span style="color:#a6e22e">o</span>[<span style="color:#a6e22e">row</span>[<span style="color:#ae81ff">0</span>]] <span style="color:#f92672">=</span> <span style="color:#a6e22e">row</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
+</span></span><span style="display:flex;"><span>  }, {});
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withObjectAssign</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">o</span>, <span style="color:#a6e22e">row</span>) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">row</span>[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">!=</span> <span style="color:#a6e22e">searchText</span>) <span style="color:#66d9ef">return</span> Object.<span style="color:#a6e22e">assign</span>(<span style="color:#a6e22e">o</span>, { [<span style="color:#a6e22e">row</span>[<span style="color:#ae81ff">0</span>]]<span style="color:#f92672">:</span> <span style="color:#a6e22e">row</span> });
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
+</span></span><span style="display:flex;"><span>  }, {});
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withSpreadSyntax</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ar</span> =&gt;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">o</span>, <span style="color:#a6e22e">row</span>) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">row</span>[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">!=</span> <span style="color:#a6e22e">searchText</span>) <span style="color:#66d9ef">return</span> { ...<span style="color:#a6e22e">o</span>, [<span style="color:#a6e22e">row</span>[<span style="color:#ae81ff">0</span>]]<span style="color:#f92672">:</span> <span style="color:#a6e22e">row</span> };
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
+</span></span><span style="display:flex;"><span>  }, {});
+</span></span></code></pre></div><p>The result is as follows.</p>
 <p><img src="https://tanaikech.github.io/img/20200323a-fig6.png" alt=""></p>
 <p>From the result, it was found that the process cost of only <code>reduce</code> without the spread syntax and <code>Object.assign</code> was the lowest of 3 methods. The costs of <code>Object.assign</code> and Spread syntax were about 265 % and 448,063 % higher than that of only <code>reduce</code>, respectively.</p>
 <p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
 <h2 id="7-arrayfrom-only-map-and-objectentries">7. &ldquo;Array.from&rdquo;, only &ldquo;map&rdquo; and &ldquo;Object.entries&rdquo;</h2>
 <p>The sample script is as follows. The sample script converts JSON object to array. The costs of <code>Array.from</code>, only map and <code>Object.entries</code> were measured. In this measurement, the array (<code>ar</code>) of 300,000 rows and 10 columns was used.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withArrayFrom</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span> =&gt; Array.<span style="color:#a6e22e">from</span>(Object.<span style="color:#a6e22e">keys</span>(<span style="color:#a6e22e">obj</span>), <span style="color:#a6e22e">e</span> =&gt; [<span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">obj</span>[<span style="color:#a6e22e">e</span>]]);
-
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withoutObjectEntries</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span> =&gt; Object.<span style="color:#a6e22e">keys</span>(<span style="color:#a6e22e">obj</span>).<span style="color:#a6e22e">map</span>(<span style="color:#a6e22e">e</span> =&gt; [<span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">obj</span>[<span style="color:#a6e22e">e</span>]]);
-
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withObjectEntries</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span> =&gt; Object.<span style="color:#a6e22e">entries</span>(<span style="color:#a6e22e">obj</span>);
-</code></pre></div><p>The result is as follows.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withArrayFrom</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span> =&gt; Array.<span style="color:#a6e22e">from</span>(Object.<span style="color:#a6e22e">keys</span>(<span style="color:#a6e22e">obj</span>), <span style="color:#a6e22e">e</span> =&gt; [<span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">obj</span>[<span style="color:#a6e22e">e</span>]]);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withoutObjectEntries</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span> =&gt; Object.<span style="color:#a6e22e">keys</span>(<span style="color:#a6e22e">obj</span>).<span style="color:#a6e22e">map</span>(<span style="color:#a6e22e">e</span> =&gt; [<span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">obj</span>[<span style="color:#a6e22e">e</span>]]);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">withObjectEntries</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span> =&gt; Object.<span style="color:#a6e22e">entries</span>(<span style="color:#a6e22e">obj</span>);
+</span></span></code></pre></div><p>The result is as follows.</p>
 <p><img src="https://tanaikech.github.io/img/20200323a-fig7.png" alt=""></p>
 <p>From the result, it was found that the process costs of <code>Array.from</code> and only map were almost the same. The cost of <code>Object.entries</code> was about 131 % higher than that of <code>Array.from</code>.</p>
 <h1 id="summary">Summary</h1>
@@ -529,15 +528,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -560,15 +550,6 @@
 
 
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>

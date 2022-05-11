@@ -5,8 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="generator" content="Hugo 0.88.1" />
-  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+  <meta name="generator" content="Hugo 0.98.0" />
 
   <title>Selecting Files in Google Drive using Select Box for Google Apps Script &middot; tanaike</title>
 
@@ -307,108 +306,108 @@
 <li>See Spreadsheet. You can see the side bar like the demonstration.</li>
 </ol>
 <h2 id="gas--codegs">GAS : code.gs</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
-  <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getUi</span>().<span style="color:#a6e22e">showSidebar</span>(
-    <span style="color:#a6e22e">HtmlService</span>
-    .<span style="color:#a6e22e">createTemplateFromFile</span>(<span style="color:#e6db74">&#39;index&#39;</span>)
-    .<span style="color:#a6e22e">evaluate</span>()
-    .<span style="color:#a6e22e">setTitle</span>(<span style="color:#e6db74">&#34;File selector sample&#34;</span>)
-  );
-}
-
-<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getFiles</span>(<span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">rootFolderId</span>) {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> {};
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">idn</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>;
-  <span style="color:#a6e22e">e</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;root&#34;</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getRootFolder</span>().<span style="color:#a6e22e">getId</span>() <span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>;
-  <span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">e</span>] <span style="color:#f92672">=</span> {};
-  <span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">e</span>].<span style="color:#a6e22e">keyname</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFolderById</span>(<span style="color:#a6e22e">e</span>).<span style="color:#a6e22e">getName</span>();
-  <span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">e</span>].<span style="color:#a6e22e">keyparent</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">idn</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">rootFolderId</span>
-    <span style="color:#f92672">?</span> <span style="color:#66d9ef">null</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFolderById</span>(<span style="color:#a6e22e">e</span>).<span style="color:#a6e22e">getParents</span>().<span style="color:#a6e22e">hasNext</span>()
-    <span style="color:#f92672">?</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFolderById</span>(<span style="color:#a6e22e">e</span>).<span style="color:#a6e22e">getParents</span>().<span style="color:#a6e22e">next</span>().<span style="color:#a6e22e">getId</span>() <span style="color:#f92672">:</span> <span style="color:#66d9ef">null</span>;
-  <span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">e</span>].<span style="color:#a6e22e">files</span> <span style="color:#f92672">=</span> [];
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">da</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">idn</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;root&#34;</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getRootFolder</span>() <span style="color:#f92672">:</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFolderById</span>(<span style="color:#a6e22e">e</span>);
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">folders</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">da</span>.<span style="color:#a6e22e">getFolders</span>();
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">files</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">da</span>.<span style="color:#a6e22e">getFiles</span>();
-  <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">folders</span>.<span style="color:#a6e22e">hasNext</span>()) {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">folder</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">folders</span>.<span style="color:#a6e22e">next</span>();
-    <span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">e</span>].<span style="color:#a6e22e">files</span>.<span style="color:#a6e22e">push</span>({<span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">folder</span>.<span style="color:#a6e22e">getName</span>(), <span style="color:#a6e22e">id</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">folder</span>.<span style="color:#a6e22e">getId</span>(), <span style="color:#a6e22e">mimeType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;folder&#34;</span>});
-  }
-  <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">files</span>.<span style="color:#a6e22e">hasNext</span>()) {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">file</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">files</span>.<span style="color:#a6e22e">next</span>();
-    <span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">e</span>].<span style="color:#a6e22e">files</span>.<span style="color:#a6e22e">push</span>({<span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getName</span>(), <span style="color:#a6e22e">id</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getId</span>(), <span style="color:#a6e22e">mimeType</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getMimeType</span>()});
-  }
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">data</span>;
-}
-
-<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">doSomething</span>(<span style="color:#a6e22e">id</span>) {
-  <span style="color:#75715e">// do something
-</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">id</span>;
-  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">res</span>;
-}
-</code></pre></div><h2 id="html--indexhtml">HTML : index.html</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">style</span>&gt;
-  #select_file {
-    <span style="color:#66d9ef">text-align</span>: <span style="color:#66d9ef">left</span>;
-    <span style="color:#66d9ef">width</span>: <span style="color:#ae81ff">95</span><span style="color:#66d9ef">%</span>;
-    <span style="color:#66d9ef">font-size</span>: <span style="color:#ae81ff">1</span><span style="color:#66d9ef">em</span>;
-    <span style="color:#66d9ef">margin</span>: <span style="color:#66d9ef">auto</span>;
-    <span style="color:#66d9ef">height</span>: <span style="color:#ae81ff">3</span><span style="color:#66d9ef">em</span>;
-  }
-&lt;/<span style="color:#f92672">style</span>&gt;
-&lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.js&#34;</span>&gt;&lt;/<span style="color:#f92672">script</span>&gt;
-
-&lt;<span style="color:#f92672">select</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;select_file&#34;</span>&gt;&lt;/<span style="color:#f92672">select</span>&gt;
-&lt;<span style="color:#f92672">p</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;id&#34;</span>&gt;&lt;/<span style="color:#f92672">p</span>&gt;
-
-&lt;<span style="color:#f92672">script</span>&gt;
-<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">alldata</span> <span style="color:#f92672">=</span> {};
-
-<span style="color:#a6e22e">$</span>(<span style="color:#66d9ef">function</span>() {
-  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">rootFolderId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;root&#34;</span>;
-  <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">script</span>.<span style="color:#a6e22e">run</span>.<span style="color:#a6e22e">withSuccessHandler</span>(<span style="color:#a6e22e">importData</span>).<span style="color:#a6e22e">getFiles</span>(<span style="color:#a6e22e">rootFolderId</span>, <span style="color:#a6e22e">rootFolderId</span>);
-
-  <span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#39;#select_file&#39;</span>).<span style="color:#a6e22e">change</span>(<span style="color:#66d9ef">function</span>() {
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">id</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#39;#select_file&#39;</span>).<span style="color:#a6e22e">val</span>();
-    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">disp</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#39;#select_file option:selected&#39;</span>).<span style="color:#a6e22e">text</span>();
-    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">~</span><span style="color:#a6e22e">disp</span>.<span style="color:#a6e22e">indexOf</span>(<span style="color:#e6db74">&#34;Folder&#34;</span>) <span style="color:#f92672">||</span> <span style="color:#f92672">~</span><span style="color:#a6e22e">disp</span>.<span style="color:#a6e22e">indexOf</span>(<span style="color:#e6db74">&#34;../&#34;</span>)) {
-      <span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#39;#select_file &gt; option&#39;</span>).<span style="color:#a6e22e">remove</span>();
-      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">alldata</span>[<span style="color:#a6e22e">id</span>]) {
-        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dat</span> <span style="color:#f92672">=</span> {};
-        <span style="color:#a6e22e">dat</span>[<span style="color:#a6e22e">id</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">alldata</span>[<span style="color:#a6e22e">id</span>];
-        <span style="color:#a6e22e">importData</span>(<span style="color:#a6e22e">dat</span>);
-        <span style="color:#66d9ef">return</span>;
-      } <span style="color:#66d9ef">else</span> {
-        <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">script</span>.<span style="color:#a6e22e">run</span>.<span style="color:#a6e22e">withSuccessHandler</span>(<span style="color:#a6e22e">importData</span>).<span style="color:#a6e22e">getFiles</span>(<span style="color:#a6e22e">id</span>, <span style="color:#a6e22e">rootFolderId</span>);
-        <span style="color:#66d9ef">return</span>;
-      }
-      <span style="color:#66d9ef">return</span>;
-    }
-    <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">script</span>.<span style="color:#a6e22e">run</span>.<span style="color:#a6e22e">withSuccessHandler</span>(<span style="color:#a6e22e">output</span>).<span style="color:#a6e22e">doSomething</span>(<span style="color:#a6e22e">id</span>);
-  });
-});
-
-<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">importData</span>(<span style="color:#a6e22e">e</span>) {
-  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">key</span> <span style="color:#f92672">=</span> Object.<span style="color:#a6e22e">keys</span>(<span style="color:#a6e22e">e</span>)[<span style="color:#ae81ff">0</span>];
-  <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">alldata</span>[<span style="color:#a6e22e">key</span>]) <span style="color:#a6e22e">alldata</span>[<span style="color:#a6e22e">key</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>[<span style="color:#a6e22e">key</span>];
-  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">e</span>[<span style="color:#a6e22e">key</span>][<span style="color:#e6db74">&#34;keyparent&#34;</span>]) {
-    <span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#39;#select_file&#39;</span>).<span style="color:#a6e22e">append</span>(<span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#39;&lt;option&gt;&#39;</span>).<span style="color:#a6e22e">html</span>(<span style="color:#e6db74">&#34;./&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">e</span>[<span style="color:#a6e22e">key</span>][<span style="color:#e6db74">&#34;keyname&#34;</span>]).<span style="color:#a6e22e">val</span>(<span style="color:#a6e22e">key</span>));
-    <span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#39;#select_file&#39;</span>).<span style="color:#a6e22e">append</span>(<span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#39;&lt;option&gt;&#39;</span>).<span style="color:#a6e22e">html</span>(<span style="color:#e6db74">&#34;../&#34;</span>).<span style="color:#a6e22e">val</span>(<span style="color:#a6e22e">e</span>[<span style="color:#a6e22e">key</span>][<span style="color:#e6db74">&#34;keyparent&#34;</span>]));
-  } <span style="color:#66d9ef">else</span> {
-    <span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#39;#select_file&#39;</span>).<span style="color:#a6e22e">append</span>(<span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#39;&lt;option&gt;&#39;</span>).<span style="color:#a6e22e">html</span>(<span style="color:#e6db74">&#34;./&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">e</span>[<span style="color:#a6e22e">key</span>][<span style="color:#e6db74">&#34;keyname&#34;</span>]).<span style="color:#a6e22e">val</span>(<span style="color:#a6e22e">key</span>));
-  }
-  <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span><span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">e</span>[<span style="color:#a6e22e">key</span>][<span style="color:#e6db74">&#34;files&#34;</span>].<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
-    <span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#39;#select_file&#39;</span>).<span style="color:#a6e22e">append</span>(<span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#39;&lt;option&gt;&#39;</span>)
-      .<span style="color:#a6e22e">html</span>(<span style="color:#a6e22e">e</span>[<span style="color:#a6e22e">key</span>][<span style="color:#e6db74">&#34;files&#34;</span>][<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">mimeType</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;folder&#34;</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#34;[Folder]&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">e</span>[<span style="color:#a6e22e">key</span>][<span style="color:#e6db74">&#34;files&#34;</span>][<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">name</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>[<span style="color:#a6e22e">key</span>][<span style="color:#e6db74">&#34;files&#34;</span>][<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">name</span>)
-      .<span style="color:#a6e22e">val</span>(<span style="color:#a6e22e">e</span>[<span style="color:#a6e22e">key</span>][<span style="color:#e6db74">&#34;files&#34;</span>][<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">id</span>)
-    );
-  }
-}
-
-<span style="color:#66d9ef">function</span> <span style="color:#a6e22e">output</span>(<span style="color:#a6e22e">res</span>){
-  <span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#39;#id&#39;</span>).<span style="color:#a6e22e">text</span>(<span style="color:#a6e22e">res</span>);
-}
-&lt;/<span style="color:#f92672">script</span>&gt;
-</code></pre></div><ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getUi</span>().<span style="color:#a6e22e">showSidebar</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">HtmlService</span>
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">createTemplateFromFile</span>(<span style="color:#e6db74">&#39;index&#39;</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">evaluate</span>()
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">setTitle</span>(<span style="color:#e6db74">&#34;File selector sample&#34;</span>)
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getFiles</span>(<span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">rootFolderId</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> {};
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">idn</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">e</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;root&#34;</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getRootFolder</span>().<span style="color:#a6e22e">getId</span>() <span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">e</span>] <span style="color:#f92672">=</span> {};
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">e</span>].<span style="color:#a6e22e">keyname</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFolderById</span>(<span style="color:#a6e22e">e</span>).<span style="color:#a6e22e">getName</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">e</span>].<span style="color:#a6e22e">keyparent</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">idn</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">rootFolderId</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">?</span> <span style="color:#66d9ef">null</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFolderById</span>(<span style="color:#a6e22e">e</span>).<span style="color:#a6e22e">getParents</span>().<span style="color:#a6e22e">hasNext</span>()
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">?</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFolderById</span>(<span style="color:#a6e22e">e</span>).<span style="color:#a6e22e">getParents</span>().<span style="color:#a6e22e">next</span>().<span style="color:#a6e22e">getId</span>() <span style="color:#f92672">:</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">e</span>].<span style="color:#a6e22e">files</span> <span style="color:#f92672">=</span> [];
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">da</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">idn</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;root&#34;</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getRootFolder</span>() <span style="color:#f92672">:</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFolderById</span>(<span style="color:#a6e22e">e</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">folders</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">da</span>.<span style="color:#a6e22e">getFolders</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">files</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">da</span>.<span style="color:#a6e22e">getFiles</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">folders</span>.<span style="color:#a6e22e">hasNext</span>()) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">folder</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">folders</span>.<span style="color:#a6e22e">next</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">e</span>].<span style="color:#a6e22e">files</span>.<span style="color:#a6e22e">push</span>({<span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">folder</span>.<span style="color:#a6e22e">getName</span>(), <span style="color:#a6e22e">id</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">folder</span>.<span style="color:#a6e22e">getId</span>(), <span style="color:#a6e22e">mimeType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;folder&#34;</span>});
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">files</span>.<span style="color:#a6e22e">hasNext</span>()) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">file</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">files</span>.<span style="color:#a6e22e">next</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">e</span>].<span style="color:#a6e22e">files</span>.<span style="color:#a6e22e">push</span>({<span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getName</span>(), <span style="color:#a6e22e">id</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getId</span>(), <span style="color:#a6e22e">mimeType</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getMimeType</span>()});
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">data</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">doSomething</span>(<span style="color:#a6e22e">id</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// do something
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">id</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">res</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="html--indexhtml">HTML : index.html</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-html" data-lang="html"><span style="display:flex;"><span>&lt;<span style="color:#f92672">style</span>&gt;
+</span></span><span style="display:flex;"><span>  #select_file {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">text-align</span>: <span style="color:#66d9ef">left</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">width</span>: <span style="color:#ae81ff">95</span><span style="color:#66d9ef">%</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">font-size</span>: <span style="color:#ae81ff">1</span><span style="color:#66d9ef">em</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">margin</span>: <span style="color:#66d9ef">auto</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">height</span>: <span style="color:#ae81ff">3</span><span style="color:#66d9ef">em</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>&lt;/<span style="color:#f92672">style</span>&gt;
+</span></span><span style="display:flex;"><span>&lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.js&#34;</span>&gt;&lt;/<span style="color:#f92672">script</span>&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>&lt;<span style="color:#f92672">select</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;select_file&#34;</span>&gt;&lt;/<span style="color:#f92672">select</span>&gt;
+</span></span><span style="display:flex;"><span>&lt;<span style="color:#f92672">p</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;id&#34;</span>&gt;&lt;/<span style="color:#f92672">p</span>&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>&lt;<span style="color:#f92672">script</span>&gt;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">alldata</span> <span style="color:#f92672">=</span> {};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">$</span>(<span style="color:#66d9ef">function</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">rootFolderId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;root&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">script</span>.<span style="color:#a6e22e">run</span>.<span style="color:#a6e22e">withSuccessHandler</span>(<span style="color:#a6e22e">importData</span>).<span style="color:#a6e22e">getFiles</span>(<span style="color:#a6e22e">rootFolderId</span>, <span style="color:#a6e22e">rootFolderId</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#39;#select_file&#39;</span>).<span style="color:#a6e22e">change</span>(<span style="color:#66d9ef">function</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">id</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#39;#select_file&#39;</span>).<span style="color:#a6e22e">val</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">disp</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#39;#select_file option:selected&#39;</span>).<span style="color:#a6e22e">text</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">~</span><span style="color:#a6e22e">disp</span>.<span style="color:#a6e22e">indexOf</span>(<span style="color:#e6db74">&#34;Folder&#34;</span>) <span style="color:#f92672">||</span> <span style="color:#f92672">~</span><span style="color:#a6e22e">disp</span>.<span style="color:#a6e22e">indexOf</span>(<span style="color:#e6db74">&#34;../&#34;</span>)) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#39;#select_file &gt; option&#39;</span>).<span style="color:#a6e22e">remove</span>();
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">alldata</span>[<span style="color:#a6e22e">id</span>]) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dat</span> <span style="color:#f92672">=</span> {};
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">dat</span>[<span style="color:#a6e22e">id</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">alldata</span>[<span style="color:#a6e22e">id</span>];
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">importData</span>(<span style="color:#a6e22e">dat</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>      } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">script</span>.<span style="color:#a6e22e">run</span>.<span style="color:#a6e22e">withSuccessHandler</span>(<span style="color:#a6e22e">importData</span>).<span style="color:#a6e22e">getFiles</span>(<span style="color:#a6e22e">id</span>, <span style="color:#a6e22e">rootFolderId</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">script</span>.<span style="color:#a6e22e">run</span>.<span style="color:#a6e22e">withSuccessHandler</span>(<span style="color:#a6e22e">output</span>).<span style="color:#a6e22e">doSomething</span>(<span style="color:#a6e22e">id</span>);
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>});
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">importData</span>(<span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">key</span> <span style="color:#f92672">=</span> Object.<span style="color:#a6e22e">keys</span>(<span style="color:#a6e22e">e</span>)[<span style="color:#ae81ff">0</span>];
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">alldata</span>[<span style="color:#a6e22e">key</span>]) <span style="color:#a6e22e">alldata</span>[<span style="color:#a6e22e">key</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>[<span style="color:#a6e22e">key</span>];
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">e</span>[<span style="color:#a6e22e">key</span>][<span style="color:#e6db74">&#34;keyparent&#34;</span>]) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#39;#select_file&#39;</span>).<span style="color:#a6e22e">append</span>(<span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#39;&lt;option&gt;&#39;</span>).<span style="color:#a6e22e">html</span>(<span style="color:#e6db74">&#34;./&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">e</span>[<span style="color:#a6e22e">key</span>][<span style="color:#e6db74">&#34;keyname&#34;</span>]).<span style="color:#a6e22e">val</span>(<span style="color:#a6e22e">key</span>));
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#39;#select_file&#39;</span>).<span style="color:#a6e22e">append</span>(<span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#39;&lt;option&gt;&#39;</span>).<span style="color:#a6e22e">html</span>(<span style="color:#e6db74">&#34;../&#34;</span>).<span style="color:#a6e22e">val</span>(<span style="color:#a6e22e">e</span>[<span style="color:#a6e22e">key</span>][<span style="color:#e6db74">&#34;keyparent&#34;</span>]));
+</span></span><span style="display:flex;"><span>  } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#39;#select_file&#39;</span>).<span style="color:#a6e22e">append</span>(<span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#39;&lt;option&gt;&#39;</span>).<span style="color:#a6e22e">html</span>(<span style="color:#e6db74">&#34;./&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">e</span>[<span style="color:#a6e22e">key</span>][<span style="color:#e6db74">&#34;keyname&#34;</span>]).<span style="color:#a6e22e">val</span>(<span style="color:#a6e22e">key</span>));
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span><span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">e</span>[<span style="color:#a6e22e">key</span>][<span style="color:#e6db74">&#34;files&#34;</span>].<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#39;#select_file&#39;</span>).<span style="color:#a6e22e">append</span>(<span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#39;&lt;option&gt;&#39;</span>)
+</span></span><span style="display:flex;"><span>      .<span style="color:#a6e22e">html</span>(<span style="color:#a6e22e">e</span>[<span style="color:#a6e22e">key</span>][<span style="color:#e6db74">&#34;files&#34;</span>][<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">mimeType</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;folder&#34;</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#34;[Folder]&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">e</span>[<span style="color:#a6e22e">key</span>][<span style="color:#e6db74">&#34;files&#34;</span>][<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">name</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>[<span style="color:#a6e22e">key</span>][<span style="color:#e6db74">&#34;files&#34;</span>][<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">name</span>)
+</span></span><span style="display:flex;"><span>      .<span style="color:#a6e22e">val</span>(<span style="color:#a6e22e">e</span>[<span style="color:#a6e22e">key</span>][<span style="color:#e6db74">&#34;files&#34;</span>][<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">id</span>)
+</span></span><span style="display:flex;"><span>    );
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">output</span>(<span style="color:#a6e22e">res</span>){
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">$</span>(<span style="color:#e6db74">&#39;#id&#39;</span>).<span style="color:#a6e22e">text</span>(<span style="color:#a6e22e">res</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>&lt;/<span style="color:#f92672">script</span>&gt;
+</span></span></code></pre></div><ul>
 <li>When you want to change the top folder of the list to the specific folder, please modify <code>root</code> of <code>const rootFolderId = &quot;root&quot;;</code> to the folder ID of the specific folder. By this, the top folder of the list becomes the specific folder.</li>
 </ul>
 
@@ -499,15 +498,6 @@
 <script src="https://tanaikech.github.io/js/ui.js"></script>
 <script src="https://tanaikech.github.io/js/menus.js"></script>
 
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-    }
-  });
-</script>
-
 
 
 
@@ -533,15 +523,6 @@
   <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
   
 
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-J3Z6T50WL5');
-</script>
 
 </body>
 </html>
