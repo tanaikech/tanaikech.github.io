@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="generator" content="Hugo 0.98.0" />
+
+  <title>Uploading Video File on Google Drive to YouTube with Resumable Upload using Google Apps Script &middot; tanaike</title>
+
+    
+
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/pure-min.css">
+
+  <!--[if lte IE 8]>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-old-ie-min.css">
+  <![endif]-->
+  <!--[if gt IE 8]><!-->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-min.css">
+  <!--<![endif]-->
+
+  <!--[if lte IE 8]>
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/side-menu-old-ie.css">
+  <![endif]-->
+  <!--[if gt IE 8]><!-->
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/side-menu.css">
+  <!--<![endif]-->
+
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
+
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet" type="text/css">
+
+  
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+ 
+  
+
+  
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/styles/androidstudio.min.css">
+  <script async src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/highlight.min.js"></script>
+  
+  <script>hljs.initHighlightingOnLoad();</script>
+  
+
+  <link rel="shortcut icon" href="https://tanaikech.github.io/img/favicon.ico" type="image/x-icon" />
+
+  
+  
+
+</head>
+
+
+<body>
+<div id="layout">
+
+  
+<a href="#menu" id="menuLink" class="menu-link">
+  
+  <span></span>
+</a>
+<div id="menu">
+
+  
+  <a class="pure-menu-heading brand" href="https://tanaikech.github.io/">TANAIKE</a>
+
+
+  <div class="pure-menu">
+    <ul class="pure-menu-list">
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/about/"><i class='fa fa-user fa-fw'></i>About</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/post/"><i class='fa fa-list fa-fw'></i>Posts</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/topics/"><i class='fa fa-folder fa-fw'></i>Topics</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/tags/"><i class='fa fa-tags fa-fw'></i>Tags</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/contact/"><i class='fa fa-phone fa-fw'></i>Contact</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/webapps/"><i class='fas fa-toolbox'></i>Web Applications</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/donate/"><i class='fas fa-donate'></i>Donate</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
+      
+        </li>
+      
+    </ul>
+  </div>
+
+  <div class="pure-menu social">
+  <ul class="pure-menu-list">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
+    </li>
+    
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+    </li>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+  </ul>
+</div>
+
+
+  <div>
+  <div class="small-print">
+    <small>&copy; 2017. All rights reserved.</small>
+  </div>
+  <div class="small-print">
+    <small>Built with&nbsp;<a href="https://gohugo.io/" target="_blank">Hugo</a></small>
+    <small>Theme&nbsp;<a href="https://github.com/yoshiharuyamashita/blackburn" target="_blank">Blackburn</a></small>
+  </div>
+</div>
+
+</div>
+
+
+  <div id="main">
+
+
+<div class="header">
+  <h1>Uploading Video File on Google Drive to YouTube with Resumable Upload using Google Apps Script</h1>
+  <h2></h2>
+</div>
+<div class="content">
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>13 Nov 2022, 14:30</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/youtube">YouTube</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/upload">upload</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/resumable-upload">resumable-upload</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  <p><a href="https://gist.github.com/tanaikech/e41b1a674f0c3912aa7c29aac28a57cd">Gists</a></p>
+<p><img src="https://tanaikech.github.io/image-storage/20221113a/fig1.png" alt=""></p>
+<p>This is a simple sample script for uploading a video file on Google Drive to YouTube with the resumable upload using Google Apps Script.</p>
+<p>When you want to upload a video file to YouTube using Google Apps Script, when YouTube API of Advanced Google services is used, the maximum file size is 5 MB, because, in this case, the video file is uploaded with <code>multipart/form-data</code>. When you want to use a video file with more file size using Google Apps Script, a resumable upload is required to be used. But, unfortunately, in the current stage, the methods of Google Apps Script for uploading large video files are not prepared. And also, when I saw the document of resumable upload on YouTube in the official document, I thought that it might be a bit complicated for understanding the resumable upload process. <a href="https://developers.google.com/youtube/v3/guides/using_resumable_upload_protocol">Ref</a> So, in this post, I would like to introduce a simple sample script for uploading video data of more than 5 MB with the resumable upload using Google Apps Script. In this case, the video file is existing in Google Drive. The video file on Google Drive is uploaded to YouTube using Google Apps Script.</p>
+<p>I have uploaded a file to Google Drive using the resumable upload with Drive API. This experience helped me understand the resumable upload of video data to YouTube.</p>
+<h2 id="usage">Usage</h2>
+<h3 id="1-upload-a-video-file-to-google-drive">1. Upload a video file to Google Drive.</h3>
+<p>Please upload a sample video file to your Google Drive. In this sample script, the video data of the video file on Google Drive is uploaded to YouTube using Google Apps Script.</p>
+<h3 id="2-create-a-google-apps-script-project">2. Create a Google Apps Script project.</h3>
+<p>Please create a Google Apps Script project. In this case, you can use both the standalone type and the container-bound script type.</p>
+<h3 id="3-enable-apis">3. Enable APIs.</h3>
+<p>This sample script used Drive API and YouTube API. So, please enable them at Advanced Google services.</p>
+<h3 id="4-sample-script">4. Sample script.</h3>
+<p>Please copy and paste the following sample script to the script editor of Google Apps Script.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Please set the file ID of video file and the metadata for uploading it to YouTube.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">fileId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">metadata</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">snippet</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">description</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Upload sample.&#34;</span>, <span style="color:#a6e22e">title</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Sample uploaded video.&#34;</span> },
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">status</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">privacyStatus</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;private&#34;</span> },
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 1. Retrieve location.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">headers</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>() };
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">url1</span> <span style="color:#f92672">=</span> encodeURI(
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&amp;part=snippet,status&#34;</span>
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res1</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url1</span>, {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">headers</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">metadata</span>),
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">contentType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/json&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">muteHttpExceptions</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">res1</span>.<span style="color:#a6e22e">getResponseCode</span>() <span style="color:#f92672">!=</span> <span style="color:#ae81ff">200</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res1</span>.<span style="color:#a6e22e">getContentText</span>());
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">location</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">res1</span>.<span style="color:#a6e22e">getAllHeaders</span>()[<span style="color:#e6db74">&#34;Location&#34;</span>];
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Got Location.&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 2. Calculate chunks.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">chunkSize</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">20971520</span>; <span style="color:#75715e">// 20 MB
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">fileSize</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">Drive</span>.<span style="color:#a6e22e">Files</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">fileId</span>, {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">supportsAllDrives</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fields</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;fileSize&#34;</span>,
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">chunks</span> <span style="color:#f92672">=</span> [...Array(Math.<span style="color:#a6e22e">ceil</span>(<span style="color:#a6e22e">fileSize</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">chunkSize</span>))].<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">a</span>) =&gt; [
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">i</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">chunkSize</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">i</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">fileSize</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">:</span> (<span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">*</span> <span style="color:#a6e22e">chunkSize</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>,
+</span></span><span style="display:flex;"><span>  ]);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Calculated chunk data.&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 3. Retrieve chunks from Google Drive with the partial download and uploading chunks to YouTube with the resumable upload.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">url2</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`https://www.googleapis.com/drive/v3/files/</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">fileId</span><span style="color:#e6db74">}</span><span style="color:#e6db74">?alt=media&amp;supportsAllDrives=true`</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">res2</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">len</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">chunks</span>.<span style="color:#a6e22e">length</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">chunks</span>.<span style="color:#a6e22e">forEach</span>((<span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">i</span>) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">`Now... </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">len</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">params2</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">authorization</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">headers</span>.<span style="color:#a6e22e">authorization</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">range</span><span style="color:#f92672">:</span> <span style="color:#e6db74">`bytes=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">e</span>[<span style="color:#ae81ff">0</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">-</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">e</span>[<span style="color:#ae81ff">1</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">res2</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url2</span>, <span style="color:#a6e22e">params2</span>).<span style="color:#a6e22e">getContent</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">params3</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> { <span style="color:#e6db74">&#34;Content-Range&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">`bytes </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">e</span>[<span style="color:#ae81ff">0</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">-</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">e</span>[<span style="color:#ae81ff">1</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">fileSize</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span> },
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">res2</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">muteHttpExceptions</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Downloaded a chunk, and upload a chunk.&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res3</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">location</span>, <span style="color:#a6e22e">params3</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">statusCode</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">res3</span>.<span style="color:#a6e22e">getResponseCode</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">statusCode</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">200</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Done.&#34;</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res3</span>.<span style="color:#a6e22e">getContentText</span>());
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">statusCode</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">308</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Upload the next chunk.&#34;</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">res2</span>.<span style="color:#a6e22e">splice</span>(<span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">res2</span>.<span style="color:#a6e22e">length</span>);
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#a6e22e">res3</span>.<span style="color:#a6e22e">getContentText</span>());
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Please don&#39;t remove the following comment line. This comment line is important for running this script.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">// YouTube.Videos.insert(); // This is used for automatically detecting the scope of &#34;https://www.googleapis.com/auth/youtube&#34; with the script editor.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><h3 id="5-testing">5. Testing</h3>
+<p>When this script is run, you can see the following process in the log.</p>
+<pre tabindex="0"><code>Got Location.
+Calculated chunk data.
+Now... 1/10
+Downloaded a chunk, and upload a chunk.
+Upload the next chunk.
+Now... 2/10
+Downloaded a chunk, and upload a chunk.
+Upload the next chunk.
+Now... 3/10
+Downloaded a chunk, and upload a chunk.
+Upload the next chunk.
+Now... 4/10
+Downloaded a chunk, and upload a chunk.
+Upload the next chunk.
+Now... 5/10
+Downloaded a chunk, and upload a chunk.
+Upload the next chunk.
+Now... 6/10
+Downloaded a chunk, and upload a chunk.
+Upload the next chunk.
+Now... 7/10
+Downloaded a chunk, and upload a chunk.
+Upload the next chunk.
+Now... 8/10
+Downloaded a chunk, and upload a chunk.
+Upload the next chunk.
+Now... 9/10
+Downloaded a chunk, and upload a chunk.
+Upload the next chunk.
+Now... 10/10
+Downloaded a chunk, and upload a chunk.
+Done.
+{
+  &#34;kind&#34;: &#34;youtube#video&#34;,
+  &#34;etag&#34;: &#34;###&#34;,
+  &#34;id&#34;: &#34;###&#34;,
+  &#34;snippet&#34;: {,,,},
+  &#34;status&#34;: {,,,}
+}
+</code></pre><h2 id="important">IMPORTANT</h2>
+<ul>
+<li>In this sample script, the chunk size is 20 MB as a sample. You can modify this. But, when this size is large, an error might occur. Please be careful about this.</li>
+<li>If you have no YouTube channel, you cannot upload the video file.</li>
+<li>When your account is not confirmed by Google side, video data of more than 15 minutes cannot be uploaded. Please be careful about this.</li>
+<li>In the current stage, the maximum execution time of Google Apps Script is 6 minutes. So, when you want to upload a large video data, the data might not be able to be completely uploaded, because of the maximum execution time. Please be careful about this.
+<ul>
+<li>If you want to upload the video data with more large size, I think that you can achieve it by executing the script with the time-driven trigger. But, in this case, it is required to modify the above script. Please be careful about this. In this post, the simple sample script is introduced.</li>
+</ul>
+</li>
+</ul>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="http://localhost:1313/2022/11/11/curl-command-uploading-video-file-to-youtube-with-resumable-upload-using-youtube-api/">Curl Command Uploading Video File to YouTube with Resumable Upload using YouTube API</a></li>
+<li><a href="https://developers.google.com/youtube/v3/guides/using_resumable_upload_protocol">Resumable Uploads</a></li>
+</ul>
+
+  
+  <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2022%2f11%2f13%2fuploading-video-file-on-google-drive-to-youtube-with-resumable-upload-using-google-apps-script%2f" target="_blank" title="Share on Facebook"><i class="fab fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2022%2f11%2f13%2fuploading-video-file-on-google-drive-to-youtube-with-resumable-upload-using-google-apps-script%2f" target="_blank" title="Tweet"><i class="fab fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2022%2f11%2f13%2fuploading-video-file-on-google-drive-to-youtube-with-resumable-upload-using-google-apps-script%2f" target="_blank" title="Share on Google+"><i class="fab fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2022%2f11%2f13%2fuploading-video-file-on-google-drive-to-youtube-with-resumable-upload-using-google-apps-script%2f" target="_blank" title="Post to Tumblr"><i class="fab fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2022%2f11%2f13%2fuploading-video-file-on-google-drive-to-youtube-with-resumable-upload-using-google-apps-script%2f" target="_blank" title="Pin it"><i class="fab fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2022%2f11%2f13%2fuploading-video-file-on-google-drive-to-youtube-with-resumable-upload-using-google-apps-script%2f" target="_blank" title="Submit to Reddit"><i class="fab fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
+
+
+  
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2022/11/11/curl-command-uploading-video-file-to-youtube-with-resumable-upload-using-youtube-api/"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2022/11/11/curl-command-uploading-video-file-to-youtube-with-resumable-upload-using-youtube-api/">Curl Command Uploading Video File to YouTube with Resumable Upload using YouTube API</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
+</div>
+
+
+  
+  
+  
+  
+
+  
+
+</div>
+
+</div>
+</div>
+<script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
+
+
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
+<script>
+  
+  if (window.location.hostname != "localhost") {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-J3Z6T50WL5');
+  }
+</script>
+
+
+
+
+
+
+<script src="https://tanaikech.github.io/js/math-code.js"></script>
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  
+
+
+</body>
+</html>
+
