@@ -291,13 +291,8 @@
 <h2 id="sample-script">Sample script</h2>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheetName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Sheet1&#34;</span>;
-</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> [<span style="color:#a6e22e">headers</span>, ...<span style="color:#a6e22e">rows</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>()
-</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#a6e22e">sheetName</span>)
-</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">getDataRange</span>()
-</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">getValues</span>();
-</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">rows</span>.<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">r</span>) =&gt;
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">headers</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">o</span>, <span style="color:#a6e22e">h</span>, <span style="color:#a6e22e">j</span>) =&gt; Object.<span style="color:#a6e22e">assign</span>(<span style="color:#a6e22e">o</span>, { [<span style="color:#a6e22e">h</span>]<span style="color:#f92672">:</span> <span style="color:#a6e22e">r</span>[<span style="color:#a6e22e">j</span>] }), {})
-</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> [<span style="color:#a6e22e">headers</span>, ...<span style="color:#a6e22e">rows</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>().<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#a6e22e">sheetName</span>).<span style="color:#a6e22e">getDataRange</span>().<span style="color:#a6e22e">getValues</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">rows</span>.<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">r</span>) =&gt; <span style="color:#a6e22e">headers</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">o</span>, <span style="color:#a6e22e">h</span>, <span style="color:#a6e22e">j</span>) =&gt; Object.<span style="color:#a6e22e">assign</span>(<span style="color:#a6e22e">o</span>, { [<span style="color:#a6e22e">h</span>]<span style="color:#f92672">:</span> <span style="color:#a6e22e">r</span>[<span style="color:#a6e22e">j</span>] }), {}));
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>);
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><ul>
@@ -309,6 +304,9 @@
 </li>
 <li>
 <p><code>const res = rows.map((r) =&gt; headers.reduce((o, h, j) =&gt; Object.assign(o, { [h]: r[j] }), {}));</code> can be also replaced with <code>const res = rows.map((r) =&gt; headers.reduce((o, h, j) =&gt; (o[h] = r[j], o), {}));</code>.</p>
+</li>
+<li>
+<p>Also, <code>const res = rows.map((r) =&gt; headers.reduce((o, h, j) =&gt; Object.assign(o, { [h]: r[j] }), {}));</code> can be replaced with <code>const res = rows.map((r) =&gt; Object.fromEntries(headers.map((h, j) =&gt; [h, r[j]])));</code>.</p>
 </li>
 </ul>
 <h2 id="added-1">Added 1</h2>
@@ -328,7 +326,7 @@
 </span></span></code></pre></div><h2 id="added-2">Added 2</h2>
 <p>For example, for the above sample Spreadsheet, when the same header titles are included, the sample script is as follows.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
-</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheetName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Sheet3&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheetName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Sheet1&#34;</span>;
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> [<span style="color:#a6e22e">headers</span>, ...<span style="color:#a6e22e">rows</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>().<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#a6e22e">sheetName</span>).<span style="color:#a6e22e">getDataRange</span>().<span style="color:#a6e22e">getValues</span>();
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">rows</span>.<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">r</span>) =&gt; <span style="color:#a6e22e">headers</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">o</span>, <span style="color:#a6e22e">h</span>, <span style="color:#a6e22e">j</span>) =&gt; (<span style="color:#a6e22e">o</span>[<span style="color:#a6e22e">h</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">o</span>[<span style="color:#a6e22e">h</span>] <span style="color:#f92672">?</span> [...<span style="color:#a6e22e">o</span>[<span style="color:#a6e22e">h</span>], <span style="color:#a6e22e">r</span>[<span style="color:#a6e22e">j</span>]] <span style="color:#f92672">:</span> [<span style="color:#a6e22e">r</span>[<span style="color:#a6e22e">j</span>]], <span style="color:#a6e22e">o</span>), {}));
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">obj</span>);
