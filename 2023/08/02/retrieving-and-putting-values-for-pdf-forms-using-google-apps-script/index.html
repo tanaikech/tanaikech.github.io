@@ -310,9 +310,19 @@
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e">   *
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @return {void}
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e">   */</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">constructor</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">constructor</span>(<span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> {}) {
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">cdnjs</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js&#34;</span>; <span style="color:#75715e">// or &#34;https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js&#34;
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">loadPdfLib_</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">standardFont</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">customFont</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">standardFont</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#66d9ef">typeof</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">standardFont</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;string&#34;</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">standardFont</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">standardFont</span>;
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">customFont</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">customFont</span>.<span style="color:#a6e22e">toString</span>() <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;Blob&#34;</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">customFont</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">customFont</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">cdnFontkit</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://unpkg.com/@pdf-lib/fontkit/dist/fontkit.umd.min.js&#34;</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">loadFontkit_</span>();
+</span></span><span style="display:flex;"><span>    }
 </span></span><span style="display:flex;"><span>  }
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>  <span style="color:#75715e">/**
@@ -325,12 +335,9 @@
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">getValues</span>(<span style="color:#a6e22e">blob</span>) {
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> Promise(<span style="color:#66d9ef">async</span> (<span style="color:#a6e22e">resolve</span>, <span style="color:#a6e22e">reject</span>) =&gt; {
 </span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">try</span> {
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">pdfDoc</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">getPdfDocFromBlob_</span>(<span style="color:#a6e22e">blob</span>).<span style="color:#66d9ef">catch</span>((<span style="color:#a6e22e">err</span>) =&gt;
-</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">reject</span>(<span style="color:#a6e22e">err</span>)
-</span></span><span style="display:flex;"><span>        );
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">pdfDoc</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">getPdfDocFromBlob_</span>(<span style="color:#a6e22e">blob</span>).<span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">err</span> =&gt; <span style="color:#a6e22e">reject</span>(<span style="color:#a6e22e">err</span>));
 </span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">form</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">pdfDoc</span>.<span style="color:#a6e22e">getForm</span>();
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">PDFTextField</span>, <span style="color:#a6e22e">PDFDropdown</span>, <span style="color:#a6e22e">PDFCheckBox</span>, <span style="color:#a6e22e">PDFRadioGroup</span> } <span style="color:#f92672">=</span>
-</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">PDFLib</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">PDFTextField</span>, <span style="color:#a6e22e">PDFDropdown</span>, <span style="color:#a6e22e">PDFCheckBox</span>, <span style="color:#a6e22e">PDFRadioGroup</span> } <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">PDFLib</span>;
 </span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">form</span>.<span style="color:#a6e22e">getFields</span>().<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span> (<span style="color:#a6e22e">f</span>) {
 </span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">retObj</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">getName</span>() };
 </span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">f</span> <span style="color:#66d9ef">instanceof</span> <span style="color:#a6e22e">PDFTextField</span>) {
@@ -370,12 +377,12 @@
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">setValues</span>(<span style="color:#a6e22e">blob</span>, <span style="color:#a6e22e">object</span>) {
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> Promise(<span style="color:#66d9ef">async</span> (<span style="color:#a6e22e">resolve</span>, <span style="color:#a6e22e">reject</span>) =&gt; {
 </span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">try</span> {
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">pdfDoc</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">getPdfDocFromBlob_</span>(<span style="color:#a6e22e">blob</span>).<span style="color:#66d9ef">catch</span>((<span style="color:#a6e22e">err</span>) =&gt;
-</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">reject</span>(<span style="color:#a6e22e">err</span>)
-</span></span><span style="display:flex;"><span>        );
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">pdfDoc</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">getPdfDocFromBlob_</span>(<span style="color:#a6e22e">blob</span>).<span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">err</span> =&gt; <span style="color:#a6e22e">reject</span>(<span style="color:#a6e22e">err</span>));
 </span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">form</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">pdfDoc</span>.<span style="color:#a6e22e">getForm</span>();
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">PDFTextField</span>, <span style="color:#a6e22e">PDFDropdown</span>, <span style="color:#a6e22e">PDFCheckBox</span>, <span style="color:#a6e22e">PDFRadioGroup</span> } <span style="color:#f92672">=</span>
-</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">PDFLib</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">standardFont</span> <span style="color:#f92672">||</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">customFont</span>) {
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">await</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">setCustomFont_</span>(<span style="color:#a6e22e">pdfDoc</span>, <span style="color:#a6e22e">form</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">PDFTextField</span>, <span style="color:#a6e22e">PDFDropdown</span>, <span style="color:#a6e22e">PDFCheckBox</span>, <span style="color:#a6e22e">PDFRadioGroup</span> } <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">PDFLib</span>;
 </span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> { <span style="color:#a6e22e">name</span>, <span style="color:#a6e22e">value</span> } <span style="color:#66d9ef">of</span> <span style="color:#a6e22e">object</span>) {
 </span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">field</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">form</span>.<span style="color:#a6e22e">getField</span>(<span style="color:#a6e22e">name</span>);
 </span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">field</span> <span style="color:#66d9ef">instanceof</span> <span style="color:#a6e22e">PDFTextField</span>) {
@@ -396,11 +403,7 @@
 </span></span><span style="display:flex;"><span>        }
 </span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">bytes</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> <span style="color:#a6e22e">pdfDoc</span>.<span style="color:#a6e22e">save</span>();
 </span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> [<span style="color:#a6e22e">filename</span>, <span style="color:#a6e22e">extension</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">blob</span>.<span style="color:#a6e22e">getName</span>().<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;.&#34;</span>);
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">newBlob</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">newBlob</span>(
-</span></span><span style="display:flex;"><span>          [...<span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Int8Array</span>(<span style="color:#a6e22e">bytes</span>)],
-</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">MimeType</span>.<span style="color:#a6e22e">PDF</span>,
-</span></span><span style="display:flex;"><span>          <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">filename</span><span style="color:#e6db74">}</span><span style="color:#e6db74">_updated</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">extension</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#34;.&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">extension</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>
-</span></span><span style="display:flex;"><span>        );
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">newBlob</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">newBlob</span>([...<span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Int8Array</span>(<span style="color:#a6e22e">bytes</span>)], <span style="color:#a6e22e">MimeType</span>.<span style="color:#a6e22e">PDF</span>, <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">filename</span><span style="color:#e6db74">}</span><span style="color:#e6db74">_updated</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">extension</span> <span style="color:#f92672">?</span> (<span style="color:#e6db74">&#34;.&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">extension</span>) <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;&#34;</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
 </span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">resolve</span>(<span style="color:#a6e22e">newBlob</span>);
 </span></span><span style="display:flex;"><span>      } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">e</span>) {
 </span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">reject</span>(<span style="color:#a6e22e">e</span>);
@@ -415,14 +418,17 @@
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @return {void}
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e">   */</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">loadPdfLib_</span>() {
-</span></span><span style="display:flex;"><span>    eval(
-</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">cdnjs</span>)
-</span></span><span style="display:flex;"><span>        .<span style="color:#a6e22e">getContentText</span>()
-</span></span><span style="display:flex;"><span>        .<span style="color:#a6e22e">replace</span>(
-</span></span><span style="display:flex;"><span>          <span style="color:#e6db74">/setTimeout\(.*?,.*?(\d*?)\)/g</span>,
-</span></span><span style="display:flex;"><span>          <span style="color:#e6db74">&#34;Utilities.sleep($1);return t();&#34;</span>
-</span></span><span style="display:flex;"><span>        )
-</span></span><span style="display:flex;"><span>    );
+</span></span><span style="display:flex;"><span>    eval(<span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">cdnjs</span>).<span style="color:#a6e22e">getContentText</span>().<span style="color:#a6e22e">replace</span>(<span style="color:#e6db74">/setTimeout\(.*?,.*?(\d*?)\)/g</span>, <span style="color:#e6db74">&#34;Utilities.sleep($1);return t();&#34;</span>));
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * ### Description
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * Load fontkit. https://github.com/Hopding/fontkit
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @return {void}
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   */</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">loadFontkit_</span>() {
+</span></span><span style="display:flex;"><span>    eval(<span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">cdnFontkit</span>).<span style="color:#a6e22e">getContentText</span>());
 </span></span><span style="display:flex;"><span>  }
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>  <span style="color:#75715e">/**
@@ -436,12 +442,36 @@
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">blob</span>.<span style="color:#a6e22e">toString</span>() <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#34;Blob&#34;</span>) {
 </span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">error</span>(<span style="color:#e6db74">&#34;Please set PDF blob.&#34;</span>);
 </span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">await</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">PDFLib</span>.<span style="color:#a6e22e">PDFDocument</span>.<span style="color:#a6e22e">load</span>(<span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Uint8Array</span>(<span style="color:#a6e22e">blob</span>.<span style="color:#a6e22e">getBytes</span>()), {
-</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">updateMetadata</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>,
-</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">await</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">PDFLib</span>.<span style="color:#a6e22e">PDFDocument</span>.<span style="color:#a6e22e">load</span>(<span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Uint8Array</span>(<span style="color:#a6e22e">blob</span>.<span style="color:#a6e22e">getBytes</span>()), { <span style="color:#a6e22e">updateMetadata</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span> });
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * ### Description
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * Set custom font to PDF form.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @param {Object} pdfDoc Object of PDF document.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @param {Object} form Object of PDF form.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @return {void}
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   */</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">async</span> <span style="color:#a6e22e">setCustomFont_</span>(<span style="color:#a6e22e">pdfDoc</span>, <span style="color:#a6e22e">form</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">customfont</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">standardFont</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">customfont</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> <span style="color:#a6e22e">pdfDoc</span>.<span style="color:#a6e22e">embedFont</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">PDFLib</span>.<span style="color:#a6e22e">StandardFonts</span>[<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">standardFont</span>]);
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">customFont</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">pdfDoc</span>.<span style="color:#a6e22e">registerFontkit</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">fontkit</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">customfont</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> <span style="color:#a6e22e">pdfDoc</span>.<span style="color:#a6e22e">embedFont</span>(<span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Uint8Array</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">customFont</span>.<span style="color:#a6e22e">getBytes</span>()));
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Ref: https://github.com/Hopding/pdf-lib/issues/1152
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">rawUpdateFieldAppearances</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">form</span>.<span style="color:#a6e22e">updateFieldAppearances</span>.<span style="color:#a6e22e">bind</span>(<span style="color:#a6e22e">form</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">form</span>.<span style="color:#a6e22e">updateFieldAppearances</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span> () {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">rawUpdateFieldAppearances</span>(<span style="color:#a6e22e">customfont</span>);
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>  }
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h2 id="limitations">Limitations</h2>
+</span></span></code></pre></div><p>Updated on August 5, 2023: Standard font and custom font can be used.</p>
+<h2 id="limitations">Limitations</h2>
 <ul>
 <li>In the current stage, the fields of the textbox, the checkbox, the dropdown list, and the radio button of the PDF Form can be used.</li>
 </ul>
@@ -548,6 +578,37 @@
 </span></span></code></pre></div><p>When this script is run with the above sample PDF file, you can see a new PDF file in the root folder. When you open the new PDF file, you can see the updated fields of the PDF Form.</p>
 <p>The image converted from the updated PDF is as follows.</p>
 <p><img src="https://tanaikech.github.io/image-storage/20230802a/fig3.png" alt=""></p>
+<h2 id="sample-3-put-values-to-pdf-form-with-custom-function">Sample 3: Put values to PDF form with custom function</h2>
+<p>In this sample script, the above script is used with the custom function. In this case, please prepare the font of TTF and OTF on your Google Drive, and retrieve the file ID.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">setValuesToPdfForm2</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">fileId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set the file ID of the PDF file on Google Drive.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">fileIdOfFontFile</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// File ID of ttf and otf file you want to use.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Please set an object for putting values to PDF form.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">// Before you use this script, please retrieve &#34;name&#34; of each field of PDF form using the function &#34;getValuesFromPDFForm&#34;.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    { <span style="color:#e6db74">&#34;name&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;textbox.sample1.sample1.page1&#34;</span>, <span style="color:#e6db74">&#34;value&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;サンプルテキスト&#34;</span> },
+</span></span><span style="display:flex;"><span>    { <span style="color:#e6db74">&#34;name&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;dropdownlist.sample2.sample1.page1&#34;</span>, <span style="color:#e6db74">&#34;value&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sample option5&#34;</span> },
+</span></span><span style="display:flex;"><span>    { <span style="color:#e6db74">&#34;name&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;checkbox.sample3.checkbox1.page1&#34;</span>, <span style="color:#e6db74">&#34;value&#34;</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span> },
+</span></span><span style="display:flex;"><span>    { <span style="color:#e6db74">&#34;name&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;checkbox.sample3.checkbox2.page1&#34;</span>, <span style="color:#e6db74">&#34;value&#34;</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">false</span> },
+</span></span><span style="display:flex;"><span>    { <span style="color:#e6db74">&#34;name&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;checkbox.sample3.checkbox3.page1&#34;</span>, <span style="color:#e6db74">&#34;value&#34;</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span> },
+</span></span><span style="display:flex;"><span>    { <span style="color:#e6db74">&#34;name&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;radiobutton.sample4.page1&#34;</span>, <span style="color:#e6db74">&#34;value&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;radiobutton.sample4.radiobutton2.page1&#34;</span> }
+</span></span><span style="display:flex;"><span>  ];
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">customFont</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">fileIdOfFontFile</span>).<span style="color:#a6e22e">getBlob</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">PF</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">PdfForm</span>({ <span style="color:#a6e22e">customFont</span> });
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// or, when you want to use the standard font.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">// const standardFont = &#34;TimesRoman&#34;;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">// const PF = new PdfForm({ standardFont });
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">blob</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">fileId</span>).<span style="color:#a6e22e">getBlob</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">PF</span>.<span style="color:#a6e22e">setValues</span>(<span style="color:#a6e22e">blob</span>, <span style="color:#a6e22e">obj</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">then</span>((<span style="color:#a6e22e">newBlob</span>) =&gt; <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">createFile</span>(<span style="color:#a6e22e">newBlob</span>))
+</span></span><span style="display:flex;"><span>    .<span style="color:#66d9ef">catch</span>((<span style="color:#a6e22e">err</span>) =&gt; <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">err</span>));
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>The image converted from the updated PDF is as follows.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20230802a/fig4.png" alt=""></p>
 <h2 id="references">References</h2>
 <ul>
 <li><a href="https://pdf-lib.js.org/">pdf-lib</a></li>
