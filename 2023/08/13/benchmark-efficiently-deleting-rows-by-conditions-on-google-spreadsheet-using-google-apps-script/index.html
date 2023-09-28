@@ -409,6 +409,29 @@
 </span></span></code></pre></div><h2 id="principle-of-this-method">Principle of this method</h2>
 <p>Explain the principle of this method as follows. The method of <code>removeDuplicates()</code> delete rows the duplicated rows. In that case, the 1st row of the duplicated rows is left. This method uses this. When you see the Spreadsheet before the script is run, you can see both the header row and the data rows. In this method, all the duplicated rows are replaced with the header row. Under this condition, when <code>removeDuplicates()</code> is run, the header row is left while the duplicated rows of data rows are deleted.</p>
 <p>For example, when the header row is not existing, first, please insert the temporal header row into the 1st row, and run this script. And, please delete the temporal header row.</p>
+<h2 id="additional-information">Additional information</h2>
+<p>The process cost of this method depends on the number of cells. When the number of cells is large, the process cost becomes high.</p>
+<p>Also, when the number of cells is large, the process costs of <code>getValues</code> and <code>setValues</code> become high. <a href="https://tanaikech.github.io/2022/04/25/report-handling-10000000-cells-in-google-spreadsheet-using-google-apps-script/">Ref</a> and <a href="https://tanaikech.github.io/2018/10/12/benchmark-reading-and-writing-spreadsheet-using-google-apps-script/">Ref</a> As a test, I checked the following 2 patterns using the above &ldquo;sample3&rdquo; script.</p>
+<ol>
+<li>
+<p>100,000 rows and 26 columns: 130 seconds</p>
+</li>
+<li>
+<p>100,000 rows and 5 columns: 90 seconds</p>
+</li>
+</ol>
+<p>When I tested this, the process cost of &ldquo;removeDuplicates&rdquo; was about 10 % of all costs of &ldquo;sample3&rdquo;. And, the process cost of <code>getValues</code> and <code>setValues</code> is about 85 % of all costs. It is found that the process cost for transferring data from Spreadsheet is very high. For example, when <code>getValues</code> and <code>setValues</code> are modified to Sheets API, &ldquo;100,000 rows and 5 columns: 90 seconds&rdquo; is changed to 30 seconds.</p>
+<p>As additional information, in this case, the process costs of the scripts &ldquo;sample1&rdquo; and &ldquo;sample2&rdquo; are much higher than that of &ldquo;sample3&rdquo;.</p>
+<p>From this test,</p>
+<ol>
+<li>Process cost for deleting rows while keeping the cell format depends on the number of cells.
+<ul>
+<li>My proposed script supposes the cell format that is not patterned, either. For example, that is the situation in which the cell backgrounds are randomly set.</li>
+</ul>
+</li>
+<li>When the number of rows is large, replacing <code>getValues</code> and <code>setValues</code> with Sheets API will be lower cost.</li>
+<li>Process cost of &ldquo;removeDuplicates&rdquo; is much lower than that of the data transfer to a Spreadsheet.</li>
+</ol>
 
   
   <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
