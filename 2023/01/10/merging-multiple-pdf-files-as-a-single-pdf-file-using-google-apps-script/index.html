@@ -295,21 +295,19 @@
 <p><img src="https://tanaikech.github.io/image-storage/20230110a/fig1.png" alt=""></p>
 <p>This is a sample script for merging multiple PDF files as a single PDF file using Google Apps Script.</p>
 <p>In this sample script, <a href="https://pdf-lib.js.org/">pdf-lib</a> is used. In the current stage, it seems that this Javascript can be directly used with Google Apps Script.</p>
-<h2 id="sample-script">Sample script</h2>
+<h2 id="sample-script-1">Sample script 1</h2>
 <p>As a sample situation, please put multiple PDF files in your Google Drive. This sample merges those PDF files as a single PDF file.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">async</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
 </span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Retrieve PDF data.
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ids</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;###fileId1###&#34;</span>, <span style="color:#e6db74">&#34;###fileId2###&#34;</span>, <span style="color:#e6db74">&#34;###fileId3###&#34;</span>, , ,]; <span style="color:#75715e">// Please set the file IDs of your PDF files.
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ids</span>.<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">id</span>) =&gt; <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Uint8Array</span>(<span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">id</span>).<span style="color:#a6e22e">getBlob</span>().<span style="color:#a6e22e">getBytes</span>()));
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Merge PDFs.
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Load pdf-lib
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">cdnjs</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js&#34;</span>;
-</span></span><span style="display:flex;"><span>  eval(<span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">cdnjs</span>).<span style="color:#a6e22e">getContentText</span>()); <span style="color:#75715e">// Load pdf-lib
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">setTimeout</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">f</span>, <span style="color:#a6e22e">t</span>) {
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">sleep</span>(<span style="color:#a6e22e">t</span>);
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">f</span>();
-</span></span><span style="display:flex;"><span>  }
-</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">pdfDoc</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> <span style="color:#a6e22e">PDFLib</span>.<span style="color:#a6e22e">PDFDocument</span>.<span style="color:#a6e22e">create</span>();
+</span></span><span style="display:flex;"><span>  eval(<span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">cdnjs</span>).<span style="color:#a6e22e">getContentText</span>().<span style="color:#a6e22e">replace</span>(<span style="color:#e6db74">/setTimeout\(.*?,.*?(\d*?)\)/g</span>, <span style="color:#e6db74">&#34;Utilities.sleep($1);return t();&#34;</span>));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Merge PDFs.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">pdfDoc</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> <span style="color:#a6e22e">PDFLib</span>.<span style="color:#a6e22e">PDFDocument</span>.<span style="color:#a6e22e">create</span>();
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">pdfData</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> <span style="color:#a6e22e">PDFLib</span>.<span style="color:#a6e22e">PDFDocument</span>.<span style="color:#a6e22e">load</span>(<span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">i</span>]);
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">pages</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> <span style="color:#a6e22e">pdfDoc</span>.<span style="color:#a6e22e">copyPages</span>(<span style="color:#a6e22e">pdfData</span>, [...Array(<span style="color:#a6e22e">pdfData</span>.<span style="color:#a6e22e">getPageCount</span>())].<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">i</span>) =&gt; <span style="color:#a6e22e">i</span>));
@@ -340,7 +338,30 @@
 </ul>
 </li>
 </ul>
-<h2 id="references">References</h2>
+<h2 id="sample-script-2">Sample script 2</h2>
+<p>From <a href="https://github.com/Hopding/pdf-lib/issues/252">this discussion</a>, it seems that the following script can be used for merging PDF files.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">async</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Retrieve PDF data.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ids</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;###fileId1###&#34;</span>, <span style="color:#e6db74">&#34;###fileId2###&#34;</span>, <span style="color:#e6db74">&#34;###fileId3###&#34;</span>, , ,]; <span style="color:#75715e">// Please set the file IDs of your PDF files.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ids</span>.<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">id</span>) =&gt; <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Uint8Array</span>(<span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">id</span>).<span style="color:#a6e22e">getBlob</span>().<span style="color:#a6e22e">getBytes</span>()));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Load pdf-lib
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">cdnjs</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js&#34;</span>;
+</span></span><span style="display:flex;"><span>  eval(<span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">cdnjs</span>).<span style="color:#a6e22e">getContentText</span>().<span style="color:#a6e22e">replace</span>(<span style="color:#e6db74">/setTimeout\(.*?,.*?(\d*?)\)/g</span>, <span style="color:#e6db74">&#34;Utilities.sleep($1);return t();&#34;</span>));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Merge PDFs.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">pdfDoc</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> <span style="color:#a6e22e">PDFLib</span>.<span style="color:#a6e22e">PDFDocument</span>.<span style="color:#a6e22e">create</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">pdfData</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> <span style="color:#a6e22e">PDFLib</span>.<span style="color:#a6e22e">PDFDocument</span>.<span style="color:#a6e22e">load</span>(<span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">i</span>]);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">pages</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> <span style="color:#a6e22e">pdfDoc</span>.<span style="color:#a6e22e">copyPages</span>(<span style="color:#a6e22e">pdfData</span>, <span style="color:#a6e22e">pdfData</span>.<span style="color:#a6e22e">getPageIndices</span>());
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">pages</span>.<span style="color:#a6e22e">forEach</span>(<span style="color:#a6e22e">page</span> =&gt; <span style="color:#a6e22e">pdfDoc</span>.<span style="color:#a6e22e">addPage</span>(<span style="color:#a6e22e">page</span>));
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">bytes</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> <span style="color:#a6e22e">pdfDoc</span>.<span style="color:#a6e22e">save</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Create a PDF file.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">createFile</span>(<span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">newBlob</span>([...<span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Int8Array</span>(<span style="color:#a6e22e">bytes</span>)], <span style="color:#a6e22e">MimeType</span>.<span style="color:#a6e22e">PDF</span>, <span style="color:#e6db74">&#34;sample2.pdf&#34;</span>));
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="references">References</h2>
 <ul>
 <li><a href="https://pdf-lib.js.org/">pdf-lib</a></li>
 <li><a href="https://pdf-lib.js.org/docs/api/classes/pdfdocument#copypages">copyPages of pdf-lib</a></li>
@@ -460,6 +481,9 @@
 
 
 
+<script src="https://tanaikech.github.io/js/math-code.js"></script>
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  
 
 
 </body>
