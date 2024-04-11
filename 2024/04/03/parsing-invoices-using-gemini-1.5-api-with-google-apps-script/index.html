@@ -315,8 +315,8 @@
 <p>And, please open the script editor of the Google Apps Script project.</p>
 <h3 id="important">IMPORTANT</h3>
 <p><strong>This script uses a Google Apps Script library for converting PDF data to image data. So, please install <a href="https://github.com/tanaikech/PDFApp">PDFApp</a>. I created this library.</strong></p>
-<h2 id="3-base-script">3. Base script</h2>
-<p>This is the base script as Class InvoiceApp. This is used from a work function.</p>
+<h2 id="3a-base-script">3A. Base script</h2>
+<p>This is the base script as Class InvoiceApp. This is used from a work function. In this script, the function calling is not used. Because when I created this script, Gemini 1.5 API couldn&rsquo;t use the function calling.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">/**
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Parsing invoice with Gemini API.
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
@@ -525,6 +525,251 @@
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @param {Object} obj Object for using UrlFetchApp.fetchAll.
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @returns {UrlFetchApp.HTTPResponse} Response from API.
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e">   */</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">fetch_</span>(<span style="color:#a6e22e">obj</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">muteHttpExceptions</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetchAll</span>([<span style="color:#a6e22e">obj</span>])[<span style="color:#ae81ff">0</span>];
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getResponseCode</span>() <span style="color:#f92672">!=</span> <span style="color:#ae81ff">200</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getContentText</span>());
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">res</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="3b-base-script">3B. Base script</h2>
+<p>This is the base script as Class InvoiceApp. This is used from a work function.</p>
+<p>In this script, the function calling is used. In the current stage, Gemini 1.5 API can use the function calling. When the function calling is used, the output format can be easily controlled. <a href="https://medium.com/@tanaike/specifying-output-types-for-gemini-api-with-google-apps-script-c2f6a753c8d7">Ref</a></p>
+<p>You can use one of the scripts &ldquo;3A. Base script&rdquo; and &ldquo;3B. Base script&rdquo;.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Parsing invoice with Gemini API.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * In this script, the function calling is used. In the current stage, Gemini 1.5 API can use the function calling. When the function calling is used, the output format can be easily controlled.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * ref: https://medium.com/@tanaike/specifying-output-types-for-gemini-api-with-google-apps-script-c2f6a753c8d7
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">InvoiceApp</span> {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @param {Object} object Object using this library.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">  */</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">constructor</span>(<span style="color:#a6e22e">object</span> <span style="color:#f92672">=</span> {}) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">model</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;models/gemini-1.5-pro-latest&#34;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">version</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;v1beta&#34;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">baseUrl</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://generativelanguage.googleapis.com&#34;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">apiKey</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">object</span>.<span style="color:#a6e22e">apiKey</span> <span style="color:#f92672">||</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">headers</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">object</span>.<span style="color:#a6e22e">apiKey</span> <span style="color:#f92672">?</span> <span style="color:#66d9ef">null</span> <span style="color:#f92672">:</span> { <span style="color:#a6e22e">authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">`Bearer </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">object</span>.<span style="color:#a6e22e">token</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>()<span style="color:#e6db74">}</span><span style="color:#e6db74">`</span> };
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">retry</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">folderId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">object</span>.<span style="color:#a6e22e">folderId</span> <span style="color:#f92672">||</span> <span style="color:#e6db74">&#34;root&#34;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">object</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">object</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">functions</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">params_</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">customType_object</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">description</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;Output type is JSON object type. When the output type is object type, this is used. No descriptions and explanations.&#34;</span>,
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">parameters</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;OBJECT&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">properties</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>              <span style="color:#a6e22e">items</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;OBJECT&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">description</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>                  <span style="color:#e6db74">&#34;Output type is JSON object type. When the output type is object type, this is used. No descriptions and explanations.&#34;</span>,
+</span></span><span style="display:flex;"><span>              },
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">required</span><span style="color:#f92672">:</span> [<span style="color:#e6db74">&#34;items&#34;</span>],
+</span></span><span style="display:flex;"><span>          },
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">customType_object</span><span style="color:#f92672">:</span> (<span style="color:#a6e22e">e</span>) =&gt; <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">items</span>,
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">  * ### Description
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">  * Main method.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">  *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">  * @returns {Promise} Response from API is returned as Promise object.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">  */</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">async</span> <span style="color:#a6e22e">run</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">object</span><span style="color:#f92672">?</span>.<span style="color:#a6e22e">blob</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">&#34;Please set the PDF blob of invoice on Google Drive.&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">blob</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">object</span>.<span style="color:#a6e22e">blob</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">`--- Converting PDF blob to PNG images and uploading images to Gemini.`</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">uploadFileByBlob_</span>(<span style="color:#a6e22e">blob</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">`--- Processing Gemini using the uploaded images.`</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">q</span> <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`Create a table from the given image of the invoice as a JSON object.`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`The giving image is the invoice.`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`Return a created table as a JSON object.`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`No descriptions and explanations. Return only raw JSON object without markdown. No markdown format.`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`The required properties in JSON object are as follows.`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">``</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`[Properties in JSON object]`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`&#34;invoiceTitle&#34;: &#34;title of invoice&#34;`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`&#34;invoiceDate&#34;: &#34;date of invoice&#34;`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`&#34;invoiceNumber&#34;: &#34;number of the invoice&#34;`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`&#34;invoiceDestinationName&#34;: &#34;Name of destination of invoice&#34;`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`&#34;invoiceDestinationAddress&#34;: &#34;address of the destination of invoice&#34;`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`&#34;totalCost&#34;: &#34;total cost of all costs&#34;`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`&#34;table&#34;: &#34;Table of invoice. This is a 2-dimensional array. Add the first header row to the table in the 2-dimensional array.&#34;`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">``</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`[Format of 2-dimensional array of &#34;table&#34;]`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`&#34;title or description of item&#34;, &#34;number of items&#34;, &#34;unit cost&#34;, &#34;total cost&#34;`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">``</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`If the requirement information is not found, set &#34;no value&#34;.`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`Return only raw JSON object without markdown. No markdown format. No markcodn tags.`</span>,
+</span></span><span style="display:flex;"><span>    ].<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;\n&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">doGemini_</span>({ <span style="color:#a6e22e">q</span>, <span style="color:#a6e22e">obj</span> });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">`--- Deleting the uploaded images from Gemini.`</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">forEach</span>(({ <span style="color:#a6e22e">name</span> }) =&gt; <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">deleteFile_</span>(<span style="color:#a6e22e">name</span>));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">`--- Done.`</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">res</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">  * ### Description
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">  * Upload image files to Gemini.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">  *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">  * @param {Blob} Blob PDF blob of invoice on Google Drive.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">  * @returns {Promise} An array including uri, name, mimeType 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">  */</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">async</span> <span style="color:#a6e22e">uploadFileByBlob_</span>(<span style="color:#a6e22e">blob</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">blob</span>.<span style="color:#a6e22e">getContentType</span>() <span style="color:#f92672">!=</span> <span style="color:#a6e22e">MimeType</span>.<span style="color:#a6e22e">PDF</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">`Please set PDF blob. The mimeType of this blob is &#39;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">blob</span>.<span style="color:#a6e22e">getContentType</span>()<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;`</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">imageBlobs</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> <span style="color:#a6e22e">PDFApp</span>.<span style="color:#a6e22e">setPDFBlob</span>(<span style="color:#a6e22e">blob</span>).<span style="color:#a6e22e">convertPDFToPng</span>().<span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">err</span> =&gt; {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#a6e22e">err</span>);
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ar</span> <span style="color:#f92672">=</span> [];
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">baseUrl</span><span style="color:#e6db74">}</span><span style="color:#e6db74">/upload/</span><span style="color:#e6db74">${</span><span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">version</span><span style="color:#e6db74">}</span><span style="color:#e6db74">/files?uploadType=multipart`</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">blob</span> <span style="color:#66d9ef">of</span> <span style="color:#a6e22e">imageBlobs</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">metadata</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">file</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">displayName</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">blob</span>.<span style="color:#a6e22e">getName</span>() } };
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">payload</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">metadata</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">newBlob</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">metadata</span>), <span style="color:#e6db74">&#34;application/json&#34;</span>),
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">file</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">blob</span>,
+</span></span><span style="display:flex;"><span>      };
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">options</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;post&#34;</span>, <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">payload</span> };
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">apiKey</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">url</span> <span style="color:#f92672">+=</span> <span style="color:#e6db74">`&amp;key=</span><span style="color:#e6db74">${</span><span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">apiKey</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>;
+</span></span><span style="display:flex;"><span>      } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">options</span>.<span style="color:#a6e22e">headers</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">headers</span>;
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">fetch_</span>({ <span style="color:#a6e22e">url</span>, ...<span style="color:#a6e22e">options</span> });
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">o</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getContentText</span>());
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">push</span>({ <span style="color:#a6e22e">uri</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">uri</span>, <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">name</span>, <span style="color:#a6e22e">mimeType</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">mimeType</span> });
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ar</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">  * ### Description
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">  * Parsing invoice of image data by Gemini API.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">  *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">  * @param {Object} object Object including q and fileUri.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">  * @returns {String|Object} Return parsed invoice data from Gemini API.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">  */</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">doGemini_</span>(<span style="color:#a6e22e">object</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">q</span>, <span style="color:#a6e22e">obj</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">object</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">function_declarations</span> <span style="color:#f92672">=</span> Object.<span style="color:#a6e22e">keys</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">functions</span>).<span style="color:#a6e22e">flatMap</span>((<span style="color:#a6e22e">k</span>) =&gt; <span style="color:#a6e22e">k</span> <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#34;params_&#34;</span> <span style="color:#f92672">?</span> { <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">k</span>, <span style="color:#a6e22e">description</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">functions</span>.<span style="color:#a6e22e">params_</span>[<span style="color:#a6e22e">k</span>].<span style="color:#a6e22e">description</span>, <span style="color:#a6e22e">parameters</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">functions</span>.<span style="color:#a6e22e">params_</span>[<span style="color:#a6e22e">k</span>]<span style="color:#f92672">?</span>.<span style="color:#a6e22e">parameters</span>, } <span style="color:#f92672">:</span> []);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">text</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">q</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">baseUrl</span><span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">${</span><span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">version</span><span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">${</span><span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">model</span><span style="color:#e6db74">}</span><span style="color:#e6db74">:generateContent`</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">options</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">contentType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/json&#34;</span>, <span style="color:#a6e22e">muteHttpExceptions</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span> };
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">apiKey</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">url</span> <span style="color:#f92672">+=</span> <span style="color:#e6db74">`?key=</span><span style="color:#e6db74">${</span><span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">apiKey</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>;
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">options</span>.<span style="color:#a6e22e">headers</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">headers</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">fileData</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">map</span>(({ <span style="color:#a6e22e">uri</span>, <span style="color:#a6e22e">mimeType</span> }) =&gt; ({ <span style="color:#a6e22e">fileData</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">fileUri</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">uri</span>, <span style="color:#a6e22e">mimeType</span> } }))
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">contents</span> <span style="color:#f92672">=</span> [{ <span style="color:#a6e22e">parts</span><span style="color:#f92672">:</span> [{ <span style="color:#a6e22e">text</span> }, ...<span style="color:#a6e22e">fileData</span>], <span style="color:#a6e22e">role</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;user&#34;</span> }];
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> [];
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">check</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">retry</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">do</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">retry</span><span style="color:#f92672">--</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">options</span>.<span style="color:#a6e22e">payload</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>({ <span style="color:#a6e22e">contents</span>, <span style="color:#a6e22e">tools</span><span style="color:#f92672">:</span> [{ <span style="color:#a6e22e">function_declarations</span> }] });
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">fetch_</span>({ <span style="color:#a6e22e">url</span>, ...<span style="color:#a6e22e">options</span> });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getContentText</span>())
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getResponseCode</span>() <span style="color:#f92672">==</span> <span style="color:#ae81ff">500</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">retry</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">warn</span>(<span style="color:#e6db74">&#34;Retry by the status code 500.&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">sleep</span>(<span style="color:#ae81ff">3000</span>); <span style="color:#75715e">// wait
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">doGemini_</span>(<span style="color:#a6e22e">object</span>);
+</span></span><span style="display:flex;"><span>      } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getResponseCode</span>() <span style="color:#f92672">!=</span> <span style="color:#ae81ff">200</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getContentText</span>());
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">candidates</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getContentText</span>());
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">candidates</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#f92672">!</span><span style="color:#a6e22e">candidates</span>[<span style="color:#ae81ff">0</span>]<span style="color:#f92672">?</span>.<span style="color:#a6e22e">content</span><span style="color:#f92672">?</span>.<span style="color:#a6e22e">parts</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">candidates</span>[<span style="color:#ae81ff">0</span>]);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">break</span>;
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">parts</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">candidates</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">candidates</span>[<span style="color:#ae81ff">0</span>]<span style="color:#f92672">?</span>.<span style="color:#a6e22e">content</span><span style="color:#f92672">?</span>.<span style="color:#a6e22e">parts</span>) <span style="color:#f92672">||</span> [];
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">check</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">parts</span>.<span style="color:#a6e22e">find</span>((<span style="color:#a6e22e">o</span>) =&gt; <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">hasOwnProperty</span>(<span style="color:#e6db74">&#34;functionCall&#34;</span>));
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">check</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">contents</span>.<span style="color:#a6e22e">push</span>({ <span style="color:#a6e22e">parts</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">parts</span>.<span style="color:#a6e22e">slice</span>(), <span style="color:#a6e22e">role</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;model&#34;</span> });
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">functionName</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">check</span>.<span style="color:#a6e22e">functionCall</span>.<span style="color:#a6e22e">name</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res2</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">functions</span>[<span style="color:#a6e22e">functionName</span>](
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">check</span>.<span style="color:#a6e22e">functionCall</span>.<span style="color:#a6e22e">args</span> <span style="color:#f92672">||</span> <span style="color:#66d9ef">null</span>
+</span></span><span style="display:flex;"><span>        );
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#e6db74">/^customType_.*/</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">functionName</span>)) {
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">res2</span>.<span style="color:#a6e22e">items</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">res2</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">contents</span>.<span style="color:#a6e22e">push</span>({
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">parts</span><span style="color:#f92672">:</span> [
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>              <span style="color:#a6e22e">functionResponse</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">functionName</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">response</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">functionName</span>, <span style="color:#a6e22e">content</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">res2</span> },
+</span></span><span style="display:flex;"><span>              },
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>          ],
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">role</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;function&#34;</span>,
+</span></span><span style="display:flex;"><span>        });
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">parts</span>.<span style="color:#a6e22e">push</span>({ <span style="color:#a6e22e">functionResponse</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">res2</span> });
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">push</span>(...<span style="color:#a6e22e">parts</span>);
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">check</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#f92672">!</span><span style="color:#a6e22e">result</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">retry</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">output</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">pop</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">!</span><span style="color:#a6e22e">output</span> <span style="color:#f92672">||</span>
+</span></span><span style="display:flex;"><span>      (<span style="color:#a6e22e">output</span>.<span style="color:#a6e22e">finishReason</span> <span style="color:#f92672">&amp;&amp;</span>
+</span></span><span style="display:flex;"><span>        [<span style="color:#e6db74">&#34;OTHER&#34;</span>, <span style="color:#e6db74">&#34;RECITATION&#34;</span>].<span style="color:#a6e22e">includes</span>(<span style="color:#a6e22e">output</span>.<span style="color:#a6e22e">finishReason</span>))
+</span></span><span style="display:flex;"><span>    ) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;No values.&#34;</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">output</span>.<span style="color:#a6e22e">text</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;\n&#34;</span>).<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">e</span>) =&gt; <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">trim</span>());
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">  * ### Description
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">  * Delete file from Gemini.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">  *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">  * @param {String} name Name of file.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">  * @return {void}
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">  */</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">deleteFile_</span>(<span style="color:#a6e22e">name</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">baseUrl</span><span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">${</span><span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">version</span><span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">name</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">options</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;delete&#34;</span>, <span style="color:#a6e22e">muteHttpExceptions</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span> };
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">apiKey</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">url</span> <span style="color:#f92672">+=</span> <span style="color:#e6db74">`?key=</span><span style="color:#e6db74">${</span><span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">apiKey</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>;
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">options</span>.<span style="color:#a6e22e">headers</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">headers</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">fetch_</span>({ <span style="color:#a6e22e">url</span>, ...<span style="color:#a6e22e">options</span> });
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">  * ### Description
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">  * Request Gemini API.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">  *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">  * @param {Object} obj Object for using UrlFetchApp.fetchAll.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">  * @returns {UrlFetchApp.HTTPResponse} Response from API.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">  */</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">fetch_</span>(<span style="color:#a6e22e">obj</span>) {
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">muteHttpExceptions</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetchAll</span>([<span style="color:#a6e22e">obj</span>])[<span style="color:#ae81ff">0</span>];
