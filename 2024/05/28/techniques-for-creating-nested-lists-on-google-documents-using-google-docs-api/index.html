@@ -309,74 +309,74 @@
 <p>Enable the Google Docs API in Advanced Google services. You can find instructions for enabling advanced services in the Apps Script documentation. <a href="https://developers.google.com/apps-script/guides/services/advanced#enable_advanced_services">Ref</a></p>
 <h2 id="3-sample-script">3. Sample script</h2>
 <p>Copy and paste the following script into the script editor of your Google Document. Save the script after pasting.</p>
-<pre tabindex="0"><code>/**
- * ### Description
- * Create a request body for creating a nested list to Google Document using Google Docs API with Google Apps Script.
- *
- * @param {Object} object Object for using this method.
- * @param {Number} object.startIndex Position for inserting the list.
- * @param {String} object.bulletPreset Please select this from https://developers.google.com/docs/api/reference/rest/v1/documents/request#BulletGlyphPreset
- * @param {String} object.temporalBullet Temporal bullet using the value of &#34;listArray&#34;.
- * @param {Array} object.listArray Array includes the list using the temporal bullet. The nested list is set using the space and the temporal bullet.
- * @returns {Array} Request body for creating a nested list to Google Document using Google Docs API.
- */
-function createRequestBody_(object) {
-  const { startIndex, bulletPreset, temporalBullet, listArray } = object;
-  const { totalText, deleteParagraphBullets } = listArray.reduce((o, e) =&gt; {
-    const reg = new RegExp(`^([ ${temporalBullet}]*) `);
-    const r = e.match(reg);
-    if (r) {
-      const nest = r[1].replace(temporalBullet, &#34;&#34;).length;
-      const temp = `${Array(nest).fill(&#34;\t&#34;).join(&#34;&#34;)}${e.replace(r[0], &#34;&#34;)}\n`;
-      o.totalText += temp;
-    } else {
-      const temp = `${e}\n`;
-      const start = startIndex + o.totalText.length;
-      o.totalText += temp;
-      o.deleteParagraphBullets.push({ deleteParagraphBullets: { range: { startIndex: start, endIndex: start + 1 } } });
-    }
-    return o;
-  }, { totalText: &#34;&#34;, deleteParagraphBullets: [] });
-  return [
-    { insertText: { text: totalText, location: { index: startIndex } } },
-    { createParagraphBullets: { range: { startIndex: startIndex, endIndex: startIndex + totalText.length }, bulletPreset } },
-    ...deleteParagraphBullets.reverse()
-  ];
-}
-
-// Please run this function.
-function myFunction() {
-  // Please set your variables.
-  const startIndex = 1; // When 1 is set, the list is inserted from the top of Google Document.
-  const bulletPreset = &#34;NUMBERED_DECIMAL_NESTED&#34;; // Please select this from https://developers.google.com/docs/api/reference/rest/v1/documents/request#BulletGlyphPreset
-  const temporalBullet = &#34;*&#34;; // Temporal bullet using the value of &#34;listArray&#34;.
-
-  // Array including the list using the temporal bullet.
-  // Nested list is set using the space and the temporal bullet.
-  const listArray = [
-    &#34;Sample text 1&#34;,
-    &#34;* Sample text 2&#34;,
-    &#34; * Sample text 3&#34;,
-    &#34;  * Sample text 4&#34;,
-    &#34;   * Sample text 5&#34;,
-    &#34;  * Sample text 6&#34;,
-    &#34; * Sample text 7&#34;,
-    &#34;* Sample text 8&#34;,
-    &#34;Sample text 9&#34;,
-    &#34;  * Sample text 10&#34;,
-    &#34;  * Sample text 11&#34;,
-    &#34;  * Sample text 12&#34;,
-    &#34;* Sample text 13&#34;,
-    &#34; * Sample text 14&#34;,
-    &#34; * Sample text 15&#34;,
-  ];
-
-  const requests = createRequestBody_({ startIndex, bulletPreset, temporalBullet, listArray });
-
-  const docmentId = DocumentApp.getActiveDocument().getId();
-  Docs.Documents.batchUpdate({ requests }, docmentId);
-}
-</code></pre><h2 id="4-explanation-of-script">4. Explanation of script</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * ### Description
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Create a request body for creating a nested list to Google Document using Google Docs API with Google Apps Script.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param {Object} object Object for using this method.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param {Number} object.startIndex Position for inserting the list.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param {String} object.bulletPreset Please select this from https://developers.google.com/docs/api/reference/rest/v1/documents/request#BulletGlyphPreset
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param {String} object.temporalBullet Temporal bullet using the value of &#34;listArray&#34;.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param {Array} object.listArray Array includes the list using the temporal bullet. The nested list is set using the space and the temporal bullet.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @returns {Array} Request body for creating a nested list to Google Document using Google Docs API.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">createRequestBody_</span>(<span style="color:#a6e22e">object</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">startIndex</span>, <span style="color:#a6e22e">bulletPreset</span>, <span style="color:#a6e22e">temporalBullet</span>, <span style="color:#a6e22e">listArray</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">object</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">totalText</span>, <span style="color:#a6e22e">deleteParagraphBullets</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">listArray</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">o</span>, <span style="color:#a6e22e">e</span>) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">reg</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> RegExp(<span style="color:#e6db74">`^([ </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">temporalBullet</span><span style="color:#e6db74">}</span><span style="color:#e6db74">]*) `</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">match</span>(<span style="color:#a6e22e">reg</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">r</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">nest</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">r</span>[<span style="color:#ae81ff">1</span>].<span style="color:#a6e22e">replace</span>(<span style="color:#a6e22e">temporalBullet</span>, <span style="color:#e6db74">&#34;&#34;</span>).<span style="color:#a6e22e">length</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span>Array(<span style="color:#a6e22e">nest</span>).<span style="color:#a6e22e">fill</span>(<span style="color:#e6db74">&#34;\t&#34;</span>).<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;&#34;</span>)<span style="color:#e6db74">}${</span><span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">replace</span>(<span style="color:#a6e22e">r</span>[<span style="color:#ae81ff">0</span>], <span style="color:#e6db74">&#34;&#34;</span>)<span style="color:#e6db74">}</span><span style="color:#e6db74">\n`</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">totalText</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">temp</span>;
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">e</span><span style="color:#e6db74">}</span><span style="color:#e6db74">\n`</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">start</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">startIndex</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">totalText</span>.<span style="color:#a6e22e">length</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">totalText</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">temp</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">deleteParagraphBullets</span>.<span style="color:#a6e22e">push</span>({ <span style="color:#a6e22e">deleteParagraphBullets</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">range</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">startIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">start</span>, <span style="color:#a6e22e">endIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">start</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span> } } });
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
+</span></span><span style="display:flex;"><span>  }, { <span style="color:#a6e22e">totalText</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#a6e22e">deleteParagraphBullets</span><span style="color:#f92672">:</span> [] });
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> [
+</span></span><span style="display:flex;"><span>    { <span style="color:#a6e22e">insertText</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">text</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">totalText</span>, <span style="color:#a6e22e">location</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">index</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">startIndex</span> } } },
+</span></span><span style="display:flex;"><span>    { <span style="color:#a6e22e">createParagraphBullets</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">range</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">startIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">startIndex</span>, <span style="color:#a6e22e">endIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">startIndex</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">totalText</span>.<span style="color:#a6e22e">length</span> }, <span style="color:#a6e22e">bulletPreset</span> } },
+</span></span><span style="display:flex;"><span>    ...<span style="color:#a6e22e">deleteParagraphBullets</span>.<span style="color:#a6e22e">reverse</span>()
+</span></span><span style="display:flex;"><span>  ];
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Please run this function.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Please set your variables.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">startIndex</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>; <span style="color:#75715e">// When 1 is set, the list is inserted from the top of Google Document.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">bulletPreset</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;NUMBERED_DECIMAL_NESTED&#34;</span>; <span style="color:#75715e">// Please select this from https://developers.google.com/docs/api/reference/rest/v1/documents/request#BulletGlyphPreset
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">temporalBullet</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;*&#34;</span>; <span style="color:#75715e">// Temporal bullet using the value of &#34;listArray&#34;.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Array including the list using the temporal bullet.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">// Nested list is set using the space and the temporal bullet.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">listArray</span> <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;Sample text 1&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;* Sample text 2&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34; * Sample text 3&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;  * Sample text 4&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;   * Sample text 5&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;  * Sample text 6&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34; * Sample text 7&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;* Sample text 8&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;Sample text 9&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;  * Sample text 10&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;  * Sample text 11&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;  * Sample text 12&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;* Sample text 13&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34; * Sample text 14&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34; * Sample text 15&#34;</span>,
+</span></span><span style="display:flex;"><span>  ];
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">requests</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">createRequestBody_</span>({ <span style="color:#a6e22e">startIndex</span>, <span style="color:#a6e22e">bulletPreset</span>, <span style="color:#a6e22e">temporalBullet</span>, <span style="color:#a6e22e">listArray</span> });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">docmentId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DocumentApp</span>.<span style="color:#a6e22e">getActiveDocument</span>().<span style="color:#a6e22e">getId</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">Docs</span>.<span style="color:#a6e22e">Documents</span>.<span style="color:#a6e22e">batchUpdate</span>({ <span style="color:#a6e22e">requests</span> }, <span style="color:#a6e22e">docmentId</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="4-explanation-of-script">4. Explanation of script</h2>
 <p>When the function myFunction is run, it performs the following steps:</p>
 <ol>
 <li>Set variables.</li>
@@ -402,13 +402,13 @@ function myFunction() {
 <li>Delete Unwanted Bullets: For paragraphs that shouldn&rsquo;t have bullets (like <code>Sample text 1</code> and <code>Sample text 9</code>), remove them using <a href="https://developers.google.com/docs/api/reference/rest/v1/documents/request#deleteparagraphbulletsrequest">DeleteParagraphBulletsRequest</a>. Set <code>startIndex</code> and <code>endIndex</code> to target only the first character of the paragraph.</li>
 </ol>
 <p>Following this flow, the <code>createRequestBody_</code> function constructs the request body for the nested list. Here&rsquo;s the created request body:</p>
-<pre tabindex="0"><code>[
-  { &#34;insertText&#34;: { &#34;text&#34;: &#34;Sample text 1\nSample text 2\n\tSample text 3\n\t\tSample text 4\n\t\t\tSample text 5\n\t\tSample text 6\n\tSample text 7\nSample text 8\nSample text 9\n\t\tSample text 10\n\t\tSample text 11\n\t\tSample text 12\nSample text 13\n\tSample text 14\n\tSample text 15\n&#34;, &#34;location&#34;: { &#34;index&#34;: 1 } } },
-  { &#34;createParagraphBullets&#34;: { &#34;range&#34;: { &#34;startIndex&#34;: 1, &#34;endIndex&#34;: 234 }, &#34;bulletPreset&#34;: &#34;NUMBERED_DECIMAL_NESTED&#34; } },
-  { &#34;deleteParagraphBullets&#34;: { &#34;range&#34;: { &#34;startIndex&#34;: 122, &#34;endIndex&#34;: 123 } } },
-  { &#34;deleteParagraphBullets&#34;: { &#34;range&#34;: { &#34;startIndex&#34;: 1, &#34;endIndex&#34;: 2 } } }
-]
-</code></pre><p>This request body can also be used with various languages besides Google Apps Script. For instance, you can directly use it with the &ldquo;API explorer&rdquo; of &ldquo;Try it!&rdquo; at <a href="https://developers.google.com/docs/api/reference/rest/v1/documents/batchUpdate">Method: documents.batchUpdate</a>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>[
+</span></span><span style="display:flex;"><span>  { <span style="color:#f92672">&#34;insertText&#34;</span>: { <span style="color:#f92672">&#34;text&#34;</span>: <span style="color:#e6db74">&#34;Sample text 1\nSample text 2\n\tSample text 3\n\t\tSample text 4\n\t\t\tSample text 5\n\t\tSample text 6\n\tSample text 7\nSample text 8\nSample text 9\n\t\tSample text 10\n\t\tSample text 11\n\t\tSample text 12\nSample text 13\n\tSample text 14\n\tSample text 15\n&#34;</span>, <span style="color:#f92672">&#34;location&#34;</span>: { <span style="color:#f92672">&#34;index&#34;</span>: <span style="color:#ae81ff">1</span> } } },
+</span></span><span style="display:flex;"><span>  { <span style="color:#f92672">&#34;createParagraphBullets&#34;</span>: { <span style="color:#f92672">&#34;range&#34;</span>: { <span style="color:#f92672">&#34;startIndex&#34;</span>: <span style="color:#ae81ff">1</span>, <span style="color:#f92672">&#34;endIndex&#34;</span>: <span style="color:#ae81ff">234</span> }, <span style="color:#f92672">&#34;bulletPreset&#34;</span>: <span style="color:#e6db74">&#34;NUMBERED_DECIMAL_NESTED&#34;</span> } },
+</span></span><span style="display:flex;"><span>  { <span style="color:#f92672">&#34;deleteParagraphBullets&#34;</span>: { <span style="color:#f92672">&#34;range&#34;</span>: { <span style="color:#f92672">&#34;startIndex&#34;</span>: <span style="color:#ae81ff">122</span>, <span style="color:#f92672">&#34;endIndex&#34;</span>: <span style="color:#ae81ff">123</span> } } },
+</span></span><span style="display:flex;"><span>  { <span style="color:#f92672">&#34;deleteParagraphBullets&#34;</span>: { <span style="color:#f92672">&#34;range&#34;</span>: { <span style="color:#f92672">&#34;startIndex&#34;</span>: <span style="color:#ae81ff">1</span>, <span style="color:#f92672">&#34;endIndex&#34;</span>: <span style="color:#ae81ff">2</span> } } }
+</span></span><span style="display:flex;"><span>]
+</span></span></code></pre></div><p>This request body can also be used with various languages besides Google Apps Script. For instance, you can directly use it with the &ldquo;API explorer&rdquo; of &ldquo;Try it!&rdquo; at <a href="https://developers.google.com/docs/api/reference/rest/v1/documents/batchUpdate">Method: documents.batchUpdate</a>.</p>
 <h3 id="steps-in-the-createrequestbody_-function">Steps in the createRequestBody_ function:</h3>
 <ol>
 <li>The text for insertion is created within a <code>reduce</code> loop. The loop also builds an array containing objects for using DeleteParagraphBulletsRequest. This array needs to be reversed because deleting unnecessary bullets alters the indices.</li>
