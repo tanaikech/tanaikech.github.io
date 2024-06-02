@@ -316,66 +316,66 @@
 <p>This official document can be also seen. <a href="https://ai.google.dev/">Ref</a>.</p>
 <h2 id="6-sample-script-for-server">6. Sample script for &ldquo;server&rdquo;</h2>
 <p>Please copy and paste the following script to the script editor of &ldquo;server&rdquo;, and please set your API key to <code>apiKey</code>.</p>
-<pre tabindex="0"><code>function doGet(e) {
-  const apiKey = &#34;###&#34;; // Please set your API key.
-
-  const model = &#34;models/gemini-1.5-flash-latest&#34;;
-  const version = &#34;v1beta&#34;;
-
-  const { scriptId, errorMessage } = e.parameter;
-  if (!scriptId || !errorMessage) {
-    return ContentService.createTextOutput(&#34;No script ID or an error message.&#34;);
-  }
-  try {
-    // Retrieve scripts from a Google Apps Script project with Apps Script API.
-    const res1 = UrlFetchApp.fetch(
-      `https://script.googleapis.com/v1/projects/${scriptId}/content`,
-      { headers: { authorization: &#34;Bearer &#34; + ScriptApp.getOAuthToken() } }
-    );
-    let { files } = JSON.parse(res1.getContentText());
-    const script = files.filter(({ type }) =&gt; [&#34;SERVER_JS&#34;, &#34;HTML&#34;].includes(type)).map(({ name, source }) =&gt; `&lt;filename:${name}&gt;${source}&lt;/filename:${name}&gt;`).join(&#34;\n&#34;);
-
-    // Upload scripts to Gemini with Gemini API.
-    const baseUrl = &#34;https://generativelanguage.googleapis.com&#34;;
-    const metadata = { file: { displayName: `Script of &#34;${scriptId}&#34;` } };
-    const res = UrlFetchApp.fetch(
-      `${baseUrl}/upload/v1beta/files?uploadType=multipart&amp;key=${apiKey}`,
-      {
-        method: &#34;post&#34;,
-        payload: {
-          metadata: Utilities.newBlob(JSON.stringify(metadata), &#34;application/json&#34;),
-          file: Utilities.newBlob(script, MimeType.PLAIN_TEXT),
-        }
-      }
-    ).getContentText();
-    const { file: { uri, mimeType } } = JSON.parse(res);
-
-    // Count tokens with Gemin API.
-    const text = [
-      `Read &#34;script&#34; of the uploaded file and the &#34;errorMessage&#34;. Return the reason for the error within 100 words.`,
-      `&lt;errorMessage&gt;${errorMessage}&lt;/errorMessage&gt;`,
-    ].join(&#34;\n&#34;);
-    const payload = { contents: [{ parts: [{ text }, { text: &#34;The below file is Google Apps Script.&#34; }, { fileData: { fileUri: uri, mimeType } }] }] };
-    const { totalTokens } = JSON.parse(UrlFetchApp.fetch(`${baseUrl}/${version}/${model}:countTokens?key=${apiKey}`, { payload: JSON.stringify(payload), contentType: &#34;application/json&#34; }).getContentText());
-
-    // Generate content with Gemin API.
-    const start = new Date().getTime();
-    const res2 = UrlFetchApp.fetch(
-      `${baseUrl}/${version}/${model}:generateContent?key=${apiKey}`,
-      { payload: JSON.stringify(payload), contentType: &#34;application/json&#34; }
-    );
-    const diff = (new Date().getTime() - start) / 1000;
-    const obj = JSON.parse(res2.getContentText());
-    if (obj.candidates &amp;&amp; obj.candidates.length &gt; 0 &amp;&amp; obj.candidates[0].content.parts.length &gt; 0) {
-      const res = { res: obj.candidates[0].content.parts[0].text, diff, promptSize: text.length, totalTokens };
-      return ContentService.createTextOutput(JSON.stringify(res));
-    }
-    return ContentService.createTextOutput(&#34;No response.&#34;);
-  } catch ({ stack }) {
-    return ContentService.createTextOutput(stack);
-  }
-}
-</code></pre><h2 id="7-deploy-web-apps">7. Deploy Web Apps</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">doGet</span>(<span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">apiKey</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set your API key.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">model</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;models/gemini-1.5-flash-latest&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">version</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;v1beta&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">scriptId</span>, <span style="color:#a6e22e">errorMessage</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">parameter</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">scriptId</span> <span style="color:#f92672">||</span> <span style="color:#f92672">!</span><span style="color:#a6e22e">errorMessage</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ContentService</span>.<span style="color:#a6e22e">createTextOutput</span>(<span style="color:#e6db74">&#34;No script ID or an error message.&#34;</span>);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Retrieve scripts from a Google Apps Script project with Apps Script API.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res1</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`https://script.googleapis.com/v1/projects/</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">scriptId</span><span style="color:#e6db74">}</span><span style="color:#e6db74">/content`</span>,
+</span></span><span style="display:flex;"><span>      { <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>() } }
+</span></span><span style="display:flex;"><span>    );
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> { <span style="color:#a6e22e">files</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">res1</span>.<span style="color:#a6e22e">getContentText</span>());
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">script</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">files</span>.<span style="color:#a6e22e">filter</span>(({ <span style="color:#a6e22e">type</span> }) =&gt; [<span style="color:#e6db74">&#34;SERVER_JS&#34;</span>, <span style="color:#e6db74">&#34;HTML&#34;</span>].<span style="color:#a6e22e">includes</span>(<span style="color:#a6e22e">type</span>)).<span style="color:#a6e22e">map</span>(({ <span style="color:#a6e22e">name</span>, <span style="color:#a6e22e">source</span> }) =&gt; <span style="color:#e6db74">`&lt;filename:</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">name</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&gt;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">source</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&lt;/filename:</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">name</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&gt;`</span>).<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;\n&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Upload scripts to Gemini with Gemini API.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">baseUrl</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://generativelanguage.googleapis.com&#34;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">metadata</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">file</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">displayName</span><span style="color:#f92672">:</span> <span style="color:#e6db74">`Script of &#34;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">scriptId</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;`</span> } };
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">baseUrl</span><span style="color:#e6db74">}</span><span style="color:#e6db74">/upload/v1beta/files?uploadType=multipart&amp;key=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">apiKey</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
+</span></span><span style="display:flex;"><span>      {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;post&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">metadata</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">newBlob</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">metadata</span>), <span style="color:#e6db74">&#34;application/json&#34;</span>),
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">file</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">newBlob</span>(<span style="color:#a6e22e">script</span>, <span style="color:#a6e22e">MimeType</span>.<span style="color:#a6e22e">PLAIN_TEXT</span>),
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    ).<span style="color:#a6e22e">getContentText</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">file</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">uri</span>, <span style="color:#a6e22e">mimeType</span> } } <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">res</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Count tokens with Gemin API.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">text</span> <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`Read &#34;script&#34; of the uploaded file and the &#34;errorMessage&#34;. Return the reason for the error within 100 words.`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`&lt;errorMessage&gt;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">errorMessage</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&lt;/errorMessage&gt;`</span>,
+</span></span><span style="display:flex;"><span>    ].<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;\n&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">payload</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">contents</span><span style="color:#f92672">:</span> [{ <span style="color:#a6e22e">parts</span><span style="color:#f92672">:</span> [{ <span style="color:#a6e22e">text</span> }, { <span style="color:#a6e22e">text</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;The below file is Google Apps Script.&#34;</span> }, { <span style="color:#a6e22e">fileData</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">fileUri</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">uri</span>, <span style="color:#a6e22e">mimeType</span> } }] }] };
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">totalTokens</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">baseUrl</span><span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">version</span><span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">model</span><span style="color:#e6db74">}</span><span style="color:#e6db74">:countTokens?key=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">apiKey</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>, { <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">payload</span>), <span style="color:#a6e22e">contentType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/json&#34;</span> }).<span style="color:#a6e22e">getContentText</span>());
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Generate content with Gemin API.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">start</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res2</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">baseUrl</span><span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">version</span><span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">model</span><span style="color:#e6db74">}</span><span style="color:#e6db74">:generateContent?key=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">apiKey</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
+</span></span><span style="display:flex;"><span>      { <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">payload</span>), <span style="color:#a6e22e">contentType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/json&#34;</span> }
+</span></span><span style="display:flex;"><span>    );
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">diff</span> <span style="color:#f92672">=</span> (<span style="color:#66d9ef">new</span> Date().<span style="color:#a6e22e">getTime</span>() <span style="color:#f92672">-</span> <span style="color:#a6e22e">start</span>) <span style="color:#f92672">/</span> <span style="color:#ae81ff">1000</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">res2</span>.<span style="color:#a6e22e">getContentText</span>());
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">candidates</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">candidates</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">candidates</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">content</span>.<span style="color:#a6e22e">parts</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">res</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">candidates</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">content</span>.<span style="color:#a6e22e">parts</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">text</span>, <span style="color:#a6e22e">diff</span>, <span style="color:#a6e22e">promptSize</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">text</span>.<span style="color:#a6e22e">length</span>, <span style="color:#a6e22e">totalTokens</span> };
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ContentService</span>.<span style="color:#a6e22e">createTextOutput</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">res</span>));
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ContentService</span>.<span style="color:#a6e22e">createTextOutput</span>(<span style="color:#e6db74">&#34;No response.&#34;</span>);
+</span></span><span style="display:flex;"><span>  } <span style="color:#66d9ef">catch</span> ({ <span style="color:#a6e22e">stack</span> }) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ContentService</span>.<span style="color:#a6e22e">createTextOutput</span>(<span style="color:#a6e22e">stack</span>);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="7-deploy-web-apps">7. Deploy Web Apps</h2>
 <p>Please deploy Web Apps on the “server” file.</p>
 <p>The detailed information can be seen in <a href="https://developers.google.com/apps-script/guides/web#deploy_a_script_as_a_web_app">the official document</a>.</p>
 <ol>
@@ -392,30 +392,30 @@
 <h2 id="8-testing">8. Testing</h2>
 <p>By the above setting, you can configure Google Apps Script to display expanded error messages for all projects in your Google Drive. This can be incredibly helpful for debugging purposes, as expanded error messages often contain more specific information about the source of the error.</p>
 <p>In order to test this script, please create a Google Spreadsheet and open the script editor of the created Spreadsheet. And, please copy and paste the following script to the script editor, please set your Web Apps URL to <code>webAppsURL</code>, and save the script.</p>
-<pre tabindex="0"><code>function expandErrorMessage_(errorMessage) {
-  const webAppsURL = &#34;https://script.google.com/macros/s/###/dev&#34;; // Please set your Web Apps URL.
-
-  const res = UrlFetchApp.fetch(`${webAppsURL}?scriptId=${ScriptApp.getScriptId()}&amp;errorMessage=${encodeURIComponent(errorMessage.stack)}`, { headers: { authorization: &#34;Bearer &#34; + ScriptApp.getOAuthToken() }, muteHttpExceptions: true });
-  if (res.getResponseCode() != 200) {
-    return { errorMessage: errorMessage.stack, expandedErrorMessage: null };
-  }
-  return { errorMessage: errorMessage.stack, expandedErrorMessage: res.getContentText() };
-
-  // DriveApp.getFiles(); // This comment line is used for automatically detecting a scope of &#34;https://www.googleapis.com/auth/drive.readonly&#34;. This scope is used for requesting Web Apps. Please don&#39;t remove this comment line.
-}
-
-// This is a sample function for occuring an error.
-function onEdit(e) {
-  try {
-
-    const { range } = e;
-    console.log(range.getA1Notation());
-
-  } catch (err) {
-    console.error(expandErrorMessage_(err));
-  }
-}
-</code></pre><p>When you directly run the function <code>onEdit</code> with the script editor, the following result is obtained.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">expandErrorMessage_</span>(<span style="color:#a6e22e">errorMessage</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">webAppsURL</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://script.google.com/macros/s/###/dev&#34;</span>; <span style="color:#75715e">// Please set your Web Apps URL.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">webAppsURL</span><span style="color:#e6db74">}</span><span style="color:#e6db74">?scriptId=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getScriptId</span>()<span style="color:#e6db74">}</span><span style="color:#e6db74">&amp;errorMessage=</span><span style="color:#e6db74">${</span>encodeURIComponent(<span style="color:#a6e22e">errorMessage</span>.<span style="color:#a6e22e">stack</span>)<span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>, { <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>() }, <span style="color:#a6e22e">muteHttpExceptions</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span> });
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getResponseCode</span>() <span style="color:#f92672">!=</span> <span style="color:#ae81ff">200</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> { <span style="color:#a6e22e">errorMessage</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">errorMessage</span>.<span style="color:#a6e22e">stack</span>, <span style="color:#a6e22e">expandedErrorMessage</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">null</span> };
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> { <span style="color:#a6e22e">errorMessage</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">errorMessage</span>.<span style="color:#a6e22e">stack</span>, <span style="color:#a6e22e">expandedErrorMessage</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getContentText</span>() };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// DriveApp.getFiles(); // This comment line is used for automatically detecting a scope of &#34;https://www.googleapis.com/auth/drive.readonly&#34;. This scope is used for requesting Web Apps. Please don&#39;t remove this comment line.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// This is a sample function for occuring an error.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">onEdit</span>(<span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">range</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getA1Notation</span>());
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">err</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">error</span>(<span style="color:#a6e22e">expandErrorMessage_</span>(<span style="color:#a6e22e">err</span>));
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>When you directly run the function <code>onEdit</code> with the script editor, the following result is obtained.</p>
 <p><img src="https://tanaikech.github.io/image-storage/20240602a/fig2.gif" alt=""></p>
 <p>The console output will contain both the original error message and the expanded error message retrieved from the server. Additionally, you might see values for <code>diff</code>, <code>promptSize</code>, and <code>totalTokens</code>. These values are used internally for processing time calculations (explained in a later section) and can be disregarded for now.</p>
 <p>The following section will delve into the processing times for different Gemini models (1.0 Pro, 1.5 Pro, and 1.5 Flash) utilizing the <code>diff</code> and <code>totalTokens</code>. values.</p>
