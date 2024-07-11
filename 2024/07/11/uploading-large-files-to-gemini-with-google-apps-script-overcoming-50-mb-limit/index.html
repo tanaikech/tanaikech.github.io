@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  
+  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+
+  <meta name="description" content="">
+  <meta name="generator" content="Hugo 0.98.0" />
+
+  <title>Uploading Large Files to Gemini with Google Apps Script: Overcoming 50 MB Limit &middot; tanaike</title>
+
+    
+
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/pure-min.css">
+
+  <!--[if lte IE 8]>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-old-ie-min.css">
+  <![endif]-->
+  <!--[if gt IE 8]><!-->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-min.css">
+  <!--<![endif]-->
+
+  <!--[if lte IE 8]>
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/side-menu-old-ie.css">
+  <![endif]-->
+  <!--[if gt IE 8]><!-->
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/side-menu.css">
+  <!--<![endif]-->
+
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
+
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet" type="text/css">
+
+  
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+ 
+  
+
+  
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/styles/androidstudio.min.css">
+  <script async src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/highlight.min.js"></script>
+  
+  <script>hljs.initHighlightingOnLoad();</script>
+  
+
+  <link rel="shortcut icon" href="https://tanaikech.github.io/img/favicon.ico" type="image/x-icon" />
+
+  
+  
+
+</head>
+
+
+<body>
+<div id="layout">
+
+  
+<a href="#menu" id="menuLink" class="menu-link">
+  
+  <span></span>
+</a>
+<div id="menu">
+
+  
+  <a class="pure-menu-heading brand" href="https://tanaikech.github.io/">TANAIKE</a>
+
+
+  <div class="pure-menu">
+    <ul class="pure-menu-list">
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/about/"><i class='fa fa-user fa-fw'></i>About</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/post/"><i class='fa fa-list fa-fw'></i>Posts</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/topics/"><i class='fa fa-folder fa-fw'></i>Topics</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/tags/"><i class='fa fa-tags fa-fw'></i>Tags</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/contact/"><i class='fa fa-phone fa-fw'></i>Contact</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/webapps/"><i class='fas fa-toolbox'></i>Web Applications</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/donate/"><i class='fas fa-donate'></i>Donate</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
+      
+        </li>
+      
+    </ul>
+  </div>
+
+  <div class="pure-menu social">
+  <ul class="pure-menu-list">
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://twitter.com/tanaikech" rel="me" target="_blank"><i class="fab fa-twitter-square fa-fw"></i>X</a>
+    </li>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
+    </li>
+    
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+    </li>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+  </ul>
+</div>
+
+
+  <div>
+  <div class="small-print">
+    <small>&copy; 2017. All rights reserved.</small>
+  </div>
+  <div class="small-print">
+    <small>Built with&nbsp;<a href="https://gohugo.io/" target="_blank">Hugo</a></small>
+    <small>Theme&nbsp;<a href="https://github.com/yoshiharuyamashita/blackburn" target="_blank">Blackburn</a></small>
+  </div>
+</div>
+
+</div>
+
+
+  <div id="main">
+
+
+<div class="header">
+  <h1>Uploading Large Files to Gemini with Google Apps Script: Overcoming 50 MB Limit</h1>
+  <h2></h2>
+</div>
+<div class="content">
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>11 Jul 2024, 11:10</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/upload">upload</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/resumable-upload">resumable upload</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/gemini">Gemini</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  <p><a href="https://gist.github.com/tanaikech/ad5b87df2842ecd2f9864784ac6bbecb">Gists</a></p>
+<p><img src="https://tanaikech.github.io/image-storage/20240711a/fig1.png" alt=""></p>
+<h1 id="abstract">Abstract</h1>
+<p>Uploads in Google Apps Script are limited to 50 MB, hindering work with large datasets. This report introduces a script with <code>uploadType=resumable</code> to overcome this limit, enabling uploads over 50 MB to Gemini and other services.</p>
+<h1 id="introduction">Introduction</h1>
+<p>This report explores the limitations of data upload size using Google Apps Script and introduces a script to overcome these limitations. In the current stage, Gemini API can generate content using the uploaded data to Gemini. You can find more information on this in a previous report. <a href="https://medium.com/google-cloud/generating-texts-using-files-uploaded-by-gemini-1-5-api-5777f1c902ab">Ref</a> As mentioned in the report, Google Apps Script uses <code>uploadType=multipart</code> for uploading files. However, the maximum file size is limited to 5 MB with this method for Drive API. <a href="https://developers.google.com/drive/api/guides/manage-uploads">Ref</a> While I confirmed that the Gemini API allows for uploading over about 20 MB with <code>uploadType=multipart</code>, Google Apps Script enforces a stricter 50 MB limit for both uploads and downloads. <a href="https://developers.google.com/apps-script/guides/services/quotas#current_limitations">Ref</a> This can be inconvenient when working with larger datasets, such as movie or text data, which often exceed this limit.</p>
+<p>To address this limitation, I have created a script that leverages <code>uploadType=resumable</code> to upload files larger than 50 MB by freely changing the destination endpoint. This script not only enables uploading large files to Gemini but also supports uploading data from Google Drive and external URLs to other services like Google Drive and YouTube.</p>
+<p>The repository of the scripts introducing this script is <a href="https://github.com/tanaikech/UploadApp">here</a>.</p>
+<h1 id="usage">Usage</h1>
+<h2 id="1-prepare-a-google-apps-script-project">1. Prepare a Google Apps Script project</h2>
+<p>Please create a Google Apps Script project. In this case, you can use both the standalone type and the container-bound type.</p>
+<p>Please open the script editor.</p>
+<h2 id="2-enable-drive-api">2. Enable Drive API</h2>
+<p>Please enable Drive API at Advanced Google services. <a href="https://developers.google.com/apps-script/guides/services/advanced#enable_advanced_services">Ref</a></p>
+<h2 id="3-class-uploadapp">3. Class UploadApp</h2>
+<p>Please copy and paste the following script to the script editor.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * ### Description
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Upload a little large data with Google APIs. The target of this script is the data with several hundred MB.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * GitHub: https://github.com/tanaikech/UploadApp
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Sample situation:
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * - Upload a file from Google Drive to Gemini, Google Drive, YouTube, and so on.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * - Upload a file from the URL outside of Google to Gemini, Google Drive, YouTube, and so on.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">UploadApp</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @param {Object} object Information of the source data and the metadata of the destination.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @param {Object} object.source Information of the source data.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @param {Object} object.destination Information of the metadata of the destination.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   */</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">constructor</span>(<span style="color:#a6e22e">object</span> <span style="color:#f92672">=</span> {}) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">property</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">PropertiesService</span>.<span style="color:#a6e22e">getScriptProperties</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">next</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">property</span>.<span style="color:#a6e22e">getProperty</span>(<span style="color:#e6db74">&#34;next&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">!</span><span style="color:#a6e22e">next</span> <span style="color:#f92672">&amp;&amp;</span>
+</span></span><span style="display:flex;"><span>      (<span style="color:#f92672">!</span><span style="color:#a6e22e">object</span>.<span style="color:#a6e22e">source</span> <span style="color:#f92672">||</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">object</span>.<span style="color:#a6e22e">source</span>.<span style="color:#a6e22e">fileId</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#f92672">!</span><span style="color:#a6e22e">object</span>.<span style="color:#a6e22e">source</span>.<span style="color:#a6e22e">url</span>))
+</span></span><span style="display:flex;"><span>    ) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">&#34;Please set a valid object.&#34;</span>);
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">next</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">next</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">current</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span>.<span style="color:#a6e22e">next</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span>.<span style="color:#a6e22e">next</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span>.<span style="color:#a6e22e">result</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">delete</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span>.<span style="color:#a6e22e">result</span>;
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">current</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">orgObject</span><span style="color:#f92672">:</span> { ...<span style="color:#a6e22e">object</span> } };
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span>.<span style="color:#a6e22e">orgObject</span>.<span style="color:#a6e22e">source</span>.<span style="color:#a6e22e">fileId</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">googleDrive</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">fileGet</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`https://www.googleapis.com/drive/v3/files/</span><span style="color:#e6db74">${</span><span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span>.<span style="color:#a6e22e">orgObject</span>.<span style="color:#a6e22e">source</span>.<span style="color:#a6e22e">fileId</span><span style="color:#e6db74">}</span><span style="color:#e6db74">?supportsAllDrives=true`</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">downloadUrl</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">fileGet</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&amp;alt=media`</span>;
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">googleDrive</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">downloadUrl</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span>.<span style="color:#a6e22e">orgObject</span>.<span style="color:#a6e22e">source</span>.<span style="color:#a6e22e">url</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">startTime</span> <span style="color:#f92672">=</span> Date.<span style="color:#a6e22e">now</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">limitProcessTime</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">300</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1000</span>; <span style="color:#75715e">// seconds
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">authorization</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`Bearer </span><span style="color:#e6db74">${</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span>.<span style="color:#a6e22e">orgObject</span>.<span style="color:#a6e22e">accessToken</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>()
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">chunkSize</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">16777216</span>; <span style="color:#75715e">// Chunk size is 16 MB.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * ### Description
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * Main method.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @returns {Object} Response value. When the file could be completly uploaded, the file metadata of the uploaded file is returned. When the file is not be completly uploaded, an object including message.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   */</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">run</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">current</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Get metadata&#34;</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">getMetadata_</span>();
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Calculate chunks&#34;</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">getChunks_</span>();
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Get location&#34;</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">getLocation_</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Download and upload data.&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">downloadAndUpload_</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span>.<span style="color:#a6e22e">result</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * ### Description
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * Get metadata of the source data.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @return {void}
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @private
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   */</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">getMetadata_</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">googleDrive</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">fileGet</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&amp;fields=mimeType%2Csize`</span>, {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">authorization</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">authorization</span> },
+</span></span><span style="display:flex;"><span>      });
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getContentText</span>());
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">mimeType</span>.<span style="color:#a6e22e">includes</span>(<span style="color:#e6db74">&#34;application/vnd.google-apps&#34;</span>)) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(
+</span></span><span style="display:flex;"><span>          <span style="color:#e6db74">&#34;This script cannot be used to the files related to Google. For example, Google Doc, Google Sheet, and so on.&#34;</span>
+</span></span><span style="display:flex;"><span>        );
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span>.<span style="color:#a6e22e">orgObject</span>.<span style="color:#a6e22e">source</span>.<span style="color:#a6e22e">mimeType</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">mimeType</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span>.<span style="color:#a6e22e">orgObject</span>.<span style="color:#a6e22e">source</span>.<span style="color:#a6e22e">size</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">size</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">downloadUrl</span>, {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">muteHttpExceptions</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">Range</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;bytes=0-1&#34;</span> },
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getResponseCode</span>() <span style="color:#f92672">!=</span> <span style="color:#ae81ff">206</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">&#34;This file cannot be done the resumable download.&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">headers</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getHeaders</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">headers</span>[<span style="color:#e6db74">&#34;Content-Range&#34;</span>].<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;/&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span>.<span style="color:#a6e22e">orgObject</span>.<span style="color:#a6e22e">source</span>.<span style="color:#a6e22e">fileName</span> <span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">headers</span>[<span style="color:#e6db74">&#34;Content-Disposition&#34;</span>] <span style="color:#f92672">&amp;&amp;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">headers</span>[<span style="color:#e6db74">&#34;Content-Disposition&#34;</span>].<span style="color:#a6e22e">match</span>(<span style="color:#e6db74">/filename=\&#34;([a-zA-Z0-9\s\S].+)\&#34;;/</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">?</span> <span style="color:#a6e22e">headers</span>[<span style="color:#e6db74">&#34;Content-Disposition&#34;</span>]
+</span></span><span style="display:flex;"><span>            .<span style="color:#a6e22e">match</span>(<span style="color:#e6db74">/filename=\&#34;([a-zA-Z0-9\s\S].+)\&#34;;/</span>)[<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>            .<span style="color:#a6e22e">trim</span>()
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">:</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">startTime</span>.<span style="color:#a6e22e">toString</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span>.<span style="color:#a6e22e">orgObject</span>.<span style="color:#a6e22e">source</span>.<span style="color:#a6e22e">mimeType</span> <span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">headers</span>[<span style="color:#e6db74">&#34;Content-Type&#34;</span>].<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;;&#34;</span>)[<span style="color:#ae81ff">0</span>];
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span>.<span style="color:#a6e22e">orgObject</span>.<span style="color:#a6e22e">source</span>.<span style="color:#a6e22e">size</span> <span style="color:#f92672">=</span> Number(<span style="color:#a6e22e">range</span>[<span style="color:#ae81ff">1</span>]);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * ### Description
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * Calculate the chunks for uploading.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @return {void}
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @private
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   */</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">getChunks_</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">chunks</span> <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>      ...Array(
+</span></span><span style="display:flex;"><span>        Math.<span style="color:#a6e22e">ceil</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span>.<span style="color:#a6e22e">orgObject</span>.<span style="color:#a6e22e">source</span>.<span style="color:#a6e22e">size</span> <span style="color:#f92672">/</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">chunkSize</span>)
+</span></span><span style="display:flex;"><span>      ),
+</span></span><span style="display:flex;"><span>    ].<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">a</span>) =&gt; [
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">i</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">chunkSize</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">i</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">?</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span>.<span style="color:#a6e22e">orgObject</span>.<span style="color:#a6e22e">source</span>.<span style="color:#a6e22e">size</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">:</span> (<span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">*</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">chunkSize</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>,
+</span></span><span style="display:flex;"><span>    ]);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span>.<span style="color:#a6e22e">chunks</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">chunks</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * ### Description
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * Get location URL for uploading.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @return {void}
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @private
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   */</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">getLocation_</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">options</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span>.<span style="color:#a6e22e">orgObject</span>.<span style="color:#a6e22e">destination</span>.<span style="color:#a6e22e">metadata</span>),
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">contentType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/json&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">muteHttpExceptions</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">q</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">parseQueryParameters_</span>(
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span>.<span style="color:#a6e22e">orgObject</span>.<span style="color:#a6e22e">destination</span>.<span style="color:#a6e22e">uploadUrl</span>
+</span></span><span style="display:flex;"><span>    );
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">q</span>.<span style="color:#a6e22e">queryParameters</span>.<span style="color:#a6e22e">uploadType</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;Please confirm whether your endpoint can be used for the resumable upload. And, please include uploadType=resumable in uploadUrl.&#34;</span>
+</span></span><span style="display:flex;"><span>      );
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">q</span>.<span style="color:#a6e22e">queryParameters</span>.<span style="color:#a6e22e">key</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">options</span>.<span style="color:#a6e22e">headers</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">authorization</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">authorization</span> };
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span>.<span style="color:#a6e22e">orgObject</span>.<span style="color:#a6e22e">destination</span>.<span style="color:#a6e22e">uploadUrl</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">options</span>
+</span></span><span style="display:flex;"><span>    );
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getResponseCode</span>() <span style="color:#f92672">!=</span> <span style="color:#ae81ff">200</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getContentText</span>());
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span>.<span style="color:#a6e22e">location</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getAllHeaders</span>()[<span style="color:#e6db74">&#34;Location&#34;</span>];
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * ### Description
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * Download and upload data.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @return {void}
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @private
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   */</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">downloadAndUpload_</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">res1</span> <span style="color:#f92672">=</span> [];
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">len</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span>.<span style="color:#a6e22e">chunks</span>.<span style="color:#a6e22e">length</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">current</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">len</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">e</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span>.<span style="color:#a6e22e">chunks</span>[<span style="color:#a6e22e">i</span>];
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">currentBytes</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">e</span>[<span style="color:#ae81ff">0</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">-</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">e</span>[<span style="color:#ae81ff">1</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">`Now... </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">len</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">params1</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">range</span><span style="color:#f92672">:</span> <span style="color:#e6db74">`bytes=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">currentBytes</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span> },
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">muteHttpExceptions</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>      };
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">googleDrive</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">params1</span>.<span style="color:#a6e22e">headers</span>.<span style="color:#a6e22e">authorization</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">authorization</span>;
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">`Start downloading data with </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">currentBytes</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">res1</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">downloadUrl</span>, <span style="color:#a6e22e">params1</span>).<span style="color:#a6e22e">getContent</span>();
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">`Finished downloading data with </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">currentBytes</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">params2</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>          <span style="color:#e6db74">&#34;Content-Range&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">`bytes </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">currentBytes</span><span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">${</span><span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span>.<span style="color:#a6e22e">orgObject</span>.<span style="color:#a6e22e">source</span>.<span style="color:#a6e22e">size</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">res1</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">muteHttpExceptions</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>      };
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">`Start uploading data with </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">currentBytes</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res2</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span>.<span style="color:#a6e22e">location</span>, <span style="color:#a6e22e">params2</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">`Finished uploading data with </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">currentBytes</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">statusCode</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">res2</span>.<span style="color:#a6e22e">getResponseCode</span>();
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">statusCode</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">200</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Done.&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span>.<span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">res2</span>.<span style="color:#a6e22e">getContentText</span>());
+</span></span><span style="display:flex;"><span>      } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">statusCode</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">308</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Upload the next chunk.&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">res1</span>.<span style="color:#a6e22e">splice</span>(<span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">res1</span>.<span style="color:#a6e22e">length</span>);
+</span></span><span style="display:flex;"><span>      } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#a6e22e">res2</span>.<span style="color:#a6e22e">getContentText</span>());
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (Date.<span style="color:#a6e22e">now</span>() <span style="color:#f92672">-</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">startTime</span> <span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">limitProcessTime</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span>.<span style="color:#a6e22e">next</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">property</span>.<span style="color:#a6e22e">setProperty</span>(<span style="color:#e6db74">&#34;next&#34;</span>, <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span>));
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">break</span>;
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span>.<span style="color:#a6e22e">next</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#f92672">!</span><span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span>.<span style="color:#a6e22e">result</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">message</span> <span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;There is the next upload chunk. So, please run the script again.&#34;</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">warn</span>(<span style="color:#a6e22e">message</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tempObject</span>.<span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">message</span> };
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">property</span>.<span style="color:#a6e22e">deleteProperty</span>(<span style="color:#e6db74">&#34;next&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * ### Description
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * Parse query parameters.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * ref: https://github.com/tanaikech/UtlApp?tab=readme-ov-file#parsequeryparameters
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @param {String} url URL including the query parameters.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @return {Array} Array including the parsed query parameters.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @private
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   */</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">parseQueryParameters_</span>(<span style="color:#a6e22e">url</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">url</span> <span style="color:#f92672">===</span> <span style="color:#66d9ef">null</span> <span style="color:#f92672">||</span> <span style="color:#66d9ef">typeof</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#34;string&#34;</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;Please give URL (String) including the query parameters.&#34;</span>
+</span></span><span style="display:flex;"><span>      );
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">s</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">url</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;?&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> { <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">s</span>[<span style="color:#ae81ff">0</span>], <span style="color:#a6e22e">queryParameters</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">null</span> };
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> [<span style="color:#a6e22e">baseUrl</span>, <span style="color:#a6e22e">query</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">s</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">query</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">queryParameters</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">query</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;&amp;&#34;</span>).<span style="color:#a6e22e">reduce</span>(<span style="color:#66d9ef">function</span> (<span style="color:#a6e22e">o</span>, <span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;=&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">key</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">temp</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">trim</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">value</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">temp</span>[<span style="color:#ae81ff">1</span>].<span style="color:#a6e22e">trim</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">value</span> <span style="color:#f92672">=</span> isNaN(<span style="color:#a6e22e">value</span>) <span style="color:#f92672">?</span> <span style="color:#a6e22e">value</span> <span style="color:#f92672">:</span> Number(<span style="color:#a6e22e">value</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">o</span>[<span style="color:#a6e22e">key</span>]) {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">o</span>[<span style="color:#a6e22e">key</span>].<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">value</span>);
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">o</span>[<span style="color:#a6e22e">key</span>] <span style="color:#f92672">=</span> [<span style="color:#a6e22e">value</span>];
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
+</span></span><span style="display:flex;"><span>      }, {});
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> { <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">baseUrl</span>, <span style="color:#a6e22e">queryParameters</span> };
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="4-upload-a-file-to-gemini">4. Upload a file to Gemini</h2>
+<p>Please copy and paste the following script to the script editor. Please get the API key using Gemini API and set your API key and the file ID of the file you want to upload.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">sample1a</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">apiKey</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set your API key.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">fileId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set the file ID of the uploaded file on Google Drive.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">object</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">source</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">fileId</span> },
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">destination</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">uploadUrl</span><span style="color:#f92672">:</span> <span style="color:#e6db74">`https://generativelanguage.googleapis.com/upload/v1beta/files?uploadType=resumable&amp;key=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">apiKey</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">metadata</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">file</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">displayName</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">fileId</span>).<span style="color:#a6e22e">getName</span>() },
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">accessToken</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>(),
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">UploadApp</span>(<span style="color:#a6e22e">object</span>).<span style="color:#a6e22e">run</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// DriveApp.createFile(); // This comment line is used for automatically detecting a scope of Drive API. So, please don&#39;t remove this.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><p>When this script is run, the file is uploaded with the resumable upload. In my test, a file of 200 MB in size could be uploaded by one execution of the script. Namely, it was finished within 6 minutes. And, the following result is returned. This value can be used for generating content with Gemini API.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;file&#34;</span>: {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;files/###&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;displayName&#34;</span>: <span style="color:#e6db74">&#34;sample name&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;mimeType&#34;</span>: <span style="color:#e6db74">&#34;video/mp4&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;sizeBytes&#34;</span>: <span style="color:#e6db74">&#34;123456789&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;createTime&#34;</span>: <span style="color:#e6db74">&#34;2024-07-10T00:00:00.000000Z&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;updateTime&#34;</span>: <span style="color:#e6db74">&#34;2024-07-10T00:00:00.000000Z&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;expirationTime&#34;</span>: <span style="color:#e6db74">&#34;2024-07-12T00:00:00.000000Z&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;sha256Hash&#34;</span>: <span style="color:#e6db74">&#34;###&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;uri&#34;</span>: <span style="color:#e6db74">&#34;https://generativelanguage.googleapis.com/v1beta/files/###&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;state&#34;</span>: <span style="color:#e6db74">&#34;ACTIVE&#34;</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>As another piece of information, if you want to download the data from a URL and upload it to Gemini, please replace <code>url</code> instead of <code>fileId</code> in the property <code>source</code> as follows. But, in this case, it is required to be able to download partially the data from the URL. Please be careful about this.</p>
+<pre tabindex="0"><code>source: { url: &#34;###&#34; },
+</code></pre><p><code>uploadUrl</code> and <code>metadata</code> in <code>destination</code> are the endpoint for uploading data and the metadata of the uploading data, respectively. About the details of them, please check the official document of the API you want to use. For example, you can see the official document of &ldquo;Method: media.upload&rdquo; of Gemini API at <a href="https://ai.google.dev/api/rest/v1beta/media/upload">here</a>.</p>
+<p>As another sample script, when the following steps are reflected in a script, it becomes as follows.</p>
+<ol>
+<li>Upload video file to Gemini.</li>
+<li>Generate content with Gemini.</li>
+</ol>
+<p>In this case, please install my Google Apps Script library <a href="https://github.com/tanaikech/GeminiWithFiles">GeminiWithFiles</a>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">sample1b</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">apiKey</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set your API key.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">fileId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// File ID of the sample video (mp4) on your Google Drive.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">q</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Description this video.&#34;</span>; <span style="color:#75715e">// Prompt
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Upload mp4 data to Gemini.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">object</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">source</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">fileId</span> },
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">destination</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">uploadUrl</span><span style="color:#f92672">:</span> <span style="color:#e6db74">`https://generativelanguage.googleapis.com/upload/v1beta/files?uploadType=resumable&amp;key=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">apiKey</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">metadata</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">file</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">displayName</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">fileId</span>).<span style="color:#a6e22e">getName</span>() },
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">accessToken</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>(),
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">file</span> } <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">UploadApp</span>(<span style="color:#a6e22e">object</span>).<span style="color:#a6e22e">run</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Generate content with the uploaded mp4 data.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">g</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">GeminiWithFiles</span>.<span style="color:#a6e22e">geminiWithFiles</span>({ <span style="color:#a6e22e">apiKey</span>, <span style="color:#a6e22e">functions</span><span style="color:#f92672">:</span> {} });
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">g</span>
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">withUploadedFilesByGenerateContent</span>([<span style="color:#a6e22e">file</span>])
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">generateContent</span>({ <span style="color:#a6e22e">q</span> });
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="5-another-sample-scripts">5. Another sample scripts</h2>
+<p>At Class UploadApp, the file can be simply uploaded to another endpoint by changing <code>uploadUrl</code> and <code>metadata</code> of <code>destination</code>. As with other sample scripts, here, I would like to introduce uploading a file to Google Drive and YouTube.</p>
+<h3 id="upload-a-file-to-google-drive">Upload a file to Google Drive</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">sample2</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">fileId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set the file ID of the uploaded file on Google Drive.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">object</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">source</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">fileId</span> },
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">destination</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">uploadUrl</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">metadata</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">fileId</span>).<span style="color:#a6e22e">getName</span>() },
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">accessToken</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>(),
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">UploadApp</span>(<span style="color:#a6e22e">object</span>).<span style="color:#a6e22e">run</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// DriveApp.createFile(); // This comment line is used for automatically detecting a scope of Drive API. So, please don&#39;t remove this.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><p>When you run this script, the file of <code>fileId</code> of <code>source</code> is uploaded to the root folder on your Google Drive.</p>
+<p>When you want to upload the file to the shared drive, please add <code>supportsAllDrives=true</code> to the query parameter of <code>uploadUrl</code> like <code>https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&amp;supportsAllDrives=true</code>.</p>
+<h3 id="upload-a-file-to-youtube">Upload a file to YouTube</h3>
+<p>Before you test this script, please enable YouTube Data API v3 at Advanced Google services.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">sample3</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">fileId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set the file ID of the uploaded file on Google Drive.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">object</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">source</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">fileId</span> },
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">destination</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">uploadUrl</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&amp;part=snippet,status&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">metadata</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">snippet</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">description</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Upload sample.&#34;</span>,
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">title</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Sample uploaded video.&#34;</span>,
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">status</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">privacyStatus</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;private&#34;</span> },
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">accessToken</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>(),
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">UploadApp</span>(<span style="color:#a6e22e">object</span>).<span style="color:#a6e22e">run</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// DriveApp.createFile(); // This comment line is used for automatically detecting a scope of Drive API. So, please don&#39;t remove this.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><p>When you run this script, the file of <code>fileId</code> of <code>source</code> is uploaded to your channel of YouTube. But, if you want to upload a long video, it is required to get permission from YouTube. Please be careful about this.</p>
+<h1 id="important-points">Important points</h1>
+<p>In the case of Google Apps Script, when the array with a large size is created several times in one execution, an error related to the memory occurs, and/or the script is frozen. So, in the case of Class UploadApp, an array is created outside of the loop, and the array including data is cleared using <code>splice</code>. By this, it avoids creating the new arrays.</p>
+<h1 id="note">Note</h1>
+<p>As another piece of information, Class UploadApp can also be used for uploading files with larger sizes. But, in that case, it supposes that the upload process cannot be done within 6 minutes which is the maximum execution time of Google Apps Script. At Class UploadApp, when the processing time of the script is over 5 minutes, the script is automatically finished. At that time, the data of the current process is stored in PropertiesService. And, you can see the message <code>There is the next upload chunk. So, please run the script again.</code> in the log. When you see it, please run the script again. By this, the next upload process is run. When all upload processes are finished, the metadata of the uploaded file is returned. I think that this process can be run with the time-driven trigger.</p>
+
+  
+  <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2024%2f07%2f11%2fuploading-large-files-to-gemini-with-google-apps-script-overcoming-50-mb-limit%2f" target="_blank" title="Share on Facebook"><i class="fab fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2024%2f07%2f11%2fuploading-large-files-to-gemini-with-google-apps-script-overcoming-50-mb-limit%2f" target="_blank" title="Tweet"><i class="fab fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2024%2f07%2f11%2fuploading-large-files-to-gemini-with-google-apps-script-overcoming-50-mb-limit%2f" target="_blank" title="Share on Google+"><i class="fab fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2024%2f07%2f11%2fuploading-large-files-to-gemini-with-google-apps-script-overcoming-50-mb-limit%2f" target="_blank" title="Post to Tumblr"><i class="fab fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2024%2f07%2f11%2fuploading-large-files-to-gemini-with-google-apps-script-overcoming-50-mb-limit%2f" target="_blank" title="Pin it"><i class="fab fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2024%2f07%2f11%2fuploading-large-files-to-gemini-with-google-apps-script-overcoming-50-mb-limit%2f" target="_blank" title="Submit to Reddit"><i class="fab fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
+
+
+  
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2024/07/04/updated-gas-library-geminiwithfiles/"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2024/07/04/updated-gas-library-geminiwithfiles/">Updated: GAS Library - GeminiWithFiles</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
+</div>
+
+
+  
+  
+  
+  
+
+  
+
+</div>
+
+</div>
+</div>
+<script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
+
+
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
+<script>
+  
+  if (window.location.hostname != "localhost") {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-J3Z6T50WL5');
+  }
+</script>
+
+
+
+
+
+
+<script src="https://tanaikech.github.io/js/math-code.js"></script>
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  
+
+
+</body>
+</html>
+
