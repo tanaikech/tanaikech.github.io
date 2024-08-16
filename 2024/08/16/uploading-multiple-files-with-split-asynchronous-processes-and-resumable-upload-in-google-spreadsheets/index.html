@@ -325,78 +325,78 @@
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getUi</span>().<span style="color:#a6e22e">showSidebar</span>(<span style="color:#a6e22e">html</span>);
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><p><code>index.html</code></p>
-<pre tabindex="0"><code>&lt;input type=&#34;file&#34; id=&#34;file&#34; multiple=&#34;true&#34; /&gt;
-&lt;input type=&#34;button&#34; onclick=&#34;run()&#34; value=&#34;Upload&#34; /&gt;
-&lt;div id=&#34;progress&#34;&gt;&lt;/div&gt;
-
-
-&lt;script src=&#34;https://cdn.jsdelivr.net/gh/tanaikech/ResumableUploadForGoogleDrive_js@2.0.2/resumableupload_js.min.js&#34;&gt;&lt;/script&gt;
-&lt;/script&gt;
-&lt;script&gt;
-function run() {
-  google.script.run.withSuccessHandler(accessToken =&gt; ResumableUploadForGoogleDrive(accessToken)).getAuth();
-}
-
-
-function upload({ accessToken, file, idx }) {
-  return new Promise((resolve, reject) =&gt; {
-    let fr = new FileReader();
-    fr.fileName = file.name;
-    fr.fileSize = file.size;
-    fr.fileType = file.type;
-    fr.readAsArrayBuffer(file);
-    fr.onload = e =&gt; {
-      var id = `p_${idx}`;
-      var div = document.createElement(&#34;div&#34;);
-      div.id = id;
-      document.getElementById(&#34;progress&#34;).appendChild(div);
-      document.getElementById(id).innerHTML = &#34;Initializing.&#34;;
-      const f = e.target;
-      const resource = {
-        fileName: f.fileName,
-        fileSize: f.fileSize,
-        fileType: f.fileType,
-        fileBuffer: f.result,
-        accessToken: accessToken,
-        folderId: &#34;root&#34;,
-      };
-      const ru = new ResumableUploadToGoogleDrive();
-      ru.Do(resource, function (res, err) {
-        if (err) {
-          reject(err);
-          return;
-        }
-        console.log(res);
-        let msg = &#34;&#34;;
-        if (res.status == &#34;Uploading&#34;) {
-          msg = Math.round((res.progressNumber.current / res.progressNumber.end) * 100) + `% (${f.fileName})`;
-        } else {
-          msg = `${res.status} (${f.fileName})`;
-        }
-        if (res.status == &#34;Done&#34;) {
-          resolve(res.result);
-        }
-        document.getElementById(id).innerText = msg;
-      });
-    };
-  });
-}
-
-
-async function ResumableUploadForGoogleDrive(accessToken) {
-
-  const n = 2; // You can adjust the chunk size. Default is 2.
-
-  const f = document.getElementById(&#34;file&#34;);
-  const files = [...f.files];
-  const splitFiles = [...Array(Math.ceil(files.length / n))].map((_) =&gt; files.splice(0, n));
-  for (let i = 0; i &lt; splitFiles.length; i++) {
-    const res = await Promise.all(splitFiles[i].map(async (file, j) =&gt; await upload({ accessToken, file, idx: `${i}_${j}` })));
-    console.log(res);
-  }
-}
-&lt;/script&gt;
-</code></pre><ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-html" data-lang="html"><span style="display:flex;"><span>&lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;file&#34;</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;file&#34;</span> <span style="color:#a6e22e">multiple</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;true&#34;</span> /&gt;
+</span></span><span style="display:flex;"><span>&lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;button&#34;</span> <span style="color:#a6e22e">onclick</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;run()&#34;</span> <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Upload&#34;</span> /&gt;
+</span></span><span style="display:flex;"><span>&lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;progress&#34;</span>&gt;&lt;/<span style="color:#f92672">div</span>&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>&lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;https://cdn.jsdelivr.net/gh/tanaikech/ResumableUploadForGoogleDrive_js@2.0.2/resumableupload_js.min.js&#34;</span>&gt;&lt;/<span style="color:#f92672">script</span>&gt;
+</span></span><span style="display:flex;"><span>&lt;/<span style="color:#f92672">script</span>&gt;
+</span></span><span style="display:flex;"><span>&lt;<span style="color:#f92672">script</span>&gt;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">run</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">script</span>.<span style="color:#a6e22e">run</span>.<span style="color:#a6e22e">withSuccessHandler</span>(<span style="color:#a6e22e">accessToken</span> =&gt; <span style="color:#a6e22e">ResumableUploadForGoogleDrive</span>(<span style="color:#a6e22e">accessToken</span>)).<span style="color:#a6e22e">getAuth</span>();
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">upload</span>({ <span style="color:#a6e22e">accessToken</span>, <span style="color:#a6e22e">file</span>, <span style="color:#a6e22e">idx</span> }) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> Promise((<span style="color:#a6e22e">resolve</span>, <span style="color:#a6e22e">reject</span>) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">fr</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">FileReader</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fr</span>.<span style="color:#a6e22e">fileName</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">name</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fr</span>.<span style="color:#a6e22e">fileSize</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">size</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fr</span>.<span style="color:#a6e22e">fileType</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">type</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fr</span>.<span style="color:#a6e22e">readAsArrayBuffer</span>(<span style="color:#a6e22e">file</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fr</span>.<span style="color:#a6e22e">onload</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span> =&gt; {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">id</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`p_</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">idx</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">div</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">createElement</span>(<span style="color:#e6db74">&#34;div&#34;</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">div</span>.<span style="color:#a6e22e">id</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">id</span>;
+</span></span><span style="display:flex;"><span>      document.<span style="color:#a6e22e">getElementById</span>(<span style="color:#e6db74">&#34;progress&#34;</span>).<span style="color:#a6e22e">appendChild</span>(<span style="color:#a6e22e">div</span>);
+</span></span><span style="display:flex;"><span>      document.<span style="color:#a6e22e">getElementById</span>(<span style="color:#a6e22e">id</span>).<span style="color:#a6e22e">innerHTML</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Initializing.&#34;</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">f</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">target</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">resource</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">fileName</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">fileName</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">fileSize</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">fileSize</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">fileType</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">fileType</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">fileBuffer</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">result</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">accessToken</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">accessToken</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">folderId</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;root&#34;</span>,
+</span></span><span style="display:flex;"><span>      };
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ru</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">ResumableUploadToGoogleDrive</span>();
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">ru</span>.<span style="color:#a6e22e">Do</span>(<span style="color:#a6e22e">resource</span>, <span style="color:#66d9ef">function</span> (<span style="color:#a6e22e">res</span>, <span style="color:#a6e22e">err</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">err</span>) {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">reject</span>(<span style="color:#a6e22e">err</span>);
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">msg</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">status</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;Uploading&#34;</span>) {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">msg</span> <span style="color:#f92672">=</span> Math.<span style="color:#a6e22e">round</span>((<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">progressNumber</span>.<span style="color:#a6e22e">current</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">progressNumber</span>.<span style="color:#a6e22e">end</span>) <span style="color:#f92672">*</span> <span style="color:#ae81ff">100</span>) <span style="color:#f92672">+</span> <span style="color:#e6db74">`% (</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">fileName</span><span style="color:#e6db74">}</span><span style="color:#e6db74">)`</span>;
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">msg</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">status</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> (</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">fileName</span><span style="color:#e6db74">}</span><span style="color:#e6db74">)`</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">status</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;Done&#34;</span>) {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">resolve</span>(<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">result</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        document.<span style="color:#a6e22e">getElementById</span>(<span style="color:#a6e22e">id</span>).<span style="color:#a6e22e">innerText</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">msg</span>;
+</span></span><span style="display:flex;"><span>      });
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">async</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">ResumableUploadForGoogleDrive</span>(<span style="color:#a6e22e">accessToken</span>) {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">n</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>; <span style="color:#75715e">// You can adjust the chunk size. Default is 2.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">f</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">getElementById</span>(<span style="color:#e6db74">&#34;file&#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">files</span> <span style="color:#f92672">=</span> [...<span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">files</span>];
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">splitFiles</span> <span style="color:#f92672">=</span> [...Array(Math.<span style="color:#a6e22e">ceil</span>(<span style="color:#a6e22e">files</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">n</span>))].<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">_</span>) =&gt; <span style="color:#a6e22e">files</span>.<span style="color:#a6e22e">splice</span>(<span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">n</span>));
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">splitFiles</span>.<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> Promise.<span style="color:#a6e22e">all</span>(<span style="color:#a6e22e">splitFiles</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">async</span> (<span style="color:#a6e22e">file</span>, <span style="color:#a6e22e">j</span>) =&gt; <span style="color:#66d9ef">await</span> <span style="color:#a6e22e">upload</span>({ <span style="color:#a6e22e">accessToken</span>, <span style="color:#a6e22e">file</span>, <span style="color:#a6e22e">idx</span><span style="color:#f92672">:</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">i</span><span style="color:#e6db74">}</span><span style="color:#e6db74">_</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">j</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span> })));
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>&lt;/<span style="color:#f92672">script</span>&gt;
+</span></span></code></pre></div><ul>
 <li>
 <p>In this sample, the files are uploaded to the root folder. If you want to upload the files in the specific folder, please modify <code>folderId: &quot;root&quot;,</code> to <code>folderId: &quot;###your folder ID###&quot;,</code>.</p>
 </li>
