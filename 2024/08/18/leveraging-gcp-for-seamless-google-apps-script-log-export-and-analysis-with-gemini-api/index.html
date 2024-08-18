@@ -299,7 +299,7 @@
 <p>This report delves into the process of exporting logs from functions within Google Apps Script, leveraging the capabilities of GCP. Such information will be useful for evaluating the script by Gemini API and for refactoring the script.</p>
 <h1 id="process">Process</h1>
 <p>In order to retrieve the logs from an execution of a function, the following process is run. In this process, it supposes that the logs of this function <code>sample()</code> of Google Apps Script are retrieved.</p>
-<p><img src="fig1.png" alt=""></p>
+<p><img src="https://tanaikech.github.io/image-storage/20240818a/fig1.png" alt=""></p>
 <ol>
 <li>Run a function (<code>sample()</code>) of Google Apps Script.</li>
 <li>In a separate call, after the function <code>sample()</code> has finished, use the &ldquo;Method: processes.list&rdquo; of the Apps Script API to retrieve a list of all currently running processes. This list can be used to identify the start and end times of the specific execution of <code>sample()</code> just after the execution. <a href="https://developers.google.com/apps-script/api/reference/rest/v1/processes/list">Ref</a></li>
@@ -318,108 +318,108 @@
 <h3 id="main-script">Main script</h3>
 <p>Please copy and paste the following script to the script editor and save the script.</p>
 <p>This is the main script. This function <code>getLogs_</code> retrieves the logs from the executed function using Apps Script API and Cloud Logging API. In this sample, by inputting the function name, the function <code>getLogs_</code> retrieves the logs of the function of the inputted function name which was run last executed.</p>
-<pre tabindex="0"><code>/**
- * ### Description
- * Retrieve the processing logs from a function using Apps Script API and Cloud Logging API.
- *
- * @param {Object} object Object for running this method.
- * @param {String} object.functionName Function name of the function you want to retrieve processing logs.
- * @param {Array} object.projectIds Project ID of the Google Cloud Platform Project. In the current stage, only one ID can be used.
- *
- * @return {Object}
- */
-function getLogs_(object) {
-  const { functionName, projectIds } = object;
-  const projects = projectIds.map(p =&gt; `projects/${p}`);
-  const logNames = projects.map(p =&gt; `logName=&#34;${p}/logs/script.googleapis.com%2Fconsole_logs&#34;`).join(&#34; OR &#34;);
-  const headers = { authorization: &#34;Bearer &#34; + ScriptApp.getOAuthToken() };
-
-  // Retrieve start and end times of the function.
-  const scriptId = ScriptApp.getScriptId();
-  const url1 = `https://script.googleapis.com/v1/processes?userProcessFilter.scriptId=${scriptId}&amp;userProcessFilter.functionName=${functionName}&amp;pageSize=1`;
-  const res1 = UrlFetchApp.fetch(url1, { headers });
-  const obj1 = JSON.parse(res1.getContentText());
-  if (obj1.processes.length == 0) return;
-
-  // Retrieve logs.
-  const { startTime, duration } = obj1.processes[0];
-  const endTime = new Date(new Date(startTime).getTime() + (Number(duration.replace(&#34;s&#34;, &#34;&#34;)) * 1000)).toISOString();
-  const filterAr = [
-    `resource.type = &#34;app_script_function&#34;`,
-    `timestamp &gt;= &#34;${startTime}&#34; AND timestamp &lt;= &#34;${endTime}&#34;`,
-    `(${logNames})`,
-  ];
-  const filter = filterAr.join(&#34; AND &#34;);
-  const values = [];
-  let pageToken = &#34;&#34;;
-  const payload = { resourceNames: projects, filter, pageSize: 1000 };
-  do {
-    payload.pageToken = pageToken;
-    const url2 = &#34;https://logging.googleapis.com/v2/entries:list&#34;;
-    const options = { method: &#34;post&#34;, contentType: &#34;application/json&#34;, headers, payload: JSON.stringify(payload) };
-    const res2 = UrlFetchApp.fetch(url2, options);
-    const obj2 = JSON.parse(res2.getContentText());
-    values.push(...obj2.entries.map(({ jsonPayload: { message }, timestamp, severity }) =&gt; ({ message, timestamp, severity })));
-    pageToken = obj2.nextPageToken;
-  } while (pageToken);
-  return values;
-}
-
-/**
- * ### Description
- * Parse logs from getLogs_. This is used for parsing the values from getLogs_.
- *
- * @param {Array} logs Logs from getLogs_.
- * @return {Object}
- */
-function parseLogs_(logs) {
-  return logs.reduce((o, e) =&gt; {
-    const { message } = e;
-    const [l, t] = message.split(&#34;:&#34;);
-    if (t) {
-      const time = Number(t.replace(&#34;ms&#34;, &#34;&#34;));
-      if (l.includes(&#34;_&#34;)) {
-        const [p, i] = l.split(&#34;_&#34;);
-        if (!o.logs[p]) {
-          o.logs[p] = [];
-        }
-        o.logs[p][i] = time;
-      } else {
-        o.logs[l] = o.logs[l] ? [...o.logs[l], time] : [time];
-      }
-    } else {
-      o.messages = [...o.messages, e];
-    }
-    return o;
-  }, { messages: [], logs: {} });
-}
-</code></pre><h3 id="sampe-scripts">Sampe scripts</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * ### Description
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Retrieve the processing logs from a function using Apps Script API and Cloud Logging API.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param {Object} object Object for running this method.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param {String} object.functionName Function name of the function you want to retrieve processing logs.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param {Array} object.projectIds Project ID of the Google Cloud Platform Project. In the current stage, only one ID can be used.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @return {Object}
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getLogs_</span>(<span style="color:#a6e22e">object</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">functionName</span>, <span style="color:#a6e22e">projectIds</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">object</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">projects</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">projectIds</span>.<span style="color:#a6e22e">map</span>(<span style="color:#a6e22e">p</span> =&gt; <span style="color:#e6db74">`projects/</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">p</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">logNames</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">projects</span>.<span style="color:#a6e22e">map</span>(<span style="color:#a6e22e">p</span> =&gt; <span style="color:#e6db74">`logName=&#34;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">p</span><span style="color:#e6db74">}</span><span style="color:#e6db74">/logs/script.googleapis.com%2Fconsole_logs&#34;`</span>).<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34; OR &#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">headers</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>() };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Retrieve start and end times of the function.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">scriptId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getScriptId</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">url1</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`https://script.googleapis.com/v1/processes?userProcessFilter.scriptId=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">scriptId</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&amp;userProcessFilter.functionName=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">functionName</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&amp;pageSize=1`</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res1</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url1</span>, { <span style="color:#a6e22e">headers</span> });
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj1</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">res1</span>.<span style="color:#a6e22e">getContentText</span>());
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">obj1</span>.<span style="color:#a6e22e">processes</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Retrieve logs.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">startTime</span>, <span style="color:#a6e22e">duration</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj1</span>.<span style="color:#a6e22e">processes</span>[<span style="color:#ae81ff">0</span>];
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">endTime</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date(<span style="color:#66d9ef">new</span> Date(<span style="color:#a6e22e">startTime</span>).<span style="color:#a6e22e">getTime</span>() <span style="color:#f92672">+</span> (Number(<span style="color:#a6e22e">duration</span>.<span style="color:#a6e22e">replace</span>(<span style="color:#e6db74">&#34;s&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>)) <span style="color:#f92672">*</span> <span style="color:#ae81ff">1000</span>)).<span style="color:#a6e22e">toISOString</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">filterAr</span> <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`resource.type = &#34;app_script_function&#34;`</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`timestamp &gt;= &#34;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">startTime</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34; AND timestamp &lt;= &#34;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">endTime</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;`</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`(</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">logNames</span><span style="color:#e6db74">}</span><span style="color:#e6db74">)`</span>,
+</span></span><span style="display:flex;"><span>  ];
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">filter</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">filterAr</span>.<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34; AND &#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> [];
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">pageToken</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">payload</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">resourceNames</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">projects</span>, <span style="color:#a6e22e">filter</span>, <span style="color:#a6e22e">pageSize</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">1000</span> };
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">do</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">payload</span>.<span style="color:#a6e22e">pageToken</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">pageToken</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">url2</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://logging.googleapis.com/v2/entries:list&#34;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">options</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;post&#34;</span>, <span style="color:#a6e22e">contentType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/json&#34;</span>, <span style="color:#a6e22e">headers</span>, <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">payload</span>) };
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res2</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url2</span>, <span style="color:#a6e22e">options</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj2</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">res2</span>.<span style="color:#a6e22e">getContentText</span>());
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">push</span>(...<span style="color:#a6e22e">obj2</span>.<span style="color:#a6e22e">entries</span>.<span style="color:#a6e22e">map</span>(({ <span style="color:#a6e22e">jsonPayload</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">message</span> }, <span style="color:#a6e22e">timestamp</span>, <span style="color:#a6e22e">severity</span> }) =&gt; ({ <span style="color:#a6e22e">message</span>, <span style="color:#a6e22e">timestamp</span>, <span style="color:#a6e22e">severity</span> })));
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">pageToken</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj2</span>.<span style="color:#a6e22e">nextPageToken</span>;
+</span></span><span style="display:flex;"><span>  } <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">pageToken</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">values</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * ### Description
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Parse logs from getLogs_. This is used for parsing the values from getLogs_.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param {Array} logs Logs from getLogs_.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @return {Object}
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">parseLogs_</span>(<span style="color:#a6e22e">logs</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">logs</span>.<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">o</span>, <span style="color:#a6e22e">e</span>) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">message</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> [<span style="color:#a6e22e">l</span>, <span style="color:#a6e22e">t</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">message</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;:&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">t</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">time</span> <span style="color:#f92672">=</span> Number(<span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">replace</span>(<span style="color:#e6db74">&#34;ms&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>));
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">includes</span>(<span style="color:#e6db74">&#34;_&#34;</span>)) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> [<span style="color:#a6e22e">p</span>, <span style="color:#a6e22e">i</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">l</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;_&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">logs</span>[<span style="color:#a6e22e">p</span>]) {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">logs</span>[<span style="color:#a6e22e">p</span>] <span style="color:#f92672">=</span> [];
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">logs</span>[<span style="color:#a6e22e">p</span>][<span style="color:#a6e22e">i</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">time</span>;
+</span></span><span style="display:flex;"><span>      } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">logs</span>[<span style="color:#a6e22e">l</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">logs</span>[<span style="color:#a6e22e">l</span>] <span style="color:#f92672">?</span> [...<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">logs</span>[<span style="color:#a6e22e">l</span>], <span style="color:#a6e22e">time</span>] <span style="color:#f92672">:</span> [<span style="color:#a6e22e">time</span>];
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">messages</span> <span style="color:#f92672">=</span> [...<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">messages</span>, <span style="color:#a6e22e">e</span>];
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
+</span></span><span style="display:flex;"><span>  }, { <span style="color:#a6e22e">messages</span><span style="color:#f92672">:</span> [], <span style="color:#a6e22e">logs</span><span style="color:#f92672">:</span> {} });
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="sampe-scripts">Sampe scripts</h3>
 <h4 id="sample-script-1">Sample script 1</h4>
 <p>Please copy and paste the following script to the script editor and directly run <code>sampleFunction1()</code> with the script editor. If a dialog for authorizing the scopes, please authorize them.</p>
-<pre tabindex="0"><code>function sampleFunction1() {
-  const labelPrefix = &#34;label&#34;;
-
-  const label1 = `${labelPrefix}1`;
-  const label2 = `${labelPrefix}2`;
-  const label3 = `${labelPrefix}3`;
-  const label4 = `${labelPrefix}4`;
-
-  console.time(label1);
-  console.time(label2);
-  Utilities.sleep(1000);
-  console.timeEnd(label2);
-
-  console.time(label3);
-  for (let i = 0; i &lt; 5; i++) {
-    const label4a = `${label4}_${i}`;
-    console.time(label4a);
-    Utilities.sleep(100 * (i + 1));
-    console.timeEnd(label4a);
-  }
-  console.timeEnd(label3);
-  console.timeEnd(label1);
-}
-</code></pre><p>In order to measure the processing time of each part of the script, <code>console.time</code> and <code>console.timeEnd</code> are added. In this sample, as the format of the label, if the single processing time of a script, <code>label1</code>, <code>label2</code>,,, are used. If the multiple processing time of a script in a loop, <code>label1_1</code>, <code>label1_2</code>,,, are used.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">sampleFunction1</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">labelPrefix</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;label&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">label1</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">labelPrefix</span><span style="color:#e6db74">}</span><span style="color:#e6db74">1`</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">label2</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">labelPrefix</span><span style="color:#e6db74">}</span><span style="color:#e6db74">2`</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">label3</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">labelPrefix</span><span style="color:#e6db74">}</span><span style="color:#e6db74">3`</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">label4</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">labelPrefix</span><span style="color:#e6db74">}</span><span style="color:#e6db74">4`</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">time</span>(<span style="color:#a6e22e">label1</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">time</span>(<span style="color:#a6e22e">label2</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">sleep</span>(<span style="color:#ae81ff">1000</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">timeEnd</span>(<span style="color:#a6e22e">label2</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">time</span>(<span style="color:#a6e22e">label3</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">5</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">label4a</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">label4</span><span style="color:#e6db74">}</span><span style="color:#e6db74">_</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">i</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">time</span>(<span style="color:#a6e22e">label4a</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">sleep</span>(<span style="color:#ae81ff">100</span> <span style="color:#f92672">*</span> (<span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>));
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">timeEnd</span>(<span style="color:#a6e22e">label4a</span>);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">timeEnd</span>(<span style="color:#a6e22e">label3</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">timeEnd</span>(<span style="color:#a6e22e">label1</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>In order to measure the processing time of each part of the script, <code>console.time</code> and <code>console.timeEnd</code> are added. In this sample, as the format of the label, if the single processing time of a script, <code>label1</code>, <code>label2</code>,,, are used. If the multiple processing time of a script in a loop, <code>label1_1</code>, <code>label1_2</code>,,, are used.</p>
 <p>When this script is run, you can see the following logs in &ldquo;Execution log&rdquo; of the script editor.</p>
 <pre tabindex="0"><code>Notice	Execution started
 Debug	label2: 1001ms
@@ -432,14 +432,14 @@ Debug	label3: 1511ms
 Debug	label1: 2515ms
 Notice	Execution completed
 </code></pre><p>And, please copy and paste the following script to the script editor and directly run it with the script editor.</p>
-<pre tabindex="0"><code>function main() {
-  const functionName = &#34;sampleFunction1&#34;;
-  const projectIds = [&#34;###&#34;]; // Please set your project ID created with GCP.
-
-  const logs = getLogs_({ functionName, projectIds });
-  console.log(logs);
-}
-</code></pre><p>When this script is run, the following result is obtained.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">functionName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;sampleFunction1&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">projectIds</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;###&#34;</span>]; <span style="color:#75715e">// Please set your project ID created with GCP.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">logs</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">getLogs_</span>({ <span style="color:#a6e22e">functionName</span>, <span style="color:#a6e22e">projectIds</span> });
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">logs</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>When this script is run, the following result is obtained.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>[
 </span></span><span style="display:flex;"><span>  { <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;label2: 1001ms&#34;</span>, <span style="color:#f92672">&#34;timestamp&#34;</span>: <span style="color:#e6db74">&#34;###&#34;</span>, <span style="color:#f92672">&#34;severity&#34;</span>: <span style="color:#e6db74">&#34;DEBUG&#34;</span> },
 </span></span><span style="display:flex;"><span>  { <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;label4_0: 101ms&#34;</span>, <span style="color:#f92672">&#34;timestamp&#34;</span>: <span style="color:#e6db74">&#34;###&#34;</span>, <span style="color:#f92672">&#34;severity&#34;</span>: <span style="color:#e6db74">&#34;DEBUG&#34;</span> },
@@ -451,15 +451,15 @@ Notice	Execution completed
 </span></span><span style="display:flex;"><span>  { <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;label1: 2515ms&#34;</span>, <span style="color:#f92672">&#34;timestamp&#34;</span>: <span style="color:#e6db74">&#34;###&#34;</span>, <span style="color:#f92672">&#34;severity&#34;</span>: <span style="color:#e6db74">&#34;DEBUG&#34;</span> }
 </span></span><span style="display:flex;"><span>]
 </span></span></code></pre></div><p>When the following script is used,</p>
-<pre tabindex="0"><code>function main() {
-  const functionName = &#34;sampleFunction1&#34;;
-  const projectIds = [&#34;###&#34;]; // Please set your project ID created with GCP.
-
-  const logs = getLogs_({ functionName, projectIds });
-  const obj = parseLogs_(logs);
-  console.log(obj);
-}
-</code></pre><p>the following result is obtained.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">functionName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;sampleFunction1&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">projectIds</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;###&#34;</span>]; <span style="color:#75715e">// Please set your project ID created with GCP.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">logs</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">getLogs_</span>({ <span style="color:#a6e22e">functionName</span>, <span style="color:#a6e22e">projectIds</span> });
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">parseLogs_</span>(<span style="color:#a6e22e">logs</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">obj</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>the following result is obtained.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;messages&#34;</span>: [],
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;logs&#34;</span>: {
@@ -472,43 +472,43 @@ Notice	Execution completed
 </span></span></code></pre></div><p>You can analyze the process cost of the script from this result.</p>
 <h4 id="sample-script-2">Sample script 2</h4>
 <p>Please copy and paste the following script to the script editor and directly run <code>sampleFunction2()</code> with the script editor. If a dialog for authorizing the scopes, please authorize them.</p>
-<pre tabindex="0"><code>function sampleFunction2() {
-  const labelPrefix = &#34;label&#34;;
-
-  const label1 = `${labelPrefix}1`;
-  const label2 = `${labelPrefix}2`;
-  const label3 = `${labelPrefix}3`;
-  const label4 = `${labelPrefix}4`;
-
-  console.time(label1);
-  console.time(label2);
-  Utilities.sleep(1000);
-  console.timeEnd(label2);
-
-  console.time(label3);
-  for (let i = 0; i &lt; 5; i++) {
-    const label4a = `${label4}_${i}`;
-    console.time(label4a);
-    Utilities.sleep(100000 * (i + 1));
-    console.timeEnd(label4a);
-  }
-  console.timeEnd(label3);
-  console.timeEnd(label1);
-}
-</code></pre><pre tabindex="0"><code>Notice	Execution started
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">sampleFunction2</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">labelPrefix</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;label&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">label1</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">labelPrefix</span><span style="color:#e6db74">}</span><span style="color:#e6db74">1`</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">label2</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">labelPrefix</span><span style="color:#e6db74">}</span><span style="color:#e6db74">2`</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">label3</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">labelPrefix</span><span style="color:#e6db74">}</span><span style="color:#e6db74">3`</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">label4</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">labelPrefix</span><span style="color:#e6db74">}</span><span style="color:#e6db74">4`</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">time</span>(<span style="color:#a6e22e">label1</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">time</span>(<span style="color:#a6e22e">label2</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">sleep</span>(<span style="color:#ae81ff">1000</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">timeEnd</span>(<span style="color:#a6e22e">label2</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">time</span>(<span style="color:#a6e22e">label3</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">5</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">label4a</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">label4</span><span style="color:#e6db74">}</span><span style="color:#e6db74">_</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">i</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">time</span>(<span style="color:#a6e22e">label4a</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">sleep</span>(<span style="color:#ae81ff">100000</span> <span style="color:#f92672">*</span> (<span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>));
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">timeEnd</span>(<span style="color:#a6e22e">label4a</span>);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">timeEnd</span>(<span style="color:#a6e22e">label3</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">timeEnd</span>(<span style="color:#a6e22e">label1</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><pre tabindex="0"><code>Notice	Execution started
 Debug	label2: 1001ms
 Debug	label4_0: 100002ms
 Debug	label4_1: 200001ms
 Error	Exceeded maximum execution time
 </code></pre><p>And, please copy and paste the following script to the script editor and directly run it with the script editor.</p>
-<pre tabindex="0"><code>function main() {
-  const functionName = &#34;sampleFunction2&#34;;
-  const projectIds = [&#34;###&#34;]; // Please set your project ID created with GCP.
-
-  const logs = getLogs_({ functionName, projectIds });
-  console.log(logs);
-}
-</code></pre><p>When this script is run, the following result is obtained.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">functionName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;sampleFunction2&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">projectIds</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;###&#34;</span>]; <span style="color:#75715e">// Please set your project ID created with GCP.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">logs</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">getLogs_</span>({ <span style="color:#a6e22e">functionName</span>, <span style="color:#a6e22e">projectIds</span> });
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">logs</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>When this script is run, the following result is obtained.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>[
 </span></span><span style="display:flex;"><span>  { <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;label2: 1001ms&#34;</span>, <span style="color:#f92672">&#34;timestamp&#34;</span>: <span style="color:#e6db74">&#34;###&#34;</span>, <span style="color:#f92672">&#34;severity&#34;</span>: <span style="color:#e6db74">&#34;DEBUG&#34;</span> },
 </span></span><span style="display:flex;"><span>  { <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;label4_0: 100002ms&#34;</span>, <span style="color:#f92672">&#34;timestamp&#34;</span>: <span style="color:#e6db74">&#34;###&#34;</span>, <span style="color:#f92672">&#34;severity&#34;</span>: <span style="color:#e6db74">&#34;DEBUG&#34;</span> },
@@ -521,15 +521,15 @@ Error	Exceeded maximum execution time
 </span></span><span style="display:flex;"><span>]
 </span></span></code></pre></div><p>It was found that the error message due to over-execution time could also be obtained.</p>
 <p>When the following script is used,</p>
-<pre tabindex="0"><code>function main() {
-  const functionName = &#34;sampleFunction2&#34;;
-  const projectIds = [&#34;###&#34;]; // Please set your project ID created with GCP.
-
-  const logs = getLogs_({ functionName, projectIds });
-  const obj = parseLogs_(logs);
-  console.log(obj);
-}
-</code></pre><p>the following result is obtained.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">functionName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;sampleFunction2&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">projectIds</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;###&#34;</span>]; <span style="color:#75715e">// Please set your project ID created with GCP.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">logs</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">getLogs_</span>({ <span style="color:#a6e22e">functionName</span>, <span style="color:#a6e22e">projectIds</span> });
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">parseLogs_</span>(<span style="color:#a6e22e">logs</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">obj</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>the following result is obtained.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;messages&#34;</span>: [
 </span></span><span style="display:flex;"><span>    {
@@ -548,66 +548,66 @@ Error	Exceeded maximum execution time
 <p>This script sample generates a more detailed evaluation of the script using logs retrieved by the getLogs_ function and the Gemini API. By providing the script&rsquo;s logs, we can expect a more comprehensive evaluation.</p>
 <p>The script utilizes the following functions: <code>getLogs_</code>, <code>sampleFunction1</code>, and <code>sampleFunction2</code> shown in the above sections. Additionally, it leverages the GeminiWithFiles library from Google Apps Script to generate the evaluation.</p>
 <p>For testing, please install the GeminiWithFiles library from the following repository: <a href="https://github.com/tanaikech/GeminiWithFiles">Ref</a></p>
-<pre tabindex="0"><code>/**
- * ### Description
- * Generate evaluation of the script using Gemini.
- *
- * @param {Object} object Object for running this method.
- * @param {String} object.apiKey API key for using Gemini API.
- * @param {String} object.functionName Function name of script.
- * @param {Object} object.logs Logs when the script is run.
- *
- * @return {String} Generated evaluation of the script using Gemini.
- */
-function generateEvaluation_(object) {
-  const { apiKey, functionName, logs } = object;
-
-  const scriptFilename = `${functionName}.gs`;
-  const logFilename = `log for ${functionName}.txt`;
-  const scriptBlob = Utilities.newBlob(this[functionName].toString(), MimeType.PLAIN_TEXT, scriptFilename);
-  const logBlob = Utilities.newBlob(JSON.stringify(logs), MimeType.PLAIN_TEXT, logFilename);
-
-  const jsonSchema = {
-    description: &#34;Processing log. This log shows the processing time of each part in the script.&#34;,
-    type: &#34;array&#34;,
-    items: {
-      type: &#34;object&#34;,
-      properties: {
-        message: { type: &#34;string&#34;, description: &#34;Message from except for console.time and console.timeEnd.&#34; },
-        timestamp: { type: &#34;string&#34;, description: &#34;Time stamp of the message.&#34; },
-        severity: { type: &#34;string&#34;, description: &#34;Type of message.&#34; },
-      }
-    }
-  };
-  const q = [
-    `You are required to evaluate the Google Apps Script.`,
-    `In order to evaluate the script, 2 text files are uploaded as follows.`,
-    `1. Google Apps Script. Filename is ${scriptFilename}.`,
-    `2. Log data for the Google Apps Script. Filename is ${logFilename}.`,
-    `The script of ${scriptFilename} has &#34;console.time&#39; and &#39;console.timeEnd&#39;.`,
-    `Those are used for measuring the processing time of each part.`,
-    `The log of ${logFilename} is an object. The JSON schema of this object is as follows.`,
-    `&lt;JSONSchema&gt;${JSON.stringify(jsonSchema)}&lt;/JSONSchema&gt;`,
-    `Please evaluate this Google Apps Script using the log data.`,
-    `Also, please clearly describe the problems points and the improvement points.`,
-    `Export the result by summarizing the generated description within 100 words without a markdown.`,
-  ].join(&#34;\n&#34;);
-  const g = GeminiWithFiles.geminiWithFiles({ apiKey });
-  const fileList = g.setBlobs([scriptBlob, logBlob]).uploadFiles();
-  return g.withUploadedFilesByGenerateContent(fileList).generateContent({ q });
-}
-</code></pre><p>When you want to generate the evaluation of the function <code>sampleFunction1</code>, you can use the following script.</p>
-<pre tabindex="0"><code>function sample3() {
-  const functionName = &#34;sampleFunction1&#34;;
-  const projectIds = [&#34;forappsscript&#34;];
-  const apiKey = &#34;###&#34;; // Please set your API key for using Gemini API.
-
-  const logs = getLogs_({ functionName, projectIds });
-  console.log(logs);
-  const res = generateEvaluation_({ apiKey, functionName, logs });
-  console.log(res);
-}
-</code></pre><p>When this script is run, the following result is obtained.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * ### Description
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Generate evaluation of the script using Gemini.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param {Object} object Object for running this method.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param {String} object.apiKey API key for using Gemini API.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param {String} object.functionName Function name of script.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param {Object} object.logs Logs when the script is run.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @return {String} Generated evaluation of the script using Gemini.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">generateEvaluation_</span>(<span style="color:#a6e22e">object</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">apiKey</span>, <span style="color:#a6e22e">functionName</span>, <span style="color:#a6e22e">logs</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">object</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">scriptFilename</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">functionName</span><span style="color:#e6db74">}</span><span style="color:#e6db74">.gs`</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">logFilename</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`log for </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">functionName</span><span style="color:#e6db74">}</span><span style="color:#e6db74">.txt`</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">scriptBlob</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">newBlob</span>(<span style="color:#66d9ef">this</span>[<span style="color:#a6e22e">functionName</span>].<span style="color:#a6e22e">toString</span>(), <span style="color:#a6e22e">MimeType</span>.<span style="color:#a6e22e">PLAIN_TEXT</span>, <span style="color:#a6e22e">scriptFilename</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">logBlob</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">newBlob</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">logs</span>), <span style="color:#a6e22e">MimeType</span>.<span style="color:#a6e22e">PLAIN_TEXT</span>, <span style="color:#a6e22e">logFilename</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">jsonSchema</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">description</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Processing log. This log shows the processing time of each part in the script.&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;array&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">items</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;object&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">properties</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">message</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;string&#34;</span>, <span style="color:#a6e22e">description</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Message from except for console.time and console.timeEnd.&#34;</span> },
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">timestamp</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;string&#34;</span>, <span style="color:#a6e22e">description</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Time stamp of the message.&#34;</span> },
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">severity</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;string&#34;</span>, <span style="color:#a6e22e">description</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Type of message.&#34;</span> },
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">q</span> <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`You are required to evaluate the Google Apps Script.`</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`In order to evaluate the script, 2 text files are uploaded as follows.`</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`1. Google Apps Script. Filename is </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">scriptFilename</span><span style="color:#e6db74">}</span><span style="color:#e6db74">.`</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`2. Log data for the Google Apps Script. Filename is </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">logFilename</span><span style="color:#e6db74">}</span><span style="color:#e6db74">.`</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`The script of </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">scriptFilename</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> has &#34;console.time&#39; and &#39;console.timeEnd&#39;.`</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`Those are used for measuring the processing time of each part.`</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`The log of </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">logFilename</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> is an object. The JSON schema of this object is as follows.`</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`&lt;JSONSchema&gt;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">jsonSchema</span>)<span style="color:#e6db74">}</span><span style="color:#e6db74">&lt;/JSONSchema&gt;`</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`Please evaluate this Google Apps Script using the log data.`</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`Also, please clearly describe the problems points and the improvement points.`</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`Export the result by summarizing the generated description within 100 words without a markdown.`</span>,
+</span></span><span style="display:flex;"><span>  ].<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;\n&#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">g</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">GeminiWithFiles</span>.<span style="color:#a6e22e">geminiWithFiles</span>({ <span style="color:#a6e22e">apiKey</span> });
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">fileList</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">g</span>.<span style="color:#a6e22e">setBlobs</span>([<span style="color:#a6e22e">scriptBlob</span>, <span style="color:#a6e22e">logBlob</span>]).<span style="color:#a6e22e">uploadFiles</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">g</span>.<span style="color:#a6e22e">withUploadedFilesByGenerateContent</span>(<span style="color:#a6e22e">fileList</span>).<span style="color:#a6e22e">generateContent</span>({ <span style="color:#a6e22e">q</span> });
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>When you want to generate the evaluation of the function <code>sampleFunction1</code>, you can use the following script.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">sample3</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">functionName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;sampleFunction1&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">projectIds</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;forappsscript&#34;</span>];
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">apiKey</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set your API key for using Gemini API.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">logs</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">getLogs_</span>({ <span style="color:#a6e22e">functionName</span>, <span style="color:#a6e22e">projectIds</span> });
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">logs</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">generateEvaluation_</span>({ <span style="color:#a6e22e">apiKey</span>, <span style="color:#a6e22e">functionName</span>, <span style="color:#a6e22e">logs</span> });
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>When this script is run, the following result is obtained.</p>
 <pre tabindex="0"><code>The Google Apps Script measures the processing time of different parts using console.time and console.timeEnd. The log data shows the execution time of different labels, indicating that label2 took 1001ms, label3 took 1511ms, and label1 took 2515ms.  The script measures the time of each iteration in the loop using label4_i, but these measurements are not useful for identifying performance issues since each iteration has different sleep durations. The script unnecessarily measures the time of label4a within the loop, which is not a meaningful measurement for overall performance. The script could be improved by focusing on measuring the time of relevant sections and removing redundant measurements.
 </code></pre><p>When the evaluation is generated from <code>sampleFunction2</code>, please modify <code>const functionName = &quot;sampleFunction1&quot;;</code> to <code>const functionName = &quot;sampleFunction2&quot;;</code>. By this, the following result is obtained.</p>
 <pre tabindex="0"><code>The Google Apps Script has a performance issue. The script takes a significant amount of time to execute due to the long sleep durations and the nested loop. Specifically, the sleep duration in the loop increases with each iteration, leading to an extended execution time. The script also exceeds the maximum execution time.  The script can be improved by reducing the sleep duration, restructuring the loop, or using asynchronous functions.
