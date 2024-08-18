@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  
+  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+
+  <meta name="description" content="">
+  <meta name="generator" content="Hugo 0.98.0" />
+
+  <title>Leveraging GCP for Seamless Google Apps Script Log Export and Analysis with Gemini API &middot; tanaike</title>
+
+    
+
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/pure-min.css">
+
+  <!--[if lte IE 8]>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-old-ie-min.css">
+  <![endif]-->
+  <!--[if gt IE 8]><!-->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-min.css">
+  <!--<![endif]-->
+
+  <!--[if lte IE 8]>
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/side-menu-old-ie.css">
+  <![endif]-->
+  <!--[if gt IE 8]><!-->
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/side-menu.css">
+  <!--<![endif]-->
+
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
+
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet" type="text/css">
+
+  
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+ 
+  
+
+  
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/styles/androidstudio.min.css">
+  <script async src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/highlight.min.js"></script>
+  
+  <script>hljs.initHighlightingOnLoad();</script>
+  
+
+  <link rel="shortcut icon" href="https://tanaikech.github.io/img/favicon.ico" type="image/x-icon" />
+
+  
+  
+
+</head>
+
+
+<body>
+<div id="layout">
+
+  
+<a href="#menu" id="menuLink" class="menu-link">
+  
+  <span></span>
+</a>
+<div id="menu">
+
+  
+  <a class="pure-menu-heading brand" href="https://tanaikech.github.io/">TANAIKE</a>
+
+
+  <div class="pure-menu">
+    <ul class="pure-menu-list">
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/about/"><i class='fa fa-user fa-fw'></i>About</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/post/"><i class='fa fa-list fa-fw'></i>Posts</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/topics/"><i class='fa fa-folder fa-fw'></i>Topics</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/tags/"><i class='fa fa-tags fa-fw'></i>Tags</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/contact/"><i class='fa fa-phone fa-fw'></i>Contact</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/webapps/"><i class='fas fa-toolbox'></i>Web Applications</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/donate/"><i class='fas fa-donate'></i>Donate</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
+      
+        </li>
+      
+    </ul>
+  </div>
+
+  <div class="pure-menu social">
+  <ul class="pure-menu-list">
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://twitter.com/tanaikech" rel="me" target="_blank"><i class="fab fa-twitter-square fa-fw"></i>X</a>
+    </li>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
+    </li>
+    
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+    </li>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+  </ul>
+</div>
+
+
+  <div>
+  <div class="small-print">
+    <small>&copy; 2017. All rights reserved.</small>
+  </div>
+  <div class="small-print">
+    <small>Built with&nbsp;<a href="https://gohugo.io/" target="_blank">Hugo</a></small>
+    <small>Theme&nbsp;<a href="https://github.com/yoshiharuyamashita/blackburn" target="_blank">Blackburn</a></small>
+  </div>
+</div>
+
+</div>
+
+
+  <div id="main">
+
+
+<div class="header">
+  <h1>Leveraging GCP for Seamless Google Apps Script Log Export and Analysis with Gemini API</h1>
+  <h2></h2>
+</div>
+<div class="content">
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>18 Aug 2024, 15:05</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/process">process</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/gemini">Gemini</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  <p><a href="https://gist.github.com/tanaikech/68aa1dfbe041606d0d1df9cbd0079bcd">Gists</a></p>
+<h1 id="abstract">Abstract</h1>
+<p>Linking a Google Apps Script project to a GCP project enables you to export logs from the Class console to Logs Explorer for simplified analysis and debugging. By overcoming the limitations of in-script logging methods, this report outlines a method for exporting logs using the Cloud Logging API with Google Apps Script.</p>
+<h1 id="introduction">Introduction</h1>
+<p>While developing applications with Google Apps Script, the Class console is a valuable tool for debugging individual components. <a href="https://developers.google.com/apps-script/reference/base/console">Ref</a> However, a key limitation exists: by default, Google Apps Script projects on Google Drive are not linked to Google Cloud Platform (GCP) projects. In this unlinked scenario, logs from the Class console are only visible within the script editor, requiring manual copying for export.</p>
+<p>Linking a Google Apps Script project to a GCP project unlocks the power of Logs Explorer. <a href="https://cloud.google.com/logging/docs/view/logs-explorer-interface">Ref</a> Logs generated using the Class console become readily accessible in Logs Explorer, allowing for effortless export via the Cloud Logging API. <a href="https://cloud.google.com/logging/docs/reference/api-overview">Ref</a> This exported log data proves invaluable for script refactoring and analysis.</p>
+<p>While in-script options exist for exporting logs to files or Spreadsheets, these methods have limitations. Script execution errors like &ldquo;Exceeded maximum execution time&rdquo; can prevent successful in-script logging. Therefore, the ability to export logs after script execution, regardless of success or failure, offers a significant advantage.</p>
+<p>This report delves into the process of exporting logs from functions within Google Apps Script, leveraging the capabilities of GCP. Such information will be useful for evaluating the script by Gemini API and for refactoring the script.</p>
+<h1 id="process">Process</h1>
+<p>In order to retrieve the logs from an execution of a function, the following process is run. In this process, it supposes that the logs of this function <code>sample()</code> of Google Apps Script are retrieved.</p>
+<p><img src="fig1.png" alt=""></p>
+<ol>
+<li>Run a function (<code>sample()</code>) of Google Apps Script.</li>
+<li>In a separate call, after the function <code>sample()</code> has finished, use the &ldquo;Method: processes.list&rdquo; of the Apps Script API to retrieve a list of all currently running processes. This list can be used to identify the start and end times of the specific execution of <code>sample()</code> just after the execution. <a href="https://developers.google.com/apps-script/api/reference/rest/v1/processes/list">Ref</a></li>
+<li>Using the retrieved start and end times from step 2, retrieve the logs of the executed function <code>sample()</code> with the &ldquo;Method: entries.list&rdquo; of Cloud Logging API. <a href="https://cloud.google.com/logging/docs/reference/v2/rest/v2/entries/list">Ref</a></li>
+</ol>
+<p>By following this flow, you can obtain the logs specifically for the executed function <code>sample()</code>.</p>
+<p>As another approach for retrieving logs, logs can also be exported to a file or Spreadsheet while the function is running. However, this method has limitations: logs might not export correctly if the function runs for more than 6 minutes, and exporting logs after every line can significantly increase processing costs. Due to these issues, I opted for the previously described method.</p>
+<h1 id="usage">Usage</h1>
+<h2 id="1-create-google-apps-script-project">1. Create Google Apps Script project</h2>
+<p>In order to use the following sample scripts, please create a new Google Apps Script project. <a href="https://developers.google.com/apps-script/guides/standalone">Ref</a> In this case, the standalone script is used. Of course, the container-bound script can also be used.</p>
+<h2 id="2-linking-google-cloud-platform-project-to-google-apps-script-project">2. Linking Google Cloud Platform project to Google Apps Script project</h2>
+<p>Please link the Google Cloud Platform project to the Google Apps Script project. You can see how to do it at my repository. <a href="https://github.com/tanaikech/Linking-Google-Cloud-Platform-Project-to-Google-Apps-Script-Project-for-New-IDE">Ref</a></p>
+<h2 id="3-enable-apis">3. Enable APIs</h2>
+<p>Please enable Apps Script API and Cloud Logging API at API console.</p>
+<h2 id="4-scripts">4. Scripts</h2>
+<h3 id="main-script">Main script</h3>
+<p>Please copy and paste the following script to the script editor and save the script.</p>
+<p>This is the main script. This function <code>getLogs_</code> retrieves the logs from the executed function using Apps Script API and Cloud Logging API. In this sample, by inputting the function name, the function <code>getLogs_</code> retrieves the logs of the function of the inputted function name which was run last executed.</p>
+<pre tabindex="0"><code>/**
+ * ### Description
+ * Retrieve the processing logs from a function using Apps Script API and Cloud Logging API.
+ *
+ * @param {Object} object Object for running this method.
+ * @param {String} object.functionName Function name of the function you want to retrieve processing logs.
+ * @param {Array} object.projectIds Project ID of the Google Cloud Platform Project. In the current stage, only one ID can be used.
+ *
+ * @return {Object}
+ */
+function getLogs_(object) {
+  const { functionName, projectIds } = object;
+  const projects = projectIds.map(p =&gt; `projects/${p}`);
+  const logNames = projects.map(p =&gt; `logName=&#34;${p}/logs/script.googleapis.com%2Fconsole_logs&#34;`).join(&#34; OR &#34;);
+  const headers = { authorization: &#34;Bearer &#34; + ScriptApp.getOAuthToken() };
+
+  // Retrieve start and end times of the function.
+  const scriptId = ScriptApp.getScriptId();
+  const url1 = `https://script.googleapis.com/v1/processes?userProcessFilter.scriptId=${scriptId}&amp;userProcessFilter.functionName=${functionName}&amp;pageSize=1`;
+  const res1 = UrlFetchApp.fetch(url1, { headers });
+  const obj1 = JSON.parse(res1.getContentText());
+  if (obj1.processes.length == 0) return;
+
+  // Retrieve logs.
+  const { startTime, duration } = obj1.processes[0];
+  const endTime = new Date(new Date(startTime).getTime() + (Number(duration.replace(&#34;s&#34;, &#34;&#34;)) * 1000)).toISOString();
+  const filterAr = [
+    `resource.type = &#34;app_script_function&#34;`,
+    `timestamp &gt;= &#34;${startTime}&#34; AND timestamp &lt;= &#34;${endTime}&#34;`,
+    `(${logNames})`,
+  ];
+  const filter = filterAr.join(&#34; AND &#34;);
+  const values = [];
+  let pageToken = &#34;&#34;;
+  const payload = { resourceNames: projects, filter, pageSize: 1000 };
+  do {
+    payload.pageToken = pageToken;
+    const url2 = &#34;https://logging.googleapis.com/v2/entries:list&#34;;
+    const options = { method: &#34;post&#34;, contentType: &#34;application/json&#34;, headers, payload: JSON.stringify(payload) };
+    const res2 = UrlFetchApp.fetch(url2, options);
+    const obj2 = JSON.parse(res2.getContentText());
+    values.push(...obj2.entries.map(({ jsonPayload: { message }, timestamp, severity }) =&gt; ({ message, timestamp, severity })));
+    pageToken = obj2.nextPageToken;
+  } while (pageToken);
+  return values;
+}
+
+/**
+ * ### Description
+ * Parse logs from getLogs_. This is used for parsing the values from getLogs_.
+ *
+ * @param {Array} logs Logs from getLogs_.
+ * @return {Object}
+ */
+function parseLogs_(logs) {
+  return logs.reduce((o, e) =&gt; {
+    const { message } = e;
+    const [l, t] = message.split(&#34;:&#34;);
+    if (t) {
+      const time = Number(t.replace(&#34;ms&#34;, &#34;&#34;));
+      if (l.includes(&#34;_&#34;)) {
+        const [p, i] = l.split(&#34;_&#34;);
+        if (!o.logs[p]) {
+          o.logs[p] = [];
+        }
+        o.logs[p][i] = time;
+      } else {
+        o.logs[l] = o.logs[l] ? [...o.logs[l], time] : [time];
+      }
+    } else {
+      o.messages = [...o.messages, e];
+    }
+    return o;
+  }, { messages: [], logs: {} });
+}
+</code></pre><h3 id="sampe-scripts">Sampe scripts</h3>
+<h4 id="sample-script-1">Sample script 1</h4>
+<p>Please copy and paste the following script to the script editor and directly run <code>sampleFunction1()</code> with the script editor. If a dialog for authorizing the scopes, please authorize them.</p>
+<pre tabindex="0"><code>function sampleFunction1() {
+  const labelPrefix = &#34;label&#34;;
+
+  const label1 = `${labelPrefix}1`;
+  const label2 = `${labelPrefix}2`;
+  const label3 = `${labelPrefix}3`;
+  const label4 = `${labelPrefix}4`;
+
+  console.time(label1);
+  console.time(label2);
+  Utilities.sleep(1000);
+  console.timeEnd(label2);
+
+  console.time(label3);
+  for (let i = 0; i &lt; 5; i++) {
+    const label4a = `${label4}_${i}`;
+    console.time(label4a);
+    Utilities.sleep(100 * (i + 1));
+    console.timeEnd(label4a);
+  }
+  console.timeEnd(label3);
+  console.timeEnd(label1);
+}
+</code></pre><p>In order to measure the processing time of each part of the script, <code>console.time</code> and <code>console.timeEnd</code> are added. In this sample, as the format of the label, if the single processing time of a script, <code>label1</code>, <code>label2</code>,,, are used. If the multiple processing time of a script in a loop, <code>label1_1</code>, <code>label1_2</code>,,, are used.</p>
+<p>When this script is run, you can see the following logs in &ldquo;Execution log&rdquo; of the script editor.</p>
+<pre tabindex="0"><code>Notice	Execution started
+Debug	label2: 1001ms
+Debug	label4_0: 101ms
+Debug	label4_1: 201ms
+Debug	label4_2: 301ms
+Debug	label4_3: 401ms
+Debug	label4_4: 501ms
+Debug	label3: 1511ms
+Debug	label1: 2515ms
+Notice	Execution completed
+</code></pre><p>And, please copy and paste the following script to the script editor and directly run it with the script editor.</p>
+<pre tabindex="0"><code>function main() {
+  const functionName = &#34;sampleFunction1&#34;;
+  const projectIds = [&#34;###&#34;]; // Please set your project ID created with GCP.
+
+  const logs = getLogs_({ functionName, projectIds });
+  console.log(logs);
+}
+</code></pre><p>When this script is run, the following result is obtained.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>[
+</span></span><span style="display:flex;"><span>  { <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;label2: 1001ms&#34;</span>, <span style="color:#f92672">&#34;timestamp&#34;</span>: <span style="color:#e6db74">&#34;###&#34;</span>, <span style="color:#f92672">&#34;severity&#34;</span>: <span style="color:#e6db74">&#34;DEBUG&#34;</span> },
+</span></span><span style="display:flex;"><span>  { <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;label4_0: 101ms&#34;</span>, <span style="color:#f92672">&#34;timestamp&#34;</span>: <span style="color:#e6db74">&#34;###&#34;</span>, <span style="color:#f92672">&#34;severity&#34;</span>: <span style="color:#e6db74">&#34;DEBUG&#34;</span> },
+</span></span><span style="display:flex;"><span>  { <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;label4_1: 201ms&#34;</span>, <span style="color:#f92672">&#34;timestamp&#34;</span>: <span style="color:#e6db74">&#34;###&#34;</span>, <span style="color:#f92672">&#34;severity&#34;</span>: <span style="color:#e6db74">&#34;DEBUG&#34;</span> },
+</span></span><span style="display:flex;"><span>  { <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;label4_2: 301ms&#34;</span>, <span style="color:#f92672">&#34;timestamp&#34;</span>: <span style="color:#e6db74">&#34;###&#34;</span>, <span style="color:#f92672">&#34;severity&#34;</span>: <span style="color:#e6db74">&#34;DEBUG&#34;</span> },
+</span></span><span style="display:flex;"><span>  { <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;label4_3: 401ms&#34;</span>, <span style="color:#f92672">&#34;timestamp&#34;</span>: <span style="color:#e6db74">&#34;###&#34;</span>, <span style="color:#f92672">&#34;severity&#34;</span>: <span style="color:#e6db74">&#34;DEBUG&#34;</span> },
+</span></span><span style="display:flex;"><span>  { <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;label4_4: 501ms&#34;</span>, <span style="color:#f92672">&#34;timestamp&#34;</span>: <span style="color:#e6db74">&#34;###&#34;</span>, <span style="color:#f92672">&#34;severity&#34;</span>: <span style="color:#e6db74">&#34;DEBUG&#34;</span> },
+</span></span><span style="display:flex;"><span>  { <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;label3: 1511ms&#34;</span>, <span style="color:#f92672">&#34;timestamp&#34;</span>: <span style="color:#e6db74">&#34;###&#34;</span>, <span style="color:#f92672">&#34;severity&#34;</span>: <span style="color:#e6db74">&#34;DEBUG&#34;</span> },
+</span></span><span style="display:flex;"><span>  { <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;label1: 2515ms&#34;</span>, <span style="color:#f92672">&#34;timestamp&#34;</span>: <span style="color:#e6db74">&#34;###&#34;</span>, <span style="color:#f92672">&#34;severity&#34;</span>: <span style="color:#e6db74">&#34;DEBUG&#34;</span> }
+</span></span><span style="display:flex;"><span>]
+</span></span></code></pre></div><p>When the following script is used,</p>
+<pre tabindex="0"><code>function main() {
+  const functionName = &#34;sampleFunction1&#34;;
+  const projectIds = [&#34;###&#34;]; // Please set your project ID created with GCP.
+
+  const logs = getLogs_({ functionName, projectIds });
+  const obj = parseLogs_(logs);
+  console.log(obj);
+}
+</code></pre><p>the following result is obtained.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;messages&#34;</span>: [],
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;logs&#34;</span>: {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;label2&#34;</span>: [<span style="color:#ae81ff">1001</span>],
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;label4&#34;</span>: [<span style="color:#ae81ff">101</span>, <span style="color:#ae81ff">201</span>, <span style="color:#ae81ff">301</span>, <span style="color:#ae81ff">401</span>, <span style="color:#ae81ff">501</span>],
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;label3&#34;</span>: [<span style="color:#ae81ff">1511</span>],
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;label1&#34;</span>: [<span style="color:#ae81ff">2515</span>]
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>You can analyze the process cost of the script from this result.</p>
+<h4 id="sample-script-2">Sample script 2</h4>
+<p>Please copy and paste the following script to the script editor and directly run <code>sampleFunction2()</code> with the script editor. If a dialog for authorizing the scopes, please authorize them.</p>
+<pre tabindex="0"><code>function sampleFunction2() {
+  const labelPrefix = &#34;label&#34;;
+
+  const label1 = `${labelPrefix}1`;
+  const label2 = `${labelPrefix}2`;
+  const label3 = `${labelPrefix}3`;
+  const label4 = `${labelPrefix}4`;
+
+  console.time(label1);
+  console.time(label2);
+  Utilities.sleep(1000);
+  console.timeEnd(label2);
+
+  console.time(label3);
+  for (let i = 0; i &lt; 5; i++) {
+    const label4a = `${label4}_${i}`;
+    console.time(label4a);
+    Utilities.sleep(100000 * (i + 1));
+    console.timeEnd(label4a);
+  }
+  console.timeEnd(label3);
+  console.timeEnd(label1);
+}
+</code></pre><pre tabindex="0"><code>Notice	Execution started
+Debug	label2: 1001ms
+Debug	label4_0: 100002ms
+Debug	label4_1: 200001ms
+Error	Exceeded maximum execution time
+</code></pre><p>And, please copy and paste the following script to the script editor and directly run it with the script editor.</p>
+<pre tabindex="0"><code>function main() {
+  const functionName = &#34;sampleFunction2&#34;;
+  const projectIds = [&#34;###&#34;]; // Please set your project ID created with GCP.
+
+  const logs = getLogs_({ functionName, projectIds });
+  console.log(logs);
+}
+</code></pre><p>When this script is run, the following result is obtained.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>[
+</span></span><span style="display:flex;"><span>  { <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;label2: 1001ms&#34;</span>, <span style="color:#f92672">&#34;timestamp&#34;</span>: <span style="color:#e6db74">&#34;###&#34;</span>, <span style="color:#f92672">&#34;severity&#34;</span>: <span style="color:#e6db74">&#34;DEBUG&#34;</span> },
+</span></span><span style="display:flex;"><span>  { <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;label4_0: 100002ms&#34;</span>, <span style="color:#f92672">&#34;timestamp&#34;</span>: <span style="color:#e6db74">&#34;###&#34;</span>, <span style="color:#f92672">&#34;severity&#34;</span>: <span style="color:#e6db74">&#34;DEBUG&#34;</span> },
+</span></span><span style="display:flex;"><span>  { <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;label4_1: 200001ms&#34;</span>, <span style="color:#f92672">&#34;timestamp&#34;</span>: <span style="color:#e6db74">&#34;###&#34;</span>, <span style="color:#f92672">&#34;severity&#34;</span>: <span style="color:#e6db74">&#34;DEBUG&#34;</span> },
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;Exceeded maximum execution time&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;timestamp&#34;</span>: <span style="color:#e6db74">&#34;###&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;severity&#34;</span>: <span style="color:#e6db74">&#34;ERROR&#34;</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>]
+</span></span></code></pre></div><p>It was found that the error message due to over-execution time could also be obtained.</p>
+<p>When the following script is used,</p>
+<pre tabindex="0"><code>function main() {
+  const functionName = &#34;sampleFunction2&#34;;
+  const projectIds = [&#34;###&#34;]; // Please set your project ID created with GCP.
+
+  const logs = getLogs_({ functionName, projectIds });
+  const obj = parseLogs_(logs);
+  console.log(obj);
+}
+</code></pre><p>the following result is obtained.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;messages&#34;</span>: [
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;Exceeded maximum execution time&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;timestamp&#34;</span>: <span style="color:#e6db74">&#34;###&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;severity&#34;</span>: <span style="color:#e6db74">&#34;ERROR&#34;</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  ],
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;logs&#34;</span>: {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;label2&#34;</span>: [<span style="color:#ae81ff">1001</span>],
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;label4&#34;</span>: [<span style="color:#ae81ff">100002</span>, <span style="color:#ae81ff">200001</span>]
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>In this result, only &ldquo;label2&rdquo; and &ldquo;label4&rdquo; have the values. From this result, it is found that the script is stopped before the loop is finished.</p>
+<h4 id="sample-script-3">Sample script 3</h4>
+<p>This script sample generates a more detailed evaluation of the script using logs retrieved by the getLogs_ function and the Gemini API. By providing the script&rsquo;s logs, we can expect a more comprehensive evaluation.</p>
+<p>The script utilizes the following functions: <code>getLogs_</code>, <code>sampleFunction1</code>, and <code>sampleFunction2</code> shown in the above sections. Additionally, it leverages the GeminiWithFiles library from Google Apps Script to generate the evaluation.</p>
+<p>For testing, please install the GeminiWithFiles library from the following repository: <a href="https://github.com/tanaikech/GeminiWithFiles">Ref</a></p>
+<pre tabindex="0"><code>/**
+ * ### Description
+ * Generate evaluation of the script using Gemini.
+ *
+ * @param {Object} object Object for running this method.
+ * @param {String} object.apiKey API key for using Gemini API.
+ * @param {String} object.functionName Function name of script.
+ * @param {Object} object.logs Logs when the script is run.
+ *
+ * @return {String} Generated evaluation of the script using Gemini.
+ */
+function generateEvaluation_(object) {
+  const { apiKey, functionName, logs } = object;
+
+  const scriptFilename = `${functionName}.gs`;
+  const logFilename = `log for ${functionName}.txt`;
+  const scriptBlob = Utilities.newBlob(this[functionName].toString(), MimeType.PLAIN_TEXT, scriptFilename);
+  const logBlob = Utilities.newBlob(JSON.stringify(logs), MimeType.PLAIN_TEXT, logFilename);
+
+  const jsonSchema = {
+    description: &#34;Processing log. This log shows the processing time of each part in the script.&#34;,
+    type: &#34;array&#34;,
+    items: {
+      type: &#34;object&#34;,
+      properties: {
+        message: { type: &#34;string&#34;, description: &#34;Message from except for console.time and console.timeEnd.&#34; },
+        timestamp: { type: &#34;string&#34;, description: &#34;Time stamp of the message.&#34; },
+        severity: { type: &#34;string&#34;, description: &#34;Type of message.&#34; },
+      }
+    }
+  };
+  const q = [
+    `You are required to evaluate the Google Apps Script.`,
+    `In order to evaluate the script, 2 text files are uploaded as follows.`,
+    `1. Google Apps Script. Filename is ${scriptFilename}.`,
+    `2. Log data for the Google Apps Script. Filename is ${logFilename}.`,
+    `The script of ${scriptFilename} has &#34;console.time&#39; and &#39;console.timeEnd&#39;.`,
+    `Those are used for measuring the processing time of each part.`,
+    `The log of ${logFilename} is an object. The JSON schema of this object is as follows.`,
+    `&lt;JSONSchema&gt;${JSON.stringify(jsonSchema)}&lt;/JSONSchema&gt;`,
+    `Please evaluate this Google Apps Script using the log data.`,
+    `Also, please clearly describe the problems points and the improvement points.`,
+    `Export the result by summarizing the generated description within 100 words without a markdown.`,
+  ].join(&#34;\n&#34;);
+  const g = GeminiWithFiles.geminiWithFiles({ apiKey });
+  const fileList = g.setBlobs([scriptBlob, logBlob]).uploadFiles();
+  return g.withUploadedFilesByGenerateContent(fileList).generateContent({ q });
+}
+</code></pre><p>When you want to generate the evaluation of the function <code>sampleFunction1</code>, you can use the following script.</p>
+<pre tabindex="0"><code>function sample3() {
+  const functionName = &#34;sampleFunction1&#34;;
+  const projectIds = [&#34;forappsscript&#34;];
+  const apiKey = &#34;###&#34;; // Please set your API key for using Gemini API.
+
+  const logs = getLogs_({ functionName, projectIds });
+  console.log(logs);
+  const res = generateEvaluation_({ apiKey, functionName, logs });
+  console.log(res);
+}
+</code></pre><p>When this script is run, the following result is obtained.</p>
+<pre tabindex="0"><code>The Google Apps Script measures the processing time of different parts using console.time and console.timeEnd. The log data shows the execution time of different labels, indicating that label2 took 1001ms, label3 took 1511ms, and label1 took 2515ms.  The script measures the time of each iteration in the loop using label4_i, but these measurements are not useful for identifying performance issues since each iteration has different sleep durations. The script unnecessarily measures the time of label4a within the loop, which is not a meaningful measurement for overall performance. The script could be improved by focusing on measuring the time of relevant sections and removing redundant measurements.
+</code></pre><p>When the evaluation is generated from <code>sampleFunction2</code>, please modify <code>const functionName = &quot;sampleFunction1&quot;;</code> to <code>const functionName = &quot;sampleFunction2&quot;;</code>. By this, the following result is obtained.</p>
+<pre tabindex="0"><code>The Google Apps Script has a performance issue. The script takes a significant amount of time to execute due to the long sleep durations and the nested loop. Specifically, the sleep duration in the loop increases with each iteration, leading to an extended execution time. The script also exceeds the maximum execution time.  The script can be improved by reducing the sleep duration, restructuring the loop, or using asynchronous functions.
+</code></pre><p>Here, when the line of <code>Export the result by summarizing the generated description within 100 words without a markdown.</code> is removed from <code>generateEvaluation_</code>, the detailed evaluation will be generated.</p>
+<h1 id="summary">Summary</h1>
+<p>This report outlines a method for exporting logs from Google Apps Script projects to GCP for analysis using the Cloud Logging API. This approach overcomes limitations of in-script logging methods by enabling retrieval of logs after script execution, regardless of success or failure.</p>
+<p>Key steps involve:</p>
+<ol>
+<li>Linking a Google Apps Script project to a GCP project.</li>
+<li>Employing the Apps Script API to retrieve a list of currently running processes.</li>
+<li>Leveraging the Cloud Logging API to retrieve logs for the specific function execution based on start and end times.</li>
+</ol>
+<p>Sample scripts are provided to demonstrate retrieving logs and parsing them to analyze script process costs. Additionally, a script is included to generate an evaluation of the script using the Gemini API and the retrieved logs.</p>
+
+  
+  <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2024%2f08%2f18%2fleveraging-gcp-for-seamless-google-apps-script-log-export-and-analysis-with-gemini-api%2f" target="_blank" title="Share on Facebook"><i class="fab fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2024%2f08%2f18%2fleveraging-gcp-for-seamless-google-apps-script-log-export-and-analysis-with-gemini-api%2f" target="_blank" title="Tweet"><i class="fab fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2024%2f08%2f18%2fleveraging-gcp-for-seamless-google-apps-script-log-export-and-analysis-with-gemini-api%2f" target="_blank" title="Share on Google+"><i class="fab fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2024%2f08%2f18%2fleveraging-gcp-for-seamless-google-apps-script-log-export-and-analysis-with-gemini-api%2f" target="_blank" title="Post to Tumblr"><i class="fab fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2024%2f08%2f18%2fleveraging-gcp-for-seamless-google-apps-script-log-export-and-analysis-with-gemini-api%2f" target="_blank" title="Pin it"><i class="fab fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2024%2f08%2f18%2fleveraging-gcp-for-seamless-google-apps-script-log-export-and-analysis-with-gemini-api%2f" target="_blank" title="Submit to Reddit"><i class="fab fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
+
+
+  
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2024/08/16/uploading-multiple-files-with-split-asynchronous-processes-and-resumable-upload-in-google-spreadsheets/"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2024/08/16/uploading-multiple-files-with-split-asynchronous-processes-and-resumable-upload-in-google-spreadsheets/">Uploading Multiple Files with Split Asynchronous Processes and Resumable Upload in Google Spreadsheets</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
+</div>
+
+
+  
+  
+  
+  
+
+  
+
+</div>
+
+</div>
+</div>
+<script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
+
+
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
+<script>
+  
+  if (window.location.hostname != "localhost") {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-J3Z6T50WL5');
+  }
+</script>
+
+
+
+
+
+
+<script src="https://tanaikech.github.io/js/math-code.js"></script>
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  
+
+
+</body>
+</html>
+
