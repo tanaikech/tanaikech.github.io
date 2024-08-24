@@ -318,108 +318,108 @@
 <h2 id="4-script">4. Script</h2>
 <p>Please copy and paste the following script to the script editor of your created Google Apps Script project.</p>
 <p>Please set your API key and URLs to the function <code>main</code>.</p>
-<pre tabindex="0"><code>/**
- * ### Description
- * Convert HTML of the inputted URL to PDF blob.
- *
- * @param {Object} object Object for running this method.
- * @param {String} object.url URL you want to use.
- * @param {Boolean} object.convertByGoogleDoc When this is true, in order to convert HTML to PDF, Google Document is used. I think that the most cases are not required to use this. But, if you use this, please set &#34;convertByGoogleDoc&#34; as true. The default value is false.
- *
- * @return {Blob} PDF blob converted from HTML of the URL is returned.
- */
-function convertHTMLToPDFBlob_(object) {
-  const { url, convertByGoogleDoc = false } = object;
-  console.log(`--- Get HTML from &#34;${url}&#34;.`);
-  const res = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
-  let text = res.getContentText();
-  if (res.getResponseCode() != 200) {
-    throw new Error(text);
-  }
-  console.log(`--- Convert image data.`);
-
-  // Convert the source URL of img tag to the data URL.
-  text.matchAll(/&lt;img.*?&gt;/g).forEach(e =&gt; {
-    const t = e[0].match(/src\=[&#34;&#39;](http.*?)[&#34;&#39;]/);
-    if (t) {
-      const imageUrl = t[1];
-      const r = UrlFetchApp.fetch(imageUrl.trim(), { muteHttpExceptions: true });
-      if (r.getResponseCode() == 200) {
-        const blob = r.getBlob();
-        const dataUrl = `data:${blob.getContentType()};base64,${Utilities.base64Encode(blob.getBytes())}`;
-        text = text.replace(imageUrl, dataUrl);
-      }
-    }
-  });
-
-  // For medium
-  if (url.includes(&#34;medium.com&#34;)) {
-    text.matchAll(/&lt;picture&gt;.*?&lt;\/picture&gt;/g).forEach(e =&gt; {
-      const t = e[0].match(/srcSet\=[&#34;&#39;](http.*?)[&#34;&#39;]/);
-      if (t) {
-        const imageUrl = t[1].split(&#34; &#34;)[0].trim();
-        const r = UrlFetchApp.fetch(imageUrl.trim(), { muteHttpExceptions: true });
-        if (r.getResponseCode() == 200) {
-          const blob = r.getBlob();
-          const dataUrl = `data:${blob.getContentType()};base64,${Utilities.base64Encode(blob.getBytes())}`;
-          text = text.replace(e[0], `&lt;img src=&#34;${dataUrl}&#34;`);
-        }
-      }
-    });
-  }
-
-  let pdfBlob;
-  if (convertByGoogleDoc) {
-    console.log(`--- Convert HTML to PDF blob with Google Docs.`);
-    const doc = Drive.Files.create({ name: &#34;temp&#34;, mimeType: MimeType.GOOGLE_DOCS }, Utilities.newBlob(text, MimeType.HTML));
-    pdfBlob = DriveApp.getFileById(doc.id).getBlob().setName(url);
-    Drive.Files.remove(doc.id);
-  } else {
-    console.log(`--- Convert HTML to PDF blob.`);
-    pdfBlob = Utilities.newBlob(text, MimeType.HTML).getAs(MimeType.PDF).setName(url);
-  }
-  console.log(`--- Complately converted HTML to PDF blob.`);
-  return pdfBlob;
-}
-
-
-// Please run this function.
-function main() {
-  const apiKey = &#34;###&#34;; // Please set your API key.
-
-  // Please set your URLs you want to use.
-  // These are the samples.
-  const urls = [
-    &#34;https://tanaikech.github.io/2024/06/15/unlock-smart-invoice-management-gemini-gmail-and-google-apps-script-integration/&#34;,
-    &#34;https://tanaikech.github.io/2024/08/08/a-novel-approach-to-learning-combining-gemini-with-google-apps-script-for-automated-qa/&#34;,
-  ];
-
-  // Prompt
-  const jsonSchema = {
-    description: &#34;Summarize the articles of the following PDF files within 100 words, respectively. Return the result as an array.&#34;,
-    type: &#34;array&#34;,
-    items: {
-      type: &#34;object&#34;,
-      properties: {
-        url: { type: &#34;string&#34;, description: &#34;Filename&#34; },
-        summary: { type: &#34;string&#34;, description: &#34;Summary of PDF.&#34; }
-      },
-      required: [&#34;summary&#34;],
-      additionalProperties: false,
-    }
-  };
-  const q = `Follow JSON schema.&lt;jsonSchema&gt;${JSON.stringify(jsonSchema)}&lt;/jsonSchema&gt;`
-
-  // Upload PDF
-  const blobs = urls.map(url =&gt; convertHTMLToPDFBlob_({ url, convertByGoogleDoc: false }));
-
-  // Generate content with Gemini API.
-  const g = GeminiWithFiles.geminiWithFiles({ apiKey, response_mime_type: &#34;application/json&#34; });
-  const fileList = g.setBlobs(blobs).uploadFiles();
-  const res = g.withUploadedFilesByGenerateContent(fileList).generateContent({ q });
-  console.log(res);
-}
-</code></pre><p>When <code>main</code> is run, the following result is obtained.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * ### Description
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Convert HTML of the inputted URL to PDF blob.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param {Object} object Object for running this method.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param {String} object.url URL you want to use.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param {Boolean} object.convertByGoogleDoc When this is true, in order to convert HTML to PDF, Google Document is used. I think that the most cases are not required to use this. But, if you use this, please set &#34;convertByGoogleDoc&#34; as true. The default value is false.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @return {Blob} PDF blob converted from HTML of the URL is returned.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">convertHTMLToPDFBlob_</span>(<span style="color:#a6e22e">object</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">convertByGoogleDoc</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">object</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">`--- Get HTML from &#34;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">url</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;.`</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, { <span style="color:#a6e22e">muteHttpExceptions</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span> });
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">text</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getContentText</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getResponseCode</span>() <span style="color:#f92672">!=</span> <span style="color:#ae81ff">200</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#a6e22e">text</span>);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">`--- Convert image data.`</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Convert the source URL of img tag to the data URL.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#a6e22e">text</span>.<span style="color:#a6e22e">matchAll</span>(<span style="color:#e6db74">/&lt;img.*?&gt;/g</span>).<span style="color:#a6e22e">forEach</span>(<span style="color:#a6e22e">e</span> =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">t</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">match</span>(<span style="color:#e6db74">/src\=[&#34;&#39;](http.*?)[&#34;&#39;]/</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">t</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">imageUrl</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">t</span>[<span style="color:#ae81ff">1</span>];
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">imageUrl</span>.<span style="color:#a6e22e">trim</span>(), { <span style="color:#a6e22e">muteHttpExceptions</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span> });
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">getResponseCode</span>() <span style="color:#f92672">==</span> <span style="color:#ae81ff">200</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">blob</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">getBlob</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">dataUrl</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`data:</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">blob</span>.<span style="color:#a6e22e">getContentType</span>()<span style="color:#e6db74">}</span><span style="color:#e6db74">;base64,</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(<span style="color:#a6e22e">blob</span>.<span style="color:#a6e22e">getBytes</span>())<span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">text</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">text</span>.<span style="color:#a6e22e">replace</span>(<span style="color:#a6e22e">imageUrl</span>, <span style="color:#a6e22e">dataUrl</span>);
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// For medium
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">url</span>.<span style="color:#a6e22e">includes</span>(<span style="color:#e6db74">&#34;medium.com&#34;</span>)) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">text</span>.<span style="color:#a6e22e">matchAll</span>(<span style="color:#e6db74">/&lt;picture&gt;.*?&lt;\/picture&gt;/g</span>).<span style="color:#a6e22e">forEach</span>(<span style="color:#a6e22e">e</span> =&gt; {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">t</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">match</span>(<span style="color:#e6db74">/srcSet\=[&#34;&#39;](http.*?)[&#34;&#39;]/</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">t</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">imageUrl</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">t</span>[<span style="color:#ae81ff">1</span>].<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34; &#34;</span>)[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">trim</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">imageUrl</span>.<span style="color:#a6e22e">trim</span>(), { <span style="color:#a6e22e">muteHttpExceptions</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span> });
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">getResponseCode</span>() <span style="color:#f92672">==</span> <span style="color:#ae81ff">200</span>) {
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">blob</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">getBlob</span>();
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">dataUrl</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`data:</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">blob</span>.<span style="color:#a6e22e">getContentType</span>()<span style="color:#e6db74">}</span><span style="color:#e6db74">;base64,</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(<span style="color:#a6e22e">blob</span>.<span style="color:#a6e22e">getBytes</span>())<span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>;
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">text</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">text</span>.<span style="color:#a6e22e">replace</span>(<span style="color:#a6e22e">e</span>[<span style="color:#ae81ff">0</span>], <span style="color:#e6db74">`&lt;img src=&#34;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">dataUrl</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;`</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">pdfBlob</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">convertByGoogleDoc</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">`--- Convert HTML to PDF blob with Google Docs.`</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">doc</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Drive</span>.<span style="color:#a6e22e">Files</span>.<span style="color:#a6e22e">create</span>({ <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;temp&#34;</span>, <span style="color:#a6e22e">mimeType</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">MimeType</span>.<span style="color:#a6e22e">GOOGLE_DOCS</span> }, <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">newBlob</span>(<span style="color:#a6e22e">text</span>, <span style="color:#a6e22e">MimeType</span>.<span style="color:#a6e22e">HTML</span>));
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">pdfBlob</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">doc</span>.<span style="color:#a6e22e">id</span>).<span style="color:#a6e22e">getBlob</span>().<span style="color:#a6e22e">setName</span>(<span style="color:#a6e22e">url</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Drive</span>.<span style="color:#a6e22e">Files</span>.<span style="color:#a6e22e">remove</span>(<span style="color:#a6e22e">doc</span>.<span style="color:#a6e22e">id</span>);
+</span></span><span style="display:flex;"><span>  } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">`--- Convert HTML to PDF blob.`</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">pdfBlob</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">newBlob</span>(<span style="color:#a6e22e">text</span>, <span style="color:#a6e22e">MimeType</span>.<span style="color:#a6e22e">HTML</span>).<span style="color:#a6e22e">getAs</span>(<span style="color:#a6e22e">MimeType</span>.<span style="color:#a6e22e">PDF</span>).<span style="color:#a6e22e">setName</span>(<span style="color:#a6e22e">url</span>);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">`--- Complately converted HTML to PDF blob.`</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">pdfBlob</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Please run this function.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">apiKey</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set your API key.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Please set your URLs you want to use.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">// These are the samples.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">urls</span> <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;https://tanaikech.github.io/2024/06/15/unlock-smart-invoice-management-gemini-gmail-and-google-apps-script-integration/&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;https://tanaikech.github.io/2024/08/08/a-novel-approach-to-learning-combining-gemini-with-google-apps-script-for-automated-qa/&#34;</span>,
+</span></span><span style="display:flex;"><span>  ];
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Prompt
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">jsonSchema</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">description</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Summarize the articles of the following PDF files within 100 words, respectively. Return the result as an array.&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;array&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">items</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;object&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">properties</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;string&#34;</span>, <span style="color:#a6e22e">description</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Filename&#34;</span> },
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">summary</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;string&#34;</span>, <span style="color:#a6e22e">description</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Summary of PDF.&#34;</span> }
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">required</span><span style="color:#f92672">:</span> [<span style="color:#e6db74">&#34;summary&#34;</span>],
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">additionalProperties</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">false</span>,
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">q</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`Follow JSON schema.&lt;jsonSchema&gt;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">jsonSchema</span>)<span style="color:#e6db74">}</span><span style="color:#e6db74">&lt;/jsonSchema&gt;`</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Upload PDF
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">blobs</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">urls</span>.<span style="color:#a6e22e">map</span>(<span style="color:#a6e22e">url</span> =&gt; <span style="color:#a6e22e">convertHTMLToPDFBlob_</span>({ <span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">convertByGoogleDoc</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">false</span> }));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Generate content with Gemini API.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">g</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">GeminiWithFiles</span>.<span style="color:#a6e22e">geminiWithFiles</span>({ <span style="color:#a6e22e">apiKey</span>, <span style="color:#a6e22e">response_mime_type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/json&#34;</span> });
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">fileList</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">g</span>.<span style="color:#a6e22e">setBlobs</span>(<span style="color:#a6e22e">blobs</span>).<span style="color:#a6e22e">uploadFiles</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">g</span>.<span style="color:#a6e22e">withUploadedFilesByGenerateContent</span>(<span style="color:#a6e22e">fileList</span>).<span style="color:#a6e22e">generateContent</span>({ <span style="color:#a6e22e">q</span> });
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>When <code>main</code> is run, the following result is obtained.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>[
 </span></span><span style="display:flex;"><span>  {
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;url&#34;</span>: <span style="color:#e6db74">&#34;https://tanaikech.github.io/2024/06/15/unlock-smart-invoice-management-gemini-gmail-and-google-apps-script-integration/&#34;</span>,
