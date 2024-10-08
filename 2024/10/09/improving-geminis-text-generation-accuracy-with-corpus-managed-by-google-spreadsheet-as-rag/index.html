@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  
+  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+
+  <meta name="description" content="">
+  <meta name="generator" content="Hugo 0.98.0" />
+
+  <title>Improving Gemini&#39;s Text Generation Accuracy with Corpus Managed by Google Spreadsheet as RAG &middot; tanaike</title>
+
+    
+
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/pure-min.css">
+
+  <!--[if lte IE 8]>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-old-ie-min.css">
+  <![endif]-->
+  <!--[if gt IE 8]><!-->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-min.css">
+  <!--<![endif]-->
+
+  <!--[if lte IE 8]>
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/side-menu-old-ie.css">
+  <![endif]-->
+  <!--[if gt IE 8]><!-->
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/side-menu.css">
+  <!--<![endif]-->
+
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
+
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet" type="text/css">
+
+  
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+ 
+  
+
+  
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/styles/androidstudio.min.css">
+  <script async src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/highlight.min.js"></script>
+  
+  <script>hljs.initHighlightingOnLoad();</script>
+  
+
+  <link rel="shortcut icon" href="https://tanaikech.github.io/img/favicon.ico" type="image/x-icon" />
+
+  
+  
+
+</head>
+
+
+<body>
+<div id="layout">
+
+  
+<a href="#menu" id="menuLink" class="menu-link">
+  
+  <span></span>
+</a>
+<div id="menu">
+
+  
+  <a class="pure-menu-heading brand" href="https://tanaikech.github.io/">TANAIKE</a>
+
+
+  <div class="pure-menu">
+    <ul class="pure-menu-list">
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/about/"><i class='fa fa-user fa-fw'></i>About</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/post/"><i class='fa fa-list fa-fw'></i>Posts</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/topics/"><i class='fa fa-folder fa-fw'></i>Topics</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/tags/"><i class='fa fa-tags fa-fw'></i>Tags</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/contact/"><i class='fa fa-phone fa-fw'></i>Contact</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/webapps/"><i class='fas fa-toolbox'></i>Web Applications</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/donate/"><i class='fas fa-donate'></i>Donate</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
+      
+        </li>
+      
+    </ul>
+  </div>
+
+  <div class="pure-menu social">
+  <ul class="pure-menu-list">
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://twitter.com/tanaikech" rel="me" target="_blank"><i class="fab fa-twitter-square fa-fw"></i>X</a>
+    </li>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
+    </li>
+    
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+    </li>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+  </ul>
+</div>
+
+
+  <div>
+  <div class="small-print">
+    <small>&copy; 2017. All rights reserved.</small>
+  </div>
+  <div class="small-print">
+    <small>Built with&nbsp;<a href="https://gohugo.io/" target="_blank">Hugo</a></small>
+    <small>Theme&nbsp;<a href="https://github.com/yoshiharuyamashita/blackburn" target="_blank">Blackburn</a></small>
+  </div>
+</div>
+
+</div>
+
+
+  <div id="main">
+
+
+<div class="header">
+  <h1>Improving Gemini&#39;s Text Generation Accuracy with Corpus Managed by Google Spreadsheet as RAG</h1>
+  <h2></h2>
+</div>
+<div class="content">
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>09 Oct 2024, 08:53</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/spreadsheet">spreadsheet</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/gemini">Gemini</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/application">application</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  <p><a href="https://gist.github.com/tanaikech/bed216a816ba19b99618cf7902103a59">Gists</a></p>
+<p><img src="https://tanaikech.github.io/image-storage/20241009a/fig1.gif" alt=""></p>
+<h1 id="abstract">Abstract</h1>
+<p>Gemini excels at text generation with RAG for large datasets, but smaller ones benefit from prompting or data upload. This report explores using Gemini 1.5 Flash/Pro with RAG on medium-sized, Google Spreadsheet-stored datasets for improved accuracy and effectiveness.</p>
+<h1 id="introduction">Introduction</h1>
+<p>Gemini&rsquo;s text generation capabilities have seen significant advancements with the Retrieval-Augmented Generation (RAG). This approach excels for large datasets, where embedding data and querying the model leads to high-quality answers. However, for smaller datasets, directly including data in the prompt or an uploaded file can be more efficient. <a href="https://medium.com/google-cloud/harnessing-geminis-power-a-guide-to-generating-content-from-structured-data-45080dac0bbb">Ref</a></p>
+<p>A recent request asked for content generation using both Gemini 1.5 Flash and Retrieval Augmented Generation (RAG) at a low cost. The RAG component would use a Q&amp;A dataset of approximately 100,000 items. To accommodate this, I considered using a Google Spreadsheet-managed corpus instead of a single data file containing all Q&amp;A datasets. I anticipated future growth in the Q&amp;A dataset. While Gemini offers semantic retrieval through the &lsquo;models.generateAnswer&rsquo; function, it primarily relies on the &lsquo;models/aqa&rsquo; model. Although functional, this model might have limitations in response diversity and update frequency compared to the more versatile Gemini 1.5 Flash and Gemini 1.5 Pro models.</p>
+<p>This report explores strategies to address these limitations and achieve high-quality content generation using Gemini 1.5 Flash and Gemini 1.5 Pro models. We will leverage RAG techniques and optimize the use of corpus data stored in Google Spreadsheets. These efforts aim to improve the overall accuracy and effectiveness of Gemini&rsquo;s text generation capabilities, specifically for situations involving medium-sized datasets.</p>
+<h1 id="repository">Repository</h1>
+<p>The repository of this application is <a href="https://github.com/tanaikech/QAApp">https://github.com/tanaikech/QAApp</a>.</p>
+<p>When you want to see the scripts of this report, you can do it in my repository.</p>
+<h1 id="workflow">Workflow</h1>
+<p><img src="https://tanaikech.github.io/image-storage/20241009a/fig2.png" alt=""></p>
+<h2 id="process-for-managing-corpus">Process for managing corpus</h2>
+<ol>
+<li>Data: Read data from Google Spreadsheet.</li>
+<li>Divide data into chunks: Break down the data into smaller segments (chunks) and store them in a document within the corpus. In this case, each chunk is created every row.</li>
+</ol>
+<h2 id="process-for-generating-an-answer">Process for generating an answer</h2>
+<ol>
+<li>Retrieve relevant chunks: Use the &ldquo;corpora.documents.query&rdquo; method to retrieve chunks that meet the specified threshold criteria.</li>
+<li>Upload chunks to Gemini: Upload the selected chunks to Gemini as a file.</li>
+<li>Generate content: Employ the Gemini 1.5 Flash and Gemini 1.5 Pro models to generate content based on the prompt and the uploaded file.</li>
+</ol>
+<h1 id="for-application">For application</h1>
+<p>In this report, to implement the aforementioned goal in a practical application, I utilized a Google Spreadsheet and Google Apps Script.</p>
+<h1 id="usage">Usage</h1>
+<h2 id="1-copy-a-google-spreadsheet">1. Copy a Google Spreadsheet</h2>
+<p>When you test this application, you can do it by copying the following Google Spreadsheet. After you copy the Spreadsheet into your Google Drive, you can do the following steps.</p>
+<p>You can copy the Spreadsheet to your Google Drive by accessing the following URL.</p>
+<p><a href="https://docs.google.com/spreadsheets/d/1zhq82EbhJXBYyYM9t97ixwxiXCc5wDk8Ytl1mUrXUEs/copy">https://docs.google.com/spreadsheets/d/1zhq82EbhJXBYyYM9t97ixwxiXCc5wDk8Ytl1mUrXUEs/copy</a></p>
+<p>When you open this Spreadsheet, you can see the following 2 sheets.</p>
+<ul>
+<li><code>dashboard</code>: This sheet is used for setting variables including the API key for using Gemini API and corpus name.</li>
+<li><code>data</code>: This sheet is used for managing chunks in the corpus.</li>
+</ul>
+<p>This spreadsheet has a container-bound script including 5 script files, 1 HTML file, and 1 JSON file.</p>
+<ul>
+<li><code>appsscript.json</code>: Manifest file.</li>
+<li><code>Code.gs</code>: Main functions.</li>
+<li><code>CorporaApp.gs</code>: <a href="https://github.com/tanaikech/CorporaApp">https://github.com/tanaikech/CorporaApp</a></li>
+<li><code>GeminiWithFiles.gs</code>: <a href="https://github.com/tanaikech/GeminiWithFiles">https://github.com/tanaikech/GeminiWithFiles</a></li>
+<li><code>QAApp.gs</code>: Main class object. <a href="https://github.com/tanaikech/QAApp">https://github.com/tanaikech/QAApp</a></li>
+<li><code>javascript.gs</code>: Javascript for HTML.</li>
+<li><code>index.html</code>: HTML for user interface.</li>
+</ul>
+<h2 id="2-linking-google-cloud-platform-project-to-google-apps-script-project">2. Linking Google Cloud Platform Project to Google Apps Script Project</h2>
+<p>In this case, you can see how to do this at <a href="https://github.com/tanaikech/Linking-Google-Cloud-Platform-Project-to-Google-Apps-Script-Project-for-New-IDE">my repository</a>. Please link your Google Cloud Platform Project with the container-bound script of the copied Spreadsheet.</p>
+<p>Also, please enable 2 APIs <strong>Generative Language API</strong> and <strong>Sheets API</strong> at the API console.</p>
+<h2 id="3-set-dashboard-sheet">3. Set &ldquo;dashboard&rdquo; sheet</h2>
+<p><img src="https://tanaikech.github.io/image-storage/20241009a/fig3.png" alt=""></p>
+<p>The above image is the &ldquo;dashboard&rdquo; sheet. Please set the column &ldquo;Value&rdquo; in the dashboard sheet to your situation. At least, please set your API key for using Gemini API. The API is used for uploading a file to Gemini and generating content. The corpus is managed by the access token. So, it is required to link the Google Cloud Platform Project to the Google Apps Script Project.</p>
+<h2 id="4-set-data-sheet">4. Set &ldquo;data&rdquo; sheet</h2>
+<p><img src="https://tanaikech.github.io/image-storage/20241009a/fig4.png" alt=""></p>
+<p>The above image is the &ldquo;data&rdquo; sheet. Please set the questions and answers to columns &ldquo;B&rdquo; and &ldquo;C&rdquo;. Column &ldquo;D&rdquo; is used for managing data. Column &ldquo;E&rdquo; shows IDs when the data is put into the corpus. Now, these are not required to be used.</p>
+<p>After the above setting, this application can be worked.</p>
+<h2 id="5-testing">5. Testing</h2>
+<p><img src="https://tanaikech.github.io/image-storage/20241009a/fig5.png" alt=""></p>
+<p>When you run &ldquo;Open sidebar&rdquo; from the custom menu, the sidebar is opened as shown in the above image. The demonstration can be seen at the top of this report.</p>
+<ol>
+<li>Open sidebar.</li>
+<li>Put the data into columns &ldquo;A&rdquo; to &ldquo;C&rdquo;. It supposes that you have already done this.</li>
+<li>Click &ldquo;MANAGE CHUNK&rdquo; on the sidebar. By this, the data of columns &ldquo;A&rdquo; to &ldquo;C&rdquo; are put into corpus. And, each ID on the corpus is automatically put into column &ldquo;E&rdquo;.</li>
+<li>Put your question into the text box of &ldquo;Generate answer&rdquo;.</li>
+<li>Click &ldquo;GENERATE ANSWER&rdquo;. By this, the answer is generated by Gemini with your data.</li>
+</ol>
+<p>If you want to update data, please do the following steps.</p>
+<ol>
+<li>Modify columns &ldquo;B&rdquo; and &ldquo;C&rdquo; and set column &ldquo;D&rdquo; to &ldquo;Update&rdquo;.</li>
+<li>Click &ldquo;MANAGE CHUNK&rdquo; on the sidebar.</li>
+</ol>
+<p>If you want to delete several pieces of data, please do the following steps.</p>
+<ol>
+<li>Set column &ldquo;D&rdquo; to &ldquo;Delete&rdquo;.</li>
+<li>Click &ldquo;MANAGE CHUNK&rdquo; on the sidebar.</li>
+</ol>
+<p>If you want to clear all data in the corpus, please do the following steps.</p>
+<ol>
+<li>Click &ldquo;CLEAR CORPUS&rdquo; on the sidebar.</li>
+</ol>
+<p>If you want to load data from the existing corpus, please do the following steps.</p>
+<ol>
+<li>Set &ldquo;databaseName&rdquo;, &ldquo;corpusName&rdquo;, and &ldquo;documentName&rdquo; in the &ldquo;dashboard&rdquo; sheet. Here, please set the name of the existing corpus and document.</li>
+<li>Click &ldquo;GET DATA FROM CORPUS&rdquo;. By this, the data is loaded from your corpus and put into the &ldquo;data&rdquo; sheet. In this case, the data is overwritten in the sheet. Please be careful about this.</li>
+</ol>
+<p>You can also see the whole script at <a href="https://github.com/tanaikech/QAApp">my repository</a>.</p>
+<h1 id="summary">Summary</h1>
+<p>This report details a method to improve Gemini&rsquo;s text generation accuracy with medium-sized datasets using Google Spreadsheet as a Retrieval-Augmented Generation (RAG) corpus. Instead of relying solely on the &lsquo;models/aqa&rsquo; model, this approach leverages Gemini 1.5 Flash/Pro models for increased response diversity and update frequency. Data from the spreadsheet is divided into chunks and stored within a Google Cloud Platform corpus. A Google Apps Script facilitates data management and content generation. This allows for dynamic, accurate responses to user queries based on the information stored in the spreadsheet.</p>
+
+  
+  <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2024%2f10%2f09%2fimproving-geminis-text-generation-accuracy-with-corpus-managed-by-google-spreadsheet-as-rag%2f" target="_blank" title="Share on Facebook"><i class="fab fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2024%2f10%2f09%2fimproving-geminis-text-generation-accuracy-with-corpus-managed-by-google-spreadsheet-as-rag%2f" target="_blank" title="Tweet"><i class="fab fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2024%2f10%2f09%2fimproving-geminis-text-generation-accuracy-with-corpus-managed-by-google-spreadsheet-as-rag%2f" target="_blank" title="Share on Google+"><i class="fab fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2024%2f10%2f09%2fimproving-geminis-text-generation-accuracy-with-corpus-managed-by-google-spreadsheet-as-rag%2f" target="_blank" title="Post to Tumblr"><i class="fab fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2024%2f10%2f09%2fimproving-geminis-text-generation-accuracy-with-corpus-managed-by-google-spreadsheet-as-rag%2f" target="_blank" title="Pin it"><i class="fab fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2024%2f10%2f09%2fimproving-geminis-text-generation-accuracy-with-corpus-managed-by-google-spreadsheet-as-rag%2f" target="_blank" title="Submit to Reddit"><i class="fab fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
+
+
+  
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2024/10/01/pseudo-function-calling-for-gemini-api-through-prompt-engineering/"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2024/10/01/pseudo-function-calling-for-gemini-api-through-prompt-engineering/">Pseudo Function Calling for Gemini API Through Prompt Engineering</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
+</div>
+
+
+  
+  
+  
+  
+
+  
+
+</div>
+
+</div>
+</div>
+<script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
+
+
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
+<script>
+  
+  if (window.location.hostname != "localhost") {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-J3Z6T50WL5');
+  }
+</script>
+
+
+
+
+
+
+
+
+</body>
+</html>
+
