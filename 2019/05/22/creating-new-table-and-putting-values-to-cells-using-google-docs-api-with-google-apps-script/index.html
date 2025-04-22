@@ -338,13 +338,66 @@
 <li>These sample scripts use the scope of <code>https://www.googleapis.com/auth/documents</code>.</li>
 <li>Google Docs API is growing now. So I think that in the future, more simple method for this situation might be added.</li>
 </ul>
+<h2 id="added-on-april-23-2025">Added on April 23, 2025</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * ### Description
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Create the requests for batchUpdate of Docs API.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Create a new table and put the cell values by one API call.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param {Object} object
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param {Number} object.tableIndex Table index you expect. 1 is the top of document.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param {Array} object.tableValues Cell values. 2-dimensional array.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @return {Array} Created requests for batchUpdate of Docs API.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">createRequests_</span>(<span style="color:#a6e22e">object</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">tableIndex</span>, <span style="color:#a6e22e">tableValues</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">object</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">maxLen</span> <span style="color:#f92672">=</span> Math.<span style="color:#a6e22e">max</span>(...<span style="color:#a6e22e">tableValues</span>.<span style="color:#a6e22e">map</span>(<span style="color:#a6e22e">r</span> =&gt; <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">length</span>));
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">index</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">tableIndex</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">5</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">cellValues</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">tableValues</span>.<span style="color:#a6e22e">flatMap</span>((<span style="color:#a6e22e">r</span>, <span style="color:#a6e22e">i</span>) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">rowIndex</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">index</span> <span style="color:#f92672">+</span> (<span style="color:#a6e22e">i</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">?</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">:</span> <span style="color:#ae81ff">3</span>) <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">o</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">c</span>, <span style="color:#a6e22e">j</span>) =&gt; {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">idx</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">rowIndex</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">j</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">insertText</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">text</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">c</span>, <span style="color:#a6e22e">location</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">index</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">idx</span> } } };
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">index</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">idx</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">obj</span>;
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">maxLen</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">index</span> <span style="color:#f92672">+=</span> (<span style="color:#a6e22e">maxLen</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">length</span>) <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
+</span></span><span style="display:flex;"><span>  }).<span style="color:#a6e22e">reverse</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">requests</span> <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    { <span style="color:#a6e22e">insertTable</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">rows</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">tableValues</span>.<span style="color:#a6e22e">length</span>, <span style="color:#a6e22e">columns</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">maxLen</span>, <span style="color:#a6e22e">location</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">index</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">tableIndex</span> } } },
+</span></span><span style="display:flex;"><span>    ...<span style="color:#a6e22e">cellValues</span>
+</span></span><span style="display:flex;"><span>  ];
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">requests</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Please run this function.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Please set your Doc ID.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">docId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Please set the table index you expect. 1 is the top of document.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">tableIndex</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// This is a sample table values.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">tableValues</span> <span style="color:#f92672">=</span> [[<span style="color:#e6db74">&#34;A1&#34;</span>, <span style="color:#e6db74">&#34;B1&#34;</span>], [<span style="color:#e6db74">&#34;A2&#34;</span>, <span style="color:#e6db74">&#34;B2&#34;</span>]];
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">requests</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">createRequests_</span>({ <span style="color:#a6e22e">tableIndex</span>, <span style="color:#a6e22e">tableValues</span> });
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">Docs</span>.<span style="color:#a6e22e">Documents</span>.<span style="color:#a6e22e">batchUpdate</span>({ <span style="color:#a6e22e">requests</span> }, <span style="color:#a6e22e">docId</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>When this script is run, the same result as the above script is obtained.</p>
+<p>Also, in this script, you can modify the value <code>tableValues</code> to your situation. For example, when <code>const tableValues = [[&quot;A1&quot;, &quot;B1&quot;, &quot;C1&quot;], [&quot;A2&quot;, &quot;B2&quot;, &quot;C2&quot;], [&quot;A3&quot;, &quot;B3&quot;, &quot;C3&quot;]];</code> is used, a 3 x 3 table including the cell values is created.</p>
+<p>This sample is Google Apps Script. But, in this case, the function <code>createRequests_</code> can also be used with Node.js and JavaScript.</p>
 <h2 id="references">References:</h2>
 <ul>
 <li><a href="https://developers.google.com/apps-script/guides/services/advanced">Advanced Google Services</a></li>
 <li><a href="https://developers.google.com/docs/api/reference/rest/v1/documents/request#inserttablerequest">InsertTableRequest</a></li>
-<li><a href="https://stackoverflow.com/a/56247351">Insert table in Google Docs API Python</a>
+<li>I answered to Stackoverflow using this post.
 <ul>
-<li>This method was also used for this thread.</li>
+<li><a href="https://stackoverflow.com/a/56247351">Insert table in Google Docs API Python</a></li>
+<li><a href="https://stackoverflow.com/a/79584218">Google Docs API: Text from insertText appears all in the first cell of table — how to correctly insert text into each cell? Using React</a></li>
 </ul>
 </li>
 </ul>
