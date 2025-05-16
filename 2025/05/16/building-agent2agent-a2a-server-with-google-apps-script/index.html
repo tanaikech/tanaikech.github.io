@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  
+  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+
+  <meta name="description" content="">
+  <meta name="generator" content="Hugo 0.98.0" />
+
+  <title>Building Agent2Agent (A2A) Server with Google Apps Script &middot; tanaike</title>
+
+    
+
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/pure-min.css">
+
+  <!--[if lte IE 8]>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-old-ie-min.css">
+  <![endif]-->
+  <!--[if gt IE 8]><!-->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-min.css">
+  <!--<![endif]-->
+
+  <!--[if lte IE 8]>
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/side-menu-old-ie.css">
+  <![endif]-->
+  <!--[if gt IE 8]><!-->
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/side-menu.css">
+  <!--<![endif]-->
+
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
+
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet" type="text/css">
+
+  
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+ 
+  
+
+  
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/styles/androidstudio.min.css">
+  <script async src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/highlight.min.js"></script>
+  
+  <script>hljs.initHighlightingOnLoad();</script>
+  
+
+  <link rel="shortcut icon" href="https://tanaikech.github.io/img/favicon.ico" type="image/x-icon" />
+
+  
+  
+
+</head>
+
+
+<body>
+<div id="layout">
+
+  
+<a href="#menu" id="menuLink" class="menu-link">
+  
+  <span></span>
+</a>
+<div id="menu">
+
+  
+  <a class="pure-menu-heading brand" href="https://tanaikech.github.io/">TANAIKE</a>
+
+
+  <div class="pure-menu">
+    <ul class="pure-menu-list">
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/about/"><i class='fa fa-user fa-fw'></i>About</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/post/"><i class='fa fa-list fa-fw'></i>Posts</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/topics/"><i class='fa fa-folder fa-fw'></i>Topics</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/tags/"><i class='fa fa-tags fa-fw'></i>Tags</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/contact/"><i class='fa fa-phone fa-fw'></i>Contact</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/webapps/"><i class='fas fa-toolbox'></i>Web Applications</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/donate/"><i class='fas fa-donate'></i>Donate</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
+      
+        </li>
+      
+    </ul>
+  </div>
+
+  <div class="pure-menu social">
+  <ul class="pure-menu-list">
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://twitter.com/tanaikech" rel="me" target="_blank"><i class="fab fa-twitter-square fa-fw"></i>X</a>
+    </li>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
+    </li>
+    
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+    </li>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+  </ul>
+</div>
+
+
+  <div>
+  <div class="small-print">
+    <small>&copy; 2017. All rights reserved.</small>
+  </div>
+  <div class="small-print">
+    <small>Built with&nbsp;<a href="https://gohugo.io/" target="_blank">Hugo</a></small>
+    <small>Theme&nbsp;<a href="https://github.com/yoshiharuyamashita/blackburn" target="_blank">Blackburn</a></small>
+  </div>
+</div>
+
+</div>
+
+
+  <div id="main">
+
+
+<div class="header">
+  <h1>Building Agent2Agent (A2A) Server with Google Apps Script</h1>
+  <h2></h2>
+</div>
+<div class="content">
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>16 May 2025, 15:16</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/agent2agent">agent2agent</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/a2a">A2A</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  <p><a href="https://gist.github.com/tanaikech/85c4762a8b8c6c7d8bee1d7ed32ade34">Gists</a></p>
+<p><img src="https://tanaikech.github.io/image-storage/20250516a/fig1.jpg" alt=""></p>
+<h1 id="abstract">Abstract</h1>
+<p>Exploring Agent2Agent (A2A) protocol implementation in Google Apps Script seamlessly allows AI agents to access Google Workspace data and functions. This could enable complex workflows and automation, overcoming platform silos for integrated AI applications.</p>
+<h1 id="introduction">Introduction</h1>
+<p>Agent2Agent (A2A) is a proposed open protocol facilitating communication and collaboration among diverse AI agents, aiming to overcome platform silos and enable complex tasks while preserving agent opacity. This report examines the feasibility of implementing a core A2A server component using Google Apps Script within Google Workspace. Such an implementation could seamlessly allow AI agents to securely access and utilize data and functionalities across Google services like Docs, Sheets, and Gmail via a standardized protocol. This would enable sophisticated AI-powered workflows and automation directly linked to user data. A sample script demonstrates the technical potential despite the current lack of a dedicated Apps Script SDK for A2A. While acknowledging potential Apps Script limitations, such as execution time, this exploratory approach remains valuable for developing internal or user-centric AI applications and integrations within Google Workspace. A successful demonstration could potentially highlight the capabilities of Google Apps Script.</p>
+<h1 id="usage">Usage</h1>
+<h2 id="1-create-a-google-apps-script-project">1. Create a Google Apps Script project</h2>
+<p>Please create a new Google Apps Script project of the standalone type. <a href="https://developers.google.com/apps-script/guides/projects#create-standalone">Ref</a> Of course, the sample script in this report can also be used for the container-bound script type.</p>
+<p>Open the script editor of the created Google Apps Script project.</p>
+<h2 id="2-install-a-library">2. Install a library</h2>
+<h3 id="repository">Repository</h3>
+<p><a href="https://github.com/tanaikech/A2AApp">https://github.com/tanaikech/A2AApp</a></p>
+<h3 id="librarys-project-key">Library&rsquo;s project key</h3>
+<pre tabindex="0"><code>1OuHIiA5Ge0MG_SpKdv1JLz8ZS3ouqhvrF5J6gRRr6xFiFPHxkRsgjMI6
+</code></pre><p>In order to simply deploy the A2A server, I created the script as a Google Apps Script library. To use this library, please install the library as follows.</p>
+<ol>
+<li>Open the script editor of Google Apps Script.</li>
+<li><a href="https://developers.google.com/apps-script/guides/libraries">Install this library</a>: The library&rsquo;s project key is <strong><code>1OuHIiA5Ge0MG_SpKdv1JLz8ZS3ouqhvrF5J6gRRr6xFiFPHxkRsgjMI6</code></strong>.</li>
+</ol>
+<p>This library includes <a href="https://github.com/tanaikech/GeminiWithFiles">GeminiWithFiles</a> for accessing Gemini.</p>
+<h2 id="3-web-apps">3. Web Apps</h2>
+<p>To allow access from the A2A client, the project uses Web Apps built with Google Apps Script. <a href="https://developers.google.com/apps-script/guides/web">Ref</a> The A2A client can access the A2A server using a GET and POST HTTP request. Thus, the Web Apps can be used as the A2A server.</p>
+<p>Detailed information can be found in <a href="https://developers.google.com/apps-script/guides/web#deploy_a_script_as_a_web_app">the official documentation</a>.</p>
+<p>Please follow these steps to deploy the Web App in the script editor.</p>
+<ol>
+<li>In the script editor, at the top right, click &ldquo;Deploy&rdquo; -&gt; &ldquo;New deployment&rdquo;.</li>
+<li>Click &ldquo;Select type&rdquo; -&gt; &ldquo;Web App&rdquo;.</li>
+<li>Enter the information about the Web App in the fields under &ldquo;Deployment configuration&rdquo;.</li>
+<li>Select <strong>&ldquo;Me&rdquo;</strong> for <strong>&ldquo;Execute as&rdquo;</strong>.</li>
+<li>Select <strong>&ldquo;Anyone&rdquo;</strong> for <strong>&ldquo;Who has access to the app:&rdquo;</strong>. In this sample, a simple approach allows requests without an access token. However, a custom API key is used for accessing the Web App.</li>
+<li>Click &ldquo;Deploy&rdquo;.</li>
+<li>On the script editor, at the top right, click &ldquo;Deploy&rdquo; -&gt; &ldquo;Test deployments&rdquo;.</li>
+<li>Copy the Web App URL. It will be similar to <code>https://script.google.com/macros/s/###/exec</code>.</li>
+</ol>
+<p><strong>It is important to note that when you modify the Google Apps Script for the Web App, you must modify the deployment as a new version.</strong> This ensures the modified script is reflected in the Web App. Please be careful about this. Also, you can find more details on this in my report &ldquo;<a href="https://gist.github.com/tanaikech/ebf92d8f427d02d53989d6c3464a9c43">Redeploying Web Apps without Changing URL of Web Apps for new IDE</a>&rdquo;.</p>
+<h2 id="4-script">4. Script</h2>
+<p>The script in this sample is as follows.</p>
+<ul>
+<li>Please set your API key for using the Gemini API to <code>apiKey</code>.</li>
+<li>Please set your Web Apps URL to <code>WebAppsURL</code>.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Please set your Web Apps URL.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * This URL is as follows. I think that in order to test the sample, the following URL can be used.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * https://script.google.com/macros/s/###/exec
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * If you want to use the access key to Web Apps, please use the following URL.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * In this case, please include {accessKey: &#34;sample&#34;} to the method &#34;a2aApp&#34;.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * https://script.google.com/macros/s/###/exec?accessKey=sample
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">WebAppsURL</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://script.google.com/macros/s/###/exec&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// doGet and doPost are used for connecting between the A2A server and the A2A client with the HTTP request.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">doGet</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">e</span>) =&gt; <span style="color:#a6e22e">main</span>(<span style="color:#a6e22e">e</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">doPost</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">e</span>) =&gt; <span style="color:#a6e22e">main</span>(<span style="color:#a6e22e">e</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// This is the main function.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>(<span style="color:#a6e22e">eventObject</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">apiKey</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set your API key for using Gemini API.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">object</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">eventObject</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">agentCard</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">getAgentCard_</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">functions</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">getFunctions_</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">apiKey</span>,
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">A2AApp</span>.<span style="color:#a6e22e">a2aApp</span>().<span style="color:#a6e22e">server</span>(<span style="color:#a6e22e">object</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><code>getAgentCard_</code> and <code>getFunctions_</code> are the following functions. In this sample, the following agent card and functions are used.</p>
+<p>About the agent card, in the current stage, it is required to set <code>&quot;streaming&quot;: false, &quot;pushNotifications&quot;: false, &quot;stateTransitionHistory&quot;: false</code> at <code>capabilities</code> because of the specification of the Web Apps. Please be careful about this. This also might be a limitation.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * This is a sample agent card.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * You can see the specification of the agent card at the following official site.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Ref: https://google.github.io/A2A/specification/
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * This agent card of &#34;Currency Exchange Rates Tool&#34; is from
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * https://google.github.io/A2A/specification/#56-sample-agent-card
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * https://github.com/google/A2A/blob/main/samples/python/agents/langgraph/__main__.py#L28
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">getAgentCard_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">_</span>) =&gt; ({
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Google Resource Manager Agent&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">description</span><span style="color:#f92672">:</span> [
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`Provide management for using Google resources.`</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`Also, help with exchange values between various currencies.`</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`1. Return an image data from a given filename by searching Google Drive.`</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`2. Run with exchange values between various currencies. For example, this answers &#34;What is the exchange rate between USD and GBP?&#34;.`</span>,
+</span></span><span style="display:flex;"><span>  ].<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;\n&#34;</span>),
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">provider</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">organization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Tanaike&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;https://github.com/tanaikech&#34;</span>,
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">version</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;1.0.0&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">WebAppsURL</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">defaultInputModes</span><span style="color:#f92672">:</span> [<span style="color:#e6db74">&#34;text/plain&#34;</span>],
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">defaultOutputModes</span><span style="color:#f92672">:</span> [<span style="color:#e6db74">&#34;text/plain&#34;</span>],
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">capabilities</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">streaming</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">false</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">pushNotifications</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">false</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">stateTransitionHistory</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">false</span>,
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">skills</span><span style="color:#f92672">:</span> [
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">id</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;get_image_from_google_drive&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Get Images from Google Drive&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">description</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;Return an image data from a given filename by searching Google Drive.&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">tags</span><span style="color:#f92672">:</span> [<span style="color:#e6db74">&#34;image&#34;</span>, <span style="color:#e6db74">&#34;google drive&#34;</span>],
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">examples</span><span style="color:#f92672">:</span> [
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#39;Return an image file of &#34;sample.png&#34; on Google Drive.&#39;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#39;Show an image file of &#34;sample.png&#34; on Google Drive.&#39;</span>,
+</span></span><span style="display:flex;"><span>      ],
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">inputModes</span><span style="color:#f92672">:</span> [<span style="color:#e6db74">&#34;text/plain&#34;</span>],
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">outputModes</span><span style="color:#f92672">:</span> [<span style="color:#e6db74">&#34;image/png&#34;</span>],
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">id</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;convert_currency&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Currency Exchange Rates Tool&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">description</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Helps with exchange values between various currencies&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">tags</span><span style="color:#f92672">:</span> [<span style="color:#e6db74">&#34;currency conversion&#34;</span>, <span style="color:#e6db74">&#34;currency exchange&#34;</span>],
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">examples</span><span style="color:#f92672">:</span> [<span style="color:#e6db74">&#34;What is exchange rate between USD and GBP?&#34;</span>],
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">inputModes</span><span style="color:#f92672">:</span> [<span style="color:#e6db74">&#34;text/plain&#34;</span>],
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">outputModes</span><span style="color:#f92672">:</span> [<span style="color:#e6db74">&#34;text/plain&#34;</span>],
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>  ],
+</span></span><span style="display:flex;"><span>});
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * This is an object including sample functions. These functions are used for creating the response data to the A2A client.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * You can see the specification of this object as follows.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Ref: https://github.com/tanaikech/GeminiWithFiles?tab=readme-ov-file#use-function-calling
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * get_exchange_rate is from the Google&#39;s sample as follows.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Ref: https://github.com/google/A2A/blob/main/samples/python/agents/langgraph/agent.py#L19
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">getFunctions_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">_</span>) =&gt; ({
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">params_</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">get_image_from_google_drive</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">description</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;Use this to get image data from Google Drive by giving a filename.&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">parameters</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;object&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">properties</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">filename</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;string&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">description</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Filename of the image file on Google Drive.&#34;</span>,
+</span></span><span style="display:flex;"><span>          },
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">required</span><span style="color:#f92672">:</span> [<span style="color:#e6db74">&#34;filename&#34;</span>],
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">get_exchange_rate</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">description</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Use this to get current exchange rate.&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">parameters</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;object&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">properties</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">currency_from</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;string&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">description</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Source currency. Default is USD.&#34;</span>,
+</span></span><span style="display:flex;"><span>          },
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">currency_to</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;string&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">description</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Destination currency. Default is EUR.&#34;</span>,
+</span></span><span style="display:flex;"><span>          },
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">currency_date</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;string&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">description</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Date of the currency. Default is latest.&#34;</span>,
+</span></span><span style="display:flex;"><span>          },
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">required</span><span style="color:#f92672">:</span> [<span style="color:#e6db74">&#34;currency_from&#34;</span>, <span style="color:#e6db74">&#34;currency_to&#34;</span>, <span style="color:#e6db74">&#34;currency_date&#34;</span>],
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">get_image_from_google_drive</span><span style="color:#f92672">:</span> ({ <span style="color:#a6e22e">filename</span> }) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">result</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">files</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">searchFiles</span>(
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">`title contains &#39;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">filename</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#39; and mimeType contains &#39;image&#39; and trashed=false`</span>
+</span></span><span style="display:flex;"><span>      );
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">files</span>.<span style="color:#a6e22e">hasNext</span>()) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">file</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">files</span>.<span style="color:#a6e22e">next</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">         * You can see the format of the response value from the following official document.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">         * Ref: https://google.github.io/A2A/specification/#65-part-union-type
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">         */</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;file&#34;</span>,
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">file</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getName</span>(),
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">bytes</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(<span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getBlob</span>().<span style="color:#a6e22e">getBytes</span>()),
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">mimeType</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getMimeType</span>(),
+</span></span><span style="display:flex;"><span>          },
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">metadata</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">null</span>,
+</span></span><span style="display:flex;"><span>        };
+</span></span><span style="display:flex;"><span>      } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`There is no file of &#34;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">filename</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;.`</span>;
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">err</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">err</span>.<span style="color:#a6e22e">message</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">returnThis</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>, <span style="color:#75715e">// When this is true, the response value to the A2A client is this result of this function. When you want to directly return the data from the function, please use this.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>      <span style="color:#a6e22e">result</span>,
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * Ref: https://github.com/google/A2A/blob/main/samples/python/agents/langgraph/agent.py#L19
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * When returnThis is not used, the response value to the A2A client is generated using this result of this function.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   */</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">get_exchange_rate</span><span style="color:#f92672">:</span> ({ <span style="color:#a6e22e">currency_from</span>, <span style="color:#a6e22e">currency_to</span>, <span style="color:#a6e22e">currency_date</span> }) =&gt; ({
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">returnThis</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">false</span>, <span style="color:#75715e">// When this is false, the response value to the A2A client is generated using this result of this function.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">     * You can see the format of the response value from the following official document.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">     * Ref: https://google.github.io/A2A/specification/#65-part-union-type
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">     */</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">result</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;text&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">text</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(
+</span></span><span style="display:flex;"><span>          <span style="color:#e6db74">`https://api.frankfurter.app/</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">currency_date</span><span style="color:#e6db74">}</span><span style="color:#e6db74">?from=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">currency_from</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&amp;to=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">currency_to</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>
+</span></span><span style="display:flex;"><span>        ).<span style="color:#a6e22e">getContentText</span>()
+</span></span><span style="display:flex;"><span>      ),
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">metadata</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">null</span>,
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>  }),
+</span></span><span style="display:flex;"><span>});
+</span></span></code></pre></div><p>Here, <code>get_image_from_google_drive</code> and <code>get_exchange_rate</code> are the functions of Google Apps Script. These scripts are automatically run in this script. And, the response value is generated using the result from the function, and the value is returned to the A2A client.</p>
+<h3 id="options">Options</h3>
+<p>A2AApp has the following options.</p>
+<ul>
+<li>In the case of <code>Execute as: Me</code> and <code>Who has access to the app: Anyone</code> for Web Apps, anyone can access. To enhance security, an access key can be used. When using the access key, please set it as follows: <code>return new A2AApp.a2aApp({accessKey: &quot;sample&quot;}).server(object);</code>. Additionally, please add it as a query parameter to the Web App URL as follows: <code>https://script.google.com/macros/s/###/exec?accessKey=sample</code> and <code>https://script.google.com/macros/s/###/dev?access_token=###&amp;accessKey=sample</code>.</li>
+<li>A2AApp can also record a log. In this case, please set it as follows: <code>return new A2AApp.a2aApp({accessKey: &quot;sample&quot;, log: true, spreadsheetId: &quot;###&quot;}).server(object);</code>. With this setting, the log is recorded in the Spreadsheet.</li>
+</ul>
+<h3 id="format-of-returned-value-from-function">Format of returned value from function</h3>
+<p>In this script, please set the format of the value returned from the function as follows.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;returnThis&#34;</span>: [<span style="color:#960050;background-color:#1e0010">Boolean</span>],
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;result&#34;</span>: { <span style="color:#960050;background-color:#1e0010">[Part]</span> }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><ul>
+<li><code>returnThis</code>: There is a case where it is required to return the raw data from the function. In this case, please use this. When you want to directly return the data from the function, please set <code>true</code>. When this is <code>false</code>, the final response text is generated using the result of the function.</li>
+<li><code>result</code>: Result from the function. The details of <code>[Part]</code> can be seen at <a href="https://google.github.io/A2A/specification/#65-part-union-type">the official document</a>.</li>
+</ul>
+<h3 id="another-approach">Another approach</h3>
+<p>Of course, you can use this library by directly copying and pasting &ldquo;A2AApp&rdquo; into your script editor without using it as a library. In that case, please copy and paste the script of this library. And modify as follows.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">A2AApp</span>.<span style="color:#a6e22e">a2aApp</span>().<span style="color:#a6e22e">server</span>(<span style="color:#a6e22e">object</span>);
+</span></span></code></pre></div><p>to</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">A2AApp</span>().<span style="color:#a6e22e">server</span>(<span style="color:#a6e22e">object</span>);
+</span></span></code></pre></div><h2 id="5-prepare-a-demo-for-testing-an-a2a-protocol">5. Prepare a demo for testing an A2A Protocol</h2>
+<p>The demo can be retrieved from <a href="https://github.com/google/A2A">https://github.com/google/A2A</a>.</p>
+<p>To connect the client of this demo to the Web App created using Google Apps Script, several modifications are required as follows.</p>
+<h3 id="5-1-add-redirect">5-1. Add redirect</h3>
+<p>Accessing the Web App requires a redirect. However, currently, the demo script cannot handle redirects. Therefore, a modification is required. Please modify the <code>_send_request</code> function in <code>A2A/samples/python/common/client/client.py</code> as follows. <a href="https://github.com/google/A2A/blob/main/samples/python/common/client/client.py#L66">Ref</a> This modification allows the client to access the Web App.</p>
+<p>From</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>response <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> client<span style="color:#f92672">.</span>post(
+</span></span><span style="display:flex;"><span>    self<span style="color:#f92672">.</span>url, json<span style="color:#f92672">=</span>request<span style="color:#f92672">.</span>model_dump(), timeout<span style="color:#f92672">=</span>self<span style="color:#f92672">.</span>timeout
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><p>To</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>response <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> client<span style="color:#f92672">.</span>post(
+</span></span><span style="display:flex;"><span>    self<span style="color:#f92672">.</span>url, json<span style="color:#f92672">=</span>request<span style="color:#f92672">.</span>model_dump(), timeout<span style="color:#f92672">=</span>self<span style="color:#f92672">.</span>timeout, follow_redirects<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><h3 id="5-2-add-query-parameter">5-2. Add query parameter</h3>
+<p>As mentioned in the next section, to directly access the Web App using the <code>.well-known/agent.json</code> path, an access token is required. In this case, the access token must be included as a query parameter. However, currently, the demo script cannot add the query parameter. Therefore, a modification is required. Please modify the <code>get_agent_card</code> function in <code>A2A/demo/ui/utils/agent_card.py</code> as follows. <a href="https://github.com/google/A2A/blob/main/demo/ui/utils/agent_card.py">Ref</a> This modification ensures that when a URL like <code>https://script.google.com/macros/s/###/dev?access_token=###</code> is used to register the agent card, it is correctly converted to <code>https://script.google.com/macros/s/###/dev/.well-known/agent.json?access_token=###</code>. This allows the Web App to be accessed using the <code>.well-known/agent.json</code> path.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> requests
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> common.types <span style="color:#f92672">import</span> AgentCard
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> urllib.parse <span style="color:#f92672">import</span> urlparse
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_agent_card</span>(remote_agent_address: str) <span style="color:#f92672">-&gt;</span> AgentCard:
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;Get the agent card.&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    p <span style="color:#f92672">=</span> urlparse(remote_agent_address)
+</span></span><span style="display:flex;"><span>    url <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>p<span style="color:#f92672">.</span>scheme<span style="color:#e6db74">}</span><span style="color:#e6db74">://</span><span style="color:#e6db74">{</span>p<span style="color:#f92672">.</span>netloc<span style="color:#e6db74">}{</span>p<span style="color:#f92672">.</span>path<span style="color:#e6db74">}</span><span style="color:#e6db74">/.well-known/agent.json?</span><span style="color:#e6db74">{</span>p<span style="color:#f92672">.</span>query<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># agent_card = requests.get(f&#39;http://{remote_agent_address}/.well-known/agent.json&#39;)</span>
+</span></span><span style="display:flex;"><span>    agent_card <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>get(url)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> AgentCard(<span style="color:#f92672">**</span>agent_card<span style="color:#f92672">.</span>json())
+</span></span></code></pre></div><p>This modification is not required if you are using a local server to register the Web App&rsquo;s agent card.</p>
+<h2 id="6-register-agent-card">6. Register Agent Card</h2>
+<p>To register the agent card on the client side, there are the following two patterns.</p>
+<h3 id="pattern-1">Pattern 1</h3>
+<p>In this pattern, the agent card is registered directly from the A2A server to the A2A client. To achieve this, it is required to know the specifications of Web Apps in Google Apps Script. When the agent card is registered to the client side, it is required to access the path <code>https://{someURL}/.well-known/agent.json</code>. Unfortunately, at the current stage, Web Apps cannot be directly accessed with such a URL. However, when an access token is used, Web Apps can be accessed using such a URL. <a href="https://github.com/tanaikech/taking-advantage-of-Web-Apps-with-google-apps-script?tab=readme-ov-file#pathinfo-updated-on-february-14-2023">Ref</a> The path <code>.well-known/agent.json</code> can be confirmed as <code>pathInfo</code> in the event object of Web Apps. This specification is used in this pattern.</p>
+<p>To test this, the URL for registering the agent card is retrieved using the following script.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * This function is used for retrieving the URL for registering the AgentCard.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Please directly run this function and copy the URL from the log.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getRegisteringAgentCardURL</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">registeringAgentCardURL</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getService</span>().<span style="color:#a6e22e">getUrl</span>()<span style="color:#e6db74">}</span><span style="color:#e6db74">?access_token=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>()<span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">registeringAgentCardURL</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// The following comment line is used for automatically detecting the scope of &#34;https://www.googleapis.com/auth/drive.readonly&#34;. This scope is used for accessing Web Apps. So, please don&#39;t remove the comment.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">// DriveApp.getFiles();
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><p>At the current stage, the expiration time of the access token is 1 hour. However, it is considered that this will be sufficient for testing this sample. If you want to permanently use the server built with Web Apps created by Google Apps Script, the next pattern 2 might be useful.</p>
+<h3 id="pattern-2">Pattern 2</h3>
+<p>In this pattern, the agent card is registered to the A2A client using a local server. The sample script is as follows.</p>
+<p>Please set your Web Apps URL to <code>WebApps_URL = &quot;https://script.google.com/macros/s/###/exec&quot;</code>. If you want to use an access key, please add it like <code>https://script.google.com/macros/s/###/exec?accessKey=sample</code>.</p>
+<p><strong>IMPORTANT: In this case, <code>/dev</code> is not used. It&rsquo;s required to be <code>/exec</code> because the access token is not used.. Please be careful about this.</strong></p>
+<p>When you add the agent card for the A2A server with Web Apps, it can be achieved by putting the Web Apps URL into <code>url</code> in the agent card. In this case, the access token is not required because Web Apps is not accessed via the <code>.well-known/agent.json</code> path. You can register the agent card using this server. In this pattern, the A2A server created by Web Apps can be used permanently.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> logging
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> click
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> common.server <span style="color:#f92672">import</span> A2AServer
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> common.types <span style="color:#f92672">import</span> (
+</span></span><span style="display:flex;"><span>    AgentCapabilities,
+</span></span><span style="display:flex;"><span>    AgentCard,
+</span></span><span style="display:flex;"><span>    AgentSkill,
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>WebApps_URL <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://script.google.com/macros/s/###/exec&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>logging<span style="color:#f92672">.</span>basicConfig(level<span style="color:#f92672">=</span>logging<span style="color:#f92672">.</span>INFO)
+</span></span><span style="display:flex;"><span>logger <span style="color:#f92672">=</span> logging<span style="color:#f92672">.</span>getLogger(__name__)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@click</span><span style="color:#f92672">.</span>command()
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@click</span><span style="color:#f92672">.</span>option(<span style="color:#e6db74">&#39;--host&#39;</span>, <span style="color:#e6db74">&#39;host&#39;</span>, default<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;localhost&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@click</span><span style="color:#f92672">.</span>option(<span style="color:#e6db74">&#39;--port&#39;</span>, <span style="color:#e6db74">&#39;port&#39;</span>, default<span style="color:#f92672">=</span><span style="color:#ae81ff">10001</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>(host, port):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;Starts the Sample Agent server.&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    capabilities <span style="color:#f92672">=</span> AgentCapabilities(streaming<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>, pushNotifications<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>)
+</span></span><span style="display:flex;"><span>    skill <span style="color:#f92672">=</span> AgentSkill(
+</span></span><span style="display:flex;"><span>        id<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;###&#34;</span>,
+</span></span><span style="display:flex;"><span>        name<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;###&#34;</span>,
+</span></span><span style="display:flex;"><span>        description<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;###&#34;</span>,
+</span></span><span style="display:flex;"><span>        tags<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#34;###&#34;</span>],
+</span></span><span style="display:flex;"><span>        examples<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#34;###&#34;</span>],
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    agent_card <span style="color:#f92672">=</span> AgentCard(
+</span></span><span style="display:flex;"><span>        name<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;###&#34;</span>,
+</span></span><span style="display:flex;"><span>        description<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;###&#34;</span>,
+</span></span><span style="display:flex;"><span>        url<span style="color:#f92672">=</span>WebApps_URL,
+</span></span><span style="display:flex;"><span>        version<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;1.0.0&#39;</span>,
+</span></span><span style="display:flex;"><span>        defaultInputModes<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;text&#39;</span>, <span style="color:#e6db74">&#39;text/plain&#39;</span>],
+</span></span><span style="display:flex;"><span>        defaultOutputModes<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;text&#39;</span>, <span style="color:#e6db74">&#39;text/plain&#39;</span>],
+</span></span><span style="display:flex;"><span>        capabilities<span style="color:#f92672">=</span>capabilities,
+</span></span><span style="display:flex;"><span>        skills<span style="color:#f92672">=</span>[skill],
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    server <span style="color:#f92672">=</span> A2AServer(
+</span></span><span style="display:flex;"><span>        agent_card<span style="color:#f92672">=</span>agent_card,
+</span></span><span style="display:flex;"><span>        task_manager<span style="color:#f92672">=</span>{},
+</span></span><span style="display:flex;"><span>        host<span style="color:#f92672">=</span>host,
+</span></span><span style="display:flex;"><span>        port<span style="color:#f92672">=</span>port,
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    logger<span style="color:#f92672">.</span>info(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;Starting server on </span><span style="color:#e6db74">{</span>host<span style="color:#e6db74">}</span><span style="color:#e6db74">:</span><span style="color:#e6db74">{</span>port<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>    server<span style="color:#f92672">.</span>start()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;__main__&#39;</span>:
+</span></span><span style="display:flex;"><span>    main()
+</span></span></code></pre></div><h2 id="7-testing">7. Testing</h2>
+<p>To test this, complete the following steps:</p>
+<ul>
+<li>The A2A server for the Web Apps has already been deployed.</li>
+<li>The demo script at <a href="https://github.com/google/A2A">https://github.com/google/A2A</a> has already been modified to access the Google Apps Script web app.</li>
+<li>The demo script has already been run.</li>
+</ul>
+<p>Once the above steps are completed, access <code>http://0.0.0.0:12000/</code> or <code>http://localhost:12000</code> in your browser. This will display the UI like the following demonstration.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20250516a/fig2.gif" alt=""></p>
+<p>In your browser, perform the following steps:</p>
+<ol>
+<li>Set your API key for the Gemini API.</li>
+<li>Set the agent by inputting the URL <code>https://script.google.com/macros/s/###/dev?access_token=###</code>. This can be obtained from the <code>getRegisteringAgentCardURL</code> function in Google Apps Script.</li>
+<li>Input questions like <code>Exchange 10,000 yen to US Dollars with current rate.</code> and <code>Show the image of CherryBlossom from Google Drive.</code>. Replace <code>CherryBlossom</code> with your filename.</li>
+</ol>
+<p>By following these steps, you can see results similar to the demonstration shown above.</p>
+<h1 id="note">Note</h1>
+<ul>
+<li>In the current version of <a href="https://github.com/google/A2A">https://github.com/google/A2A</a>, it seems that the JPEG image cannot be displayed in the browser. This might be resolved in the future update.</li>
+</ul>
+
+  
+  <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2025%2f05%2f16%2fbuilding-agent2agent-a2a-server-with-google-apps-script%2f" target="_blank" title="Share on Facebook"><i class="fab fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2025%2f05%2f16%2fbuilding-agent2agent-a2a-server-with-google-apps-script%2f" target="_blank" title="Tweet"><i class="fab fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2025%2f05%2f16%2fbuilding-agent2agent-a2a-server-with-google-apps-script%2f" target="_blank" title="Share on Google+"><i class="fab fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2025%2f05%2f16%2fbuilding-agent2agent-a2a-server-with-google-apps-script%2f" target="_blank" title="Post to Tumblr"><i class="fab fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2025%2f05%2f16%2fbuilding-agent2agent-a2a-server-with-google-apps-script%2f" target="_blank" title="Pin it"><i class="fab fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2025%2f05%2f16%2fbuilding-agent2agent-a2a-server-with-google-apps-script%2f" target="_blank" title="Submit to Reddit"><i class="fab fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
+
+
+  
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2025/05/12/managing-tables-on-google-sheets-using-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2025/05/12/managing-tables-on-google-sheets-using-google-apps-script/">Managing Tables on Google Sheets using Google Apps Script</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
+</div>
+
+
+  
+  
+  
+  
+
+  
+
+</div>
+
+</div>
+</div>
+<script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
+
+
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
+<script>
+  
+  if (window.location.hostname != "localhost") {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-J3Z6T50WL5');
+  }
+</script>
+
+
+
+
+
+
+<script src="https://tanaikech.github.io/js/math-code.js"></script>
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  
+
+
+</body>
+</html>
+
