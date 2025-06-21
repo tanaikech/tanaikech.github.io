@@ -379,7 +379,107 @@
 </span></span><span style="display:flex;"><span>    }
 </span></span><span style="display:flex;"><span>  ]
 </span></span><span style="display:flex;"><span>]
-</span></span></code></pre></div><h1 id="references">References</h1>
+</span></span></code></pre></div><h1 id="tips-for-creating-a-request-body">Tips for Creating a Request Body</h1>
+<p>The official Google Sheets API documentation provides guidance on using <code>chipRuns</code> <a href="https://developers.google.com/workspace/sheets/api/guides/chips">Ref</a>. This additional information aims to further clarify how to construct the request body for smart chips.</p>
+<p>When creating the request body for the Sheets API, the following points are important:</p>
+<p>The <code>startIndex</code> property is defined as:</p>
+<blockquote>
+<p>The zero-based character index where this run starts, in UTF-16 code units.</p>
+</blockquote>
+<p>When you manually insert a smart chip into a cell, <code>@</code> is used as a placeholder. The <code>startIndex</code> indicates the position of this placeholder, and it appears that <code>@</code> is the required placeholder character.</p>
+<p>Let&rsquo;s consider a scenario where you want to insert an email smart chip. The following request body can be used:</p>
+<pre tabindex="0"><code>{
+  &#34;requests&#34;: [
+    {
+      &#34;updateCells&#34;: {
+        &#34;rows&#34;: [
+          {
+            &#34;values&#34;: [
+              {
+                &#34;userEnteredValue&#34;: {
+                  &#34;stringValue&#34;: &#34;@&#34;
+                },
+                &#34;chipRuns&#34;: [
+                  {
+                    &#34;startIndex&#34;: 0,
+                    &#34;chip&#34;: {
+                      &#34;personProperties&#34;: {
+                        &#34;email&#34;: &#34;###@gmail.com&#34;, // sample email address
+                        &#34;displayFormat&#34;: &#34;DEFAULT&#34;
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        &#34;range&#34;: {
+          &#34;sheetId&#34;: 0,
+          &#34;startRowIndex&#34;: 0,
+          &#34;startColumnIndex&#34;: 0
+        },
+        &#34;fields&#34;: &#34;userEnteredValue,chipRuns&#34;
+      }
+    }
+  ]
+}
+</code></pre><p>In this example, the <code>startIndex</code> of <code>@</code> is <strong>0</strong>. When <code>startIndex</code> is 0 in the Sheets API, this property can be omitted.</p>
+<p>Here&rsquo;s another example demonstrating how to include multiple smart chips within a single cell:</p>
+<pre tabindex="0"><code>	{
+  &#34;requests&#34;: [
+    {
+      &#34;updateCells&#34;: {
+        &#34;rows&#34;: [
+          {
+            &#34;values&#34;: [
+              {
+                &#34;userEnteredValue&#34;: {
+                  &#34;stringValue&#34;: &#34;Email is @\nSample spreadsheet is @\nSample image file is @&#34;
+                },
+                &#34;chipRuns&#34;: [
+                  {
+                    &#34;startIndex&#34;: 9,
+                    &#34;chip&#34;: {
+                      &#34;personProperties&#34;: {
+                        &#34;email&#34;: &#34;###@gmail.com&#34;,
+                        &#34;displayFormat&#34;: &#34;DEFAULT&#34;
+                      }
+                    }
+                  },
+                  {
+                    &#34;startIndex&#34;: 33,
+                    &#34;chip&#34;: {
+                      &#34;richLinkProperties&#34;: {
+                        &#34;uri&#34;: &#34;https://docs.google.com/spreadsheets/d/###/edit&#34;
+                      }
+                    }
+                  },
+                  {
+                    &#34;startIndex&#34;: 56,
+                    &#34;chip&#34;: {
+                      &#34;richLinkProperties&#34;: {
+                        &#34;uri&#34;: &#34;https://drive.google.com/file/d/###/view?usp=drivesdk&#34;
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        &#34;range&#34;: {
+          &#34;sheetId&#34;: 0,
+          &#34;startRowIndex&#34;: 0,
+          &#34;startColumnIndex&#34;: 0
+        },
+        &#34;fields&#34;: &#34;userEnteredValue,chipRuns&#34;
+      }
+    }
+  ]
+}
+</code></pre><p>In this request body, the cell text is <code>&quot;Email is @\nSample spreadsheet is @\nSample image file is @&quot;</code>. The positions of the <code>@</code> placeholders are 9, 33, and 56, respectively. Each <code>@</code> will be replaced with its corresponding smart chip.</p>
+<h1 id="references">References</h1>
 <ul>
 <li><a href="https://developers.google.com/workspace/sheets/api/guides/chips">Smart chips</a></li>
 <li><a href="https://developers.google.com/workspace/sheets/api/reference/rest/v4/spreadsheets/batchUpdate">Method: spreadsheets.batchUpdate</a></li>
