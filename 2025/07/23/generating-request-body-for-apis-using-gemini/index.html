@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  
+  <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
+
+  <meta name="description" content="">
+  <meta name="generator" content="Hugo 0.98.0" />
+
+  <title>Generating Request Body for APIs using Gemini &middot; tanaike</title>
+
+    
+
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/pure-min.css">
+
+  <!--[if lte IE 8]>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-old-ie-min.css">
+  <![endif]-->
+  <!--[if gt IE 8]><!-->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-min.css">
+  <!--<![endif]-->
+
+  <!--[if lte IE 8]>
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/side-menu-old-ie.css">
+  <![endif]-->
+  <!--[if gt IE 8]><!-->
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/side-menu.css">
+  <!--<![endif]-->
+
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
+
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet" type="text/css">
+
+  
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+ 
+  
+
+  
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/styles/androidstudio.min.css">
+  <script async src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/highlight.min.js"></script>
+  
+  <script>hljs.initHighlightingOnLoad();</script>
+  
+
+  <link rel="shortcut icon" href="https://tanaikech.github.io/img/favicon.ico" type="image/x-icon" />
+
+  
+  
+
+</head>
+
+
+<body>
+<div id="layout">
+
+  
+<a href="#menu" id="menuLink" class="menu-link">
+  
+  <span></span>
+</a>
+<div id="menu">
+
+  
+  <a class="pure-menu-heading brand" href="https://tanaikech.github.io/">TANAIKE</a>
+
+
+  <div class="pure-menu">
+    <ul class="pure-menu-list">
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/about/"><i class='fa fa-user fa-fw'></i>About</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/post/"><i class='fa fa-list fa-fw'></i>Posts</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/topics/"><i class='fa fa-folder fa-fw'></i>Topics</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/tags/"><i class='fa fa-tags fa-fw'></i>Tags</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/contact/"><i class='fa fa-phone fa-fw'></i>Contact</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/webapps/"><i class='fas fa-toolbox'></i>Web Applications</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/donate/"><i class='fas fa-donate'></i>Donate</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
+      
+        </li>
+      
+    </ul>
+  </div>
+
+  <div class="pure-menu social">
+  <ul class="pure-menu-list">
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://twitter.com/tanaikech" rel="me" target="_blank"><i class="fab fa-twitter-square fa-fw"></i>X</a>
+    </li>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
+    </li>
+    
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+    </li>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+  </ul>
+</div>
+
+
+  <div>
+  <div class="small-print">
+    <small>&copy; 2017. All rights reserved.</small>
+  </div>
+  <div class="small-print">
+    <small>Built with&nbsp;<a href="https://gohugo.io/" target="_blank">Hugo</a></small>
+    <small>Theme&nbsp;<a href="https://github.com/yoshiharuyamashita/blackburn" target="_blank">Blackburn</a></small>
+  </div>
+</div>
+
+</div>
+
+
+  <div id="main">
+
+
+<div class="header">
+  <h1>Generating Request Body for APIs using Gemini</h1>
+  <h2></h2>
+</div>
+<div class="content">
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>23 Jul 2025, 09:12</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/gemini">Gemini</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-api">google api</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  <p><a href="https://gist.github.com/tanaikech/5c5903553f3fa6f1640229dc88e57901">Gists</a></p>
+<p><img src="https://tanaikech.github.io/image-storage/20250723a/fig1.jpg" alt=""></p>
+<h2 id="abstract">Abstract</h2>
+<p>Effortlessly generate API request bodies from natural language commands. This guide demonstrates using Gemini and Google Apps Script to streamline automation and accelerate development for Google Workspace APIs and beyond.</p>
+<h2 id="introduction">Introduction</h2>
+<p>In a recent article, &ldquo;<a href="https://medium.com/google-cloud/managing-google-docs-sheets-and-slides-by-natural-language-with-gemini-cli-and-mcp-62f4dfbef2d5">Managing Google Docs, Sheets, and Slides by Natural Language with Gemini CLI and MCP</a>,&rdquo; I showcased a powerful method for dynamically creating API request bodies using natural language. This approach, utilizing the Gemini CLI and a My Custom Proxy (MCP) server, allows users to manage Google Workspace applications with simple, human-readable commands. The core concept is that generating API request bodies directly from natural language within a script can dramatically streamline automation and development.</p>
+<p>This capability is especially valuable for developers working with Google APIs, as evidenced by frequent questions on Stack Overflow about constructing request bodies for Google Docs, Sheets, and Slides. Building on this, the following report introduces a straightforward sample script using Google Apps Script to achieve this functionality. This method is highly versatile and can be extended to various other APIs beyond Google&rsquo;s ecosystem. While the example uses Google Apps Script, the methodology is language-agnostic and can be implemented in other languages like Python, Node.js, or Java. Ultimately, this innovative approach aims to accelerate script development and empower users to build more intuitive and efficient automation solutions.</p>
+<h2 id="repository">Repository</h2>
+<p>The complete source code and related resources are available in the following repository:</p>
+<p><a href="https://github.com/tanaikech/Generating-Request-Body-for-APIs-using-Gemini">https://github.com/tanaikech/Generating-Request-Body-for-APIs-using-Gemini</a></p>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>Before you begin, ensure you have the following:</p>
+<ol>
+<li><strong>Gemini API Key</strong>: You will need an API key to access the Gemini API. You can obtain one from the <a href="https://ai.google.dev/gemini-api/docs/api-key">Google AI for Developers</a> page.</li>
+<li><strong>Google Apps Script Project</strong>: Create a new standalone Google Apps Script project. For guidance, refer to the <a href="https://developers.google.com/apps-script/guides/projects#create-standalone">official documentation</a>.</li>
+<li><strong>GeminiWithFiles Library</strong>: Install the <code>GeminiWithFiles</code> Google Apps Script library. This library simplifies the use of the Gemini API. You can find installation instructions on the <a href="https://github.com/tanaikech/GeminiWithFiles?tab=readme-ov-file#3-how-to-use-geminiwithfiles">GeminiWithFiles GitHub page</a>.</li>
+<li><strong>JSON Schema of Request Body</strong>: Prepare the JSON schemas that define the structure of the API request bodies. These schemas are crucial for guiding Gemini in generating the correct output. You can find pre-made JSON schemas for the <code>batchUpdate</code> methods of Docs, Sheets, and Slides in the repository:
+<ul>
+<li><a href="https://github.com/tanaikech/Generating-Request-Body-for-APIs-using-Gemini/blob/master/jsonSchemaForDocs.js">jsonSchemaForDocs</a></li>
+<li><a href="https://github.com/tanaikech/Generating-Request-Body-for-APIs-using-Gemini/blob/master/jsonSchemaForSheets.js">jsonSchemaForSheets</a></li>
+<li><a href="https://github.com/tanaikech/Generating-Request-Body-for-APIs-using-Gemini/blob/master/jsonSchemaForSlides.js">jsonSchemaForSlides</a></li>
+</ul>
+</li>
+</ol>
+<h2 id="usage">Usage</h2>
+<h3 id="sample-script">Sample Script</h3>
+<p>Copy and paste the following Google Apps Script code into your project&rsquo;s script editor.</p>
+<p>This is the main class object for generating the request body.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">GenerateRequestBody</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">constructor</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">/** @private */</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">service</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @typedef {Object} ApiResourceIds
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @property {string} [documentId] - The ID of the Google Document.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @property {string} [spreadsheetId] - The ID of the Google Spreadsheet.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @property {string} [presentationId] - The ID of the Google Presentation.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   */</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @typedef {Object} GenerateRequestBodyParams
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @property {string} apiKey - The API key for the Gemini API.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @property {string} prompt - The prompt to generate the request body.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @property {Object} jsonSchema - The JSON schema for the request body.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @property {ApiResourceIds} resourceIds - The IDs of the Google Workspace resources.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @property {number} [retry=5] - The number of times to retry on failure.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @property {string[]} [refUrls=[]] - Reference URLs.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   */</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * Determines the Google Workspace service details based on the provided resource IDs.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @param {ApiResourceIds} resourceIds - The IDs of the Google Workspace resources.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @private
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   */</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">getApiService_</span>({ <span style="color:#a6e22e">documentId</span>, <span style="color:#a6e22e">spreadsheetId</span>, <span style="color:#a6e22e">presentationId</span> }) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">documentId</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">service</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">batchUpdate</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">Docs</span>.<span style="color:#a6e22e">Documents</span>.<span style="color:#a6e22e">batchUpdate</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">resourceId</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">documentId</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">serviceName</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Docs&#34;</span>,
+</span></span><span style="display:flex;"><span>      };
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">spreadsheetId</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">service</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">batchUpdate</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">batchUpdate</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">resourceId</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">spreadsheetId</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">serviceName</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Sheets&#34;</span>,
+</span></span><span style="display:flex;"><span>      };
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">presentationId</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">service</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">batchUpdate</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">Slides</span>.<span style="color:#a6e22e">Presentations</span>.<span style="color:#a6e22e">batchUpdate</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">resourceId</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">presentationId</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">serviceName</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Slides&#34;</span>,
+</span></span><span style="display:flex;"><span>      };
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">&#34;No valid resource ID provided.&#34;</span>);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * Get blobs from URLs.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @param {string[]} refUrls - Reference URLs.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @returns {GoogleAppsScript.Base.Blob[]}
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @private
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   */</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">getBlobs_</span>(<span style="color:#a6e22e">refUrls</span> <span style="color:#f92672">=</span> []) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">refUrls</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">===</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> [];
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">requests</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">refUrls</span>.<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">url</span>) =&gt; ({ <span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">muteHttpExceptions</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span> }));
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetchAll</span>(<span style="color:#a6e22e">requests</span>).<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">blobs</span>, <span style="color:#a6e22e">response</span>, <span style="color:#a6e22e">i</span>) =&gt; {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">response</span>.<span style="color:#a6e22e">getResponseCode</span>() <span style="color:#f92672">===</span> <span style="color:#ae81ff">200</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">blob</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">response</span>
+</span></span><span style="display:flex;"><span>          .<span style="color:#a6e22e">getBlob</span>()
+</span></span><span style="display:flex;"><span>          .<span style="color:#a6e22e">setContentType</span>(<span style="color:#a6e22e">MimeType</span>.<span style="color:#a6e22e">HTML</span>)
+</span></span><span style="display:flex;"><span>          .<span style="color:#a6e22e">getAs</span>(<span style="color:#a6e22e">MimeType</span>.<span style="color:#a6e22e">PDF</span>)
+</span></span><span style="display:flex;"><span>          .<span style="color:#a6e22e">setName</span>(<span style="color:#a6e22e">refUrls</span>[<span style="color:#a6e22e">i</span>]);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">blobs</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">blob</span>);
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">blobs</span>;
+</span></span><span style="display:flex;"><span>    }, []);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * Builds the system instruction for the Gemini API.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @param {string} serviceName - The name of the Google Workspace service.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @param {Object} jsonSchema - The JSON schema for the request body.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @returns {Object} The system instruction object.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @private
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   */</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">buildSystemInstruction_</span>(<span style="color:#a6e22e">serviceName</span>, <span style="color:#a6e22e">jsonSchema</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">parts</span><span style="color:#f92672">:</span> [
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">text</span><span style="color:#f92672">:</span> [
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">`You are an expert in creating request bodies for the batchUpdate method of the Google </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">serviceName</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> API.`</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;Your task is to create a request body based on the user&#39;s prompt.&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;The JSON schema for the request body is as follows. Ensure your response adheres to this schema.&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">`&lt;JSONSchema&gt;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">jsonSchema</span>)<span style="color:#e6db74">}</span><span style="color:#e6db74">&lt;/JSONSchema&gt;`</span>,
+</span></span><span style="display:flex;"><span>          ].<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;\n&#34;</span>),
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>      ],
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * Executes the Gemini API chat request and handles retries.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @param {GeminiWithFiles} g - The GeminiWithFiles instance.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @param {string} initialPrompt - The initial prompt.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @param {number} retry - The number of retry attempts.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @returns {Object} The generated request body.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @private
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   */</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">executeChatWithRetry_</span>(<span style="color:#a6e22e">g</span>, <span style="color:#a6e22e">initialPrompt</span>, <span style="color:#a6e22e">retry</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">currentPrompt</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">initialPrompt</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">retry</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">`Attempt: </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">`Prompt: </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">currentPrompt</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">g</span>.<span style="color:#a6e22e">chat</span>({ <span style="color:#a6e22e">parts</span><span style="color:#f92672">:</span> [{ <span style="color:#a6e22e">text</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">currentPrompt</span> }], <span style="color:#a6e22e">role</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;user&#34;</span> });
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">part</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">candidates</span>[<span style="color:#ae81ff">0</span>]<span style="color:#f92672">?</span>.<span style="color:#a6e22e">content</span><span style="color:#f92672">?</span>.<span style="color:#a6e22e">parts</span><span style="color:#f92672">?</span>.<span style="color:#a6e22e">find</span>((<span style="color:#a6e22e">e</span>) =&gt; <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">text</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">part</span><span style="color:#f92672">?</span>.<span style="color:#a6e22e">text</span>) {
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">requestBody</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">part</span>.<span style="color:#a6e22e">text</span>);
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">if</span> (
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">requestBody</span>.<span style="color:#a6e22e">requests</span> <span style="color:#f92672">&amp;&amp;</span>
+</span></span><span style="display:flex;"><span>            Array.<span style="color:#a6e22e">isArray</span>(<span style="color:#a6e22e">requestBody</span>.<span style="color:#a6e22e">requests</span>) <span style="color:#f92672">&amp;&amp;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">requestBody</span>.<span style="color:#a6e22e">requests</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>          ) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">service</span>.<span style="color:#a6e22e">batchUpdate</span>(<span style="color:#a6e22e">requestBody</span>, <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">service</span>.<span style="color:#a6e22e">resourceId</span>);
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Successfully executed batchUpdate.&#34;</span>);
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">requestBody</span>;
+</span></span><span style="display:flex;"><span>          }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">currentPrompt</span> <span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#e6db74">&#34;The previous attempt failed to generate a valid request body. Please try again.&#34;</span>;
+</span></span><span style="display:flex;"><span>      } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">error</span>(<span style="color:#e6db74">`An error occurred: </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">message</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">currentPrompt</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`An error occurred with the generated request body: &#34;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">message</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;. Please update the request body to fix this error.`</span>;
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`Failed to generate a valid request body after </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">retry</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> attempts.`</span>
+</span></span><span style="display:flex;"><span>    );
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * Generates a request body for Google Workspace APIs using the Gemini API.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @param {GenerateRequestBodyParams} params - The parameters for generating the request body.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @returns {Object} The generated request body object.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   */</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">generateRequestBody</span>({
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">apiKey</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">prompt</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">jsonSchema</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">resourceIds</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">retry</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">refUrls</span> <span style="color:#f92672">=</span> [],
+</span></span><span style="display:flex;"><span>  }) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">apiKey</span> <span style="color:#f92672">||</span> <span style="color:#f92672">!</span><span style="color:#a6e22e">prompt</span> <span style="color:#f92672">||</span> <span style="color:#f92672">!</span><span style="color:#a6e22e">jsonSchema</span> <span style="color:#f92672">||</span> <span style="color:#f92672">!</span><span style="color:#a6e22e">resourceIds</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;Invalid arguments provided. Please check the required parameters.&#34;</span>
+</span></span><span style="display:flex;"><span>      );
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">getApiService_</span>(<span style="color:#a6e22e">resourceIds</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">serviceName</span> } <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">service</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">systemInstruction</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">buildSystemInstruction_</span>(
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">serviceName</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">jsonSchema</span>
+</span></span><span style="display:flex;"><span>    );
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">g</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">GeminiWithFiles</span>.<span style="color:#a6e22e">geminiWithFiles</span>({
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">apiKey</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">systemInstruction</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">responseMimeType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/json&#34;</span>,
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">refUrls</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">blobs</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">getBlobs_</span>(<span style="color:#a6e22e">refUrls</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">blobs</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">fileList</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">g</span>.<span style="color:#a6e22e">setBlobs</span>(<span style="color:#a6e22e">blobs</span>).<span style="color:#a6e22e">uploadFiles</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">g</span>.<span style="color:#a6e22e">withUploadedFilesByGenerateContent</span>(<span style="color:#a6e22e">fileList</span>);
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">executeChatWithRetry_</span>(<span style="color:#a6e22e">g</span>, <span style="color:#a6e22e">prompt</span>, <span style="color:#a6e22e">retry</span>);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>The following functions test the <code>GenerateRequestBody</code> class. <strong>Remember to replace the placeholder values for <code>apiKey</code>, <code>documentId</code>, <code>spreadsheetId</code>, and <code>presentationId</code> with your actual credentials.</strong></p>
+<p>Each of the <code>test_GoogleDocs</code>, <code>test_GoogleSheets</code>, and <code>test_GoogleSlides</code> functions generates a request body to insert the text &ldquo;sample text&rdquo; where &ldquo;sample&rdquo; is red and &ldquo;text&rdquo; is blue, and then executes the request using the <code>batchUpdate</code> method.</p>
+<p>Please use each JSON schema.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">apiKey</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Replace with your actual API key
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Tests the generation of a request body for Google Docs.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">test_GoogleDocs</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">prompt</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`Insert the text &#34;sample text&#34; at the beginning of the document. Color the word &#34;sample&#34; red and the word &#34;text&#34; blue.`</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">resourceIds</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">documentId</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;###&#34;</span> }; <span style="color:#75715e">// Please set your ID.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">GenerateRequestBody</span>().<span style="color:#a6e22e">generateRequestBody</span>({
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">apiKey</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">prompt</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">jsonSchema</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">jsonSchemaForDocs</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">resourceIds</span>,
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">res</span>, <span style="color:#66d9ef">null</span>, <span style="color:#ae81ff">2</span>));
+</span></span><span style="display:flex;"><span>  } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">error</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">error</span>(<span style="color:#a6e22e">error</span>.<span style="color:#a6e22e">message</span>);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Tests the generation of a request body for Google Sheets.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">test_GoogleSheets</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">prompt</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`In the sheet named &#39;Sheet1&#39; (with a sheet ID of 0), insert the text &#34;sample text&#34; into cell A1. Color the word &#34;sample&#34; red and the word &#34;text&#34; blue.`</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">resourceIds</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">spreadsheetId</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;###&#34;</span> }; <span style="color:#75715e">// Please set your ID.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">GenerateRequestBody</span>().<span style="color:#a6e22e">generateRequestBody</span>({
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">apiKey</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">prompt</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">jsonSchema</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">jsonSchemaForSheets</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">resourceIds</span>,
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">res</span>, <span style="color:#66d9ef">null</span>, <span style="color:#ae81ff">2</span>));
+</span></span><span style="display:flex;"><span>  } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">error</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">error</span>(<span style="color:#a6e22e">error</span>.<span style="color:#a6e22e">message</span>);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Tests the generation of a request body for Google Slides.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">test_GoogleSlides</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">prompt</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`On the first slide (ID &#39;p&#39;), create a new text box and insert &#34;sample text&#34;. Color the word &#34;sample&#34; red and the word &#34;text&#34; blue.`</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">resourceIds</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">presentationId</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;###&#34;</span> }; <span style="color:#75715e">// Please set your ID.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">GenerateRequestBody</span>().<span style="color:#a6e22e">generateRequestBody</span>({
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">apiKey</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">prompt</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">jsonSchema</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">jsonSchemaForSlides</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">resourceIds</span>,
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">res</span>, <span style="color:#66d9ef">null</span>, <span style="color:#ae81ff">2</span>));
+</span></span><span style="display:flex;"><span>  } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">error</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">error</span>(<span style="color:#a6e22e">error</span>.<span style="color:#a6e22e">message</span>);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>For more complex requests where the script may struggle to generate a valid request body, you can provide reference URLs for additional context. The following example demonstrates how to create a table in Google Docs by providing a relevant link. I have confirmed that this script successfully generates a valid request body, although it may require several attempts.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">test_GoogleDocs2</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">refUrls</span> <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;https://tanaikech.github.io/2019/05/22/creating-new-table-and-putting-values-to-cells-using-google-docs-api-with-google-apps-script/&#34;</span>,
+</span></span><span style="display:flex;"><span>  ];
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">prompt</span> <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`Insert a table with 2 rows and 3 columns at the beginning of the document (child index is 1.) with the following values. 1st Row: &#34;A1&#34;, &#34;B1&#34;, &#34;C1&#34; in columns. 2nd Row: &#34;A2&#34;, &#34;B2&#34;, &#34;C2&#34; in columns.`</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">`Generate the request body by referencing the uploaded text files.`</span>,
+</span></span><span style="display:flex;"><span>  ].<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;\n&#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">resourceIds</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">documentId</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;###&#34;</span> }; <span style="color:#75715e">// Please set your ID.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">GenerateRequestBody</span>().<span style="color:#a6e22e">generateRequestBody</span>({
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">apiKey</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">prompt</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">jsonSchema</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">jsonSchemaForDocs</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">resourceIds</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">refUrls</span>,
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">res</span>, <span style="color:#66d9ef">null</span>, <span style="color:#ae81ff">2</span>));
+</span></span><span style="display:flex;"><span>  } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">error</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">error</span>(<span style="color:#a6e22e">error</span>.<span style="color:#a6e22e">message</span>);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="summary">Summary</h2>
+<ul>
+<li><strong>Natural Language to API Requests</strong>: This method allows you to generate complex API request bodies using simple, human-like instructions.</li>
+<li><strong>Powered by Gemini</strong>: The core of this solution utilizes the Gemini API to interpret natural language prompts and produce structured JSON output.</li>
+<li><strong>Versatile and Extensible</strong>: While the examples focus on Google Workspace APIs (Docs, Sheets, Slides), the approach can be adapted for any API that accepts a JSON request body.</li>
+<li><strong>Language-Agnostic Methodology</strong>: The underlying concept can be implemented in various programming languages, not just Google Apps Script.</li>
+<li><strong>Accelerated Development</strong>: By automating the creation of request bodies, developers can significantly speed up their workflow and build automation scripts more efficiently.</li>
+</ul>
+
+  
+  <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2025%2f07%2f23%2fgenerating-request-body-for-apis-using-gemini%2f" target="_blank" title="Share on Facebook"><i class="fab fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2025%2f07%2f23%2fgenerating-request-body-for-apis-using-gemini%2f" target="_blank" title="Tweet"><i class="fab fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2025%2f07%2f23%2fgenerating-request-body-for-apis-using-gemini%2f" target="_blank" title="Share on Google+"><i class="fab fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2025%2f07%2f23%2fgenerating-request-body-for-apis-using-gemini%2f" target="_blank" title="Post to Tumblr"><i class="fab fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2025%2f07%2f23%2fgenerating-request-body-for-apis-using-gemini%2f" target="_blank" title="Pin it"><i class="fab fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2025%2f07%2f23%2fgenerating-request-body-for-apis-using-gemini%2f" target="_blank" title="Submit to Reddit"><i class="fab fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
+
+
+  
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="https://tanaikech.github.io/2025/07/22/updated-gas-library-geminiwithfiles/"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="https://tanaikech.github.io/2025/07/22/updated-gas-library-geminiwithfiles/">Updated: GAS Library - GeminiWithFiles</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+  </div>
+</div>
+
+
+  
+  
+  
+  
+
+  
+
+</div>
+
+</div>
+</div>
+<script src="https://tanaikech.github.io/js/ui.js"></script>
+<script src="https://tanaikech.github.io/js/menus.js"></script>
+
+
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
+<script>
+  
+  if (window.location.hostname != "localhost") {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-J3Z6T50WL5');
+  }
+</script>
+
+
+
+
+
+
+<script src="https://tanaikech.github.io/js/math-code.js"></script>
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  
+
+
+</body>
+</html>
+
