@@ -300,7 +300,7 @@
 <h2 id="introduction">Introduction</h2>
 <p>Google Antigravity has officially been released. <a href="https://antigravity.google/">Ref</a> This is a revolutionary &ldquo;Agent-first&rdquo; IDE powered by Gemini 3, designed to empower autonomous AI agents to plan, code, and verify tasks across the Editor, Terminal, and Browser. It is anticipated that this platform will trigger a paradigm shift in how we develop applications and auto-generate comprehensive documentation, moving the industry from simple code completion to fully agentic workflows.</p>
 <p>I believe this technology brings a transformative evolution to the development of Google Apps Script (GAS) by finally bridging the gap between local AI agents and the GAS cloud runtime. I have previously published several articles on modernizing GAS development, specifically regarding secure local execution and sandboxing. <a href="https://medium.com/google-cloud/a-fake-sandbox-for-google-apps-script-a-feasibility-study-on-securely-executing-code-generated-by-cc985ce5dae3">Ref</a> and <a href="https://medium.com/google-cloud/modern-google-apps-script-workflow-building-on-the-cloud-2255dbd32ac3">Ref</a>.</p>
-<p>In this article, as a practical test case, I introduce a next-generation development workflow where Google Antigravity&rsquo;s agents utilize the <a href="https://github.com/brucemcpherson/gas-fakes">gas-fakes</a> library. This combination allows the AI to autonomously generate, unit-test, and refactor GAS code in a local environment before deployment, solving the historical challenge of local GAS execution.</p>
+<p>In this article, as a practical test case, I introduce a next-generation development workflow where Google Antigravity&rsquo;s agents utilize the <a href="https://github.com/brucemcpherson/gas-fakes">gas-fakes</a> and <a href="https://github.com/google/clasp">clasp</a>. This combination allows the AI to autonomously generate, unit-test, and refactor GAS code in a local environment before deployment, solving the historical challenge of local GAS execution.</p>
 <h2 id="environment-setup">Environment Setup</h2>
 <p>To implement this workflow, we must first establish a communication bridge between the Antigravity IDE and the Google Apps Script runtime.</p>
 <h3 id="1-install-google-antigravity">1. Install Google Antigravity</h3>
@@ -320,20 +320,32 @@
 <p>Once the setup is complete, run a simple test command to verify that <code>gas-fakes</code> is correctly configured. This command uses the tool&rsquo;s sandbox to execute a script that retrieves the name of the root folder in your Google Drive.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>gas-fakes -s <span style="color:#e6db74">&#34;const rootFolder = DriveApp.getRootFolder(); const rootFolderName = rootFolder.getName(); console.log(rootFolderName);&#34;</span>
 </span></span></code></pre></div><p>If the command executes without errors and prints your root folder&rsquo;s name, your local environment is ready for development.</p>
+<h3 id="4-install-clasp">4. Install Clasp</h3>
+<p>Install <a href="https://github.com/google/clasp">Clasp</a>, the command-line tool for Google Apps Script:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>npm install -g @google/clasp
+</span></span></code></pre></div><p>Authorize Clasp by following the instructions in <a href="https://github.com/google/clasp?tab=readme-ov-file#authorization">the official GitHub repository</a>.</p>
 <h2 id="integration-model-context-protocol-mcp">Integration: Model Context Protocol (MCP)</h2>
-<p>The core of this workflow is the <strong>Model Context Protocol (MCP)</strong>. The <code>gas-fakes</code> CLI functions as an MCP server, allowing the Gemini 3 agents within Antigravity to execute tools and scripts directly. The official documentation for installing MCP servers can be viewed <a href="https://antigravity.google/docs/mcp">here</a>.</p>
+<p>The core of this workflow is the <strong>Model Context Protocol (MCP)</strong>. The <code>gas-fakes</code> and <code>clasp</code> CLI functions as an MCP server, allowing the Gemini 3 agents within Antigravity to execute tools and scripts directly. The official documentation for installing MCP servers can be viewed <a href="https://antigravity.google/docs/mcp">here</a>.</p>
 <p>For this integration, the MCP server must be manually configured. Open a file named <code>mcp_config.json</code> and paste the following configuration:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;mcpServers&#34;</span>: {
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;gas-fakes&#34;</span>: {
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;command&#34;</span>: <span style="color:#e6db74">&#34;gas-fakes&#34;</span>,
-</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;args&#34;</span>: [<span style="color:#e6db74">&#34;mcp&#34;</span>],
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;args&#34;</span>: [
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;mcp&#34;</span>
+</span></span><span style="display:flex;"><span>      ],
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;disabled&#34;</span>: <span style="color:#66d9ef">false</span>,
 </span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;disabledTools&#34;</span>: []
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;clasp&#34;</span>: {
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;command&#34;</span>: <span style="color:#e6db74">&#34;clasp&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;args&#34;</span>: [
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;mcp&#34;</span>
+</span></span><span style="display:flex;"><span>      ]
 </span></span><span style="display:flex;"><span>    }
 </span></span><span style="display:flex;"><span>  }
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>After saving the file, refresh the MCP server list in Antigravity. When installed correctly, the <code>gas-fakes</code> tools will become visible to the AI agent, as shown below:</p>
+</span></span></code></pre></div><p>After saving the file, refresh the MCP server list in Antigravity. When installed correctly, the <code>gas-fakes</code> and <code>clasp</code> tools will become visible to the AI agent, as shown below:</p>
 <p><img src="https://tanaikech.github.io/image-storage/20251121a/fig2.jpg" alt=""></p>
 <h2 id="practical-demonstration">Practical Demonstration</h2>
 <p>With the environment configured, we can now task the Gemini 3 agent with creating and testing Google Apps Scripts. The agent plans the execution, writes the code, and uses the <code>gas-fakes</code> tool to verify the output.</p>
@@ -357,8 +369,8 @@ The agent successfully calls <code>DocumentApp</code> through the local bridge.<
 <p><strong>Prompt:</strong></p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>Create a new Google Spreadsheet by putting a formula `=GOOGLEFINANCE(&#34;CURRENCY:USDJPY&#34;)` in cell &#34;A1&#34; of the first sheet. Then, get and show the value of cell &#34;A1&#34;. (Note: `gas-fakes` has no `getActiveSheet()` method. In this case, use `getSheets()[0]`.)
 </span></span></code></pre></div><p><img src="https://tanaikech.github.io/image-storage/20251121a/fig4.gif" alt=""></p>
-<p><strong>Implementation Plan:</strong>
-The Antigravity agent analyzes the request and produces the following plan:</p>
+<p><strong>Implementation Plan:</strong></p>
+<p>The Antigravity agent analyzes the request and produces the following plan:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># Create and Read Google Spreadsheet
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>## Goal Description
@@ -378,8 +390,8 @@ The Antigravity agent analyzes the request and produces the following plan:</p>
 </span></span><span style="display:flex;"><span>### Automated Tests
 </span></span><span style="display:flex;"><span>- Run the script using `mcp0_run-gas-by-gas-fakes`.
 </span></span><span style="display:flex;"><span>- Check the output for the logged value.
-</span></span></code></pre></div><p><strong>Walkthrough:</strong>
-The agent executes the plan and confirms the results.</p>
+</span></span></code></pre></div><p><strong>Walkthrough:</strong></p>
+<p>The agent executes the plan and confirms the results.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># Walkthrough - Create and Read Google Spreadsheet
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>I have successfully created a Google Spreadsheet, set a currency conversion formula, and retrieved the value using `gas-fakes`.
@@ -411,15 +423,64 @@ The agent executes the plan and confirms the results.</p>
 </span></span><span style="display:flex;"><span>1.  The spreadsheet was created.
 </span></span><span style="display:flex;"><span>2.  The formula `=GOOGLEFINANCE(&#34;CURRENCY:USDJPY&#34;)` was set and calculated.
 </span></span><span style="display:flex;"><span>3.  The value was correctly retrieved and logged.
+</span></span></code></pre></div><h3 id="sample-3-push-google-apps-script-to-google-drive">Sample 3: Push Google Apps Script to Google Drive</h3>
+<p>This example tests the agent&rsquo;s ability to push the generated Google Sheets to Google Drive.</p>
+<p><strong>Prompt:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>Create a new Google Apps Script project in Google Drive and push the script `create_doc.js`.
+</span></span></code></pre></div><p><img src="https://tanaikech.github.io/image-storage/20251121a/fig5.gif" alt=""></p>
+<p><strong>Implementation Plan:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># Create GAS Project and Push Script
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>## Goal Description
+</span></span><span style="display:flex;"><span>Create a new Google Apps Script project in the current directory and push the existing [create_doc.js](file:///temp/workspace/create_doc.js) file to it.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>## Proposed Changes
+</span></span><span style="display:flex;"><span>### Google Apps Script Project
+</span></span><span style="display:flex;"><span>#### [NEW] [.clasp.json](file:///temp/workspace/.clasp.json)
+</span></span><span style="display:flex;"><span>- Created automatically by `clasp create`.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>#### [MODIFY] [create_doc.js](file:///temp/workspace/create_doc.js)
+</span></span><span style="display:flex;"><span>- Will be pushed to the GAS project.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>## Verification Plan
+</span></span><span style="display:flex;"><span>### Automated Tests
+</span></span><span style="display:flex;"><span>- Use `mcp0_list_projects` to verify the project exists.
+</span></span><span style="display:flex;"><span>- Use `mcp0_pull_files` to verify the file was pushed (optional, or just trust push output).
+</span></span></code></pre></div><p><strong>Walkthrough:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># Walkthrough - Create GAS Project and Push Script
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>I have successfully created a new Google Apps Script project and pushed the [create_doc.js](file:///temp/workspace/create_doc.js) script to it.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>## Changes
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>### Google Apps Script Project
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>#### [NEW] [.clasp.json](file:///temp/workspace/.clasp.json)
+</span></span><span style="display:flex;"><span>- Created automatically by `clasp create`.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>#### [MODIFY] [create_doc.js](file:///temp/workspace/create_doc.js)
+</span></span><span style="display:flex;"><span>- Pushed to the GAS project.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>## Verification Results
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>### Automated Tests
+</span></span><span style="display:flex;"><span>- Verified that the project `create_doc_project` exists using `clasp list`.
+</span></span><span style="display:flex;"><span>- Verified that [create_doc.js](file:///temp/workspace/create_doc.js) was pushed using the output of `clasp push`.
 </span></span></code></pre></div><h2 id="summary">Summary</h2>
-<p>The integration of Google Antigravity and <code>gas-fakes</code> marks a significant step forward in cloud script development.</p>
+<p>This article presented a paradigm shift in Google Apps Script (GAS) development by combining the &ldquo;Agent-first&rdquo; capabilities of <strong>Google Antigravity</strong> (powered by <strong>Gemini 3.0</strong>) with the local emulation power of <strong>gas-fakes</strong>.</p>
+<p>Key takeaways from this next-generation workflow include:</p>
 <ul>
-<li><strong>Agent-First Architecture:</strong> Antigravity&rsquo;s &ldquo;Agent-first&rdquo; approach allows Gemini 3 to plan and execute complex development workflows autonomously.</li>
-<li><strong>Local-Cloud Bridging:</strong> By using <code>gas-fakes</code>, developers can finally execute and test Google Apps Script code locally without deploying to the script editor immediately.</li>
-<li><strong>Seamless Integration:</strong> The Model Context Protocol (MCP) enables seamless communication between the IDE&rsquo;s AI agents and external CLI tools.</li>
-<li><strong>Automated Verification:</strong> The workflow supports self-correction, where the agent can write code, run it, observe errors, and refactor without human intervention.</li>
-<li><strong>Future Potential:</strong> This setup paves the way for more complex CI/CD pipelines in GAS development, ensuring higher code quality and faster iteration cycles.</li>
+<li><strong>The MCP Bridge:</strong> By utilizing the <strong>Model Context Protocol (MCP)</strong>, we successfully transformed the <code>gas-fakes</code> CLI and <code>clasp</code> into accessible tools for the IDE&rsquo;s AI agents. This creates a seamless bridge between the local development environment and the GAS cloud runtime.</li>
+<li><strong>Autonomous Lifecycle Management:</strong> We demonstrated that Gemini 3.0 agents can autonomously handle the entire development lifecycle:
+<ul>
+<li><strong>Planning:</strong> Analyzing requirements to create implementation strategies.</li>
+<li><strong>Coding &amp; Testing:</strong> Writing scripts and verifying logic locally (e.g., handling spreadsheet formulas) without needing to deploy to the cloud first.</li>
+<li><strong>Deployment:</strong> Utilizing <code>clasp</code> to push verified code to production environments.</li>
 </ul>
+</li>
+<li><strong>Self-Healing Workflows:</strong> The workflow allows agents to identify environment limitations (such as the absence of <code>getActiveSheet()</code> in the local emulator) and autonomously refactor code to ensure successful execution.</li>
+</ul>
+<p>By moving from simple code completion to fully agentic verification and deployment, developers can significantly reduce context switching and accelerate the delivery of robust Google Apps Script solutions.</p>
 
   
   <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
