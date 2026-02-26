@@ -9,7 +9,7 @@
   <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
 
   <meta name="description" content="Official profile of Kanshi Tanaike, a Google Developer Expert (GDE) in Google Workspace and Physicist. Specializing in Google Apps Script, Gemini API, and innovative IT solutions.">
-  <meta name="generator" content="Hugo 0.98.0" />
+  <meta name="generator" content="Hugo 0.157.0">
 
   <meta property="og:title" content="tanaike - Developer Blog">
   <meta property="og:description" content="Leverage Google APIs, GAS, and Gemini with specialized technical insights.">
@@ -385,10 +385,10 @@
 </ul>
 <h2 id="experimental-procedure">Experimental procedure</h2>
 <p>At first, I would like to mention about &ldquo;Retrieving 1st empty cell of specific column by searching from TOP of sheet&rdquo; and &ldquo;Retrieving 1st NON empty cell of specific column by searching from BOTTOM of sheet&rdquo;. You can see a simple sample Spreadsheet for explaining them at Fig.1.</p>
-<!-- raw HTML omitted -->
+<br>
 <p><img src="https://tanaikech.github.io/img/20210519a-fig1.png" alt=""></p>
 <p>Fig 1. Simple sample Spreadsheet for explaining about &ldquo;Retrieving 1st empty or non empty cell of specific column&rdquo;.</p>
-<!-- raw HTML omitted -->
+<br>
 <p>From the Fig. 1, for the column &ldquo;C&rdquo;,</p>
 <ul>
 <li>
@@ -399,7 +399,7 @@
 </li>
 </ul>
 <p>All scripts using in this report are filled this condition.</p>
-<!-- raw HTML omitted -->
+<br>
 <p>In this report, in order to measure the process cost, the following sample Spreadsheet was used.</p>
 <p>The sample Spreadsheet has one sheet. The sheet has 5 columns and 200,000 rows. The columns &ldquo;A&rdquo;, &ldquo;B&rdquo; and &ldquo;D&rdquo; are no cell values for all rows. The column &ldquo;C&rdquo; has the cell value of &ldquo;sample&rdquo; in the rows from 1 to 100,000, and no cell values in the rows from 100,001 to 200,000. All rows from 1 to 200,000 of the column &ldquo;E&rdquo; have the cell value of &ldquo;sample&rdquo;.</p>
 <p>In order to measure the process cost, the column &ldquo;C&rdquo; was used. Under this sample Spreadsheet, when the 1st empty cell of the column &ldquo;C&rdquo; by searching from TOP of sheet is retrieved, <code>C100001</code> should be obtained. Also, when the 1st NON empty cell of the column &ldquo;C&rdquo; by searching from BOTTOM of sheet is retrieved, <code>C100000</code> should be obtained.</p>
@@ -427,16 +427,16 @@
 <p>By the way, at GAS, the processing time is not stable as you know. So the average value for more than 200 times measurements was used for each data point which is shown by figures. At this time, the fluctuation of the average values was less than 1 %. I worry that each detailed-data point at my environment might be different from that at other user’s environment. But I think that the trend of this result can be used.</p>
 <h2 id="results-and-discussions">Results and discussions</h2>
 <h3 id="1-retrieving-1st-empty-cell-of-specific-column-by-searching-from-top-of-sheet">1. Retrieving 1st empty cell of specific column by searching from TOP of sheet</h3>
-<!-- raw HTML omitted -->
+<br>
 <p><img src="https://tanaikech.github.io/img/20210519a-fig2.png" alt=""></p>
 <p>Fig 2. Process time vs 4 methods for retrieving 1st empty cell of specific column by searching from TOP of sheet.</p>
-<!-- raw HTML omitted -->
+<br>
 <p>From Fig. 2, it was found that the ascending order of the process costs of these methods was &ldquo;getNextDataCell&rdquo;, &ldquo;TextFinder&rdquo;, &ldquo;while&rdquo; and &ldquo;for loop&rdquo;. When the process speed (v axis) of Fig. 2 is seen, the speed of &ldquo;getNextDataCell&rdquo; is 1.7 times faster than &ldquo;TextFinder&rdquo;, 12.9 times faster than &ldquo;while&rdquo; and 23.3 times faster than &ldquo;for loop&rdquo;. The process costs of &ldquo;getNextDataCell&rdquo; and &ldquo;TextFinder&rdquo; are much lower than those of &ldquo;for loop&rdquo; and &ldquo;while&rdquo;. This result is as same as expected from these references. (<a href="https://gist.github.com/tanaikech/0a6f03970b471ffa286f1dac0b79359e">Ref1</a>, <a href="https://gist.github.com/tanaikech/030203c695b308606041587e6da269e7">Ref2</a>, <a href="https://gist.github.com/tanaikech/d102c9600ba12a162c667287d2f20fe4">Ref3</a>)</p>
 <h3 id="2-retrieving-1st-non-empty-cell-of-specific-column-by-searching-from-bottom-of-sheet">2. Retrieving 1st non empty cell of specific column by searching from BOTTOM of sheet</h3>
-<!-- raw HTML omitted -->
+<br>
 <p><img src="https://tanaikech.github.io/img/20210519a-fig3.png" alt=""></p>
 <p>Fig 3. Process time vs 4 methods for retrieving 1st non empty cell of specific column by searching from BOTTOM of sheet.</p>
-<!-- raw HTML omitted -->
+<br>
 <p>From Fig. 3, it was found that the ascending order of the process cost of these methods was &ldquo;TextFinder&rdquo;, &ldquo;while&rdquo;, &ldquo;for loop&rdquo; and &ldquo;getNextDataCell&rdquo;. When the process speed (v axis) of Fig. 3 is seen, the speed of &ldquo;TextFinder&rdquo; is 10.0 times faster than &ldquo;while&rdquo;, 10.3 times faster than &ldquo;for loop&rdquo; and 17.5 times faster than &ldquo;getNextDataCell&rdquo;. In this case, it was found that the process cost of the method using &ldquo;TextFinder&rdquo; is lowest of all, and, the process cost of &ldquo;getNextDataCell&rdquo; is highest of all. This is the interesting result. At &ldquo;getNextDataCell&rdquo;, when all cell values of the column are empty and no empty, the 1st empty cell cannot be directly retrieved using <code>SpreadsheetApp.Direction.DOWN</code> and <code>SpreadsheetApp.Direction.UP</code>. By this, it is required to add more script for retrieving the 1st empty and the 1st non empty cell. It is considered that the reason of this high cost is due to this additional script. When <a href="#appendix">the scripts for 1st empty cell and 1st non empty cell of specific column by searching from TOP (<code>patternA3_</code>) and BOTTOM (<code>patternB3_</code>) of sheet, respectively</a> are seen, it can understand the differences of process costs for &ldquo;getNextDataCell&rdquo; shown in Fig. 2 and 3. From this result, it was found that although the process cost of &ldquo;getNextDataCell&rdquo; is low, when &ldquo;getNextDataCell&rdquo; is used for retrieving the 1st non empty cell from the bottom of sheet, it is required to be careful. And, it was found that for &ldquo;for loop&rdquo; and &ldquo;while&rdquo;, the process cost is almost the same.</p>
 <p>By the way, I also measured the method for retrieving the 1st empty cell using <code>isBlank()</code> of Class Range. But, in this case, when the script is run for above sample Spreadsheet, an error of <code>Exceeded maximum execution time</code> occurred. By this, it is not included in this result.</p>
 <h2 id="summary">Summary</h2>
@@ -452,11 +452,11 @@
 <p>From above result, when the 1st empty cell of the specific column on Google Spreadsheet using Google Apps Script is retrieved, the methods which are running at the internal server side are suitable.</p>
 </li>
 </ol>
-<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<p><a name="scripts"></a></p>
 <h2 id="sample-scripts-obtained-from-this-report">Sample scripts obtained from this report</h2>
 <p>From this report, I could obtain the following 2 sample scripts for retrieving the 1st empty cell and the 1st non empty cell of the column.</p>
 <h3 id="1-retrieving-1st-empty-row-of-specific-column-by-searching-from-top-of-sheet">1. Retrieving 1st empty row of specific column by searching from <strong>TOP</strong> of sheet</h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span>Object.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">get1stEmptyRowFromTop</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span> (
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span>Object.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">get1stEmptyRowFromTop</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span> (
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">columnNumber</span>,
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">offsetRow</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
 </span></span><span style="display:flex;"><span>) {
@@ -471,17 +471,17 @@
 </span></span><span style="display:flex;"><span>};
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#75715e">// Please run this function.
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>().<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>);
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">get1stEmptyRowFromTop</span>(<span style="color:#ae81ff">3</span>);
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>); <span style="color:#75715e">// Retrieve the 1st empty row of column &#34;C&#34; by searching from TOP of sheet.
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><ul>
 <li>Please give the sheet object and column number.</li>
 <li>In this script, when 2nd argument is used, you can set the offset row. For example, when the 1st and 2nd rows are the header rows, you can use this script as <code>const res = sheet.get1stEmptyRowFromTop(3, 2);</code>.</li>
 </ul>
 <h3 id="2-retrieving-1st-non-empty-row-of-specific-column-by-searching-from-bottom-of-sheet">2. Retrieving 1st NON empty row of specific column by searching from <strong>BOTTOM</strong> of sheet</h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span>Object.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">get1stNonEmptyRowFromBottom</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span> (
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span>Object.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">get1stNonEmptyRowFromBottom</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span> (
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">columnNumber</span>,
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">offsetRow</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
 </span></span><span style="display:flex;"><span>) {
@@ -493,22 +493,22 @@
 </span></span><span style="display:flex;"><span>};
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#75715e">// Please run this function.
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>().<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#e6db74">&#34;Sheet1&#34;</span>);
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">get1stNonEmptyRowFromBottom</span>(<span style="color:#ae81ff">3</span>);
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>); <span style="color:#75715e">// Retrieve the 1st non empty row of column &#34;C&#34; by searching from BOTTOM of sheet.
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><ul>
 <li>Please give the sheet object and column number.</li>
 <li>In this script, when 2nd argument is used, you can set the offset row. For example, when the 1st and 2nd rows are the header rows, you can use this script as <code>const res = sheet.get1stNonEmptyRowFromBottom(3, 2);</code>.</li>
 </ul>
-<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<p><a name="appendix"></a></p>
 <h2 id="appendix">Appendix</h2>
 <h3 id="scripts">Scripts</h3>
-<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<p><a name="pattern1"></a></p>
 <h4 id="retrieving-1st-empty-cell-of-specific-column-by-searching-from-top-of-sheet">Retrieving 1st empty cell of specific column by searching from TOP of sheet</h4>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">// Pattern 1: for loop
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">patternA1_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">columnNumber</span>) =&gt; {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">// Pattern 1: for loop
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">patternA1_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">columnNumber</span>) =&gt; {
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>).<span style="color:#a6e22e">getSheets</span>()[<span style="color:#ae81ff">0</span>];
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>
 </span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">getRange</span>(<span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">columnNumber</span>, <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getLastRow</span>())
@@ -524,7 +524,7 @@
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Ref: https://stackoverflow.com/a/9102463
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e">//
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e">// In this script, when all cells of the column have the values, an error &#34;Cannot read property &#39;0&#39; of undefined&#34; occurred. So I modified the condition of while.
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">patternA2_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">columnNumber</span>) =&gt; {
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">patternA2_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">columnNumber</span>) =&gt; {
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>).<span style="color:#a6e22e">getSheets</span>()[<span style="color:#ae81ff">0</span>];
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>
 </span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">getRange</span>(<span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">columnNumber</span>, <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getLastRow</span>())
@@ -536,7 +536,7 @@
 </span></span><span style="display:flex;"><span>};
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#75715e">// Pattern 3: getNextDataCell
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">patternA3_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">columnNumber</span>) =&gt; {
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">patternA3_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">columnNumber</span>) =&gt; {
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>)
 </span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">getSheets</span>()[<span style="color:#ae81ff">0</span>]
 </span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">getRange</span>(<span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">columnNumber</span>);
@@ -546,7 +546,7 @@
 </span></span><span style="display:flex;"><span>};
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#75715e">// Pattern 4: TextFinder
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">patternA4_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">columnNumber</span>) =&gt; {
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">patternA4_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">columnNumber</span>) =&gt; {
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>).<span style="color:#a6e22e">getSheets</span>()[<span style="color:#ae81ff">0</span>];
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">search</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>
 </span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">getRange</span>(<span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">columnNumber</span>, <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getLastRow</span>())
@@ -556,10 +556,10 @@
 </span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">findNext</span>();
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">search</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">search</span>.<span style="color:#a6e22e">getRow</span>() <span style="color:#f92672">:</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getLastRow</span>() <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>;
 </span></span><span style="display:flex;"><span>};
-</span></span></code></pre></div><p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+</span></span></code></pre></div><p><a name="pattern2"></a></p>
 <h4 id="retrieving-1st-empty-cell-of-specific-column-by-searching-from-buttom-of-sheet">Retrieving 1st empty cell of specific column by searching from BUTTOM of sheet</h4>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">// Pattern 1: for loop
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">patternB1_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">columnNumber</span>) =&gt; {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">// Pattern 1: for loop
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">patternB1_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">columnNumber</span>) =&gt; {
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>).<span style="color:#a6e22e">getSheets</span>()[<span style="color:#ae81ff">0</span>];
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>
 </span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">getRange</span>(<span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">columnNumber</span>, <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getLastRow</span>())
@@ -572,7 +572,7 @@
 </span></span><span style="display:flex;"><span>};
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#75715e">// Pattern 2: while
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">patternB2_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">columnNumber</span>) =&gt; {
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">patternB2_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">columnNumber</span>) =&gt; {
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>).<span style="color:#a6e22e">getSheets</span>()[<span style="color:#ae81ff">0</span>];
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>
 </span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">getRange</span>(<span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">columnNumber</span>, <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getLastRow</span>())
@@ -583,7 +583,7 @@
 </span></span><span style="display:flex;"><span>};
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#75715e">// Pattern 3: getNextDataCell
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">patternB3_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">columnNumber</span>) =&gt; {
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">patternB3_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">columnNumber</span>) =&gt; {
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>).<span style="color:#a6e22e">getSheets</span>()[<span style="color:#ae81ff">0</span>];
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">maxRow</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getMaxRows</span>();
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">columnNumber</span>, <span style="color:#a6e22e">maxRow</span>);
@@ -601,7 +601,7 @@
 </span></span><span style="display:flex;"><span>};
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#75715e">// Pattern 4: TextFinder
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">patternB4_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">columnNumber</span>) =&gt; {
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">patternB4_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">columnNumber</span>) =&gt; {
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">ssId</span>).<span style="color:#a6e22e">getSheets</span>()[<span style="color:#ae81ff">0</span>];
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">search</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>
 </span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">getRange</span>(<span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">columnNumber</span>, <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getMaxRows</span>())

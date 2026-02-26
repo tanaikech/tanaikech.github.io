@@ -9,7 +9,7 @@
   <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
 
   <meta name="description" content="Official profile of Kanshi Tanaike, a Google Developer Expert (GDE) in Google Workspace and Physicist. Specializing in Google Apps Script, Gemini API, and innovative IT solutions.">
-  <meta name="generator" content="Hugo 0.98.0" />
+  <meta name="generator" content="Hugo 0.157.0">
 
   <meta property="og:title" content="tanaike - Developer Blog">
   <meta property="og:description" content="Leverage Google APIs, GAS, and Gemini with specialized technical insights.">
@@ -331,13 +331,13 @@
   
     <article>
   <header>
-    <h2><a href="https://tanaikech.github.io/2021/12/28/simple-method-for-using-ggsrun/">Simple Method for using ggsrun</a></h2>
+    <h2><a href="https://tanaikech.github.io/2017/08/17/downloading-files-under-specific-folder-using-node.js/">Downloading Files Under Specific Folder using Node.js</a></h2>
 
     <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>28 Dec 2021, 11:12</time>
+    <time>17 Aug 2017, 09:25</time>
   </div>
 
   
@@ -348,7 +348,559 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/clitool">CLITool</a>&nbsp;&#47;
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/nodetips">NodeTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/googleapitips">googleapitips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/node.js">Node.js</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/drive-api">drive-api</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/download">download</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <p><a href="https://gist.github.com/tanaikech/38b536923b1765da052c21aab093649d">Gists</a></p>
+<p>This sample script is for downloading files under a specific folder using Node.js. It can download files with Google Docs and others.</p>
+<p>This sample supposes as follows. So please confirm it.</p>
+<ul>
+<li><a href="https://developers.google.com/drive/v3/web/quickstart/nodejs">quickstart</a> is used and default quickstart works fine.</li>
+</ul>
+<p>In order to use this sample, please carry out as follows.</p>
+<ol>
+<li>Replace <code>listFiles()</code> of the default quickstart to this sample.</li>
+<li>Set <code>folderid</code>. This script can retrieve files in the folder with <code>folderid</code>.</li>
+<li>Delete <code>drive-nodejs-quickstart.json</code>. I think that there is the file at <code>.credentials</code> in your home directory.</li>
+<li>Change the SCOPE from <code>var SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly'];</code> to <code>var SCOPES = ['https://www.googleapis.com/auth/drive.readonly'];</code>.</li>
+<li>Run script, retrieve the code and authorize.</li>
+</ol>
+<h2 id="script-">Script :</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">listFiles</span>(<span style="color:#a6e22e">auth</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">folderid</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;### folder ID ###&#34;</span>; <span style="color:#75715e">// Folder ID. This script downloads files in the folder with this folder ID.
+</span></span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">outputExtension</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;pdf&#34;</span>; <span style="color:#75715e">// Extension of output file. This is adapted to only Google Docs.
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">outputMimeType</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">mime</span>.<span style="color:#a6e22e">lookup</span>(<span style="color:#a6e22e">outputExtension</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">service</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">drive</span>(<span style="color:#e6db74">&#39;v3&#39;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">service</span>.<span style="color:#a6e22e">files</span>.<span style="color:#a6e22e">list</span>({
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">auth</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">auth</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">q</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;&#39;&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">folderid</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&#39; in parents and trashed=false&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fields</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;files(id, name, mimeType)&#34;</span>
+</span></span><span style="display:flex;"><span>  }, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">err</span>, <span style="color:#a6e22e">response</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">err</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;The API returned an error: &#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">err</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">response</span>.<span style="color:#a6e22e">files</span>.<span style="color:#a6e22e">forEach</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>){
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">mimeType</span>.<span style="color:#a6e22e">includes</span>(<span style="color:#e6db74">&#34;application/vnd.google-apps&#34;</span>)) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dlfile</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">fs</span>.<span style="color:#a6e22e">createWriteStream</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">name</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;.&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">outputExtension</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">service</span>.<span style="color:#a6e22e">files</span>.<span style="color:#66d9ef">export</span>({
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">auth</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">auth</span>,
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">fileId</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">id</span>,
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">mimeType</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">outputMimeType</span>
+</span></span><span style="display:flex;"><span>        }).<span style="color:#a6e22e">on</span>(<span style="color:#e6db74">&#39;end&#39;</span>, <span style="color:#66d9ef">function</span>() {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;&#39;%s&#39; was downloaded as %s.&#34;</span>, <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">name</span>, <span style="color:#a6e22e">outputExtension</span>);
+</span></span><span style="display:flex;"><span>        }).<span style="color:#a6e22e">on</span>(<span style="color:#e6db74">&#39;error&#39;</span>, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">err</span>) {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">error</span>(<span style="color:#a6e22e">err</span>);
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">process</span>.<span style="color:#a6e22e">exit</span>();
+</span></span><span style="display:flex;"><span>        }).<span style="color:#a6e22e">pipe</span>(<span style="color:#a6e22e">dlfile</span>);
+</span></span><span style="display:flex;"><span>      } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dlfile</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">fs</span>.<span style="color:#a6e22e">createWriteStream</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">name</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">service</span>.<span style="color:#a6e22e">files</span>.<span style="color:#a6e22e">get</span>({
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">auth</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">auth</span>,
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">fileId</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">id</span>,
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">alt</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;media&#39;</span>
+</span></span><span style="display:flex;"><span>        }).<span style="color:#a6e22e">on</span>(<span style="color:#e6db74">&#39;end&#39;</span>, <span style="color:#66d9ef">function</span>() {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;&#39;%s&#39; was downloaded as %s.&#34;</span>, <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">name</span>, <span style="color:#a6e22e">mime</span>.<span style="color:#a6e22e">extension</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">mimeType</span>));
+</span></span><span style="display:flex;"><span>        }).<span style="color:#a6e22e">on</span>(<span style="color:#e6db74">&#39;error&#39;</span>, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">err</span>) {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">error</span>(<span style="color:#a6e22e">err</span>);
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">process</span>.<span style="color:#a6e22e">exit</span>();
+</span></span><span style="display:flex;"><span>        }).<span style="color:#a6e22e">pipe</span>(<span style="color:#a6e22e">dlfile</span>);
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div>
+  </p>
+
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2017/08/16/gas-library-onedriveapp/">GAS Library - OnedriveApp</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>16 Aug 2017, 10:31</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/onedrive">OneDrive</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <p>This is a library of Google Apps Script for using Microsoft OneDrive.</p>
+<h2 id="feature">Feature</h2>
+<p>This library can carry out following functions using OneDrive APIs.</p>
+<ol>
+<li>Retrieve file list on OneDrive.</li>
+<li>Delete files and folders on OneDrive.</li>
+<li>Create folder on OneDrive.</li>
+<li>Download files from OneDrive to Google Drive.</li>
+<li>Upload files from Google Drive to OneDrive.</li>
+</ol>
+<h2 id="demo">Demo</h2>
+<p><img src="https://github.com/tanaikech/OnedriveApp/raw/master/images/demo.gif" alt=""></p>
+<p><strong>You can see the detail information here <a href="https://github.com/tanaikech/OnedriveApp">https://github.com/tanaikech/OnedriveApp</a></strong></p>
+  </p>
+
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2017/08/15/uploading-files-to-onedrive-using-node.js/">Uploading Files to OneDrive Using Node.js</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>15 Aug 2017, 10:00</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/nodetips">NodeTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/onedrivetips">OneDriveTips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/onedrive">OneDrive</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/node.js">Node.js</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/upload">upload</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <p><a href="https://gist.github.com/tanaikech/22bfb05e61f0afb8beed29dd668bdce9">Gists</a></p>
+<h1 id="upload-contents-for-an-item-on-onedrive"><a href="https://dev.onedrive.com/items/upload.htm">Upload contents for an item on OneDrive</a></h1>
+<p>In order to use this script, please retrieve client id, client secret and refresh token before. About this, you can see the detail information at <a href="https://gist.github.com/tanaikech/d9674f0ead7e3320c5e3184f5d1b05cc">https://gist.github.com/tanaikech/d9674f0ead7e3320c5e3184f5d1b05cc</a>.</p>
+<h2 id="1-simple-item-upload">1. Simple item upload</h2>
+<p>This is for the simple item upload is available for items with less than 4 MB of content. The detail information is <a href="https://dev.onedrive.com/items/upload_put.htm">https://dev.onedrive.com/items/upload_put.htm</a>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">fs</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;fs&#39;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">mime</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;mime&#39;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">request</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;request&#39;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">file</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;./sample.zip&#39;</span>; <span style="color:#75715e">// Filename you want to upload on your local PC
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">onedrive_folder</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;SampleFolder&#39;</span>; <span style="color:#75715e">// Folder name on OneDrive
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">onedrive_filename</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;sample.zip&#39;</span>; <span style="color:#75715e">// Filename on OneDrive
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">request</span>.<span style="color:#a6e22e">post</span>({
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;https://login.microsoftonline.com/common/oauth2/v2.0/token&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">form</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">redirect_uri</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;http://localhost/dashboard&#39;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">client_id</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">onedrive_client_id</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">client_secret</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">onedrive_client_secret</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">refresh_token</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">onedrive_refresh_token</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">grant_type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;refresh_token&#39;</span>
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>}, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">error</span>, <span style="color:#a6e22e">response</span>, <span style="color:#a6e22e">body</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fs</span>.<span style="color:#a6e22e">readFile</span>(<span style="color:#a6e22e">file</span>, <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">read</span>(<span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">f</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">request</span>.<span style="color:#a6e22e">put</span>({
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;https://graph.microsoft.com/v1.0/drive/root:/&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">onedrive_folder</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;/&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">onedrive_filename</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;:/content&#39;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#39;Authorization&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">body</span>).<span style="color:#a6e22e">access_token</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#39;Content-Type&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">mime</span>.<span style="color:#a6e22e">getType</span>(<span style="color:#a6e22e">file</span>), <span style="color:#75715e">// When you use old version, please modify this to &#34;mime.lookup(file)&#34;,
+</span></span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">body</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">f</span>,
+</span></span><span style="display:flex;"><span>        }, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">er</span>, <span style="color:#a6e22e">re</span>, <span style="color:#a6e22e">bo</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">bo</span>);
+</span></span><span style="display:flex;"><span>        });
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>});
+</span></span></code></pre></div><h2 id="2-resumable-item-upload">2. Resumable item upload</h2>
+<p>This is for the resumable item upload is provided for large files or when a resumable transfer may be necessary.
+The detail information is <a href="https://dev.onedrive.com/items/upload_large_files.htm">https://dev.onedrive.com/items/upload_large_files.htm</a>.</p>
+  </p>
+
+  
+  <footer>
+    <a href="https://tanaikech.github.io/2017/08/15/uploading-files-to-onedrive-using-node.js/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+  </footer>
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2017/08/12/netatmo-api-had-been-down-3/">Netatmo API Had Been Down 3</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>12 Aug 2017, 17:38</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/etc">etc</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/netatmo">netatmo</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <h2 id="report">Report</h2>
+<p>Netatmo API had been down from Aug. 10, 2017 19:30 JST to Aug. 11, 2017 19:00 JST. Now it&rsquo;s working.</p>
+  </p>
+
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2017/08/11/interconversion-between-google-docs-and-microsoft-docs/">Interconversion Between Google Docs and Microsoft Docs</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>11 Aug 2017, 15:02</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/googleapitips">googleapitips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/convert">convert</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <p><a href="https://gist.github.com/tanaikech/8d639542577a594f6104b7f6fb753064">Gists</a></p>
+<p><strong>Updated: January 22, 2023</strong></p>
+<p>This sample script is for the interconversion between Google Docs (document, spreadsheet and presentation) and Microsoft Docs (word, excel and powerpoint). The feature is to convert them without <a href="https://developers.google.com/apps-script/guides/services/advanced">Advanced Google Services</a>.</p>
+<p>Since Advanced Google Services is not used for this, if you publish your script with this script, you are not necessary to explain how to install Advanced Google Services. This script converts between Google Docs and Microsoft Docs using <code>UrlFetchApp.fetch()</code>. <strong>Although Drive API v3 is used, Drive API is automatically enabled by the recent update on Google.</strong> <a href="http://qiita.com/tanaike/items/1d49f73ab05403d0fe4c">Ref (I&rsquo;m sorry. This is Japanese language.)</a> So you are not necessary to explain about the use of Drive API. By this, users will be easy to use the scripts that Drive API is used. This is very important for a lot of users.</p>
+  </p>
+
+  
+  <footer>
+    <a href="https://tanaikech.github.io/2017/08/11/interconversion-between-google-docs-and-microsoft-docs/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+  </footer>
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2017/08/10/netatmo-api-had-been-down-2/">Netatmo API Had Been Down 2</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>10 Aug 2017, 07:10</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/etc">etc</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/netatmo">netatmo</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <h2 id="report">Report</h2>
+<p>Netatmo API had been down from Aug. 8, 2017 21:30 JST to Aug. 9, 2017 17:30 JST. Now it&rsquo;s working.</p>
+<p>I got an e-mail from Netatmo. They say that the issue was solved.</p>
+  </p>
+
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2017/08/07/netatmo-api-had-been-down-1/">Netatmo API Had Been Down 1</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>07 Aug 2017, 09:03</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/etc">etc</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/netatmo">netatmo</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <h2 id="report">Report</h2>
+<p>Netatmo API had been down from Aug. 7, 2017 00:00 a.m. JST to Aug. 7, 2017 07:30 a.m. JST. Now it&rsquo;s working.</p>
+  </p>
+
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2017/08/05/downloading-shared-files-on-google-drive-using-curl/">Downloading Shared Files on Google Drive Using Curl</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>05 Aug 2017, 11:06</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/googleapitips">googleapitips </a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/curl">curl</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/shared">shared</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/download">download</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <p><a href="https://gist.github.com/tanaikech/f0f2d122e05bf5f971611258c22c110f">Gists</a></p>
+<p>When the shared files on Google Drive is downloaded, it is necessary to change the download method by the file size. The boundary of file size when the method is changed is about <strong>40MB</strong>.</p>
+<h3 id="file-size--40mb">File size &lt; 40MB</h3>
+<h4 id="curl">CURL</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>filename<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;### filename ###&#34;</span>
+</span></span><span style="display:flex;"><span>fileid<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;### file ID ###&#34;</span>
+</span></span><span style="display:flex;"><span>curl -L -o <span style="color:#e6db74">${</span>filename<span style="color:#e6db74">}</span> <span style="color:#e6db74">&#34;https://drive.google.com/uc?export=download&amp;id=</span><span style="color:#e6db74">${</span>fileid<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span></code></pre></div><h3 id="file-size--40mb-1">File size &gt; 40MB</h3>
+<p>When it tries to download the file with more than 40MB, Google says to download from following URL.</p>
+  </p>
+
+  
+  <footer>
+    <a href="https://tanaikech.github.io/2017/08/05/downloading-shared-files-on-google-drive-using-curl/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+  </footer>
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2017/08/04/retrieving-access-token-from-onedrive-using-google-apps-script/">Retrieving Access Token From OneDrive using Google Apps Script</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>04 Aug 2017, 14:21</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
     
       <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
     
@@ -362,72 +914,11 @@
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/ggsrun">ggsrun</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/cli">CLI</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>
-    
-  </div>
-  
-  
-
-</div>
-
-  </header>
-
-  <p>
-  Gists
-This is a simple method for using ggsrun. ggsrun is a CLI tool to execute Google Apps Script (GAS) on a terminal. Also this CLI tool can be used for managing files in Google Drive for OAuth2 and Service Account.
-When you use ggsrun, it is required to retrieve the client ID and client secret and/or the service account at Cloud Platform Project. But, there is the case that you want to simply test or you want to just upload and download the files for Google Drive.
-  </p>
-
-  
-  <footer>
-    <a href="https://tanaikech.github.io/2021/12/28/simple-method-for-using-ggsrun/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2021/12/26/inverting-selected-objects-on-google-slides-using-google-apps-script/">Inverting Selected Objects on Google Slides using Google Apps Script</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>26 Dec 2021, 17:01</time>
-  </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/slides">slides</a>
-    
-  </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/slides">slides</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/onedrive">OneDrive</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/access-token">access token</a>
     
   </div>
   
@@ -438,15 +929,78 @@ When you use ggsrun, it is required to retrieve the client ID and client secret 
   </header>
 
   <p>
-  Gists
-This is a sample script for inverting the selected objects on Google Slides using Google Apps Script.
-I have the case that I want to invert the selected objects on Google Slides. This sample script can be achieved this goal using Google Apps Script.
-Sample script Please copy and paste the following script to the script editor of Google Slides, and save the script. And, please select the objects on the Slide and run the function main().
+  <p><a href="https://gist.github.com/tanaikech/d9674f0ead7e3320c5e3184f5d1b05cc">Gist</a></p>
+<h2 id="overview">Overview</h2>
+<p>This GAS sample is for retrieving access token to use OneDrive APIs using Google Apps Script.</p>
+<p>In this script, the authorization code is automatically retrieved.</p>
+<h2 id="demo">Demo</h2>
+<p><img src="https://tanaikech.github.io/img/20170804a_demo.gif" alt=""></p>
+<h2 id="usage">Usage</h2>
+<p>In order to use this, both accounts of Google and OneDrive (MSN) are required.</p>
+<h3 id="google-side">Google side</h3>
+<ol>
+<li>Copy and paste the sample script to your script editor. You can use the standalone script for this.</li>
+<li><a href="https://developers.google.com/apps-script/guides/web">Deploy Web Apps</a>.
+<ul>
+<li>On the Script Editor
+<ul>
+<li>File</li>
+<li>-&gt; Manage Versions</li>
+<li>-&gt; Save New Version</li>
+<li>Publish</li>
+<li>-&gt; Deploy as Web App</li>
+<li>-&gt; At Execute the app as, select <strong>&ldquo;your account&rdquo;</strong></li>
+<li>-&gt; At Who has access to the app, select <strong>&ldquo;Only myself&rdquo;</strong></li>
+<li>-&gt; Click &ldquo;Deploy&rdquo;</li>
+<li>-&gt; Copy URL of <strong>&ldquo;latest code&rdquo;</strong> (This is important!)</li>
+<li>-&gt; Click &ldquo;OK&rdquo;</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>URL of <strong>&ldquo;latest code&rdquo;</strong> is <code>https://script.google.com/macros/s/###/dev</code>. So please modify this URL. Replace from &ldquo;dev&rdquo; to &ldquo;usercallback&rdquo; for the URL. And copy this modified URL.
+<ul>
+<li>From : <code>https://script.google.com/macros/s/###/dev</code></li>
+<li>To : <code>https://script.google.com/macros/s/###/usercallback</code></li>
+</ul>
+</li>
+</ol>
+<h3 id="onedrive-side">OneDrive side</h3>
+<ol>
+<li>Log in to <a href="https://portal.azure.com/">Microsoft Azure portal</a>.</li>
+<li>Search &ldquo;Azure Active Directory&rdquo; at the top of text input box. And open &ldquo;Azure Active Directory&rdquo;.</li>
+<li>Click &ldquo;App registrations&rdquo; at the left side bar.
+<ul>
+<li>In my environment, when I used Chrome as the browser, no response occurred. So in that case, I used Microsoft Edge.</li>
+</ul>
+</li>
+<li>Click &ldquo;New registration&rdquo;
+<ol>
+<li>app name: &ldquo;sample app name&rdquo;</li>
+<li>Supported account types: &ldquo;Accounts in any organizational directory (Any Azure AD directory - Multitenant) and personal Microsoft accounts (e.g. Skype, Xbox)&rdquo;</li>
+<li>Redirect URI (optional): Web
+<ul>
+<li>URL: <code>https://script.google.com/macros/s/###/usercallback</code></li>
+</ul>
+</li>
+<li>Click &ldquo;Register&rdquo;</li>
+</ol>
+</li>
+<li>Copy <strong>&ldquo;Application (client) ID&rdquo;</strong>.</li>
+<li>Click &ldquo;Certificates &amp; secrets&rdquo; at the left side bar.
+<ol>
+<li>Click &ldquo;New client secrets&rdquo;.</li>
+<li>After input the description and select &ldquo;expire&rdquo;, click &ldquo;Add&rdquo; button.</li>
+<li>Copy <strong>the created secret value</strong>.</li>
+</ol>
+</li>
+</ol>
+<p>By above operation, the preparation is done.</p>
   </p>
 
   
   <footer>
-    <a href="https://tanaikech.github.io/2021/12/26/inverting-selected-objects-on-google-slides-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+    <a href="https://tanaikech.github.io/2017/08/04/retrieving-access-token-from-onedrive-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
   </footer>
   
 </article>
@@ -454,133 +1008,13 @@ Sample script Please copy and paste the following script to the script editor of
   
     <article>
   <header>
-    <h2><a href="https://tanaikech.github.io/2021/12/24/inverting-selected-ranges-on-google-spreadsheet-using-google-apps-script/">Inverting Selected Ranges on Google Spreadsheet using Google Apps Script</a></h2>
+    <h2><a href="https://tanaikech.github.io/2017/07/31/converting-a1notation-to-gridrange-for-google-sheets-api/">Converting a1Notation to GridRange for Google Sheets API</a></h2>
 
     <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>24 Dec 2021, 16:47</time>
-  </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/spreadsheet">spreadsheet</a>
-    
-  </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>
-    
-  </div>
-  
-  
-
-</div>
-
-  </header>
-
-  <p>
-  Gists
-This is a sample script for inverting the selected ranges on Google Spreadsheet using Google Apps Script.
-I have the case that I want to invert the selected ranges on Google Spreadsheet. This sample script can be achieved this goal using Google Apps Script.
-Sample script Please copy and paste the following script to the script editor of Google Spreadsheet, and save the script. And, please select the cells and run the function main().
-  </p>
-
-  
-  <footer>
-    <a href="https://tanaikech.github.io/2021/12/24/inverting-selected-ranges-on-google-spreadsheet-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2021/12/23/checking-whether-cells-on-google-spreadsheet-have-checkboxes-using-google-apps-script/">Checking whether Cells on Google Spreadsheet have Checkboxes using Google Apps Script</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>23 Dec 2021, 14:46</time>
-  </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/spreadsheet">spreadsheet</a>
-    
-  </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>
-    
-  </div>
-  
-  
-
-</div>
-
-  </header>
-
-  <p>
-  Gists
-This is a sample script for checking whether the cells on Google Spreadsheet have checkboxes using Google Apps Script.
-When the checkboxes are used in Google Spreadsheet, there is the case that it is required to know whether the cells have the checkboxes. This sample script can be used for such the situation.
-Sample script 1 This sample script can check whether all cells in &ldquo;A1:B10&rdquo; have the checkboxes. When all cells in &ldquo;A1:B10&rdquo; have the checkboxes, res is true.
-  </p>
-
-  
-  <footer>
-    <a href="https://tanaikech.github.io/2021/12/23/checking-whether-cells-on-google-spreadsheet-have-checkboxes-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2021/12/18/converting-from-string-to-hex-from-hex-to-bytes-from-bytes-to-string-using-google-apps-script/">Converting from String to Hex, from Hex to Bytes, from Bytes to String using Google Apps script</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>18 Dec 2021, 15:31</time>
+    <time>31 Jul 2017, 14:38</time>
   </div>
 
   
@@ -603,7 +1037,11 @@ Sample script 1 This sample script can check whether all cells in &ldquo;A1:B10&
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/sheets-api">Sheets API</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>
     
   </div>
   
@@ -614,14 +1052,32 @@ Sample script 1 This sample script can check whether all cells in &ldquo;A1:B10&
   </header>
 
   <p>
-  Gists
-This is a sample script for converting from the string value to the hex value, from the hex value to the byte array, from the byte array to the string value using Google Apps script.
-When the creation of a signature for requesting and the encryption of data are used, there is the case that these conversions are required to be used. So I would like to introduce these scripts as sample scripts.
+  <p><a href="https://gist.github.com/tanaikech/95c7cd650837f33a564babcaf013cae0">Gists</a></p>
+<p>When it uses Google Sheets API v4, <a href="https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets#gridrange">GridRange</a> is used for it as the range property. These sample scripts are for converting from a1Notation to GridRange. You can chose from following 2 scripts. Both scripts can retrieve the same result.</p>
+<h3 id="script-1-">Script 1 :</h3>
+<p>This is from me.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">a1notation2gridrange1</span>(<span style="color:#a6e22e">sheetid</span>, <span style="color:#a6e22e">a1notation</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">a1notation</span>.<span style="color:#a6e22e">match</span>(<span style="color:#e6db74">/(^.+)!(.+):(.+$)/</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">sheetid</span>).<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#a6e22e">data</span>[<span style="color:#ae81ff">1</span>]);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">range</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">data</span>[<span style="color:#ae81ff">2</span>] <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;:&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">data</span>[<span style="color:#ae81ff">3</span>]);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">gridRange</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">sheetId</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getSheetId</span>(),
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">startRowIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getRow</span>() <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">endRowIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getRow</span>() <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getNumRows</span>(),
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">startColumnIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getColumn</span>() <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">endColumnIndex</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getColumn</span>() <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getNumColumns</span>(),
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">data</span>[<span style="color:#ae81ff">2</span>].<span style="color:#a6e22e">match</span>(<span style="color:#e6db74">/[0-9]/</span>)) <span style="color:#66d9ef">delete</span> <span style="color:#a6e22e">gridRange</span>.<span style="color:#a6e22e">startRowIndex</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">data</span>[<span style="color:#ae81ff">3</span>].<span style="color:#a6e22e">match</span>(<span style="color:#e6db74">/[0-9]/</span>)) <span style="color:#66d9ef">delete</span> <span style="color:#a6e22e">gridRange</span>.<span style="color:#a6e22e">endRowIndex</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">gridRange</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="script-2-">Script 2 :</h3>
+<p><code>String.prototype.to10</code> was used for this script. <code>String.prototype.to10</code> is from <a href="https://gist.github.com/oshliaer/647d574208da5f3529a3">Alexander Ivanov</a>. I think that <code>String.prototype.to10</code> is a clever solution.</p>
   </p>
 
   
   <footer>
-    <a href="https://tanaikech.github.io/2021/12/18/converting-from-string-to-hex-from-hex-to-bytes-from-bytes-to-string-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+    <a href="https://tanaikech.github.io/2017/07/31/converting-a1notation-to-gridrange-for-google-sheets-api/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
   </footer>
   
 </article>
@@ -635,7 +1091,7 @@ When the creation of a signature for requesting and the encryption of data are u
   
   <a href="https://tanaikech.github.io/page/87/"><i class="fa fa-chevron-left"></i></a>
   
-  <span>&nbsp;88 / 194&nbsp;</span>
+  <span>&nbsp;88 / 98&nbsp;</span>
   
   <a href="https://tanaikech.github.io/page/89/"><i class="fa fa-chevron-right"></i></a>
   

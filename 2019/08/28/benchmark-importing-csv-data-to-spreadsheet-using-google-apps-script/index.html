@@ -9,7 +9,7 @@
   <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
 
   <meta name="description" content="Official profile of Kanshi Tanaike, a Google Developer Expert (GDE) in Google Workspace and Physicist. Specializing in Google Apps Script, Gemini API, and innovative IT solutions.">
-  <meta name="generator" content="Hugo 0.98.0" />
+  <meta name="generator" content="Hugo 0.157.0">
 
   <meta property="og:title" content="tanaike - Developer Blog">
   <meta property="og:description" content="Leverage Google APIs, GAS, and Gemini with specialized technical insights.">
@@ -366,51 +366,55 @@
 </div>
 
   <p><a href="https://gist.github.com/tanaikech/030203c695b308606041587e6da269e7">Gists</a></p>
-<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
-<!-- raw HTML omitted -->
+<p><a name="top"></a></p>
+<center>
+August 28, 2019
+    Published.
 <p>Kanshi Tanaike</p>
-<!-- raw HTML omitted -->
+</center>
 <h1 id="introduction">Introduction</h1>
 <p><strong>Please be careful! This result can be only used for Google Apps Script.</strong></p>
-<p>There are a limit executing time for Google Apps Script (GAS). That is 6 minutes for Consumer and Google Apps free edition, and 30 minutes for G Suite and Early Access. <a href="#references"><!-- raw HTML omitted -->1<!-- raw HTML omitted --></a> So many users always have to pay attention to reducing the process cost of scripts. So it is very important to know the process cost of various situations. I have already reported the costs for various processes as the reports. <a href="#references"><!-- raw HTML omitted -->2<!-- raw HTML omitted --></a> In this report, the process cost for importing CSV data to Spreadsheet using GAS has been investigated.</p>
+<p>There are a limit executing time for Google Apps Script (GAS). That is 6 minutes for Consumer and Google Apps free edition, and 30 minutes for G Suite and Early Access. <a href="#references"><sup>1</sup></a> So many users always have to pay attention to reducing the process cost of scripts. So it is very important to know the process cost of various situations. I have already reported the costs for various processes as the reports. <a href="#references"><sup>2</sup></a> In this report, the process cost for importing CSV data to Spreadsheet using GAS has been investigated.</p>
 <p>As the result, it was found that the method using Sheets API is the lowest cost for importing CSV data to the Spreadsheet.</p>
 <h1 id="experimental-procedure">Experimental procedure</h1>
 <p>In order to measure the process cost for importing CSV data to a Spreadsheet, 4 patterns for importing it were used as shown in <a href="#table1">Table 1</a>. The sample CSV data was created as a text file. The sample CSV data can be seen at <a href="#samplecsvdata">here</a>. The numbers of rows and columns of the CSV data are 50,000 and 10, respectively. Each value of the cells is a string value of 15 bytes. At each pattern, the CSV data is retrieved from the file. And then, the CSV data is parsed and put to the existing Spreadsheet. The CSV data is put to the 1st tab of the existing Spreadsheet.</p>
 <p>The 4 patterns for importing the CSV data are shown in Table 1.</p>
-<!-- raw HTML omitted -->
+<br>
+<a name="table1"></a>
+Table 1. 4 patterns for importing the CSV data.
 <table>
-<thead>
-<tr>
-<th style="text-align:left">Tests</th>
-<th style="text-align:left">Process</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">pattern1</td>
-<td style="text-align:left">CSV data is parsed using <code>split()</code>, and put the parsed values to Spreadsheet using <code>setValues()</code>. <a href="#references"><!-- raw HTML omitted -->3<!-- raw HTML omitted --></a></td>
-</tr>
-<tr>
-<td style="text-align:left">pattern2</td>
-<td style="text-align:left">CSV data is parsed using <code>Utilities.parseCsv()</code>, and put the parsed values to Spreadsheet using <code>setValues()</code>. <a href="#references"><!-- raw HTML omitted -->4<!-- raw HTML omitted --></a></td>
-</tr>
-<tr>
-<td style="text-align:left">pattern3</td>
-<td style="text-align:left">CSV data is converted to Spreadsheet using <code>files.copy</code> Drive API, and retrieved values from the converted Spreadsheet using <code>getValues()</code>, then, the retrieved values are put to Spreadsheet using <code>setValues()</code>. <a href="#references"><!-- raw HTML omitted -->5<!-- raw HTML omitted --></a></td>
-</tr>
-<tr>
-<td style="text-align:left">pattern4</td>
-<td style="text-align:left">CSV data is directly put to Spreadsheet using <code>pasteData</code> of Sheets API. <a href="#references"><!-- raw HTML omitted -->6<!-- raw HTML omitted --></a></td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th style="text-align: left">Tests</th>
+          <th style="text-align: left">Process</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">pattern1</td>
+          <td style="text-align: left">CSV data is parsed using <code>split()</code>, and put the parsed values to Spreadsheet using <code>setValues()</code>. <a href="#references"><sup>3</sup></a></td>
+      </tr>
+      <tr>
+          <td style="text-align: left">pattern2</td>
+          <td style="text-align: left">CSV data is parsed using <code>Utilities.parseCsv()</code>, and put the parsed values to Spreadsheet using <code>setValues()</code>. <a href="#references"><sup>4</sup></a></td>
+      </tr>
+      <tr>
+          <td style="text-align: left">pattern3</td>
+          <td style="text-align: left">CSV data is converted to Spreadsheet using <code>files.copy</code> Drive API, and retrieved values from the converted Spreadsheet using <code>getValues()</code>, then, the retrieved values are put to Spreadsheet using <code>setValues()</code>. <a href="#references"><sup>5</sup></a></td>
+      </tr>
+      <tr>
+          <td style="text-align: left">pattern4</td>
+          <td style="text-align: left">CSV data is directly put to Spreadsheet using <code>pasteData</code> of Sheets API. <a href="#references"><sup>6</sup></a></td>
+      </tr>
+  </tbody>
 </table>
-<!-- raw HTML omitted -->
+<br>
 <p>The sample scripts of GAS which were used for this report are <a href="#SampleScripts">here</a>. By the way, at GAS, the processing time is not stable as you know. So the average value for more than 100 times measurements was used for each data point which is shown by figures. At this time, the fluctuation of the average values was less than 1 %. I worry that each detailed-data point at my environment might be different from that at other user&rsquo;s environment. But I think that the trend of this result can be used.</p>
 <h1 id="results">Results</h1>
 <p>Figure 1 shows the process costs for importing CSV data by 4 patterns.</p>
 <p><img src="https://tanaikech.github.io/img/20190829a-fig1.png" alt=""></p>
 <p>Fig 1. Process costs for importing CSV data by 4 patterns. About pattern 1 to 4, you can see them at <a href="#table1">Table 1</a>.</p>
-<!-- raw HTML omitted -->
+<br>
 <p>From Fig.1, the following results can be obtained.</p>
 <ul>
 <li>
@@ -442,7 +446,7 @@
 <li>When pattern4 is used for importing CSV data to Spreadsheet, the cost can be reduced by 72 % from pattern3, which use the method converting mimeType from CSV to Spreadsheet.</li>
 </ul>
 <p>As a note, I have to describe that this is the result for Google Apps Script. For other languages, this result might be difference. And also, the process cost of this report might be modified by future update of Google.</p>
-<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<p><a name="references"></a></p>
 <h1 id="references">References</h1>
 <ol>
 <li><a href="https://developers.google.com/apps-script/guides/services/quotas#current_limitations">Current limitations at Quotas for Google Services</a></li>
@@ -452,14 +456,14 @@
 <li><a href="https://developers.google.com/drive/api/v2/reference/files">Google Drive API</a></li>
 <li><a href="https://developers.google.com/sheets/api/reference/rest/">Google Sheets API</a></li>
 </ol>
-<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<p><a name="appendix"></a></p>
 <h1 id="appendix">Appendix</h1>
-<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<p><a name="samplescripts"></a></p>
 <h2 id="a1-scripts">A1. Scripts</h2>
 <p>Here, the scripts for measuring the process cost are shown as follows. When you use these scripts, please enable Drive API and Sheets API at Advanced Google services.</p>
 <h3 id="pattern1">Pattern1</h3>
 <p>CSV data is parsed using <code>split()</code>, and put the parsed values to Spreadsheet using <code>setValues()</code>. <a href="https://gist.github.com/tanaikech/848aeafaac1ec676900bb78e3ce220b6">I have already know that the process cost of <code>map()</code> is the lowest of all loop processes for Google Apps Script.</a> So I used this here.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">csvFileId</span>)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">csvFileId</span>)
 </span></span><span style="display:flex;"><span>  .<span style="color:#a6e22e">getBlob</span>()
 </span></span><span style="display:flex;"><span>  .<span style="color:#a6e22e">getDataAsString</span>();
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;\n&#34;</span>).<span style="color:#a6e22e">map</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
@@ -469,7 +473,7 @@
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">length</span>, <span style="color:#a6e22e">values</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">length</span>).<span style="color:#a6e22e">setValues</span>(<span style="color:#a6e22e">values</span>);
 </span></span></code></pre></div><h3 id="pattern2">Pattern2</h3>
 <p>CSV data is parsed using <code>Utilities.parseCsv()</code>, and put the parsed values to Spreadsheet using <code>setValues()</code>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">csvFileId</span>)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">csvFileId</span>)
 </span></span><span style="display:flex;"><span>  .<span style="color:#a6e22e">getBlob</span>()
 </span></span><span style="display:flex;"><span>  .<span style="color:#a6e22e">getDataAsString</span>();
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">values</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">parseCsv</span>(<span style="color:#a6e22e">data</span>);
@@ -477,7 +481,7 @@
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">values</span>.<span style="color:#a6e22e">length</span>, <span style="color:#a6e22e">values</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">length</span>).<span style="color:#a6e22e">setValues</span>(<span style="color:#a6e22e">values</span>);
 </span></span></code></pre></div><h3 id="pattern3">Pattern3</h3>
 <p>CSV data is converted to Spreadsheet using <code>files.copy</code> Drive API, and retrieved values from the converted Spreadsheet using <code>getValues()</code>, then, the retrieved values are put to Spreadsheet using <code>setValues()</code>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">fileId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Drive</span>.<span style="color:#a6e22e">Files</span>.<span style="color:#a6e22e">copy</span>(
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">fileId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Drive</span>.<span style="color:#a6e22e">Files</span>.<span style="color:#a6e22e">copy</span>(
 </span></span><span style="display:flex;"><span>  {
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">title</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sample&#34;</span>,
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">parents</span><span style="color:#f92672">:</span> [{ <span style="color:#a6e22e">id</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">folderId</span> }],
@@ -494,7 +498,7 @@
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">Drive</span>.<span style="color:#a6e22e">Files</span>.<span style="color:#a6e22e">remove</span>(<span style="color:#a6e22e">fileId</span>);
 </span></span></code></pre></div><h3 id="pattern4">Pattern4</h3>
 <p>CSV data is directly put to Spreadsheet using <code>pasteData</code> of Sheets API.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">csvFileId</span>)
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">csvFileId</span>)
 </span></span><span style="display:flex;"><span>  .<span style="color:#a6e22e">getBlob</span>()
 </span></span><span style="display:flex;"><span>  .<span style="color:#a6e22e">getDataAsString</span>();
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sheetId</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#a6e22e">spreadsheetId</span>)
@@ -512,7 +516,7 @@
 </span></span><span style="display:flex;"><span>  ]
 </span></span><span style="display:flex;"><span>};
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">Sheets</span>.<span style="color:#a6e22e">Spreadsheets</span>.<span style="color:#a6e22e">batchUpdate</span>(<span style="color:#a6e22e">resource</span>, <span style="color:#a6e22e">spreadsheetId</span>);
-</span></span></code></pre></div><p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+</span></span></code></pre></div><p><a name="samplecsvdata"></a></p>
 <h2 id="a2-sample-csv-data">A2. Sample CSV data</h2>
 <p>The sample CSV data which was used at this report is as follows. The numbers of rows and columns are 50,000 and 10, respectively. Each value of the cells is a string value of 15 bytes.</p>
 <pre tabindex="0"><code>r1-c1##########,r1-c2##########,r1-c3##########,r1-c4##########,r1-c5##########,r1-c6##########,r1-c7##########,r1-c8##########,r1-c9##########,r1-c10##########

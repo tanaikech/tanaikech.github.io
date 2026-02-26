@@ -9,7 +9,7 @@
   <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
 
   <meta name="description" content="Official profile of Kanshi Tanaike, a Google Developer Expert (GDE) in Google Workspace and Physicist. Specializing in Google Apps Script, Gemini API, and innovative IT solutions.">
-  <meta name="generator" content="Hugo 0.98.0" />
+  <meta name="generator" content="Hugo 0.157.0">
 
   <meta property="og:title" content="tanaike - Developer Blog">
   <meta property="og:description" content="Leverage Google APIs, GAS, and Gemini with specialized technical insights.">
@@ -331,13 +331,13 @@
   
     <article>
   <header>
-    <h2><a href="https://tanaikech.github.io/2022/10/11/creating-and-deleting-multiple-events-in-google-calendar-by-batch-requests-using-calendar-api-with-node.js/">Creating and Deleting Multiple Events in Google Calendar by Batch Requests using Calendar API with Node.js</a></h2>
+    <h2><a href="https://tanaikech.github.io/2019/07/18/creating-a-table-to-google-document-by-retrieving-values-from-google-spreadsheet-for-golang/">Creating a Table to Google Document by Retrieving Values from Google Spreadsheet for Golang</a></h2>
 
     <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>11 Oct 2022, 10:21</time>
+    <time>18 Jul 2019, 13:49</time>
   </div>
 
   
@@ -348,7 +348,7 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/nodetips">NodeTips</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gotips">GoTips</a>
     
   </div>
   
@@ -360,11 +360,11 @@
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/node.js">Node.js</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/batch-request">batch request</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/document">Document</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/calendar">Calendar</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">Spreadsheet</a>
     
   </div>
   
@@ -375,14 +375,162 @@
   </header>
 
   <p>
-  Gists
-These are the sample scripts for creating and deleting multiple events in Google Calendar by batch requests using Calendar API with Node.js.
-In the current stage, unfortunately, googleapis for Node.js cannot request batch requests. Ref So, when multiple events are created and deleted in Google Calendar using Node.js, it is required to run the script in a loop. In this case, the process cost becomes high. Ref In this post, I would like to introduce creating and deleting multiple events in Google Calendar using batch request with Node.
+  <p><a href="https://gist.github.com/tanaikech/0589a673cae9569181def8ccd10793cf">Gists</a></p>
+<p>This is a sample script for creating a table to Google Document by retrieving values from Google Spreadsheet for Golang.</p>
+<p>Before you use this script, please install go library of <a href="https://github.com/tanaikech/go-gdoctableapp">go-gdoctableapp</a>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ go get -v -u github.com/tanaikech/go-gdoctableapp
+</span></span></code></pre></div><h2 id="sample-script">Sample script:</h2>
+<p>This sample script uses Service Account.</p>
+<p>In this sample script, the values are retrieved from <code>Sheet1!A1:C5</code> of Spreadsheet, and new table is created to the Document using the values.</p>
+<pre tabindex="0"><code>package main
+
+import (
+	&#34;encoding/json&#34;
+	&#34;fmt&#34;
+	&#34;io/ioutil&#34;
+	&#34;log&#34;
+	&#34;net/http&#34;
+	&#34;os&#34;
+
+	gdoctableapp &#34;github.com/tanaikech/go-gdoctableapp&#34;
+	&#34;golang.org/x/oauth2&#34;
+	&#34;golang.org/x/oauth2/google&#34;
+	&#34;golang.org/x/oauth2/jwt&#34;
+	docs &#34;google.golang.org/api/docs/v1&#34;
+	sheets &#34;google.golang.org/api/sheets/v4&#34;
+)
+
+// ServiceAccount : Use Service account
+func ServiceAccount(credentialFile string) *http.Client {
+	b, err := ioutil.ReadFile(credentialFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	var c = struct {
+		Email      string `json:&#34;client_email&#34;`
+		PrivateKey string `json:&#34;private_key&#34;`
+	}{}
+	json.Unmarshal(b, &amp;c)
+	config := &amp;jwt.Config{
+		Email:      c.Email,
+		PrivateKey: []byte(c.PrivateKey),
+		Scopes: []string{
+			docs.DocumentsScope,
+			sheets.SpreadsheetsScope,
+		},
+		TokenURL: google.JWTTokenURL,
+	}
+	client := config.Client(oauth2.NoContext)
+	return client
+}
+
+func main() {
+	spreadsheetID := &#34;###&#34; // Please set here
+	documentID := &#34;###&#34;    // Please set here
+
+	client := ServiceAccount(&#34;credential.json&#34;) // Please set the json file of Service account.
+	srv, err := sheets.New(client)
+	if err != nil {
+		log.Fatalf(&#34;%v&#34;, err)
+	}
+
+	// Retrieve values from Spreadsheet.
+	sheetValues, err := srv.Spreadsheets.Values.Get(spreadsheetID, &#34;Sheet1!A1:C5&#34;).Do()
+	if err != nil {
+		log.Fatalf(&#34;%v&#34;, err)
+	}
+	values := sheetValues.Values
+
+	// Put the retrieved values to Document.
+	g := gdoctableapp.New()
+	obj := &amp;gdoctableapp.CreateTableRequest{
+		Rows:    int64(len(values)),
+		Columns: int64(len(values[0])),
+		Append:  true,
+		Values:  values,
+	}
+	res, err := g.Docs(documentID).CreateTable(obj).Do(client)
+	if err != nil {
+		log.Fatalf(&#34;%v&#34;, err)
+	}
+	fmt.Println(res)
+}
+</code></pre><h2 id="references">References:</h2>
+<ul>
+<li><a href="https://github.com/tanaikech/go-gdoctableapp">go-gdoctableapp</a></li>
+<li><a href="https://developers.google.com/identity/protocols/OAuth2ServiceAccount">Service account</a></li>
+</ul>
+  </p>
+
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2019/07/18/python-library-gdoctableapppy/">python library - gdoctableapppy</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>18 Jul 2019, 11:46</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/pythontips">PythonTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">library</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/googleapi">googleapi</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/python">python</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-document">Google Document</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/document">Document</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/docs-api">Docs API</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/table">Table</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <h2 id="overview">Overview</h2>
+<p>This is a python library to manage the tables on Google Document using Google Docs API.</p>
+<h2 id="description">Description</h2>
+<p>Google Docs API has been released. When I used this API, I found that it is very difficult for me to manage the tables on Google Document using Google Docs API. Although I checked <a href="https://developers.google.com/docs/api/how-tos/tables">the official document</a>, unfortunately, I thought that it&rsquo;s very difficult for me. So in order to easily manage the tables on Google Document, I created this library.</p>
   </p>
 
   
   <footer>
-    <a href="https://tanaikech.github.io/2022/10/11/creating-and-deleting-multiple-events-in-google-calendar-by-batch-requests-using-calendar-api-with-node.js/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+    <a href="https://tanaikech.github.io/2019/07/18/python-library-gdoctableapppy/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
   </footer>
   
 </article>
@@ -390,13 +538,13 @@ In the current stage, unfortunately, googleapis for Node.js cannot request batch
   
     <article>
   <header>
-    <h2><a href="https://tanaikech.github.io/2022/10/08/node-module-node-gbatchrequests/">node module - node-gbatchrequests</a></h2>
+    <h2><a href="https://tanaikech.github.io/2019/07/18/node-module-node-gdoctableapp/">node module - node-gdoctableapp</a></h2>
 
     <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>08 Oct 2022, 15:24</time>
+    <time>18 Jul 2019, 11:44</time>
   </div>
 
   
@@ -427,9 +575,13 @@ In the current stage, unfortunately, googleapis for Node.js cannot request batch
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/module">module</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-api">google api</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-document">Google Document</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/batch-request">batch request</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/document">Document</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/docs-api">Docs API</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/table">Table</a>
     
   </div>
   
@@ -440,13 +592,15 @@ In the current stage, unfortunately, googleapis for Node.js cannot request batch
   </header>
 
   <p>
-  Overview This is a Node.js module to run the batch requests of Google APIs.
-Description In Google APIs, there are APIs where batch requests can be run. The batch requests can run multiple API calls by one API call with the asynchronous process. By this, both the process cost and the quota cost can be reduced. Ref In Node.js, the wonderful module of googleapis for Node.js is existing. But, in the current stage, unfortunately, it seems that the googleapis for Node.
+  <h2 id="overview">Overview</h2>
+<p>This is a Node.js module to manage the tables on Google Document using Google Docs API.</p>
+<h2 id="description">Description</h2>
+<p>Google Docs API has been released. When I used this API, I found that it is very difficult for me to manage the tables on Google Document using Google Docs API. Although I checked <a href="https://developers.google.com/docs/api/how-tos/tables">the official document</a>, unfortunately, I thought that it&rsquo;s very difficult for me. So in order to easily manage the tables on Google Document, I created this library.</p>
   </p>
 
   
   <footer>
-    <a href="https://tanaikech.github.io/2022/10/08/node-module-node-gbatchrequests/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+    <a href="https://tanaikech.github.io/2019/07/18/node-module-node-gdoctableapp/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
   </footer>
   
 </article>
@@ -454,13 +608,13 @@ Description In Google APIs, there are APIs where batch requests can be run. The 
   
     <article>
   <header>
-    <h2><a href="https://tanaikech.github.io/2022/10/04/updating-array1-with-array2-using-google-apps-script/">Updating Array1 with Array2 using Google Apps Script</a></h2>
+    <h2><a href="https://tanaikech.github.io/2019/07/18/go-library-go-gdoctableapp/">Go Library - go-gdoctableapp</a></h2>
 
     <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>04 Oct 2022, 10:00</time>
+    <time>18 Jul 2019, 11:40</time>
   </div>
 
   
@@ -471,11 +625,9 @@ Description In Google APIs, there are APIs where batch requests can be run. The 
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gotips">GoTips</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/jstips">jstips</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/nodetips">NodeTips</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>
     
   </div>
   
@@ -487,13 +639,17 @@ Description In Google APIs, there are APIs where batch requests can be run. The 
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/javascript">Javascript</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/node.js">Node.js</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-document">Google Document</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/document">Document</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/docs-api">Docs API</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/table">Table</a>
     
   </div>
   
@@ -504,15 +660,15 @@ Description In Google APIs, there are APIs where batch requests can be run. The 
   </header>
 
   <p>
-  Gists
-This is a sample script for updating Array1 with Array2 using Google Apps Script.
-As a sample situation, there are 2 arrays (Array1 and Array2) of the 2-dimensional array. The sample situation can be seen in the above sample Spreadsheet.
- Conditions  When the values of column &ldquo;A&rdquo; of Array2 are existing in column &ldquo;A&rdquo; of Array1, the rows of Array1 are updated by that of Array2. When the values of column &ldquo;A&rdquo; of Array2 are not existing in column &ldquo;A&rdquo; of Array1, the rows of Array2 are appended to Array1.
+  <h2 id="overview">Overview</h2>
+<p>This is a Golang library for managing tables on Google Document using Google Docs API.</p>
+<h2 id="description">Description</h2>
+<p>Google Docs API has been released. When I used this API, I found that it is very difficult for me to manage the tables on Google Document using Google Docs API. Although I checked <a href="https://developers.google.com/docs/api/how-tos/tables">the official document</a>, unfortunately, I thought that it&rsquo;s very difficult for me. So in order to easily manage the tables on Google Document, I created this library.</p>
   </p>
 
   
   <footer>
-    <a href="https://tanaikech.github.io/2022/10/04/updating-array1-with-array2-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+    <a href="https://tanaikech.github.io/2019/07/18/go-library-go-gdoctableapp/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
   </footer>
   
 </article>
@@ -520,69 +676,13 @@ As a sample situation, there are 2 arrays (Array1 and Array2) of the 2-dimension
   
     <article>
   <header>
-    <h2><a href="https://tanaikech.github.io/2022/10/03/my-report-has-been-published-on-the-blog-of-google-cloud/">My report has been published on the Blog of Google Cloud</a></h2>
+    <h2><a href="https://tanaikech.github.io/2019/07/17/protecting-cells-of-spreadsheet-that-users-copied-from-your-google-drive-to-users-google-drive-using-google-apps-script/">Protecting Cells of Spreadsheet that Users Copied from Your Google Drive to User&#39;s Google Drive using Google Apps Script</a></h2>
 
     <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>03 Oct 2022, 15:18</time>
-  </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/news">news</a>
-    
-  </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/report">report</a>
-    
-  </div>
-  
-  
-
-</div>
-
-  </header>
-
-  <p>
-  My report has been published on the Blog of Google Cloud.
-Blog Efficient File Management using Batch Requests with Google Apps Script
-
-Twitter
-  </p>
-
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2022/10/01/retrieving-batch-path-for-batch-requests-using-google-apps-script/">Retrieving Batch Path for Batch Requests using Google Apps Script</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>01 Oct 2022, 09:03</time>
+    <time>17 Jul 2019, 08:20</time>
   </div>
 
   
@@ -607,7 +707,11 @@ Twitter
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/batch-request">batch request</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/web-apps">Web Apps</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">Spreadsheet</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/protect">Protect</a>
     
   </div>
   
@@ -618,14 +722,356 @@ Twitter
   </header>
 
   <p>
-  Gist
-This is a sample script for retrieving the batch path for using the batch requests using Google Apps Script.
-After August 12, 2020, in order to use batch requests, the batch path is required to be used to the endpoint of the batch requests. And, the batch path is sometimes updated. So, when a constant batch path has been continued to be used, this might lead to the reason for an error.
+  <p><a href="https://gist.github.com/tanaikech/847ea7e3e27a4a22004faa88d7b4dedb">Gists</a></p>
+<p>This is the method for protecting cells of Spreadsheet that users copied from your Google Drive to user&rsquo;s Google Drive using Google Apps Script.</p>
+<h2 id="situation">Situation:</h2>
+<p>This method supposes the following situation.</p>
+<ul>
+<li>You want to make users copy a Spreadsheet on your Google Drive to user&rsquo;s Google Drive. - Your Spreadsheet has several protected ranges. - Your Spreadsheet is shared with the user. - User doesn&rsquo;t have own folder shared with you.</li>
+<li>You want to protect the ranges of Spreadsheet for the user. Namely, you want to remove the user from the editor of protected ranges.</li>
+<li>You want to achieve this using Google Apps Script.</li>
+</ul>
+<h2 id="issue">Issue:</h2>
+<p>In above situation, I think that the following points are the bottleneck.</p>
   </p>
 
   
   <footer>
-    <a href="https://tanaikech.github.io/2022/10/01/retrieving-batch-path-for-batch-requests-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+    <a href="https://tanaikech.github.io/2019/07/17/protecting-cells-of-spreadsheet-that-users-copied-from-your-google-drive-to-users-google-drive-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+  </footer>
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2019/07/05/linking-cloud-platform-project-to-google-apps-script-project/">Linking Cloud Platform Project to Google Apps Script Project</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>05 Jul 2019, 09:17</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/specification">Specification</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/project">Project</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <p><a href="https://gist.github.com/tanaikech/e945c10917fac34a9d5d58cad768832c">Gists</a></p>
+<h2 id="introduction">Introduction</h2>
+<p>At April 8, 2019, the specification of Google Apps Script Project was changed. You can see this at <a href="https://developers.google.com/apps-script/guides/cloud-platform-projects">Google Cloud Platform Projects</a>. The official document says as follows.</p>
+<blockquote>
+<p>Warning: Starting on or after April 8, 2019, the Google Cloud Platform Console won&rsquo;t be able to access the default GCP projects created for new Apps Script projects. Older, existing scripts may have default GCP projects that are still accessible, however. If you have a new script and require access to its GCP project from the Google Cloud Platform Console, you must use a standard GCP project.</p>
+  </p>
+
+  
+  <footer>
+    <a href="https://tanaikech.github.io/2019/07/05/linking-cloud-platform-project-to-google-apps-script-project/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+  </footer>
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2019/06/25/dynamically-retrieving-keys-and-values-from-struct-property/">Dynamically Retrieving Keys and Values from Struct Property</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>25 Jun 2019, 14:34</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gotips">GoTips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/struct">struct</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <p><a href="https://gist.github.com/tanaikech/9dc4718ac9fb2473ef029eb4dbda1b01">Gists</a></p>
+<p>This is a sample script for dynamically retrieving the keys and values from struct property using golang.</p>
+<h2 id="sample-script">Sample script:</h2>
+<p><a href="https://play.golang.org/p/VBKfJg1ZBiB">Go Playground</a></p>
+<pre tabindex="0"><code>package main
+
+import (
+	&#34;fmt&#34;
+	&#34;reflect&#34;
+)
+
+func main() {
+	s := struct {
+		key1 string
+		key2 string
+		key3 string
+	}{&#34;value1&#34;, &#34;value2&#34;, &#34;value3&#34;}
+
+	r := reflect.ValueOf(&amp;s).Elem()
+	rt := r.Type()
+	for i := 0; i &lt; rt.NumField(); i++ {
+		field := rt.Field(i)
+		rv := reflect.ValueOf(&amp;s)
+		value := reflect.Indirect(rv).FieldByName(field.Name)
+		fmt.Println(field.Name, value.String())
+	}
+}
+</code></pre>
+  </p>
+
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2019/06/20/sorting-for-slice-using-golang/">Sorting for Slice using Golang</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>20 Jun 2019, 12:19</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gotips">GoTips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/sort">sort</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/slice">slice</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <p><a href="https://gist.github.com/tanaikech/4d0075dc21b643245be03d661e8d5f54">Gists</a></p>
+<p>This is a sample script for sorting a slice using Golang. Recently, I had a situation for sorting the coordinates of cells of Spreadsheet. As a test case, it thinks of the situation that the randomized cells are sorted. I think that this can be also used for a table except for Spreadsheet.</p>
+<h2 id="sample-slice">Sample slice:</h2>
+<p>The sample slice is as follows.</p>
+<pre tabindex="0"><code>ar := []struct {
+    row   int
+    col   int
+    value string
+}{
+    {0, 0, &#34;A1&#34;},
+    {0, 1, &#34;B1&#34;},
+    {0, 2, &#34;C1&#34;},
+    {1, 0, &#34;A2&#34;},
+    {1, 1, &#34;B2&#34;},
+    {1, 3, &#34;D2&#34;},
+    {2, 0, &#34;A3&#34;},
+    {2, 2, &#34;C3&#34;},
+}
+</code></pre><p>When each element of above slice is put to a Spreadsheet, it becomes as follows.</p>
+  </p>
+
+  
+  <footer>
+    <a href="https://tanaikech.github.io/2019/06/20/sorting-for-slice-using-golang/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+  </footer>
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2019/06/10/gas-library-getedittype/">GAS Library - GetEditType</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>10 Jun 2019, 16:19</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">Spreadsheet</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/event">event</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <h1 id="overview">Overview</h1>
+<p><strong>GetEditType is a GAS library for retrieving the edit types of the OnEdit event trigger of Spreadsheet using Google Apps Script (GAS).</strong></p>
+<h1 id="description">Description</h1>
+<p>In the case that the OnEdit event trigger (simple and installable triggers) is used at Spreadsheet, when users manually edited the cell of Spreadsheet, the trigger is fired. At this time, there is the case that I want to know the edit type. For example, I would like to know about the following edit types.</p>
+  </p>
+
+  
+  <footer>
+    <a href="https://tanaikech.github.io/2019/06/10/gas-library-getedittype/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+  </footer>
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2019/06/02/fixing-value-putting-by-custom-function-of-spreadsheet-using-google-apps-script/">Fixing Value Putting by Custom Function of Spreadsheet using Google Apps Script</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>02 Jun 2019, 17:41</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/custom-function">Custom function</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <p><a href="https://gist.github.com/tanaikech/6ebf4bafbdc35116470bd197d00fe614">Gists</a></p>
+<p>This is a sample script for fixing a value putting by a custom function of Spreadsheet using Google Apps Script. When a custom function is used, the value retrieved by the custom function of Spreadsheet is automatically updated by recalculating. So in the case that the value retrieved by the custom function is changed by the time, the value is also changed by automatically updating. In this sample script, I would like to introduce a method for fixing such values.</p>
+  </p>
+
+  
+  <footer>
+    <a href="https://tanaikech.github.io/2019/06/02/fixing-value-putting-by-custom-function-of-spreadsheet-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
   </footer>
   
 </article>
@@ -639,7 +1085,7 @@ After August 12, 2020, in order to use batch requests, the batch path is require
   
   <a href="https://tanaikech.github.io/page/67/"><i class="fa fa-chevron-left"></i></a>
   
-  <span>&nbsp;68 / 194&nbsp;</span>
+  <span>&nbsp;68 / 98&nbsp;</span>
   
   <a href="https://tanaikech.github.io/page/69/"><i class="fa fa-chevron-right"></i></a>
   

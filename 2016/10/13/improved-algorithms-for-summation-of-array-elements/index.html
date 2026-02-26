@@ -9,7 +9,7 @@
   <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
 
   <meta name="description" content="Official profile of Kanshi Tanaike, a Google Developer Expert (GDE) in Google Workspace and Physicist. Specializing in Google Apps Script, Gemini API, and innovative IT solutions.">
-  <meta name="generator" content="Hugo 0.98.0" />
+  <meta name="generator" content="Hugo 0.157.0">
 
   <meta property="og:title" content="tanaike - Developer Blog">
   <meta property="og:description" content="Leverage Google APIs, GAS, and Gemini with specialized technical insights.">
@@ -361,10 +361,12 @@
 
 </div>
 
-  <!-- raw HTML omitted -->
+  <center>
+Kanshi TANAIKE
+</center>
 <h2 id="abstract">Abstract</h2>
 <p>I considered an efficient algorithm for summation of array elements. All elements in an array are string. When those elements are summed using scripts, a standard method is to add each element in order. If the script is run without any optimize, the process becomes gradually sluggish, because the total amount of active data during the summation process is proportional to the square of the number of array elements. This leads directly to the high process-cost. Such phenomenon notably appears at Google Apps Script (GAS). This report says about the solution of this problem using a new algorithm of a pyramid method. The pyramid method achieves that the total amount of active data increases proportional to the linear of the number of array elements. By this, the processing time becomes much shorter than that of the process using the standard method. The pyramid method achieved the process-cost reduction of $99.7%$ compared with the standard method at GAS. I realized again that new discoveries are hidden into the familiar scenes of every-day life.</p>
-<!-- raw HTML omitted -->
+<br />
 <h2 id="introduction">Introduction</h2>
 <p>What script comes to mind when you hear the summation of string elements in an array? Most people will probably imagine the method for adding each element in order as following a pseudo code.</p>
 <pre tabindex="0"><code>    Declare a string variable arr, sum
@@ -377,46 +379,46 @@
 </code></pre><p>It can be said that these are a standard algorithm. When the number of elements is small, this standard method is so useful for the summation. But when the number is large, the summation process becomes sluggish. The reason is that the total amount of active data increases proportionally to the square of the number of array elements. Namely, it means that summing array elements in order leads to high process-cost. High process-cost connects directly to large money and time loss. The summation process is used at variety situations. Recently, the array with string elements are used at the field of big data and, web technology and so on. Therefore, it is very important to design the effective summation algorithms with lower process-cost.</p>
 <p>In this report, an efficient algorithm for summing string elements in an array is introduced. The key factor for this algorithm is to change the total amount of active data during the summation process. At the standard method, the summation process of array elements makes the total amount of active data increase proportionally to the square of number of array elements. On the other hand, at the algorithm in this report, the total amount of active data linearly increases to the number of array elements. This difference is very important for reducing the process cost.</p>
 <p>The primary aim of this report is to reduce the process cost during the summation process. The secondary aim is to reduce the burden for Google when we run the summation process of array elements using Google Apps Script (GAS). GAS is one of good resources which can be used by only browser. It is important to reduce the process cost of GAS by devising. Therefore, the samples which were used in this report were made of GAS. At next section, theoretical approaches will be introduced.</p>
-<!-- raw HTML omitted -->
+<br />
 <h2 id="theoretical-approaches">Theoretical approaches</h2>
 <p>Array element which is used in this report is string. In order to understand the pyramid method which is introduced in this report, it thinks about the total amount of active data during the summation process. When the array elements are summed by the standard method as shown in Introduce section, the total amount of active data $\Psi$ during the process is</p>
 <p>\[ \Psi = \sum_{\lambda=1}^{\theta} \mu \lambda \tag{1} \]</p>
 <p>where $\mu$ and $\theta$ are the size of one array-element and the number of array elements, respectively.</p>
-<!-- raw HTML omitted -->
+<br />
 <table>
-<thead>
-<tr>
-<th style="text-align:center"></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center"><img src="https://tanaikech.github.io/img/efig1.png" alt=""></td>
-</tr>
-<tr>
-<td style="text-align:center">Fig. 1: $\Psi$ vs. $\theta$ by Eq.(1).</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th style="text-align: center"></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center"><img src="https://tanaikech.github.io/img/efig1.png" alt=""></td>
+      </tr>
+      <tr>
+          <td style="text-align: center">Fig. 1: $\Psi$ vs. $\theta$ by Eq.(1).</td>
+      </tr>
+  </tbody>
 </table>
-<!-- raw HTML omitted -->
+<br />
 <p>Figure 1 shows $\Psi$ vs. $\theta$ when $\mu$ is 10 bytes. It is found that $\Psi$ increases proportionally to the square of $\theta$ as shown in Fig.1. I have thought that the processing time has to correlate to the total amount of active data $\Psi$ during the process. In order to reduce $\Psi$, I propose a pyramid method. The pyramid method calculates the sum while dividing $\theta$ to some groups as shown in Fig. 2.</p>
-<!-- raw HTML omitted -->
+<br />
 <table>
-<thead>
-<tr>
-<th style="text-align:center"></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center"><img src="https://tanaikech.github.io/img/efig2.png" alt="" title=""></td>
-</tr>
-<tr>
-<td style="text-align:center">Fig. 2: Concept of pyramid method.</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th style="text-align: center"></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center"><img src="https://tanaikech.github.io/img/efig2.png" alt="" title=""></td>
+      </tr>
+      <tr>
+          <td style="text-align: center">Fig. 2: Concept of pyramid method.</td>
+      </tr>
+  </tbody>
 </table>
-<!-- raw HTML omitted -->
+<br />
 <p>At the pyramid method, the base array without dividing is $\omega=0$ in Fig. 2. At $\omega=1$, $\theta$ is divided to groups by $\phi$ determined as a division number. The array elements in each group is summed. This flow is performed until obtaining the result. As a sample, it shows a pseudo code with the pyramid method at $\omega=1$ obtained from Fig. 2.</p>
 <pre tabindex="0"><code>    Declare a string variable arr, tempsum, sum
     Declare an integer variable division, loopcounter1, loopcounter2
@@ -444,23 +446,23 @@
 \tag{2}  \]</p>
 <p>where $\phi$ is a division number. $\theta_{\omega}$ and $\mu_{\omega}$ are $ \theta\phi^{1-\omega} $ and $ \mu\phi^{\omega-1} $, respectively. Equation (2) can be expanded as follows.</p>
 <p>\[ \Psi(\phi, \omega) = \frac{\mu\theta}{2}\left\{ \left(\phi + 3\right)\omega + \frac{\theta}{\phi^{\omega}} - 1 \right\} \tag{3} \]</p>
-<!-- raw HTML omitted -->
+<br />
 <table>
-<thead>
-<tr>
-<th style="text-align:center"></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center"><img src="https://tanaikech.github.io/img/efig3.png" alt="" title=""></td>
-</tr>
-<tr>
-<td style="text-align:center">Fig. 3: $\Psi$($\phi$, $\omega$) vs. $\theta$. $\mu$ and $\phi$ are constant. $\omega$ is changed from 0 to 5.</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th style="text-align: center"></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center"><img src="https://tanaikech.github.io/img/efig3.png" alt="" title=""></td>
+      </tr>
+      <tr>
+          <td style="text-align: center">Fig. 3: $\Psi$($\phi$, $\omega$) vs. $\theta$. $\mu$ and $\phi$ are constant. $\omega$ is changed from 0 to 5.</td>
+      </tr>
+  </tbody>
 </table>
-<!-- raw HTML omitted -->
+<br />
 <p>Figure 3 shows $\Psi(\phi, \omega)$ vs. $\theta$. $\mu$ and $\phi$ are constant. $\omega$ is changed from 0 to 5. A line of $\omega=0$ is same to Fig. 1. From Fig. 3, it is found that $\Psi(\phi, \omega)$ for $\theta$ strongly depends on $\omega$. Also it is found that the change of $\Psi(\phi, \omega)$ approaches the linear increase to $\theta$ with the increase in $\omega$. Then, $\Psi(\phi, \omega)$ becomes small with the increase in $\omega$. It must pay attention that the available $\theta$ changes with the increase in $\omega$. Under $\phi = 10$, when $\omega$ is 2, $\theta$ must be more than 1000. For $\omega=5$, $\theta$ must be more than 1,000,000. The optimized $\phi$ can be obtained by the partial derivative of $\Psi(\phi, \omega)$ with respect to $\phi$ as shown in Eq.(4).</p>
 <p>\[\frac{d\Psi(\phi, \omega)}{d\phi} = \frac{\mu\theta\omega}{2}\left( 1 - \theta \phi^{-(\omega+1)} \right) \tag{4} \]</p>
 <p>When $d\Psi(\phi, \omega)/d\phi$ is 0,</p>
@@ -470,46 +472,46 @@
 <p>In order to obtain optimized $\omega$ and $\phi$, either $\omega$ or $\phi$ has to be known. Therefore, at first, it is necessary to decide either $\omega$ or $\phi$. So, $\phi=10$ is used in this study.</p>
 <p>I have already talked that the processing time have to correlate to the total amount of active data $\Psi$ during the process. From theoretical results, the ratio of $\Psi$ for the standard and the pyramid method is 13,514 at $\theta = 1,000,000$. If my estimation is correct, it is considered that the ratio of processing time for the standard and the pyramid method will be large.</p>
 <p>The results of theoretical approaches indicate that the pyramid method is useful for the summation of array elements. At next section, experimental data will show the predominance of pyramid method against the standard method using GAS.</p>
-<!-- raw HTML omitted -->
+<br />
 <h2 id="experimental-results">Experimental results</h2>
 <p>The sample array used in this study is 2 dimensional array like [[&lsquo;0000000&rsquo;, &lsquo;a&rsquo;], [&lsquo;0000001&rsquo;, &lsquo;a&rsquo;], [&lsquo;0000002&rsquo;, &lsquo;a&rsquo;], ,,,]. When this array is summed, &lsquo;,&rsquo; and &lsquo;\n&rsquo; are added as a delimiter and end code, respectively. The size of an array element $\mu$ is 10 bytes. All array-elements are string.</p>
-<!-- raw HTML omitted -->
+<br />
 <table>
-<thead>
-<tr>
-<th style="text-align:center"></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center"><img src="https://tanaikech.github.io/img/efig4n.png" alt="" title=""></td>
-</tr>
-<tr>
-<td style="text-align:center">Fig. 4: Processing time vs. $\theta$ using GAS with standard method.</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th style="text-align: center"></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center"><img src="https://tanaikech.github.io/img/efig4n.png" alt="" title=""></td>
+      </tr>
+      <tr>
+          <td style="text-align: center">Fig. 4: Processing time vs. $\theta$ using GAS with standard method.</td>
+      </tr>
+  </tbody>
 </table>
-<!-- raw HTML omitted -->
+<br />
 <p>Figure 4 shows the processing time vs. $\theta$ obtained using the standard method by GAS. This data was obtained using a trigger command of GAS. The actual script can be seen at last section. It was found that the processing time of about 52 minutes are necessary for summing 1,000,000 array elements. Also it was found that the processing time increases proportionally to the square of $\theta$. Also this can be confirmed by the fitting function. This trend in Fig.4 is almost the same to that in Fig. 1. Namely, when the summation process is run, the change of $\Psi$ and the processing time have a correlation. In order to clarify the effect of pyramid method, the processing time vs. $\theta$ using GAS with pyramid method was measured.</p>
-<!-- raw HTML omitted -->
+<br />
 <table>
-<thead>
-<tr>
-<th style="text-align:center"></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center"><img src="https://tanaikech.github.io/img/efig5n.png" alt="" title=""></td>
-</tr>
-<tr>
-<td style="text-align:center">Fig. 5: Processing time vs. $\theta$ using GAS with pyramid method.</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th style="text-align: center"></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center"><img src="https://tanaikech.github.io/img/efig5n.png" alt="" title=""></td>
+      </tr>
+      <tr>
+          <td style="text-align: center">Fig. 5: Processing time vs. $\theta$ using GAS with pyramid method.</td>
+      </tr>
+  </tbody>
 </table>
-<!-- raw HTML omitted -->
+<br />
 <p>Figure 5 shows the processing time vs. $\theta$ using GAS with the pyramid method. For the pyramid method, under $\phi=10$, $\omega$ was optimized by the results obtained at the section of Theoretical approaches. Namely, $\omega$ and $\phi$ are changed in accordance with the number of digits of $\theta$. Each data-point was measured 10 times and adopted the average value with error bar. From Fig. 5, it was found that the processing time of the summation process becomes drastically short by adopting the pyramid method. The array elements of 1,000,000 could be summed in about 8 seconds. This is the process-cost reduction of $99.7%$ compared with Fig. 4. Also it was found that the pyramid method changes the slope of the processing time with the increase in $\theta$ to the linear proportion. This trend corresponds to the prediction at Theoretical approaches. This is indicated that the reduction of the amount of active data during the summation process leads to reducing the process cost. From Figs. 4 and 5, it can be said that the pyramid method is very useful for the summation process with string elements in an array. Furthermore, the pyramid method is easy to apply to the filed of parallel computing. It is considered that the pyramid method can be applied to the parallel computing by giving the summation process of each group to each thread. By this, the efficiency will be much higher.</p>
-<!-- raw HTML omitted -->
+<br />
 <h2 id="summary">Summary</h2>
 <p>I reported about the pyramid method for summing the string elements in an array and obtained following results.</p>
 <ul>
@@ -526,17 +528,17 @@
 <p>It is considered that if the code during running is optimized in any process, the amount of active data during processing dependence on the processing time will be weak. (You can see the report which confirmed this at <a href="https://tanaikech.github.io/2016/10/13/gas-library---souwa_gas---effects-on-optimized-codes-of-pyramid-method/">here</a>.)</p>
 </li>
 </ul>
-<!-- raw HTML omitted -->
+<br />
 <h2 id="acknowledgements">Acknowledgements</h2>
 <p>I would like to thank Google and Google staff.</p>
-<!-- raw HTML omitted -->
+<br />
 <h2 id="appendix">Appendix</h2>
 <h3 id="library-for-gas">Library for GAS</h3>
 <p>A library for GAS using the pyramid method  is <a href="https://github.com/tanaikech/SOUWA">here</a>.</p>
 <h3 id="scripts-used-at-this-report">Scripts used at this report</h3>
 <p>Scripts used at this report are <a href="https://github.com/tanaikech/SOUWA_test_scripts">here</a>.</p>
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
+<br />
+<br />
 
   
   <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>

@@ -9,7 +9,7 @@
   <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
 
   <meta name="description" content="Official profile of Kanshi Tanaike, a Google Developer Expert (GDE) in Google Workspace and Physicist. Specializing in Google Apps Script, Gemini API, and innovative IT solutions.">
-  <meta name="generator" content="Hugo 0.98.0" />
+  <meta name="generator" content="Hugo 0.157.0">
 
   <meta property="og:title" content="tanaike - Developer Blog">
   <meta property="og:description" content="Leverage Google APIs, GAS, and Gemini with specialized technical insights.">
@@ -362,31 +362,33 @@
 </div>
 
   <p><a href="https://gist.github.com/tanaikech/88f7fd5ed14da5e9afde18310da61cb5">Gists</a></p>
-<!-- raw HTML omitted -->
+<center>
+September 21, 2018
+    Published.
 <p>Kanshi Tanaike</p>
-<!-- raw HTML omitted -->
+</center>
 <h2 id="overview">Overview</h2>
 <p>This is a report about the possibility of asynchronous process using event triggers. This is for Google Apps Script (GAS).</p>
 <h2 id="description">Description</h2>
 <p><code>onEdit()</code> which is <a href="https://developers.google.com/apps-script/guides/triggers/">a simple trigger</a> is often used as a trigger when the values are modified on Spreadsheet. When users want to use the script including some methods which are required to be authorized as the onEdit event, <a href="https://developers.google.com/apps-script/guides/triggers/installable">a installable trigger</a> of onEdit is used. If the trigger is installed for the function of <code>onEdit()</code>, when the event trigger is run, <code>onEdit()</code> is run 2 times. In order to avoid this, the installable trigger is installed to the functions except for the functions of simple triggers. The functions of simple triggers which is the same events are not used in the project. When I thought about this situation, I thought that both <code>onEdit()</code> which is run by the simple trigger and the function which is run by the installable trigger might be able to be used, simultaneously. So I investigated about this situation.</p>
 <p>As the result, it was found that the following simple triggers and installable triggers work as the asynchronous process.</p>
 <table>
-<thead>
-<tr>
-<th style="text-align:center">Simple triggers</th>
-<th style="text-align:center">Installable triggers</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">onOpen()</td>
-<td style="text-align:center">On open</td>
-</tr>
-<tr>
-<td style="text-align:center">onEdit()</td>
-<td style="text-align:center">On edit</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th style="text-align: center">Simple triggers</th>
+          <th style="text-align: center">Installable triggers</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center">onOpen()</td>
+          <td style="text-align: center">On open</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">onEdit()</td>
+          <td style="text-align: center">On edit</td>
+      </tr>
+  </tbody>
 </table>
 <p>For example, when the event of on edit is used as the asynchronous process, it uses the following flow.</p>
 <ol>
@@ -398,19 +400,19 @@
 <p>By above setting, when the cell of spreadsheet is edited, both <code>onEdit()</code> and <code>myFunction()</code> are run as the asynchronous process.</p>
 <h2 id="simple-triggers-and-installable-triggers">Simple Triggers and Installable Triggers</h2>
 <p>At first, it investigated about the work of simple trigger and installable trigger. The sample script is as follows. Here, &ldquo;onEdit&rdquo; was used. <code>myFunction()</code> was installed as the trigger of &ldquo;On edit&rdquo;. At both <code>onEdit()</code> and <code>myFunction()</code>, the start and end time are output after <code>Utilities.sleep(t)</code> was run. When the event trigger of on edit was run, it judges whether both functions worked as the asynchronous process by confirming the start and end time. As the result, it was found that the start and end time from both functions were almost the same. By this, it is considered that the simple trigger and installable trigger work as the asynchronous process with the 2 workers which are ```onEdit()<code>and</code>myFunction()``.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">t</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">10000</span>; <span style="color:#75715e">// For task.
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">t</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">10000</span>; <span style="color:#75715e">// For task.
+</span></span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">onEdit</span>() {
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">start</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date();
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">sleep</span>(<span style="color:#a6e22e">t</span>); <span style="color:#75715e">// This is a sample task.
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">end</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date();
+</span></span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">end</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date();
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;onEdit: &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">start</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39; - &#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">end</span>);
 </span></span><span style="display:flex;"><span>}
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">start</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date();
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">sleep</span>(<span style="color:#a6e22e">t</span>); <span style="color:#75715e">// This is a sample task.
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">end</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date();
+</span></span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">end</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date();
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;myFunction: &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">start</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39; - &#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">end</span>);
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><h2 id="applications">Applications</h2>
@@ -426,13 +428,13 @@
 <li>When a cell is edited, the script is run.</li>
 </ul>
 <p>The sample script is as follows.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">t</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">10000</span>; <span style="color:#75715e">// For task.
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">t</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">10000</span>; <span style="color:#75715e">// For task.
+</span></span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">onEdit</span>(<span style="color:#a6e22e">e</span>) {
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">label</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;sample&#34;</span>;
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">time</span>(<span style="color:#a6e22e">label</span>);
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">sleep</span>(<span style="color:#a6e22e">t</span> <span style="color:#f92672">/</span> <span style="color:#ae81ff">2</span>); <span style="color:#75715e">// This is a sample task.
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">c</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">CacheService</span>.<span style="color:#a6e22e">getDocumentCache</span>();
+</span></span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">c</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">CacheService</span>.<span style="color:#a6e22e">getDocumentCache</span>();
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">v</span>;
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">while</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">v</span>) {
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">v</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#34;value&#34;</span>);
@@ -445,7 +447,7 @@
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>(<span style="color:#a6e22e">e</span>) {
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">sleep</span>(<span style="color:#a6e22e">t</span> <span style="color:#f92672">/</span> <span style="color:#ae81ff">2</span>); <span style="color:#75715e">// This is a sample task.
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">c</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">CacheService</span>.<span style="color:#a6e22e">getDocumentCache</span>();
+</span></span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">c</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">CacheService</span>.<span style="color:#a6e22e">getDocumentCache</span>();
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">put</span>(<span style="color:#e6db74">&#34;value&#34;</span>, <span style="color:#e6db74">&#34;myFunction was done. Value is &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">value</span>);
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><p>The flow of this script is as follows.</p>
@@ -467,7 +469,7 @@
 <p>Using this sample script, the process time with increasing the task was measured.</p>
 <p><img src="https://tanaikech.github.io/img/20180921a-fig1.png" alt=""></p>
 <p>Fig. 1. Task vs. process time. Task is the time for <code>Utilities.sleep(t)</code>.</p>
-<!-- raw HTML omitted -->
+<br>
 <p>Figure 1 shows the result of task vs. process time. Blue and red dots mean 1 worker and 2 workers, respectively. For 1 worker, the sample script is <a href="#SampleScripts">here</a>. For 2 workers, the sample script is mentioned above. From Fig. 1, it is found that the result of 1 worker coincides with the time of task. On the other hand, it was also found that for 2 workers, the result of it is half of the time of task. From this result, it is found that the script for 2 workers works as the asynchronous process, and also the task can be shared by the workers. This result indicates the asynchronous process can be achieved by using the event triggers and the simple script.</p>
 <h2 id="note">Note</h2>
 <ul>
@@ -475,16 +477,16 @@
 <li>Under the condition that the simple trigger and the installable trigger are used, when a custom function is used, only when the custom function is firstly put in a cell, 3 workers can be used. But when the custom function is recalculated, the triggers don&rsquo;t work. So after the function was put, it becomes only 1 worker.</li>
 </ul>
 <h1 id="appendix">Appendix</h1>
-<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<p><a name="SampleScripts"></a></p>
 <h2 id="scripts">Scripts</h2>
 <h3 id="script-for-measuring-single-task">Script for measuring single task</h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">t</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">10000</span>; <span style="color:#75715e">// For task.
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">t</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">10000</span>; <span style="color:#75715e">// For task.
+</span></span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">onEdit</span>(<span style="color:#a6e22e">e</span>) {
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">label</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;onEdit&#34;</span>;
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">time</span>(<span style="color:#a6e22e">label</span>);
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">sleep</span>(<span style="color:#a6e22e">t</span>); <span style="color:#75715e">// t is task.
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;onEdit was done. value is &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">value</span>;
+</span></span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;onEdit was done. value is &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">value</span>;
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">setValue</span>(<span style="color:#a6e22e">r</span>);
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">timeEnd</span>(<span style="color:#a6e22e">label</span>);
 </span></span><span style="display:flex;"><span>}

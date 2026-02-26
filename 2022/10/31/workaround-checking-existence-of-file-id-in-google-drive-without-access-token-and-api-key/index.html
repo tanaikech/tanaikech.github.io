@@ -9,7 +9,7 @@
   <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
 
   <meta name="description" content="Official profile of Kanshi Tanaike, a Google Developer Expert (GDE) in Google Workspace and Physicist. Specializing in Google Apps Script, Gemini API, and innovative IT solutions.">
-  <meta name="generator" content="Hugo 0.98.0" />
+  <meta name="generator" content="Hugo 0.157.0">
 
   <meta property="og:title" content="tanaike - Developer Blog">
   <meta property="og:description" content="Leverage Google APIs, GAS, and Gemini with specialized technical insights.">
@@ -360,7 +360,7 @@
 <p>When you want to check whether the file of the file ID is existing in Google Drive, generally, you might use Drive API and Drive service (DriveApp) of Google Apps Script. In this case, the scope of Drive API is required to be used. By this, the access token and the API key (in the case of publicly shared files) are required to be used. But, there might be a case that the available scopes are limited. In this post, I would like to introduce a workaround for checking the existence of file ID in Google Drive without both the access token and API key.</p>
 <h2 id="workaround-curl">Workaround: curl</h2>
 <p>In this workaround, the thumbnail link like <code>https://drive.google.com/thumbnail?id={fileId}</code> is used. <a href="https://stackoverflow.com/q/25648388">Ref</a> In this case, when the file ID is existing, the sign-in page with the status code of <code>200</code> is returned. On the other hand, when the file ID is not existing, an error like <code>Error 404 (Not Found)</code> with the status code of <code>404</code> occurs. This workaround uses this situation. A sample curl command is as follows. Please replace <code>{fileId}</code> with a sample file ID.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ curl -L -s <span style="color:#e6db74">&#34;https://drive.google.com/thumbnail?id={fileId}&#34;</span> -o /dev/null -w <span style="color:#e6db74">&#39;%{http_code}&#39;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ curl -L -s <span style="color:#e6db74">&#34;https://drive.google.com/thumbnail?id={fileId}&#34;</span> -o /dev/null -w <span style="color:#e6db74">&#39;%{http_code}&#39;</span>
 </span></span></code></pre></div><ul>
 <li>When the valid file ID is used as <code>{fileId}</code>, you can see the status code of <code>200</code> in the terminal.</li>
 <li>When the invalid file ID is used as <code>{fileId}</code>, you can see the status code of <code>404</code> in the terminal.</li>
@@ -368,7 +368,7 @@
 <p>By this, you can see whether the file ID is existing.</p>
 <h2 id="workaround-google-apps-script">Workaround: Google Apps Script</h2>
 <p>When this workaround is used with Google Apps Script, the script is as follows.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">SAMPLE</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">id</span>) =&gt;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">SAMPLE</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">id</span>) =&gt;
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#e6db74">`https://drive.google.com/thumbnail?id=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">id</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>, {
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">muteHttpExceptions</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>,
 </span></span><span style="display:flex;"><span>  }).<span style="color:#a6e22e">getResponseCode</span>() <span style="color:#f92672">==</span> <span style="color:#ae81ff">200</span>

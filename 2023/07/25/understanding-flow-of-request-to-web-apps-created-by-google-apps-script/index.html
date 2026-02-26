@@ -9,7 +9,7 @@
   <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
 
   <meta name="description" content="Official profile of Kanshi Tanaike, a Google Developer Expert (GDE) in Google Workspace and Physicist. Specializing in Google Apps Script, Gemini API, and innovative IT solutions.">
-  <meta name="generator" content="Hugo 0.98.0" />
+  <meta name="generator" content="Hugo 0.157.0">
 
   <meta property="og:title" content="tanaike - Developer Blog">
   <meta property="og:description" content="Leverage Google APIs, GAS, and Gemini with specialized technical insights.">
@@ -362,7 +362,7 @@
 <p>Here, I would like to introduce a report for understanding the flow of the request to Web Apps created by Google Apps Script. There might be a case that various applications using the Web Apps are created and the Web Apps are used as the webhook. In that case, it is considered that when you have understood the flow of requests to the Web Apps, your goal might be able to be smoothly achieved. In this report, I would like to introduce the information about it.</p>
 <h2 id="sample-situation">Sample situation</h2>
 <p>As a sample situation, the sample script for the Web Apps is as follows. And, please set a Spreadsheet ID to <code>work_</code>. In this sample, the data from the request is put into the Spreadsheet. And, the event object is directly returned from the Web Apps.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">work_</span>(<span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">method</span>) {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">work_</span>(<span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">method</span>) {
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">e</span>[<span style="color:#a6e22e">method</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">method</span>;
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">e</span>);
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">openById</span>(<span style="color:#e6db74">&#34;###SpreadsheetId###&#34;</span>).<span style="color:#a6e22e">appendRow</span>([<span style="color:#66d9ef">new</span> Date(), <span style="color:#a6e22e">res</span>]);
@@ -381,15 +381,15 @@
 <h3 id="1-simple-curl-command-by-manual-operation">1. Simple curl command by manual operation</h3>
 <p>Here, in order to understand the flow of requests to the Web Apps, it tests to request the Web Apps using a simple curl command.</p>
 <p>When it requests this Web Apps using curl command with the GET and POST methods, those are as follows.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -I -XGET <span style="color:#e6db74">&#34;https://script.google.com/macros/s/{deploymentId}/exec&#34;</span>
-</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -I -XPOST <span style="color:#e6db74">&#34;https://script.google.com/macros/s/{deploymentId}/exec&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -I -XGET <span style="color:#e6db74">&#34;https://script.google.com/macros/s/{deploymentId}/exec&#34;</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -I -XPOST <span style="color:#e6db74">&#34;https://script.google.com/macros/s/{deploymentId}/exec&#34;</span>
 </span></span></code></pre></div><p>The status code 302 is returned. In this case, it indicates the redirect. And, the response header has the &ldquo;location&rdquo; property including the redirect URL. From this result, it is found that in the case of Web Apps, it is required to run the redirect.</p>
 <p>When this redirect process is manually run, it becomes as follows.</p>
 <h4 id="for-doget">For <code>doGet</code></h4>
 <ol>
 <li>Request with the GET method to the Web Apps URL like <code>https://script.google.com/macros/s/{deploymentId}/exec</code>.</li>
 </ol>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -I -XGET <span style="color:#e6db74">&#34;https://script.google.com/macros/s/{deploymentId}/exec&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -I -XGET <span style="color:#e6db74">&#34;https://script.google.com/macros/s/{deploymentId}/exec&#34;</span>
 </span></span></code></pre></div><ol start="2">
 <li>
 <p>Retrieve the URL of &ldquo;location&rdquo; from the response header of the above request. It&rsquo;s like <code>https://script.googleusercontent.com/macros/echo?user_content_key=###id1###&amp;lib=###id2###</code>.</p>
@@ -398,9 +398,9 @@
 <p>Request the redirect URL with the GET method.</p>
 </li>
 </ol>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -XGET <span style="color:#e6db74">&#34;https://script.googleusercontent.com/macros/echo?user_content_key=###id1###&amp;lib=###id2###&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -XGET <span style="color:#e6db74">&#34;https://script.googleusercontent.com/macros/echo?user_content_key=###id1###&amp;lib=###id2###&#34;</span>
 </span></span></code></pre></div><p>By this flow, the following value is returned from Web Apps.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;contentLength&#34;</span>: <span style="color:#ae81ff">-1</span>,
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;queryString&#34;</span>: <span style="color:#e6db74">&#34;&#34;</span>,
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;contextPath&#34;</span>: <span style="color:#e6db74">&#34;&#34;</span>,
@@ -412,7 +412,7 @@
 <ol>
 <li>Request with POST method to the Web Apps URL like <code>https://script.google.com/macros/s/{deploymentId}/exec</code>.</li>
 </ol>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -I -XPOST <span style="color:#e6db74">&#34;https://script.google.com/macros/s/{deploymentId}/exec&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -I -XPOST <span style="color:#e6db74">&#34;https://script.google.com/macros/s/{deploymentId}/exec&#34;</span>
 </span></span></code></pre></div><ol start="2">
 <li>
 <p>Retrieve the URL of &ldquo;location&rdquo; from the response header of the above request. It&rsquo;s like <code>https://script.googleusercontent.com/macros/echo?user_content_key=###id1###&amp;lib=###id2###</code>.</p>
@@ -421,18 +421,18 @@
 <p>Request the redirect URL with the POST method.</p>
 </li>
 </ol>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -XPOST <span style="color:#e6db74">&#34;https://script.googleusercontent.com/macros/echo?user_content_key=###id1###&amp;lib=###id2###&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -XPOST <span style="color:#e6db74">&#34;https://script.googleusercontent.com/macros/echo?user_content_key=###id1###&amp;lib=###id2###&#34;</span>
 </span></span></code></pre></div><pre><code>- In this case, an error like &quot;Page Not Found&quot; (status code 405) occurs.
 </code></pre>
 <ol start="4">
 <li>Request the redirect URL with the GET method.</li>
 </ol>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -XGET <span style="color:#e6db74">&#34;https://script.googleusercontent.com/macros/echo?user_content_key=###id1###&amp;lib=###id2###&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -XGET <span style="color:#e6db74">&#34;https://script.googleusercontent.com/macros/echo?user_content_key=###id1###&amp;lib=###id2###&#34;</span>
 </span></span></code></pre></div><ul>
 <li>In this case, no error occurs. The correct value is returned from the Web Apps.</li>
 </ul>
 <p>By this flow, the following value is returned from Web Apps.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;queryString&#34;</span>: <span style="color:#e6db74">&#34;&#34;</span>,
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;parameters&#34;</span>: {},
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;parameter&#34;</span>: {},
@@ -447,7 +447,7 @@
 <ol>
 <li>Request with the GET method to the Web Apps URL like <code>https://script.google.com/macros/s/{deploymentId}/exec</code>. In this case, the value is included in the query parameter.</li>
 </ol>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -I -XGET <span style="color:#e6db74">&#34;https://script.google.com/macros/s/{deploymentId}/exec?key1=value1&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -I -XGET <span style="color:#e6db74">&#34;https://script.google.com/macros/s/{deploymentId}/exec?key1=value1&#34;</span>
 </span></span></code></pre></div><ol start="2">
 <li>
 <p>Retrieve the URL of &ldquo;location&rdquo; from the response header of the above request. It&rsquo;s like <code>https://script.googleusercontent.com/macros/echo?user_content_key=###id1###&amp;lib=###id2###</code>.</p>
@@ -459,9 +459,9 @@
 <p>Request the redirect URL with the GET method.</p>
 </li>
 </ol>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -XGET <span style="color:#e6db74">&#34;https://script.googleusercontent.com/macros/echo?user_content_key=###id1###&amp;lib=###id2###&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -XGET <span style="color:#e6db74">&#34;https://script.googleusercontent.com/macros/echo?user_content_key=###id1###&amp;lib=###id2###&#34;</span>
 </span></span></code></pre></div><p>By this flow, the following value is returned from Web Apps. You can see that the returned values include the sending values.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;contextPath&#34;</span>: <span style="color:#e6db74">&#34;&#34;</span>,
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;queryString&#34;</span>: <span style="color:#e6db74">&#34;key1=value1&#34;</span>,
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;parameter&#34;</span>: { <span style="color:#f92672">&#34;key1&#34;</span>: <span style="color:#e6db74">&#34;value1&#34;</span> },
@@ -473,7 +473,7 @@
 <ol>
 <li>Request with POST method to the Web Apps URL like <code>https://script.google.com/macros/s/{deploymentId}/exec</code>. In this case, the values are included in both the query parameter and the request body.</li>
 </ol>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -vso /dev/null -XPOST -d <span style="color:#e6db74">&#34;key2=value&#34;</span> <span style="color:#e6db74">&#34;https://script.google.com/macros/s/{deploymentId}/exec?key1=value1&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -vso /dev/null -XPOST -d <span style="color:#e6db74">&#34;key2=value&#34;</span> <span style="color:#e6db74">&#34;https://script.google.com/macros/s/{deploymentId}/exec?key1=value1&#34;</span>
 </span></span></code></pre></div><ol start="2">
 <li>
 <p>Retrieve the URL of &ldquo;location&rdquo; from the response header of the above request. It&rsquo;s like <code>https://script.googleusercontent.com/macros/echo?user_content_key=###id1###&amp;lib=###id2###</code>.</p>
@@ -485,9 +485,9 @@
 <p>Request the redirect URL with the GET method.</p>
 </li>
 </ol>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -XGET <span style="color:#e6db74">&#34;https://script.googleusercontent.com/macros/echo?user_content_key=###id1###&amp;lib=###id2###&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -XGET <span style="color:#e6db74">&#34;https://script.googleusercontent.com/macros/echo?user_content_key=###id1###&amp;lib=###id2###&#34;</span>
 </span></span></code></pre></div><p>By this flow, the following value is returned from Web Apps. You can see that the returned values include the sending values.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
 </span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;postData&#34;</span>: {
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;contents&#34;</span>: <span style="color:#e6db74">&#34;key2=value&#34;</span>,
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;length&#34;</span>: <span style="color:#ae81ff">10</span>,
@@ -504,9 +504,9 @@
 </span></span></code></pre></div><h3 id="4-send-values-using-the-curl-command-by-one-command">4. Send values using the curl command by one command</h3>
 <p>When <code>--location</code> or <code>-L</code> is used with the curl command, the Web Apps can be requested by one command. <a href="https://github.com/tanaikech/taking-advantage-of-Web-Apps-with-google-apps-script#sample-client-for-accessing-to-web-apps">Ref</a></p>
 <h4 id="for-doget-2">For <code>doGet</code></h4>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -L -XGET <span style="color:#e6db74">&#34;https://script.google.com/macros/s/{deploymentId}/exec?key1=value1&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -L -XGET <span style="color:#e6db74">&#34;https://script.google.com/macros/s/{deploymentId}/exec?key1=value1&#34;</span>
 </span></span></code></pre></div><h4 id="for-dopost-2">For <code>doPost</code></h4>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -L -d <span style="color:#e6db74">&#34;key2=value&#34;</span> <span style="color:#e6db74">&#34;https://script.google.com/macros/s/{deploymentId}/exec?key1=value1&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl -L -d <span style="color:#e6db74">&#34;key2=value&#34;</span> <span style="color:#e6db74">&#34;https://script.google.com/macros/s/{deploymentId}/exec?key1=value1&#34;</span>
 </span></span></code></pre></div><ul>
 <li>
 <p>Here, when <code>-XPOST</code> and <code>-L</code> are used, the request process is as follows. By this, the response values from Web Apps are not returned while the values are correctly sent to the Web Apps.</p>
@@ -555,46 +555,46 @@
 <h2 id="appendix">Appendix</h2>
 <p>As an appendix, I would like to introduce the sample scripts of Google Apps Script for the above flow.</p>
 <h3 id="for-doget-3">for <code>doGet</code></h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">requestToDoGet</span>() {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">requestToDoGet</span>() {
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">webAppsUrl</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://script.google.com/macros/s/{deploymentId}/exec&#34;</span>;
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 1st request.
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res1</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">webAppsUrl</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;?key=value&#34;</span>, {
+</span></span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res1</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">webAppsUrl</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;?key=value&#34;</span>, {
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;get&#34;</span>,
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">followRedirects</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">false</span>,
 </span></span><span style="display:flex;"><span>  });
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">headers</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">res1</span>.<span style="color:#a6e22e">getAllHeaders</span>();
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res1</span>.<span style="color:#a6e22e">getContentText</span>()); <span style="color:#75715e">// Here, HTML data including the redirect URL is returned. And, the query parameter of &#34;key=value&#34; is sent.
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">location</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">headers</span>[<span style="color:#e6db74">&#34;Location&#34;</span>];
+</span></span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">location</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">headers</span>[<span style="color:#e6db74">&#34;Location&#34;</span>];
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 2nd request.
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res2</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">location</span>, {
+</span></span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res2</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">location</span>, {
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;get&#34;</span>,
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">followRedirects</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">false</span>,
 </span></span><span style="display:flex;"><span>  });
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res2</span>.<span style="color:#a6e22e">getContentText</span>()); <span style="color:#75715e">// Here, the values are returned from `doPost`.
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><h3 id="for-dopost-3">for <code>doPost</code></h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">requestToDoPost</span>() {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">requestToDoPost</span>() {
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">webAppsUrl</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://script.google.com/macros/s/{deploymentId}/exec&#34;</span>;
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 1st request.
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res1</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">webAppsUrl</span>, {
+</span></span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res1</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">webAppsUrl</span>, {
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;post&#34;</span>,
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;sample&#34;</span>,
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">followRedirects</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">false</span>,
 </span></span><span style="display:flex;"><span>  });
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">headers</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">res1</span>.<span style="color:#a6e22e">getAllHeaders</span>();
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res1</span>.<span style="color:#a6e22e">getContentText</span>()); <span style="color:#75715e">// Here, HTML data including the redirect URL is returned. And, the request body of &#34;sample&#34; is sent.
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">location</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">headers</span>[<span style="color:#e6db74">&#34;Location&#34;</span>];
+</span></span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">location</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">headers</span>[<span style="color:#e6db74">&#34;Location&#34;</span>];
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 2nd request.
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res2</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">location</span>, {
+</span></span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res2</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">location</span>, {
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;get&#34;</span>,
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">followRedirects</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">false</span>,
 </span></span><span style="display:flex;"><span>  });
 </span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res2</span>.<span style="color:#a6e22e">getContentText</span>()); <span style="color:#75715e">// Here, the values are returned from `doPost`.
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div>
   
   <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>

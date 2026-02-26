@@ -9,7 +9,7 @@
   <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
 
   <meta name="description" content="Official profile of Kanshi Tanaike, a Google Developer Expert (GDE) in Google Workspace and Physicist. Specializing in Google Apps Script, Gemini API, and innovative IT solutions.">
-  <meta name="generator" content="Hugo 0.98.0" />
+  <meta name="generator" content="Hugo 0.157.0">
 
   <meta property="og:title" content="tanaike - Developer Blog">
   <meta property="og:description" content="Leverage Google APIs, GAS, and Gemini with specialized technical insights.">
@@ -331,13 +331,13 @@
   
     <article>
   <header>
-    <h2><a href="https://tanaikech.github.io/2022/03/10/bug-of-create-method-of-google-forms-api-was-removed/">Bug of Create Method of Google Forms API was Removed</a></h2>
+    <h2><a href="https://tanaikech.github.io/2017/12/07/downloading-file-using-button-of-dialog-box-on-google-docs/">Downloading File Using Button of Dialog Box on Google Docs</a></h2>
 
     <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>10 Mar 2022, 10:11</time>
+    <time>07 Dec 2017, 08:43</time>
   </div>
 
   
@@ -362,7 +362,7 @@
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/forms-api">forms-api</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/download">download</a>
     
   </div>
   
@@ -373,29 +373,69 @@
   </header>
 
   <p>
-  Gists
-When I tested Google Forms API, I noticed that when a new Google Form is created by the method of forms.create, there is not title of the created Google Form. So, I have reported this to Google issue tracker. Ref Today, I confirmed that this bug has been removed.
-And, when I saw the official document, I noticed that the following document has been added. Ref
-In the current stage, when the following curl command is used, a new Google Form with the file title of sampleFormTitle and the form title of sampletitle can be created.
+  <p><a href="https://gist.github.com/tanaikech/0f1fd11b7e4d45b016d45bbeeb06aa46">Gists</a></p>
+<p>This is a sample script for downloading a file using a button of dialog box on Google Docs (Spreadsheet, Document and Slides).</p>
+<p>Please use this sample script at script editor on Google Docs (Spreadsheet, Document and Slides). And please set file ID in the script.</p>
+<h2 id="flow-">FLow :</h2>
+<p>The flow of this sample script is as follows.</p>
+<ol>
+<li>Run <code>dialog()</code>.
+<ul>
+<li>Open a dialog.</li>
+</ul>
+</li>
+<li>When users click a download button, retrieve file ID at GAS side.</li>
+<li>Create download URL from the file ID. Download URL and filename are sent to <code>download(obj)</code> of Javascript.</li>
+<li>Create a tag for downloading and click it at Javascript side.</li>
+</ol>
+<ul>
+<li>By this, users can download the file of file ID.</li>
+</ul>
+<h2 id="codegs">Code.gs</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">dialog</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">html</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">HtmlService</span>.<span style="color:#a6e22e">createHtmlOutputFromFile</span>(<span style="color:#e6db74">&#39;download&#39;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getUi</span>().<span style="color:#a6e22e">showModalDialog</span>(<span style="color:#a6e22e">html</span>, <span style="color:#e6db74">&#39;Sample dialog&#39;</span>); <span style="color:#75715e">// If you use other Google Docs, please modify here.
+</span></span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getDownloadUrl</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">id</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;### file id ###&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">file</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">getFileById</span>(<span style="color:#a6e22e">id</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getDownloadUrl</span>().<span style="color:#a6e22e">replace</span>(<span style="color:#e6db74">&#34;?e=download&amp;gd=true&#34;</span>,<span style="color:#e6db74">&#34;&#34;</span>),
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">filename</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">getName</span>()
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="downloadhtml">download.html</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-html" data-lang="html"><span style="display:flex;"><span>&lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;button&#34;</span> <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;download&#34;</span> <span style="color:#a6e22e">onclick</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;getUrl()&#34;</span> /&gt;
+</span></span><span style="display:flex;"><span>&lt;<span style="color:#f92672">script</span>&gt;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getUrl</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">script</span>.<span style="color:#a6e22e">run</span>.<span style="color:#a6e22e">withSuccessHandler</span>(<span style="color:#a6e22e">download</span>).<span style="color:#a6e22e">getDownloadUrl</span>();
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">download</span>(<span style="color:#a6e22e">obj</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">d</span> <span style="color:#f92672">=</span> document.<span style="color:#a6e22e">createElement</span>(<span style="color:#e6db74">&#39;a&#39;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">href</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">url</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">download</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">filename</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">click</span>();
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>&lt;/<span style="color:#f92672">script</span>&gt;
+</span></span></code></pre></div>
   </p>
 
-  
-  <footer>
-    <a href="https://tanaikech.github.io/2022/03/10/bug-of-create-method-of-google-forms-api-was-removed/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
   
 </article>
 
   
     <article>
   <header>
-    <h2><a href="https://tanaikech.github.io/2022/02/26/updated-go-library-getcode-to-v101/">Updated: Go Library - getcode to v101</a></h2>
+    <h2><a href="https://tanaikech.github.io/2017/12/05/rearranging-files-in-gas-project-restricted/">Rearranging Files in GAS Project (Restricted)</a></h2>
 
     <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>26 Feb 2022, 15:40</time>
+    <time>05 Dec 2017, 15:13</time>
   </div>
 
   
@@ -406,7 +446,530 @@ In the current stage, when the following curl command is used, a new Google Form
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gotips">GoTips</a>&nbsp;&#47;
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/rearrange">rearrange</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/project">project</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/scripteditor">scripteditor</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <p><a href="https://gist.github.com/tanaikech/4b71f86fd6c09c983c183418fdd8e88c">Gists</a></p>
+<h2 id="introduction">Introduction</h2>
+<p>Recently, I have introduced a GAS library and a CLI tool for rearranging files in GAS project. Those are <a href="https://github.com/tanaikech/RearrangeScripts">RearrangeScripts</a> and <a href="https://github.com/tanaikech/ggsrun/blob/master/help/README.md#rearrangescripts">ggsrun</a>. Because today, I found a new way for rearranging files, I would like to introduce it although there is a restriction.</p>
+<p>By the recent Google-update, users become able to create folders in GAS project. The new way uses this. At first, please see the demonstration GIF animation.</p>
+<h2 id="demo">Demo</h2>
+<p><img src="https://tanaikech.github.io/img/20171205-rearrange_withoutLibrary.gif" alt=""></p>
+  </p>
+
+  
+  <footer>
+    <a href="https://tanaikech.github.io/2017/12/05/rearranging-files-in-gas-project-restricted/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+  </footer>
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2017/12/04/retrieving-instance-of-user-interface-environment/">Retrieving Instance of User-Interface Environment</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>04 Dec 2017, 14:11</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/ui">ui</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <p><a href="https://gist.github.com/tanaikech/f05e7d82b754b0348463b8dec1c741ad">Gists</a></p>
+<p>This sample script is for retrieving an instance of user-interface environment for Spreadsheet, Document and Slides. When I create applications which use user interface (for example, sidebar, dialog and so on), the user interface can be used for Spreadsheet, Document and Slides. If the application doesn&rsquo;t use the methods depend on Spreadsheet, Document and Slides, this script can give 3 choices to users.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getUi</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ui</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">ui</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getUi</span>();
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">e</span>) {}
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">ui</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DocumentApp</span>.<span style="color:#a6e22e">getUi</span>();
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">e</span>) {}
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">ui</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SlidesApp</span>.<span style="color:#a6e22e">getUi</span>();
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">e</span>) {}
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ui</span> <span style="color:#f92672">||</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ui</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">getUi</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">ui</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">ui</span>.<span style="color:#a6e22e">alert</span>(<span style="color:#e6db74">&#39;Hello, world!&#39;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div>
+  </p>
+
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2017/12/03/mixing-2-array-objects-included-dictionary-object-by-javascript/">Mixing 2 Array Objects Included Dictionary Object by Javascript</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>03 Dec 2017, 15:45</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/jstips">jstips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/coffeescripttips">CoffeeScriptTips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/javascript">Javascript</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/coffeescript">CoffeeScript</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/object">Object</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <p><a href="https://gist.github.com/tanaikech/8141f8a063984a111124cd2f0e36f7fb">Gists</a></p>
+<p>This is a sample script for combining and mixing 2 objects. Each object is an array which included a dictionary type. When the key of the dictionary object is the same, the values are mixed.</p>
+<p><strong>This can be also used for Google Apps Script.</strong></p>
+<h2 id="input">Input</h2>
+<pre tabindex="0"><code>var obj1 = [
+    {&#34;key1&#34;: [&#34;value1a1&#34;, &#34;value1a2&#34;]},
+    {&#34;key1&#34;: [&#34;value1aa1&#34;, &#34;value1aa2&#34;]},
+    {&#34;key2&#34;: [&#34;value2a1&#34;, &#34;value2a2&#34;]},
+    {&#34;key3&#34;: [&#34;value3a1&#34;, &#34;value3a2&#34;]},
+];
+var obj2 = [
+    {&#34;key1&#34;: [&#34;value1b1&#34;, &#34;value1b2&#34;]},
+    {&#34;key3&#34;: [&#34;value3b1&#34;, &#34;value3b2&#34;]},
+    {&#34;key3&#34;: [&#34;value3bb1&#34;, &#34;value3bb2&#34;]},
+    {&#34;key4&#34;: [&#34;value4b1&#34;, &#34;value4b2&#34;]},
+];
+</code></pre><h2 id="output">Output</h2>
+<pre tabindex="0"><code>[
+    {&#34;key1&#34;: [&#34;value1a1&#34;, &#34;value1a2&#34;, &#34;value1b1&#34;, &#34;value1b2&#34;, &#34;value1aa1&#34;, &#34;value1aa2&#34;]},
+    {&#34;key2&#34;: [&#34;value2a1&#34;, &#34;value2a2&#34;]},
+    {&#34;key3&#34;: [&#34;value3a1&#34;, &#34;value3a2&#34;, &#34;value3b1&#34;, &#34;value3b2&#34;, &#34;value3bb1&#34;, &#34;value3bb2&#34;]},
+    {&#34;key4&#34;: [&#34;value4b1&#34;, &#34;value4b2&#34;]}
+]
+</code></pre><h2 id="sample-script-">Sample script :</h2>
+<h3 id="javascript-">Javascript :</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">mixture</span>(<span style="color:#a6e22e">obj1</span>, <span style="color:#a6e22e">obj2</span>) {
+</span></span><span style="display:flex;"><span>    Array.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">push</span>.<span style="color:#a6e22e">apply</span>(<span style="color:#a6e22e">obj1</span>, <span style="color:#a6e22e">obj2</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> [];
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> [];
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">obj1</span>.<span style="color:#a6e22e">forEach</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">i</span>){
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">temp</span>[<span style="color:#a6e22e">i</span>] <span style="color:#f92672">=</span> <span style="color:#f92672">!~</span><span style="color:#a6e22e">temp</span>.<span style="color:#a6e22e">indexOf</span>(Object.<span style="color:#a6e22e">keys</span>(<span style="color:#a6e22e">e</span>)[<span style="color:#ae81ff">0</span>]) <span style="color:#f92672">?</span> Object.<span style="color:#a6e22e">keys</span>(<span style="color:#a6e22e">e</span>)[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">:</span> <span style="color:#66d9ef">false</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">temp</span>[<span style="color:#a6e22e">i</span>]) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">e</span>);
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">forEach</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">f</span>, <span style="color:#a6e22e">j</span>){
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> (Object.<span style="color:#a6e22e">keys</span>(<span style="color:#a6e22e">f</span>)[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">==</span> Object.<span style="color:#a6e22e">keys</span>(<span style="color:#a6e22e">e</span>)[<span style="color:#ae81ff">0</span>]) {
+</span></span><span style="display:flex;"><span>                    Array.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">push</span>.<span style="color:#a6e22e">apply</span>(<span style="color:#a6e22e">res</span>[<span style="color:#a6e22e">j</span>][Object.<span style="color:#a6e22e">keys</span>(<span style="color:#a6e22e">f</span>)[<span style="color:#ae81ff">0</span>]], <span style="color:#a6e22e">e</span>[Object.<span style="color:#a6e22e">keys</span>(<span style="color:#a6e22e">e</span>)[<span style="color:#ae81ff">0</span>]]);
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>            });
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">res</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">obj1</span> <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    {<span style="color:#e6db74">&#34;key1&#34;</span><span style="color:#f92672">:</span> [<span style="color:#e6db74">&#34;value1a1&#34;</span>, <span style="color:#e6db74">&#34;value1a2&#34;</span>]},
+</span></span><span style="display:flex;"><span>    {<span style="color:#e6db74">&#34;key1&#34;</span><span style="color:#f92672">:</span> [<span style="color:#e6db74">&#34;value1aa1&#34;</span>, <span style="color:#e6db74">&#34;value1aa2&#34;</span>]},
+</span></span><span style="display:flex;"><span>    {<span style="color:#e6db74">&#34;key2&#34;</span><span style="color:#f92672">:</span> [<span style="color:#e6db74">&#34;value2a1&#34;</span>, <span style="color:#e6db74">&#34;value2a2&#34;</span>]},
+</span></span><span style="display:flex;"><span>    {<span style="color:#e6db74">&#34;key3&#34;</span><span style="color:#f92672">:</span> [<span style="color:#e6db74">&#34;value3a1&#34;</span>, <span style="color:#e6db74">&#34;value3a2&#34;</span>]},
+</span></span><span style="display:flex;"><span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">obj2</span> <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    {<span style="color:#e6db74">&#34;key1&#34;</span><span style="color:#f92672">:</span> [<span style="color:#e6db74">&#34;value1b1&#34;</span>, <span style="color:#e6db74">&#34;value1b2&#34;</span>]},
+</span></span><span style="display:flex;"><span>    {<span style="color:#e6db74">&#34;key3&#34;</span><span style="color:#f92672">:</span> [<span style="color:#e6db74">&#34;value3b1&#34;</span>, <span style="color:#e6db74">&#34;value3b2&#34;</span>]},
+</span></span><span style="display:flex;"><span>    {<span style="color:#e6db74">&#34;key3&#34;</span><span style="color:#f92672">:</span> [<span style="color:#e6db74">&#34;value3bb1&#34;</span>, <span style="color:#e6db74">&#34;value3bb2&#34;</span>]},
+</span></span><span style="display:flex;"><span>    {<span style="color:#e6db74">&#34;key4&#34;</span><span style="color:#f92672">:</span> [<span style="color:#e6db74">&#34;value4b1&#34;</span>, <span style="color:#e6db74">&#34;value4b2&#34;</span>]},
+</span></span><span style="display:flex;"><span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">mixture</span>(<span style="color:#a6e22e">obj1</span>, <span style="color:#a6e22e">obj2</span>);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">res</span>))
+</span></span></code></pre></div><h3 id="coffeescript-">CoffeeScript :</h3>
+<p>This is a sample script for coffeescript.</p>
+  </p>
+
+  
+  <footer>
+    <a href="https://tanaikech.github.io/2017/12/03/mixing-2-array-objects-included-dictionary-object-by-javascript/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+  </footer>
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2017/12/01/adding-object-to-object-by-javascript/">Adding Object to Object by Javascript</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>01 Dec 2017, 12:12</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/jstips">jstips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/javascript">Javascript</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/object">Object</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <p><a href="https://gist.github.com/tanaikech/7bd06771e627afd9957ef4f13c9661d5">Gists</a></p>
+<p>This sample script is for adding object to object by javascript.</p>
+<h3 id="script-">Script :</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">key1</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;value1&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">key2</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;value2&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">key3</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;value3&#34;</span>
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">obj1</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">key4</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;value4&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">key5</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;value5&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">key6</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;value6&#34;</span>
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>Object.<span style="color:#a6e22e">assign</span>(<span style="color:#a6e22e">obj</span>, <span style="color:#a6e22e">obj1</span>);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">obj</span>);
+</span></span></code></pre></div><h2 id="result-">Result :</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{ <span style="color:#960050;background-color:#1e0010">key1:</span> <span style="color:#960050;background-color:#1e0010">&#39;value1&#39;,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#960050;background-color:#1e0010">key2:</span> <span style="color:#960050;background-color:#1e0010">&#39;value2&#39;,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#960050;background-color:#1e0010">key3:</span> <span style="color:#960050;background-color:#1e0010">&#39;value3&#39;,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#960050;background-color:#1e0010">key4:</span> <span style="color:#960050;background-color:#1e0010">&#39;value4&#39;,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#960050;background-color:#1e0010">key5:</span> <span style="color:#960050;background-color:#1e0010">&#39;value5&#39;,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#960050;background-color:#1e0010">key6:</span> <span style="color:#960050;background-color:#1e0010">&#39;value6&#39;</span> }
+</span></span></code></pre></div><p><a href="https://jsfiddle.net/896feLjk/">jsfiddle demo</a></p>
+<h2 id="reference-">Reference :</h2>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign">Object.assign()</a></li>
+</ul>
+  </p>
+
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2017/11/23/taking-advantage-of-manifests-by-gas-library/">Taking Advantage of Manifests by GAS Library</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>23 Nov 2017, 20:21</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/manifests">manifests</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <p><a href="https://gist.github.com/tanaikech/23ddf599a4155b66f1029978bba8153b">Gists</a></p>
+<h2 id="introduction">Introduction</h2>
+<p>By recent Google update (<a href="https://developers.google.com/apps-script/">Google update at October 24, 2017</a>), various new winds to GAS developers were blown. There is &ldquo;<a href="https://developers.google.com/apps-script/concepts/manifests">Manifests</a>&rdquo; as one of the new winds. &ldquo;Manifests&rdquo; makes us manage the project using JSON. Especially, the special scopes which have to use OAuth2 process can be used by only setting them to the Manifests. I think that this is the largest modification. However, when scopes are added to a project using Manifests, users who use the project can use only added scopes. This means that when users create scripts in the project, if there are some scopes which is required to be added, such scopes cannot be automatically added. So the error of &ldquo;Insufficient Permission&rdquo; occurs.</p>
+  </p>
+
+  
+  <footer>
+    <a href="https://tanaikech.github.io/2017/11/23/taking-advantage-of-manifests-by-gas-library/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+  </footer>
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2017/11/21/retrieving-size-of-tables-in-google-slides-using-google-apps-script/">Retrieving Size of Tables in Google Slides using Google Apps Script</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>21 Nov 2017, 11:24</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/slides">Slides</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <p><a href="https://gist.github.com/tanaikech/3143be7e7df8cc595d73427d22ae2e0e">Gists</a></p>
+<p>This sample script is for retrieving the size (width and height) of a table in Google Slides using Google Apps Script.</p>
+<p>There are no methods for directly retrieving the table size using SlidesApp yet. So I thought of a workaround using Slides API.</p>
+<ul>
+<li>When the slide information is retrieved using <code>Slides.Presentations.Pages.get()</code> of Slides API, the information of tables is also included. In the information, the height and width of table are also included.</li>
+<li>But the unit is EMU (English Metric Unit), and the height and width is separated by each cell. So it is required to sum each height and width while modifying the unit.</li>
+</ul>
+<p>The modified script reflected this is as follows.</p>
+  </p>
+
+  
+  <footer>
+    <a href="https://tanaikech.github.io/2017/11/21/retrieving-size-of-tables-in-google-slides-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+  </footer>
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2017/11/13/slideapp-for-google-slides/">SlideApp for Google Slides</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>13 Nov 2017, 14:17</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/slides">Slides</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <p><a href="https://gist.github.com/tanaikech/0d8110aa9a6f7c1b8848e10a702628a1">Gists</a></p>
+<p>By recent Google updated, Class SlideApp is added to Google Slides. SlideApp will be bring a lot of applications. Here, I would like to introduce 2 samples.</p>
+<h2 id="1-sidebar">1. Sidebar</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">showSidebar</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">html</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">HtmlService</span>
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">createHtmlOutput</span>(<span style="color:#e6db74">&#39;Hello, world! &lt;input type=&#34;button&#34; value=&#34;Close&#34; onclick=&#34;google.script.host.close()&#34; /&gt;&#39;</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">setTitle</span>(<span style="color:#e6db74">&#39;My custom sidebar&#39;</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">setWidth</span>(<span style="color:#ae81ff">300</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">SlidesApp</span>.<span style="color:#a6e22e">getUi</span>().<span style="color:#a6e22e">showSidebar</span>(<span style="color:#a6e22e">html</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="2-copy-slides-in-existing-slide-to-a-new-slide">2. Copy slides in existing Slide to a new Slide</h2>
+<p>This sample script create a new Slide with slides you want to copy.</p>
+  </p>
+
+  
+  <footer>
+    <a href="https://tanaikech.github.io/2017/11/13/slideapp-for-google-slides/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+  </footer>
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2017/11/13/gas-library-rearrangescripts/">GAS Library - RearrangeScripts</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>13 Nov 2017, 09:30</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
     
       <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>
     
@@ -420,65 +983,13 @@ In the current stage, when the following curl command is used, a new Google Form
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
     
-  </div>
-  
-  
-
-</div>
-
-  </header>
-
-  <p>
-  getcode was updated to v1.0.1   v1.0.1 (February 26, 2022)
- Latest libraries are reflected to this library. And, the sample script is shown using the Quickstart for go of Drive API.    You can get this from https://github.com/tanaikech/getcode
-  </p>
-
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2022/02/26/updated-goodls-to-v201/">Updated goodls to v201</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>26 Feb 2022, 11:39</time>
-  </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/rearrange">rearrange</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/clitool">CLITool</a>
-    
-  </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/goodls">goodls</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/cli">CLI</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/googledrive">GoogleDrive</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/project">project</a>
     
   </div>
   
@@ -489,13 +1000,15 @@ In the current stage, when the following curl command is used, a new Google Form
   </header>
 
   <p>
-  v2.0.1 (February 26, 2022)
- A bug for the resumable download was removed.    The detail information and how to get this are https://github.
+  <h1 id="overview">Overview</h1>
+<p>This is a GAS application for rearranging Google Apps Scripts (GAS) in a project which can be seen at the script editor.</p>
+<h1 id="description">Description</h1>
+<p>Have you ever thought about rearranging Google Apps Scripts in a project which can be seen at the script editor? I also have thought about it. Finally, I could find the workaround to do it. And recently, I have given this function to <a href="https://github.com/tanaikech/ggsrun/blob/master/help/README.md#rearrangescripts">ggsrun</a> which is a CLI tool. Furthermore, I thought that if there is a GUI application for rearranging scripts in a project, it may be useful for more users. So I created this. Today, I published this as a GUI tool using Google Apps Script. If this was useful for you, I&rsquo;m glad.</p>
   </p>
 
   
   <footer>
-    <a href="https://tanaikech.github.io/2022/02/26/updated-goodls-to-v201/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+    <a href="https://tanaikech.github.io/2017/11/13/gas-library-rearrangescripts/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
   </footer>
   
 </article>
@@ -503,13 +1016,13 @@ In the current stage, when the following curl command is used, a new Google Form
   
     <article>
   <header>
-    <h2><a href="https://tanaikech.github.io/2022/02/25/updated-ggsrun-to-v200/">Updated ggsrun to v200</a></h2>
+    <h2><a href="https://tanaikech.github.io/2017/11/12/gas-library-zipfolder/">GAS Library - ZipFolder</a></h2>
 
     <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>25 Feb 2022, 15:43</time>
+    <time>12 Nov 2017, 15:52</time>
   </div>
 
   
@@ -520,7 +1033,9 @@ In the current stage, when the following curl command is used, a new Google Form
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/clitool">CLITool</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>
     
   </div>
   
@@ -532,13 +1047,11 @@ In the current stage, when the following curl command is used, a new Google Form
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/ggsrun">ggsrun</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/cli">CLI</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/zip">zip</a>
     
   </div>
   
@@ -549,69 +1062,15 @@ In the current stage, when the following curl command is used, a new Google Form
   </header>
 
   <p>
-  v2.0.0 (February 25, 2022)
- Modified using the latest libraries. The specification of ggsrun is not changed.    You can check ggsrun at https://github.com/tanaikech/ggsrun.
-  </p>
-
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2022/02/25/updated-goodls-to-v200/">Updated goodls to v200</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>25 Feb 2022, 15:04</time>
-  </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/clitool">CLITool</a>
-    
-  </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/goodls">goodls</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/cli">CLI</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/googledrive">GoogleDrive</a>
-    
-  </div>
-  
-  
-
-</div>
-
-  </header>
-
-  <p>
-  v2.0.0 (February 25, 2022)
- By changing the specification of methods, drive.New() and transport.APIKey were deprecated. By this, I updated go-getfilelist. In this version, I used this updated library to goodls. And also, drive.NewService() is used instead of drive.New().    The detail information and how to get this are https://github.
+  <h1 id="overview">Overview</h1>
+<p>This is a library for zipping a folder using Google Apps Scripts.</p>
+<h1 id="description">Description</h1>
+<p>When users manually download a folder on Google Drive, users can download all files in the folder as a zip file using the web interface. <a href="https://developers.google.com/apps-script/reference/utilities/utilities">There are zip tools in Class Utilities of Google Apps Script</a>. However, the zip tools cannot create a zip file from a folder. And it cannot retrieve all files included any folders in a folder. So I created this. This library works like almost the same to the web interface using GAS.</p>
   </p>
 
   
   <footer>
-    <a href="https://tanaikech.github.io/2022/02/25/updated-goodls-to-v200/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+    <a href="https://tanaikech.github.io/2017/11/12/gas-library-zipfolder/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
   </footer>
   
 </article>
@@ -625,7 +1084,7 @@ In the current stage, when the following curl command is used, a new Google Form
   
   <a href="https://tanaikech.github.io/page/83/"><i class="fa fa-chevron-left"></i></a>
   
-  <span>&nbsp;84 / 194&nbsp;</span>
+  <span>&nbsp;84 / 98&nbsp;</span>
   
   <a href="https://tanaikech.github.io/page/85/"><i class="fa fa-chevron-right"></i></a>
   

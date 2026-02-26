@@ -9,7 +9,7 @@
   <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
 
   <meta name="description" content="Official profile of Kanshi Tanaike, a Google Developer Expert (GDE) in Google Workspace and Physicist. Specializing in Google Apps Script, Gemini API, and innovative IT solutions.">
-  <meta name="generator" content="Hugo 0.98.0" />
+  <meta name="generator" content="Hugo 0.157.0">
 
   <meta property="og:title" content="tanaike - Developer Blog">
   <meta property="og:description" content="Leverage Google APIs, GAS, and Gemini with specialized technical insights.">
@@ -376,10 +376,51 @@
   </header>
 
   <p>
-  Gists
-This sample script is for using Zaif API by Google Apps Script.
-The following go script is a sample at Zaif API.
-package mainimport (&#34;fmt&#34;&#34;time&#34;&#34;strconv&#34;&#34;crypto/hmac&#34;&#34;crypto/sha512&#34;&#34;io/ioutil&#34;&#34;net/http&#34;&#34;encoding/hex&#34;&#34;net/url&#34;&#34;strings&#34;)var key = &#34;&lt;your_key&gt;&#34;var secret = &#34;&lt;your_secret&gt;&#34;func main() {uri := &#34;https://api.zaif.jp/tapi&#34;values := url.Values{}values.Add(&#34;method&#34;, &#34;get_info&#34;)values.Add(&#34;nonce&#34;, strconv.FormatInt(time.Now().Unix(), 10))encodedParams := values.Encode()req, _ := http.NewRequest(&#34;POST&#34;, uri, strings.NewReader(encodedParams))hash := hmac.
+  <p><a href="https://gist.github.com/tanaikech/77481c2621dc7429449194c0f1dbd58c">Gists</a></p>
+<p>This sample script is for using <a href="http://techbureau-api-document.readthedocs.io/ja/latest/index.html">Zaif API</a> by Google Apps Script.</p>
+<p>The following go script is a sample at <a href="http://techbureau-api-document.readthedocs.io/ja/latest/trade/3_how_to_implement/2_go.html">Zaif API</a>.</p>
+<pre tabindex="0"><code>package main
+
+import (
+    &#34;fmt&#34;
+    &#34;time&#34;
+    &#34;strconv&#34;
+    &#34;crypto/hmac&#34;
+    &#34;crypto/sha512&#34;
+    &#34;io/ioutil&#34;
+    &#34;net/http&#34;
+    &#34;encoding/hex&#34;
+    &#34;net/url&#34;
+    &#34;strings&#34;
+)
+
+var key = &#34;&lt;your_key&gt;&#34;
+var secret = &#34;&lt;your_secret&gt;&#34;
+
+func main() {
+
+    uri := &#34;https://api.zaif.jp/tapi&#34;
+    values := url.Values{}
+    values.Add(&#34;method&#34;, &#34;get_info&#34;)
+    values.Add(&#34;nonce&#34;, strconv.FormatInt(time.Now().Unix(), 10))
+
+    encodedParams := values.Encode()
+    req, _ := http.NewRequest(&#34;POST&#34;, uri, strings.NewReader(encodedParams))
+
+    hash := hmac.New(sha512.New, []byte(secret))
+    hash.Write([]byte(encodedParams))
+    signature := hex.EncodeToString(hash.Sum(nil))
+
+    req.Header.Add(&#34;Key&#34;, key)
+    req.Header.Add(&#34;Sign&#34;, signature)
+    client := new(http.Client)
+    resp, _ := client.Do(req)
+    defer resp.Body.Close()
+
+    byteArray, _ := ioutil.ReadAll(resp.Body)
+    fmt.Println(string(byteArray))
+}
+</code></pre><p>When this is converted to GAS, the script is as follows.</p>
   </p>
 
   

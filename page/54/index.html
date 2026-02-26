@@ -9,7 +9,7 @@
   <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
 
   <meta name="description" content="Official profile of Kanshi Tanaike, a Google Developer Expert (GDE) in Google Workspace and Physicist. Specializing in Google Apps Script, Gemini API, and innovative IT solutions.">
-  <meta name="generator" content="Hugo 0.98.0" />
+  <meta name="generator" content="Hugo 0.157.0">
 
   <meta property="og:title" content="tanaike - Developer Blog">
   <meta property="og:description" content="Leverage Google APIs, GAS, and Gemini with specialized technical insights.">
@@ -331,13 +331,326 @@
   
     <article>
   <header>
-    <h2><a href="https://tanaikech.github.io/2023/06/11/gas-library-templateapp/">GAS Library - TemplateApp</a></h2>
+    <h2><a href="https://tanaikech.github.io/2020/10/06/setting-alternate-background-colors-for-rows-in-google-spreadsheet-using-google-apps-script/">Setting Alternate Background Colors for Rows in Google Spreadsheet using Google Apps Script</a></h2>
 
     <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>11 Jun 2023, 17:04</time>
+    <time>06 Oct 2020, 13:39</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/spreadsheet">spreadsheet</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <p><a href="https://gist.github.com/tanaikech/89aaa3adcd3a1fc37187ca61f389cbe9">Gists</a></p>
+<p>This is a sample script for setting alternate background colors for rows in Google Spreadsheet using Google Apps Script.</p>
+<p>It has already been known when the conditional formatting rule and custom function are used, this can be simply achieved. <a href="https://stackoverflow.com/q/30268451">Ref</a> In this report, I would like to introduce the method for using Google Apps Script.</p>
+<p><img src="https://tanaikech.github.io/img/20201006a-fig1.png" alt=""></p>
+<h2 id="sample-script">Sample script</h2>
+<p>In this sample script, the values of column &ldquo;A&rdquo; are checked.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">myFunction</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">colors</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">color1</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;#f4cccc&#34;</span>, <span style="color:#a6e22e">color2</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;#d9ead3&#34;</span> };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSheet</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ranges</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">getRange</span>(<span style="color:#e6db74">&#34;A1:A&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getLastRow</span>())
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">getValues</span>()
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">reduce</span>(
+</span></span><span style="display:flex;"><span>      (<span style="color:#a6e22e">o</span>, [<span style="color:#a6e22e">b</span>], <span style="color:#a6e22e">i</span>) =&gt; {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">b</span> <span style="color:#f92672">!=</span> <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span>) {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">b</span>;
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">c</span><span style="color:#f92672">++</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">o</span>[[<span style="color:#e6db74">&#34;color1&#34;</span>, <span style="color:#e6db74">&#34;color2&#34;</span>][<span style="color:#a6e22e">o</span>.<span style="color:#a6e22e">c</span> <span style="color:#f92672">%</span> <span style="color:#ae81ff">2</span>]].<span style="color:#a6e22e">push</span>(<span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">:</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      { <span style="color:#a6e22e">color1</span><span style="color:#f92672">:</span> [], <span style="color:#a6e22e">color2</span><span style="color:#f92672">:</span> [], <span style="color:#a6e22e">c</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">temp</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;&#34;</span> }
+</span></span><span style="display:flex;"><span>    );
+</span></span><span style="display:flex;"><span>  Object.<span style="color:#a6e22e">entries</span>(<span style="color:#a6e22e">colors</span>).<span style="color:#a6e22e">forEach</span>(([<span style="color:#a6e22e">k</span>, <span style="color:#a6e22e">v</span>]) =&gt;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRangeList</span>(<span style="color:#a6e22e">ranges</span>[<span style="color:#a6e22e">k</span>]).<span style="color:#a6e22e">setBackground</span>(<span style="color:#a6e22e">v</span>)
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><ul>
+<li>The process cost of this script can be reduced by using RangeList.</li>
+</ul>
+<h2 id="reference">Reference</h2>
+<ul>
+<li><a href="https://developers.google.com/apps-script/reference/spreadsheet/range-list">Class RangeList</a></li>
+</ul>
+  </p>
+
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2020/10/04/running-specific-function-when-specific-sheet-is-edited-on-google-spreadsheet/">Running Specific Function When Specific Sheet is Edited on Google Spreadsheet</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>04 Oct 2020, 09:23</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/spreadsheet">spreadsheet</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/event">event</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/trigger">trigger</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <p><a href="https://gist.github.com/tanaikech/bc09d1e03a0ebed3af894a6ed61cf12d">Gists</a></p>
+<p>This is a sample Google Apps Script for running the specific function when the specific sheet is edited.</p>
+<h2 id="sample-script">Sample script</h2>
+<p>Please copy and paste the following script to the container-bound script of Spreadsheet and set <code>sheets</code> object.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">// When the cells are edited, this function is run by the fire of event trigger.
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">onEdit</span>(<span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Please set the sheet name and function as follows.
+</span></span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheets</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Sheet1</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">functionForSheet1</span>, <span style="color:#75715e">// Sheet1 is the sheet name. functionForSheet1 is the function name of function which is run when Sheet1 is edited.
+</span></span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Sheet2</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">functionForSheet2</span>,
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheetName</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">range</span>.<span style="color:#a6e22e">getSheet</span>().<span style="color:#a6e22e">getSheetName</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">sheets</span>[<span style="color:#a6e22e">sheetName</span>]) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">sheets</span>[<span style="color:#a6e22e">sheetName</span>](<span style="color:#a6e22e">e</span>);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// In this sample, when Sheet1 is edited, this function is run.
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">functionForSheet1</span>(<span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Sheet1 was edited.&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// do something
+</span></span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// In this sample, when Sheet2 is edited, this function is run.
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">functionForSheet2</span>(<span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Sheet2 was edited.&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// do something
+</span></span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><ul>
+<li>In this sample script, when the cells of &ldquo;Sheet1&rdquo; and &ldquo;Sheet2&rdquo; are edited, <code>functionForSheet1()</code> and <code>functionForSheet2()</code> are run, respectively. When other sheets are edited, no functions are run.</li>
+<li>In this sample script, <code>onEdit</code> of the simple trigger is used. When the functions you want to run include the methods which are required to authorize, please use the installable trigger.</li>
+</ul>
+<h2 id="note">Note</h2>
+<ul>
+<li>This method can be also used for other event triggers like OnChange, OnSelectionChange and so son.</li>
+</ul>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://developers.google.com/apps-script/guides/triggers">Simple Triggers</a></li>
+<li><a href="https://developers.google.com/apps-script/guides/triggers/installable">Installable Triggers</a></li>
+<li><a href="https://developers.google.com/apps-script/guides/triggers/events">Event Objects</a></li>
+</ul>
+  </p>
+
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2020/09/30/benchmark-process-costs-for-searching-values-in-spreadsheet-using-google-apps-script/">Benchmark: Process Costs for Searching Values in Spreadsheet using Google Apps Script</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>30 Sep 2020, 11:42</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/report">report</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/benchmark">Benchmark</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <p><a href="https://gist.github.com/tanaikech/0a6f03970b471ffa286f1dac0b79359e">Gists</a></p>
+<h2 id="introduction">Introduction</h2>
+<p>Here, I would like to report the process costs for searching values in Spreadsheet using Google Apps Script (GAS). When the values are searched in Google Spreadsheet, the following 3 patterns can be considered. <a href="https://stackoverflow.com/a/56663884">Ref</a></p>
+<ol>
+<li>Retrieve all values using <code>getValues</code>, and the values are searched from the retrieved array.</li>
+<li>Use TextFinder.</li>
+<li>Use Query language.</li>
+</ol>
+<p>In these cases, it has already been found that the lowest process cost is to use the Query language. And about finding values from an array, I have already been reported as &ldquo;<a href="https://gist.github.com/tanaikech/eda9234822b5dec80549216a43c52652">Benchmark: Search for Array Processing using Google Apps Script</a>&rdquo;. But I had never summarized the process costs for TextFinder and find values from an array. So in this report, I would like to introduce this. As the result, the importance of TextFinder for retrieving the row numbers and the row values by searching a value could be understand.</p>
+  </p>
+
+  
+  <footer>
+    <a href="https://tanaikech.github.io/2020/09/30/benchmark-process-costs-for-searching-values-in-spreadsheet-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+  </footer>
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2020/09/25/creating-spreadsheet-with-custom-header-and-footer-using-google-apps-script/">Creating Spreadsheet with Custom Header and Footer using Google Apps Script</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>25 Sep 2020, 09:52</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/spreadsheet">spreadsheet</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <p><a href="https://gist.github.com/tanaikech/0430c7a8cf28508aa3cb80c22136f7f9">Gists</a></p>
+<p>In order to print and export as PDF file, this is a sample script for converting Spreadsheet to Spreadsheet which has the custom header and footer.</p>
+<p>In this sample script, <a href="https://github.com/tanaikech/DocsServiceApp">DocsServiceApp</a>, which is Google Apps Script library, is used. And, in this case, <strong>the Spreadsheet with the custom header and footer is created as new Spreadsheet.</strong></p>
+<p>Before you use this script, please install <a href="https://github.com/tanaikech/DocsServiceApp">DocsServiceApp</a> and <a href="https://developers.google.com/apps-script/guides/services/advanced#enabling_advanced_services">enable Drive API at Advanced Google services</a>.</p>
+  </p>
+
+  
+  <footer>
+    <a href="https://tanaikech.github.io/2020/09/25/creating-spreadsheet-with-custom-header-and-footer-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+  </footer>
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2020/09/24/updated-gas-library-imgapp/">Updated: GAS Library - ImgApp</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>24 Sep 2020, 14:41</time>
   </div>
 
   
@@ -366,7 +679,7 @@
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/javascript">javascript</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/image">image</a>
     
   </div>
   
@@ -377,64 +690,17 @@
   </header>
 
   <p>
-  Overview This is a Google Apps Script library for easily managing the template of Google Documents and Google Slides using Google Spreadsheet as a database using Google Apps Script.
-Description You might have situations where are required to create multiple Google Documents and Google Slides from the templates using Google Spreadsheet as a database with Google Apps Script. When the simple texts are replaced with the placeholders on the templates, this can be achieved by a simple script.
-  </p>
-
-  
-  <footer>
-    <a href="https://tanaikech.github.io/2023/06/11/gas-library-templateapp/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2023/06/11/my-report-has-been-published-at-champion-innovators-content-library-and-google-cloud-medium-publication/">My report has been published at Champion Innovators Content Library and Google Cloud Medium Publication</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>11 Jun 2023, 10:47</time>
-  </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/news">news</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
-    
-  </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>
-    
-  </div>
-  
-  
-
-</div>
-
-  </header>
-
-  <p>
-  My report has been published at Champion Innovators Content Library and Google Cloud Medium publication.
- Easily Implementing HTML Form with Google Spreadsheet as Database using Google Apps Script  If these reports will be useful, I’m glad.
+  <p><a href="https://github.com/tanaikech/ImgApp">ImgApp</a> was updated to v1.3.0.</p>
+<p><img src="https://github.com/tanaikech/ImgApp/raw/master/images/demo4.gif" alt=""></p>
+<ul>
+<li>v1.3.0 (September 24, 2020)
+<ul>
+<li>Added new method. Added <a href="https://github.com/tanaikech/ImgApp#4-editimage">editImage()</a></li>
+<li>This method is for editing images. In the current stage, the image can be cropped. And several images can be merged as an image.</li>
+</ul>
+</li>
+</ul>
+<p><strong>You can see the detail information here <a href="https://github.com/tanaikech/ImgApp">https://github.com/tanaikech/ImgApp</a></strong></p>
   </p>
 
   
@@ -443,133 +709,13 @@ Description You might have situations where are required to create multiple Goog
   
     <article>
   <header>
-    <h2><a href="https://tanaikech.github.io/2023/06/06/trend-of-google-apps-script-tag-on-stackoverflow-in-first-half-of-2023/">Trend of google-apps-script Tag on Stackoverflow in first half of 2023</a></h2>
+    <h2><a href="https://tanaikech.github.io/2020/09/24/gas-library-docsserviceapp/">GAS Library - DocsServiceApp</a></h2>
 
     <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>06 Jun 2023, 09:51</time>
-  </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/report">report</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
-    
-  </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/report">report</a>
-    
-  </div>
-  
-  
-
-</div>
-
-  </header>
-
-  <p>
-  Gists
-Abstract Recently, I felt a change like never before in the questions on Stackoverflow. In order to confirm this, in this report, the trend of &ldquo;google-apps-script&rdquo; tag on Stackoverflow in the first half (January 1st to June 1st) of 2023 has been investigated. From this report, in 2023 when the affection of COVID-19 has been reduced socially, the appreciable trend was confirmed to the questions including a tag of &ldquo;google-apps-script&rdquo;.
-  </p>
-
-  
-  <footer>
-    <a href="https://tanaikech.github.io/2023/06/06/trend-of-google-apps-script-tag-on-stackoverflow-in-first-half-of-2023/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2023/05/31/report-easily-implementing-html-form-with-google-spreadsheet-as-database-using-google-apps-script/">Report: Easily Implementing HTML Form with Google Spreadsheet as Database using Google Apps Script</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>31 May 2023, 10:02</time>
-  </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/report">report</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/spreadsheet">Spreadsheet</a>
-    
-  </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">Spreadsheet</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/form">form</a>
-    
-  </div>
-  
-  
-
-</div>
-
-  </header>
-
-  <p>
-  Gists
-Abstract This report introduces the method for easily implementing HTML forms with a Google Spreadsheet as a database using Google Apps Script. There are 2 patterns for the HTML form using Google Apps Script. One is that an HTML form is put into the same Google Apps Script project. Another is that an HTML form is put to a different server from a Google Apps Script project. In this report, the methods for easily implementing both patterns are introduced using the sample scripts.
-  </p>
-
-  
-  <footer>
-    <a href="https://tanaikech.github.io/2023/05/31/report-easily-implementing-html-form-with-google-spreadsheet-as-database-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2023/05/29/updated-gas-library-htmlformapp/">Updated: GAS Library - HtmlFormApp</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>29 May 2023, 10:23</time>
+    <time>24 Sep 2020, 14:39</time>
   </div>
 
   
@@ -584,7 +730,11 @@ Abstract This report introduces the method for easily implementing HTML forms wi
     
       <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/spreadsheet">spreadsheet</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/spreadsheet">spreadsheet</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/document">document</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/slides">slides</a>
     
   </div>
   
@@ -602,6 +752,204 @@ Abstract This report introduces the method for easily implementing HTML forms wi
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>&nbsp;&#47;
     
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/document">document</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/slides">slides</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <h1 id="overview">Overview</h1>
+<p><strong>This is a Google Apps Script library for supporting Document service, Docs API, Spreadsheet service, Sheets API, Slides service and Slides API.</strong> The aim of this library is to compensate the processes that they services cannot achieve.</p>
+<p><img src="https://github.com/tanaikech/DocsServiceApp/raw/master/images/demo1.png" alt=""></p>
+<h1 id="description">Description</h1>
+<p>The Google services, which are Document service, Docs API, Spreadsheet service, Sheets API, Slides service and Slides API, are growing now. But, unfortunately, there are still the processes that they cannot done. I created this GAS library for supporting the Google services.</p>
+  </p>
+
+  
+  <footer>
+    <a href="https://tanaikech.github.io/2020/09/24/gas-library-docsserviceapp/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+  </footer>
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2020/09/19/updated-gas-library-fetchapp/">Updated: GAS Library - FetchApp</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>19 Sep 2020, 13:11</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/fetch">fetch</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <h3 id="fetchapp-was-updated-to-v102">FetchApp was updated to v1.0.2.</h3>
+<ul>
+<li>
+<p>v1.0.2 (September 19, 2020)</p>
+<ol>
+<li>From this version, when a blob is sent, the blob is sent to <code>files</code>.</li>
+</ol>
+</li>
+</ul>
+<p><strong>You can check this at <a href="https://github.com/tanaikech/FetchApp">https://github.com/tanaikech/FetchApp</a>.</strong></p>
+  </p>
+
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2020/09/14/retrieving-all-urls-in-google-document-using-google-apps-script/">Retrieving All URLs in Google Document using Google Apps Script</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>14 Sep 2020, 10:57</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-document">Google Document</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/document">Document</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/docs-api">Docs API</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <p><a href="https://gist.github.com/tanaikech/d3ce0c2186885ee27d23e02ddd2696b7">Gists</a></p>
+<p>This is a sample script for retrieving All URLs in Google Document using Google Apps Script. In this sample script, the method of &ldquo;documents.get&rdquo; in Google Docs API is used. By this, the URL can be retrieve using <code>JSON.parse()</code>.</p>
+<h2 id="sample-script">Sample script</h2>
+<p>Before you use this script, <a href="https://developers.google.com/apps-script/guides/services/advanced#enabling_advanced_services">please enable Google Docs API at Advanced Google Services</a>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">documentId</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Please set the Google Document ID.
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">content</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Docs</span>.<span style="color:#a6e22e">Documents</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">documentId</span>).<span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">content</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">urls</span> <span style="color:#f92672">=</span> [];
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">content</span>), (<span style="color:#a6e22e">k</span>, <span style="color:#a6e22e">v</span>) =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">k</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;url&#34;</span>) <span style="color:#a6e22e">urls</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">v</span>);
+</span></span><span style="display:flex;"><span>});
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">urls</span>);
+</span></span></code></pre></div><h2 id="references">References</h2>
+<ul>
+<li><a href="https://developers.google.com/apps-script/guides/services/advanced">Advanced Google Services</a></li>
+<li><a href="https://developers.google.com/docs/api/reference/rest/v1/documents/get">Method: documents.get</a></li>
+</ul>
+  </p>
+
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2020/09/04/using-values-submitted-from-html-form-using-google-apps-script/">Using Values Submitted from HTML Form using Google Apps Script</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>04 Sep 2020, 14:58</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/upload">upload</a>&nbsp;&#47;
+    
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/form">form</a>
     
   </div>
@@ -613,10 +961,94 @@ Abstract This report introduces the method for easily implementing HTML forms wi
   </header>
 
   <p>
-  HtmlFormApp was updated to v1.0.1.   v1.0.1 (May 29, 2023)
- When multiple files are uploaded, each URL was set as the hyperlink.    You can see the detail information here https://github.com/tanaikech/HtmlFormApp
+  <p><a href="https://gist.github.com/tanaikech/58d96c023468fc1922d67764251b25e0">Gists</a></p>
+<p>This is a sample script for using the values submitted from the HTML form using Google Apps Script and Javascript. In this case, the values include the files.</p>
+<h2 id="issue">Issue</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-html" data-lang="html"><span style="display:flex;"><span>&lt;<span style="color:#f92672">form</span>&gt;
+</span></span><span style="display:flex;"><span>  Text: &lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text&#34;</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;sampleText1&#34;</span> /&gt;&lt;<span style="color:#f92672">br</span> /&gt;
+</span></span><span style="display:flex;"><span>  Single file: &lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;file&#34;</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;sampleFile1&#34;</span> /&gt;&lt;<span style="color:#f92672">br</span> /&gt;
+</span></span><span style="display:flex;"><span>  &lt;<span style="color:#f92672">input</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;submit&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;button&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;submit&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">onclick</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;main(this.parentNode)&#34;</span>
+</span></span><span style="display:flex;"><span>  /&gt;
+</span></span><span style="display:flex;"><span>&lt;/<span style="color:#f92672">form</span>&gt;
+</span></span><span style="display:flex;"><span>&lt;<span style="color:#f92672">script</span>&gt;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>(<span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">script</span>.<span style="color:#a6e22e">run</span>.<span style="color:#a6e22e">sample</span>(<span style="color:#a6e22e">e</span>);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>&lt;/<span style="color:#f92672">script</span>&gt;
+</span></span></code></pre></div><p>This is a simple sample script for sending the values of form to Google Apps Script. In this case, texts and file are sent. When the button is clicked, <code>main()</code> is run. In this case, <code>this.parentNode</code> is sent to <code>google.script.run.sample(this.parentNode)</code>. At that time, at Google Apps Script side, the text value can be correctly retrieved. But the file cannot be correctly sent. When the file is created as a file on Google Drive, the file is broken. I think that the reason of this issue might be due to character code.</p>
   </p>
 
+  
+  <footer>
+    <a href="https://tanaikech.github.io/2020/09/04/using-values-submitted-from-html-form-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+  </footer>
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2020/08/19/converting-range-in-google-spreadsheet-as-image-using-google-apps-script/">Converting Range in Google Spreadsheet as Image using Google Apps Script</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>19 Aug 2020, 14:25</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/spreadsheet">spreadsheet</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/image">image</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <h2 id="another-approach">Another approach</h2>
+<p>10 Aug 2022: <a href="https://tanaikech.github.io/2022/08/10/report-challenging-exporting-selected-cells-on-spreadsheet-as-image-using-google-apps-script-and-javascript/">Report: Challenging Exporting Selected Cells on Spreadsheet as Image using Google Apps Script and Javascript</a></p>
+<h2 id="old-approach">Old approach</h2>
+<p><a href="https://gist.github.com/tanaikech/6ec4f2278510311ea06b838c69828692">Gists</a></p>
+<p>This is a sample script for converting a range in Google Spreadsheet as an image data using Google Apps Script. Unfortunately, there are no methods for directly converting the range in Google Spreadsheet as an image data in the built-in functions. So in this case, as a workaround, <a href="https://developers.google.com/apps-script/reference/charts">Charts Service</a> is used.</p>
+  </p>
+
+  
+  <footer>
+    <a href="https://tanaikech.github.io/2020/08/19/converting-range-in-google-spreadsheet-as-image-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+  </footer>
   
 </article>
 
@@ -629,7 +1061,7 @@ Abstract This report introduces the method for easily implementing HTML forms wi
   
   <a href="https://tanaikech.github.io/page/53/"><i class="fa fa-chevron-left"></i></a>
   
-  <span>&nbsp;54 / 194&nbsp;</span>
+  <span>&nbsp;54 / 98&nbsp;</span>
   
   <a href="https://tanaikech.github.io/page/55/"><i class="fa fa-chevron-right"></i></a>
   

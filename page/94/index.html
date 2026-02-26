@@ -9,7 +9,7 @@
   <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
 
   <meta name="description" content="Official profile of Kanshi Tanaike, a Google Developer Expert (GDE) in Google Workspace and Physicist. Specializing in Google Apps Script, Gemini API, and innovative IT solutions.">
-  <meta name="generator" content="Hugo 0.98.0" />
+  <meta name="generator" content="Hugo 0.157.0">
 
   <meta property="og:title" content="tanaike - Developer Blog">
   <meta property="og:description" content="Leverage Google APIs, GAS, and Gemini with specialized technical insights.">
@@ -331,13 +331,13 @@
   
     <article>
   <header>
-    <h2><a href="https://tanaikech.github.io/2021/10/14/google-cloud-champion-innovators/">Google Cloud Champion Innovators</a></h2>
+    <h2><a href="https://tanaikech.github.io/2017/05/01/converting-pdf-to-txt/">Converting PDF to TXT</a></h2>
 
     <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>14 Oct 2021, 11:45</time>
+    <time>01 May 2017, 15:04</time>
   </div>
 
   
@@ -348,7 +348,7 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/news">news</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/googleapitips">GoogleAPITips</a>
     
   </div>
   
@@ -360,7 +360,11 @@
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/etc">etc</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/python">python</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google">Google</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/drive-api">drive-api</a>
     
   </div>
   
@@ -371,26 +375,149 @@
   </header>
 
   <p>
-  Google Cloud Innovators Regardless if you use Cloud to build, modernize, train, teach, or even for fun - in our eyes you are an Innovator. The Innovators program is here to accelerate your learning and growth on Google Cloud, and to recognize you for the contributions you make to the broader Cloud community. Champions We recognize all these individuals for being at the top of their game technically - and
+  <p>This is a sample script for converting a PDF file to a TXT file. 2 steps are required for this.</p>
+<ol>
+<li>Upload a PDF file as a Google Document</li>
+<li>Download a Google Document as a TXT file</li>
+</ol>
+<p>In this sample, Python Quickstart is used. The detail information is <a href="https://developers.google.com/drive/v3/web/quickstart/python">https://developers.google.com/drive/v3/web/quickstart/python</a>. Please read &ldquo;Step 1: Turn on the Drive API&rdquo; and &ldquo;Step 2: Install the Google Client Library&rdquo;.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> __future__ <span style="color:#f92672">import</span> print_function
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> httplib2
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> io
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> apiclient <span style="color:#f92672">import</span> discovery
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> oauth2client <span style="color:#f92672">import</span> client
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> oauth2client <span style="color:#f92672">import</span> tools
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> oauth2client.file <span style="color:#f92672">import</span> Storage
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> apiclient.http <span style="color:#f92672">import</span> MediaFileUpload, MediaIoBaseDownload
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">import</span> argparse
+</span></span><span style="display:flex;"><span>    flags <span style="color:#f92672">=</span> argparse<span style="color:#f92672">.</span>ArgumentParser(parents<span style="color:#f92672">=</span>[tools<span style="color:#f92672">.</span>argparser])<span style="color:#f92672">.</span>parse_args()
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">ImportError</span>:
+</span></span><span style="display:flex;"><span>    flags <span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>SCOPES <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;https://www.googleapis.com/auth/drive&#39;</span>
+</span></span><span style="display:flex;"><span>CLIENT_SECRET_FILE <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;client_secret.json&#39;</span>
+</span></span><span style="display:flex;"><span>APPLICATION_NAME <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Drive API Python Quickstart&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_credentials</span>():
+</span></span><span style="display:flex;"><span>    credential_path <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(<span style="color:#e6db74">&#34;./&#34;</span>, <span style="color:#e6db74">&#39;drive-python-quickstart.json&#39;</span>)
+</span></span><span style="display:flex;"><span>    store <span style="color:#f92672">=</span> Storage(credential_path)
+</span></span><span style="display:flex;"><span>    credentials <span style="color:#f92672">=</span> store<span style="color:#f92672">.</span>get()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> credentials <span style="color:#f92672">or</span> credentials<span style="color:#f92672">.</span>invalid:
+</span></span><span style="display:flex;"><span>        flow <span style="color:#f92672">=</span> client<span style="color:#f92672">.</span>flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
+</span></span><span style="display:flex;"><span>        flow<span style="color:#f92672">.</span>user_agent <span style="color:#f92672">=</span> APPLICATION_NAME
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> flags:
+</span></span><span style="display:flex;"><span>            credentials <span style="color:#f92672">=</span> tools<span style="color:#f92672">.</span>run_flow(flow, store, flags)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:  <span style="color:#75715e"># Needed only for compatibility with Python 2.6</span>
+</span></span><span style="display:flex;"><span>            credentials <span style="color:#f92672">=</span> tools<span style="color:#f92672">.</span>run(flow, store)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#39;Storing credentials to &#39;</span> <span style="color:#f92672">+</span> credential_path)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> credentials
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>():
+</span></span><span style="display:flex;"><span>    credentials <span style="color:#f92672">=</span> get_credentials()
+</span></span><span style="display:flex;"><span>    http <span style="color:#f92672">=</span> credentials<span style="color:#f92672">.</span>authorize(httplib2<span style="color:#f92672">.</span>Http())
+</span></span><span style="display:flex;"><span>    service <span style="color:#f92672">=</span> discovery<span style="color:#f92672">.</span>build(<span style="color:#e6db74">&#39;drive&#39;</span>, <span style="color:#e6db74">&#39;v3&#39;</span>, http<span style="color:#f92672">=</span>http)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    pdffile <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;sample.pdf&#39;</span>
+</span></span><span style="display:flex;"><span>    txtfile <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;sample.txt&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    mime <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;application/vnd.google-apps.document&#39;</span>
+</span></span><span style="display:flex;"><span>    res <span style="color:#f92672">=</span> service<span style="color:#f92672">.</span>files()<span style="color:#f92672">.</span>create(
+</span></span><span style="display:flex;"><span>        body<span style="color:#f92672">=</span>{
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;name&#39;</span>: pdffile,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;mimeType&#39;</span>: mime
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>        media_body<span style="color:#f92672">=</span>MediaFileUpload(pdffile, mimetype<span style="color:#f92672">=</span>mime, resumable<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>    )<span style="color:#f92672">.</span>execute()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    dl <span style="color:#f92672">=</span> MediaIoBaseDownload(
+</span></span><span style="display:flex;"><span>        io<span style="color:#f92672">.</span>FileIO(txtfile, <span style="color:#e6db74">&#39;wb&#39;</span>),
+</span></span><span style="display:flex;"><span>        service<span style="color:#f92672">.</span>files()<span style="color:#f92672">.</span>export_media(fileId<span style="color:#f92672">=</span>res[<span style="color:#e6db74">&#39;id&#39;</span>], mimeType<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text/plain&#34;</span>)
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    done <span style="color:#f92672">=</span> <span style="color:#66d9ef">False</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> done <span style="color:#f92672">is</span> <span style="color:#66d9ef">False</span>:
+</span></span><span style="display:flex;"><span>        status, done <span style="color:#f92672">=</span> dl<span style="color:#f92672">.</span>next_chunk()
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;Done.&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;__main__&#39;</span>:
+</span></span><span style="display:flex;"><span>    main()
+</span></span></code></pre></div>
   </p>
 
-  
-  <footer>
-    <a href="https://tanaikech.github.io/2021/10/14/google-cloud-champion-innovators/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
   
 </article>
 
   
     <article>
   <header>
-    <h2><a href="https://tanaikech.github.io/2021/10/11/sending-gmail-with-title-and-body-including-emoji-using-google-apps-script/">Sending Gmail with Title and Body Including Emoji using Google Apps Script</a></h2>
+    <h2><a href="https://tanaikech.github.io/2017/04/30/updated-ggsrun-to-v110/">Updated ggsrun to v110</a></h2>
 
     <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>11 Oct 2021, 09:24</time>
+    <time>30 Apr 2017, 11:49</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/clitool">CLITool</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/ggsrun">ggsrun</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/cli">CLI</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <h2 id="updated-ggsrun-to-v110">Updated ggsrun to v.1.1.0</h2>
+<p>Added a command for updating existing project on Google Drive. One of scripts in the project can be also updated.</p>
+<p><a href="https://github.com/tanaikech/ggsrun">https://github.com/tanaikech/ggsrun</a></p>
+  </p>
+
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2017/04/27/retrieving-user-information-with-shared-spreadsheet/">Retrieving User Information with Shared Spreadsheet</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>27 Apr 2017, 14:34</time>
   </div>
 
   
@@ -415,70 +542,6 @@
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/gmail">gmail</a>
-    
-  </div>
-  
-  
-
-</div>
-
-  </header>
-
-  <p>
-  Gists
-This is a sample script for sending Gmail with the title and body including Emoji using Google Apps Script.
-Sample script This sample script uses Gmail API. So please enable Gmail API at Advanced Google services. Ref
-const convert_ = ({ to, emailFrom, nameFrom, subject, textBody, htmlBody }) =&gt; {  const boundary = &#34;boundaryboundary&#34;;  const mailData = [  `MIME-Version: 1.0`,  `To: ${to}`,  nameFrom &amp;&amp; emailFrom ?
-  </p>
-
-  
-  <footer>
-    <a href="https://tanaikech.github.io/2021/10/11/sending-gmail-with-title-and-body-including-emoji-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2021/10/08/compiling-continuous-numbers-using-google-apps-script/">Compiling Continuous Numbers using Google Apps Script</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>08 Oct 2021, 21:01</time>
-  </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/jstips">jstips</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/spreadsheet">spreadsheet</a>
-    
-  </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/javascript">Javascript</a>&nbsp;&#47;
-    
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>
     
   </div>
@@ -490,14 +553,20 @@ const convert_ = ({ to, emailFrom, nameFrom, subject, textBody, htmlBody }) =&gt
   </header>
 
   <p>
-  Gists
-This is a sample script for compiling the continuous numbers using Google Apps Script. For example, the values of [4, 5, 9, 3, 10, 5, 11, 7, 7, 13, 1] are converted to [&quot;1&quot;,&quot;3-5&quot;,&quot;7&quot;,&quot;9-11&quot;,&quot;13&quot;].
-Sample script const compilingNumbers = (ar) =&gt; {  const { values } = [...new Set(ar.sort((a, b) =&gt; a - b))].reduce(  (o, e, i, a) =&gt; {  if (  o.temp.length == 0 ||  (o.
+  <p>This sample script retrieves the user information which is editing the shared spreadsheet.</p>
+<p>It was found as follows.</p>
+<ul>
+<li>User information retrieving by Class Session is the owner and users which installed triggers by themselves.</li>
+<li>When each user installs a trigger, user information retrieving by Class Session losts the accuracy. So user information has to be retrieved using a temporally installed trigger.</li>
+<li>Using <code>onOpen()</code>, it cannot directly install triggers and authorize.</li>
+<li>Using menu bar, it can install triggers and authorize Google Services using API.</li>
+</ul>
+<p>Here, I thought 2 problems.</p>
   </p>
 
   
   <footer>
-    <a href="https://tanaikech.github.io/2021/10/08/compiling-continuous-numbers-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+    <a href="https://tanaikech.github.io/2017/04/27/retrieving-user-information-with-shared-spreadsheet/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
   </footer>
   
 </article>
@@ -505,13 +574,337 @@ Sample script const compilingNumbers = (ar) =&gt; {  const { values } = [...new 
   
     <article>
   <header>
-    <h2><a href="https://tanaikech.github.io/2021/10/05/sending-outlook-emails-using-microsoft-account-with-google-apps-script/">Sending Outlook Emails using Microsoft Account with Google Apps Script</a></h2>
+    <h2><a href="https://tanaikech.github.io/2017/04/26/cli-tool-goris/">CLI Tool - goris</a></h2>
 
     <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>05 Oct 2021, 08:57</time>
+    <time>26 Apr 2017, 16:52</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/clitool">CLITool</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/goris">goris</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/cli">CLI</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google">google</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/search">search</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <h3 id="overview">Overview</h3>
+<p>This is a CLI tool to search for images with <strong>Go</strong>ogle <strong>R</strong>everse <strong>I</strong>mage <strong>S</strong>earch.</p>
+<h3 id="motivation">Motivation</h3>
+<p>Because I had wanted to search for images with an image URL and file on my terminal, I created this. This can download images from searched image URLs.</p>
+<p><font color="#3366CC"><strong>The detail information and how to get this are <a href="https://github.com/tanaikech/goris">https://github.com/tanaikech/goris</a>.</strong></font></p>
+  </p>
+
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2017/04/24/cli-tool-ggsrun/">CLI Tool - ggsrun</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>24 Apr 2017, 15:07</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/clitool">CLITool</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/ggsrun">ggsrun</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/coffeescript">CoffeeScript</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/cli">CLI</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <h3 id="overview">Overview</h3>
+<p>This is a CLI tool to execute Google Apps Script (GAS) on a terminal.</p>
+<h3 id="motivation">Motivation</h3>
+<p>Will you want to develop GAS using CoffeeScript on your local PC? Generally, when we develop GAS, we have to login to Google using own browser and develop it using Javascript on the Script Editor. Recently, I have wanted to have more convenient local-environment for developing GAS. So I created this &ldquo;ggsrun&rdquo;.</p>
+<p><img src="https://tanaikech.github.io/img/readme_sublimedemo.gif" alt=""></p>
+<p><font color="#3366CC"><strong>The detail information and how to get this are <a href="https://github.com/tanaikech/ggsrun">https://github.com/tanaikech/ggsrun</a>.</strong></font></p>
+  </p>
+
+  
+  <footer>
+    <a href="https://tanaikech.github.io/2017/04/24/cli-tool-ggsrun/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+  </footer>
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2017/04/21/overwriting-spreadsheet-to-existing-excel-file/">Overwriting Spreadsheet to Existing Excel File</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>21 Apr 2017, 13:13</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <p>This sample script converts a spreadsheet to excel file, and overwrites the excel file to the existing excel file. When you use this script, at first, <u>please confirm whether Drive API is enabled at Google API console.</u> Because the existing excel file is overwritten, the file name and file ID are not changed.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">overWrite</span>(<span style="color:#a6e22e">src_spreadsheetId</span>, <span style="color:#a6e22e">dst_excelfileId</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">accesstoken</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;https://www.googleapis.com/upload/drive/v3/files/&#34;</span> <span style="color:#f92672">+</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">dst_excelfileId</span> <span style="color:#f92672">+</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;?uploadType=multipart&#34;</span>,
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;PATCH&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {<span style="color:#a6e22e">Authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">accesstoken</span>},
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">contentType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">s</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(
+</span></span><span style="display:flex;"><span>          <span style="color:#e6db74">&#34;https://www.googleapis.com/drive/v3/files/&#34;</span> <span style="color:#f92672">+</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">s</span> <span style="color:#f92672">+</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#e6db74">&#34;/export?mimeType=application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&#34;</span>,
+</span></span><span style="display:flex;"><span>          {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;GET&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {<span style="color:#a6e22e">Authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">a</span>},
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">muteHttpExceptions</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>          }
+</span></span><span style="display:flex;"><span>        ).<span style="color:#a6e22e">getBlob</span>().<span style="color:#a6e22e">getBytes</span>();
+</span></span><span style="display:flex;"><span>      }(<span style="color:#a6e22e">accesstoken</span>, <span style="color:#a6e22e">src_spreadsheetId</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  ).<span style="color:#a6e22e">getContentText</span>();
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div>
+  </p>
+
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2017/04/20/converting-spreadsheet-to-pdf/">Converting Spreadsheet to PDF</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>20 Apr 2017, 07:56</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <p>Converting Spreadsheet to PDF</p>
+<p>This sample script converts from a spreadsheet to a PDF file which has all sheets in the spreadsheet. When you use this, please enable Drive API at Google API console.</p>
+<pre tabindex="0"><code>var spreadsheetId = &#34;#####&#34;;
+var folderId = &#34;#####&#34;;
+var outputFilename = &#34;#####&#34;;
+
+DriveApp.getFolderById(folderId)
+    .createFile(UrlFetchApp.fetch(
+      &#34;https://www.googleapis.com/drive/v3/files/&#34; +
+        spreadsheetId +
+        &#34;/export?mimeType=application/pdf&#34;,
+      {
+        method: &#34;GET&#34;,
+        headers: {Authorization: &#34;Bearer &#34; + ScriptApp.getOAuthToken()},
+        muteHttpExceptions: true
+      })
+    .getBlob())
+    .setName(outputFilename);
+</code></pre>
+  </p>
+
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2017/04/19/updated-cli-tool-gogauth/">Updated: CLI Tool - gogauth</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>19 Apr 2017, 13:34</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/clitool">CLITool</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google">Google</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/cli">CLI</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <p>gogauth is a CLI tool to retrieve easily access token for using APIs on Google.</p>
+<p>Today, it was updated with big changes. Please check it out.</p>
+<p><a href="https://github.com/tanaikech/gogauth">https://github.com/tanaikech/gogauth</a></p>
+  </p>
+
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2017/04/17/gas-library-createimg/">GAS Library - CreateImg</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>17 Apr 2017, 15:29</time>
   </div>
 
   
@@ -524,7 +917,7 @@ Sample script const compilingNumbers = (ar) =&gt; {  const { values } = [...new 
     
       <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">library</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>
     
   </div>
   
@@ -540,7 +933,7 @@ Sample script const compilingNumbers = (ar) =&gt; {  const { values } = [...new 
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/mail">mail</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/image">image</a>
     
   </div>
   
@@ -551,29 +944,24 @@ Sample script const compilingNumbers = (ar) =&gt; {  const { values } = [...new 
   </header>
 
   <p>
-  Gists
-This is a sample script for sending Outlook emails using Microsoft account with Google Apps Script.
-Before you use this script, please install OnedriveApp which is Google Apps Script library. Ref And, please authorize your Microsoft account for using Microsoft Graph API. Ref
-Sample script function myFunction() {  const obj = [  {  to: [{ name: &#34;### name ###&#34;, email: &#34;### email address ###&#34; }, , ,],  subject: &#34;sample subject 1&#34;,  body: &#34;sample text body&#34;,  cc: [{ name: &#34;name1&#34;, email: &#34;emailaddress1&#34; }, , ,],  },  {  to: [{ name: &#34;### name ###&#34;, email: &#34;### email address ###&#34; }, , ,],  subject: &#34;sample subject 2&#34;,  htmlBody: &#34;&lt;u&gt;&lt;b&gt;sample html body&lt;/b&gt;&lt;/u&gt;&#34;,  attachments: [blob],  bcc: [{ name: &#34;name1&#34;, email: &#34;emailaddress1&#34; }, , ,],  },  ];   const prop = PropertiesService.
+  <p>Recently, I had been looking for creating an image from coordinate data. Unfortunately I have never found them. So I made this. This Google Apps Script (GAS) library creates an image file from coordinate data.</p>
+<p>You can see the detail information at <a href="https://github.com/tanaikech/CreateImg">https://github.com/tanaikech/CreateImg</a>.</p>
+<p>There is a part where I would like to improve in this library. That&rsquo;s <code>convByteSlice()</code>. I think that there is the method to be faster about the part. If you know much about the logical operation using GAS, if you teach me about the improvements. I&rsquo;m so glad.</p>
   </p>
 
-  
-  <footer>
-    <a href="https://tanaikech.github.io/2021/10/05/sending-outlook-emails-using-microsoft-account-with-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
   
 </article>
 
   
     <article>
   <header>
-    <h2><a href="https://tanaikech.github.io/2021/10/04/retrieving-list-of-all-emails-of-microsoft-account-using-google-apps-script/">Retrieving List of All Emails of Microsoft Account using Google Apps Script</a></h2>
+    <h2><a href="https://tanaikech.github.io/2017/04/17/comprehension-of-gas/">Comprehension of GAS</a></h2>
 
     <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>04 Oct 2021, 16:21</time>
+    <time>17 Apr 2017, 08:16</time>
   </div>
 
   
@@ -584,11 +972,7 @@ Sample script function myFunction() {  const obj = [  {  to: [{ name: &#34;### n
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/spreadsheet">spreadsheet</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
     
   </div>
   
@@ -600,13 +984,7 @@ Sample script function myFunction() {  const obj = [  {  to: [{ name: &#34;### n
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/onedrive">OneDrive</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>
     
   </div>
   
@@ -617,14 +995,40 @@ Sample script function myFunction() {  const obj = [  {  to: [{ name: &#34;### n
   </header>
 
   <p>
-  Gists
-This is a sample script for retrieving the list of all emails of Microsoft account and putting them to Google Spreadsheet using Google Apps Script.
-I updated OnedriveApp to v1.2.0 by adding 1 method for retrieving the access token and 7 methods for managing emails of Microsoft account. By this, the emails got to be able to be gotten and sent using Microsoft account using OnedriveApp with Google Apps Script.
+  <p>Here, I would like to introduce a comprehension of GAS.</p>
+<p><strong>Input :</strong></p>
+<pre tabindex="0"><code>var data = [[[0], [1], [2], [3]], [[4], [5], [6], [7]]];
+</code></pre><p><strong>Output :</strong></p>
+<pre tabindex="0"><code>[[0.0, 2.0], [0.0, 2.0]]
+</code></pre><h3 id="pattern-1">Pattern 1</h3>
+<pre tabindex="0"><code>var a = [];
+for (var i=0; i&lt;data.length; i++) {
+  var temp = [];
+  for (var j=0; j&lt;data[i].length; j++) {
+    if (data[i][j][0] % 2 == 0) temp.push(j);
+  }
+  a.push(temp);
+}
+Logger.log(a)
+</code></pre><h3 id="pattern-2">Pattern 2</h3>
+<pre tabindex="0"><code>var b = [];
+data.forEach(function(e1){
+  var temp = [];
+  e1.forEach(function(e2, i2){
+    if (e2[0] % 2 == 0) temp.push(parseInt(i2, 10));
+  });
+  b.push(temp);
+});
+Logger.log(b)
+</code></pre><h3 id="pattern-3">Pattern 3</h3>
+<pre tabindex="0"><code>var c = [[parseInt(i, 10) for (i in e) if (e[i][0] % 2 == 0)] for each (e in data)];
+Logger.log(c)
+</code></pre><p>GAS can use JavaScript 1.7. So it can write as above.</p>
   </p>
 
   
   <footer>
-    <a href="https://tanaikech.github.io/2021/10/04/retrieving-list-of-all-emails-of-microsoft-account-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+    <a href="https://tanaikech.github.io/2017/04/17/comprehension-of-gas/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
   </footer>
   
 </article>
@@ -638,7 +1042,7 @@ I updated OnedriveApp to v1.2.0 by adding 1 method for retrieving the access tok
   
   <a href="https://tanaikech.github.io/page/93/"><i class="fa fa-chevron-left"></i></a>
   
-  <span>&nbsp;94 / 194&nbsp;</span>
+  <span>&nbsp;94 / 98&nbsp;</span>
   
   <a href="https://tanaikech.github.io/page/95/"><i class="fa fa-chevron-right"></i></a>
   

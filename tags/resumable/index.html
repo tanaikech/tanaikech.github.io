@@ -9,7 +9,7 @@
   <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
 
   <meta name="description" content="Official profile of Kanshi Tanaike, a Google Developer Expert (GDE) in Google Workspace and Physicist. Specializing in Google Apps Script, Gemini API, and innovative IT solutions.">
-  <meta name="generator" content="Hugo 0.98.0" />
+  <meta name="generator" content="Hugo 0.157.0">
 
   <meta property="og:title" content="tanaike - Developer Blog">
   <meta property="og:description" content="Leverage Google APIs, GAS, and Gemini with specialized technical insights.">
@@ -323,7 +323,7 @@
 
 
 <div class="header">
-  <h1>resumable</h1>
+  <h1>Resumable</h1>
 </div>
 
 <div class="content">
@@ -374,15 +374,90 @@
   </header>
 
   <p>
-  Gists
-This is a sample script for the resumable upload of Files to Google Drive using Golang. This script uses the library of google-api-go-client. About the installation of google-api-go-client, please check the Quickstart for golang at the official site.
-Sample script: package mainimport (&#34;context&#34;&#34;encoding/json&#34;&#34;fmt&#34;&#34;io/ioutil&#34;&#34;log&#34;&#34;net/http&#34;&#34;os&#34;drive &#34;google.golang.org/api/drive/v3&#34;&#34;golang.org/x/oauth2&#34;&#34;golang.org/x/oauth2/google&#34;&#34;golang.org/x/oauth2/jwt&#34;)// ServiceAccount : Use Service accountfunc ServiceAccount(credentialFile string) *http.Client {b, err := ioutil.
+  <p><a href="https://gist.github.com/tanaikech/19655a8130bac1ba510b29c9c44bbd97">Gists</a></p>
+<p>This is a sample script for the resumable upload of Files to Google Drive using Golang. This script uses the library of <a href="https://github.com/googleapis/google-api-go-client">google-api-go-client</a>. About the installation of google-api-go-client, please check <a href="https://developers.google.com/docs/api/quickstart/go">the Quickstart</a> for golang at the official site.</p>
+<h2 id="sample-script">Sample script:</h2>
+<pre tabindex="0"><code>package main
+
+import (
+	&#34;context&#34;
+	&#34;encoding/json&#34;
+	&#34;fmt&#34;
+	&#34;io/ioutil&#34;
+	&#34;log&#34;
+	&#34;net/http&#34;
+	&#34;os&#34;
+
+	drive &#34;google.golang.org/api/drive/v3&#34;
+
+	&#34;golang.org/x/oauth2&#34;
+	&#34;golang.org/x/oauth2/google&#34;
+	&#34;golang.org/x/oauth2/jwt&#34;
+)
+
+// ServiceAccount : Use Service account
+func ServiceAccount(credentialFile string) *http.Client {
+	b, err := ioutil.ReadFile(credentialFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	var c = struct {
+		Email      string `json:&#34;client_email&#34;`
+		PrivateKey string `json:&#34;private_key&#34;`
+	}{}
+	json.Unmarshal(b, &amp;c)
+	config := &amp;jwt.Config{
+		Email:      c.Email,
+		PrivateKey: []byte(c.PrivateKey),
+		Scopes: []string{
+			drive.DriveScope,
+		},
+		TokenURL: google.JWTTokenURL,
+	}
+	client := config.Client(oauth2.NoContext)
+	return client
+}
+
+func main() {
+	filename := &#34;sample.txt&#34;     // Filename
+	baseMimeType := &#34;text/plain&#34; // MimeType
+	client := ServiceAccount(&#34;credential.json&#34;) // Please set the json file of Service account.
+
+	srv, err := drive.New(client)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	file, err := os.Open(filename)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	fileInf, err := file.Stat()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer file.Close()
+	f := &amp;drive.File{Name: filename}
+	res, err := srv.Files.
+		Create(f).
+		ResumableMedia(context.Background(), file, fileInf.Size(), baseMimeType).
+		ProgressUpdater(func(now, size int64) { fmt.Printf(&#34;%d, %d\r&#34;, now, size) }).
+		Do()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	fmt.Printf(&#34;%s\n&#34;, res.Id)
+}
+</code></pre><h2 id="note">Note:</h2>
+<ul>
+<li>In this sample, the Service account is used. So the file is uploaded to the Service account&rsquo;s Drive. When <code>client</code> retrieved from OAuth2 is used, the file is uploaded to owner&rsquo;s Drive.</li>
+</ul>
+<h2 id="references">References:</h2>
+<ul>
+<li><a href="https://github.com/googleapis/google-api-go-client/blob/master/drive/v3/drive-gen.go">google-api-go-client</a></li>
+<li><a href="https://godoc.org/google.golang.org/api/drive/v3">package drive</a></li>
+</ul>
   </p>
 
-  
-  <footer>
-    <a href="https://tanaikech.github.io/2019/07/23/resumable-uploading-files-to-google-drive-using-golang/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
   
 </article>
 

@@ -9,7 +9,7 @@
   <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
 
   <meta name="description" content="Official profile of Kanshi Tanaike, a Google Developer Expert (GDE) in Google Workspace and Physicist. Specializing in Google Apps Script, Gemini API, and innovative IT solutions.">
-  <meta name="generator" content="Hugo 0.98.0" />
+  <meta name="generator" content="Hugo 0.157.0">
 
   <meta property="og:title" content="tanaike - Developer Blog">
   <meta property="og:description" content="Leverage Google APIs, GAS, and Gemini with specialized technical insights.">
@@ -331,13 +331,13 @@
   
     <article>
   <header>
-    <h2><a href="https://tanaikech.github.io/2023/03/15/benchmark-process-costs-for-searching-value-using-object-with-google-apps-script/">Benchmark: Process Costs for Searching Value using Object with Google Apps Script</a></h2>
+    <h2><a href="https://tanaikech.github.io/2020/06/27/update-json-object-using-jq/">Update JSON object using jq</a></h2>
 
     <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>15 Mar 2023, 16:24</time>
+    <time>27 Jun 2020, 12:35</time>
   </div>
 
   
@@ -348,11 +348,7 @@
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/report">report</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/benchmark">Benchmark</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/jqtips">jqTips</a>
     
   </div>
   
@@ -364,9 +360,7 @@
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/benchmark">Benchmark</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/jq">jq</a>
     
   </div>
   
@@ -377,27 +371,66 @@
   </header>
 
   <p>
-  Gists
-When a value is searched from the 1-dimensional array and a 2-dimensional array, after V8 runtime could be used, I use JSON object, Set object, and Map Object. But, I had never measured the process cost of this situation. In this post, I would like to introduce the process cost for searching a value using a JSON object, Set object, and Map object converted from the 1-dimensional array and 2-dimensional array.
+  <p><a href="https://gist.github.com/tanaikech/e8979e269fb2fd7eae535019ad83781c">Gists</a></p>
+<p>Achieving the following conversion using <a href="https://stedolan.github.io/jq/"><code>jq</code></a>. In this conversion, when <code>key2</code> is true, <code>updated_</code> is added to the value of <code>key1</code> and the value of <code>key2</code> is 2 times and <code>key2a</code> is added by adding <code>updated_</code> to the value as new property.</p>
+<h2 id="conversion">Conversion</h2>
+<h3 id="from">From</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>[
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;key1&#34;</span>: <span style="color:#e6db74">&#34;value1&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;key2&#34;</span>: <span style="color:#ae81ff">123</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;key3&#34;</span>: <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;key1&#34;</span>: <span style="color:#e6db74">&#34;value2&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;key2&#34;</span>: <span style="color:#ae81ff">456</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;key3&#34;</span>: <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;key1&#34;</span>: <span style="color:#e6db74">&#34;value3&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;key2&#34;</span>: <span style="color:#ae81ff">789</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;key3&#34;</span>: <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>]
+</span></span></code></pre></div><h3 id="to">To</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>[
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;key1&#34;</span>: <span style="color:#e6db74">&#34;updated_value1&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;key2&#34;</span>: <span style="color:#ae81ff">246</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;key2a&#34;</span>: <span style="color:#e6db74">&#34;updated_123&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;key3&#34;</span>: <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;key1&#34;</span>: <span style="color:#e6db74">&#34;value2&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;key2&#34;</span>: <span style="color:#ae81ff">456</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;key3&#34;</span>: <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;key1&#34;</span>: <span style="color:#e6db74">&#34;updated_value3&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;key2&#34;</span>: <span style="color:#ae81ff">1578</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;key2a&#34;</span>: <span style="color:#e6db74">&#34;updated_789&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;key3&#34;</span>: <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>]
+</span></span></code></pre></div><h2 id="command">Command</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ echo <span style="color:#e6db74">&#39;[{&#34;key1&#34;:&#34;value1&#34;,&#34;key2&#34;:123,&#34;key3&#34;:true},{&#34;key1&#34;:&#34;value2&#34;,&#34;key2&#34;:456,&#34;key3&#34;:false},{&#34;key1&#34;:&#34;value3&#34;,&#34;key2&#34;:789,&#34;key3&#34;:true}]&#39;</span> | jq <span style="color:#e6db74">&#39;[.[] | select(.key3 == true) |= {&#34;key1&#34;: (&#34;updated_&#34; + .key1), &#34;key2&#34;: (.key2 * 2), &#34;key2a&#34;: (&#34;updated_&#34; + (.key2|tostring)), &#34;key3&#34;: .key3}]&#39;</span>
+</span></span></code></pre></div><h2 id="testing">Testing</h2>
+<p><a href="https://jqplay.org/s/RbKiioures">https://jqplay.org/s/RbKiioures</a></p>
   </p>
 
-  
-  <footer>
-    <a href="https://tanaikech.github.io/2023/03/15/benchmark-process-costs-for-searching-value-using-object-with-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
   
 </article>
 
   
     <article>
   <header>
-    <h2><a href="https://tanaikech.github.io/2023/03/13/importing-microsoft-excel-to-google-spreadsheet-using-custom-function-with-google-apps-script/">Importing Microsoft Excel to Google Spreadsheet using Custom Function with Google Apps Script</a></h2>
+    <h2><a href="https://tanaikech.github.io/2020/06/26/search-dialog-sample-using-textfinder-with-google-apps-script/">Search Dialog Sample using TextFinder with Google Apps Script</a></h2>
 
     <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>13 Mar 2023, 14:31</time>
+    <time>26 Jun 2020, 16:06</time>
   </div>
 
   
@@ -410,7 +443,7 @@ When a value is searched from the 1-dimensional array and a 2-dimensional array,
     
       <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/spreadsheet">spreadsheet</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/spreadsheet">Spreadsheet</a>
     
   </div>
   
@@ -424,9 +457,7 @@ When a value is searched from the 1-dimensional array and a 2-dimensional array,
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/xlsx">XLSX</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">Spreadsheet</a>
     
   </div>
   
@@ -437,16 +468,15 @@ When a value is searched from the 1-dimensional array and a 2-dimensional array,
   </header>
 
   <p>
-  Gists
-This is a sample script for importing Microsoft Excel (XLSX) data to Google Spreadsheet using a custom function with Google Apps Script.
-Usage 1. Install SheetJS library. Please copy the script of the SheetJS library from https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js, and paste the script to the script editor of Google Spreadsheet, and save the script.
-In this case, I would like to recommend the following flow.
- Add a new script to the script editor.
+  <p><a href="https://gist.github.com/tanaikech/64ab751e8fd8727d23e5f159c00e1579">Gists</a></p>
+<p>This is a sample script for the search dialog using <a href="https://developers.google.com/apps-script/reference/spreadsheet/text-finder">TextFinder</a> with Google Apps Script. If this sample script could help to indicate the possibility of TextFinder, I&rsquo;m glad.</p>
+<h2 id="demo">Demo</h2>
+<p>In this demonstration, the value of <code>test</code> is searched. When <code>&quot;NEXT&quot;</code> is clicked, the next searched value is activated. When <code>&quot;PREVIOUS&quot;</code> is clicked, the previous searched value is activated. The search can be done for all sheets in the Google Spreadsheet.</p>
   </p>
 
   
   <footer>
-    <a href="https://tanaikech.github.io/2023/03/13/importing-microsoft-excel-to-google-spreadsheet-using-custom-function-with-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+    <a href="https://tanaikech.github.io/2020/06/26/search-dialog-sample-using-textfinder-with-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
   </footer>
   
 </article>
@@ -454,71 +484,13 @@ In this case, I would like to recommend the following flow.
   
     <article>
   <header>
-    <h2><a href="https://tanaikech.github.io/2023/03/12/directly-retrieving-values-from-xlsx-data-using-sheetjs-with-google-apps-script/">Directly Retrieving Values from XLSX data using SheetJS with Google Apps Script</a></h2>
+    <h2><a href="https://tanaikech.github.io/2020/06/26/workaround-putting-multiple-hyperlinks-to-a-cell-using-sheets-api/">Workaround: Putting Multiple Hyperlinks to a Cell using Sheets API</a></h2>
 
     <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>12 Mar 2023, 12:41</time>
-  </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
-    
-  </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/xlsx">XLSX</a>
-    
-  </div>
-  
-  
-
-</div>
-
-  </header>
-
-  <p>
-  Gists
-Updated on July 8, 2023
-In the current stage, unfortunately, the built-in methods of Google Apps Script cannot directly retrieve the values from the XLSX data. From this situation, I have created DocsServiceApp. When this Google Apps Script library is used, the values are directly retrieved from XLSX data by parsing XML data of XLSX data.
-Here, as another approach, I would like to introduce a sample script for directly retrieving the values from XLSX data using SheetJS with Google Apps Script.
-  </p>
-
-  
-  <footer>
-    <a href="https://tanaikech.github.io/2023/03/12/directly-retrieving-values-from-xlsx-data-using-sheetjs-with-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2023/03/11/removing-quote-prefix-of-cell-value-using-google-apps-script-single-quote/">Removing Quote Prefix of Cell value using Google Apps Script (Single Quote)</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>11 Mar 2023, 14:27</time>
+    <time>26 Jun 2020, 08:09</time>
   </div>
 
   
@@ -531,7 +503,9 @@ Here, as another approach, I would like to introduce a sample script for directl
     
       <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/spreadsheet">spreadsheet</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/spreadsheet">Spreadsheet</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/workaround">workaround</a>
     
   </div>
   
@@ -545,7 +519,7 @@ Here, as another approach, I would like to introduce a sample script for directl
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">Spreadsheet</a>
     
   </div>
   
@@ -556,14 +530,15 @@ Here, as another approach, I would like to introduce a sample script for directl
   </header>
 
   <p>
-  Gists
-In Google Spreadsheet, when a single quote is added to the top letter of the cell value, the cell is used as the text value. About detecting this, I have already reported in this post in my blog. In this post, I would like to introduce a sample script for removing the single quote at the top character of the cell value.
-Sample script: function sample() {  const sheetName = &#34;Sheet1&#34;; // Please set your sheet name.
+  <p><a href="https://gist.github.com/tanaikech/b18c0189a5d0266a849090fdbe6750a5">Gists</a></p>
+<p>This is a current workaround for putting the multiple hyperlinks to a cell using Sheets API.</p>
+<h2 id="description">Description</h2>
+<p>Recently, at Spreadsheet service, the multiple hyperlinks got to be able to be put to a cell. <a href="https://stackoverflow.com/a/61788303/7108653">Ref</a> In this case, it can be achieved using <a href="https://developers.google.com/apps-script/reference/spreadsheet/rich-text-value">RichTextValue</a>. On the other hand, at Sheets API, in the current stage, there are no methods for directly putting the multiple hyperlinks to a cell. And also, such methods have not been added. I believe that such methods will be added in the future update. I think that when this is implemented, it might be added to <a href="https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/cells#TextFormatRun">TextFormatRun</a>.</p>
   </p>
 
   
   <footer>
-    <a href="https://tanaikech.github.io/2023/03/11/removing-quote-prefix-of-cell-value-using-google-apps-script-single-quote/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+    <a href="https://tanaikech.github.io/2020/06/26/workaround-putting-multiple-hyperlinks-to-a-cell-using-sheets-api/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
   </footer>
   
 </article>
@@ -571,13 +546,13 @@ Sample script: function sample() {  const sheetName = &#34;Sheet1&#34;; // Pleas
   
     <article>
   <header>
-    <h2><a href="https://tanaikech.github.io/2023/03/08/split-binary-data-with-search-data-using-google-apps-script/">Split Binary Data with Search Data using Google Apps Script</a></h2>
+    <h2><a href="https://tanaikech.github.io/2020/06/24/managing-texts-on-google-slides-using-google-apps-script/">Managing Texts on Google Slides using Google Apps Script</a></h2>
 
     <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>08 Mar 2023, 11:39</time>
+    <time>24 Jun 2020, 11:57</time>
   </div>
 
   
@@ -600,7 +575,9 @@ Sample script: function sample() {  const sheetName = &#34;Sheet1&#34;; // Pleas
   <div>
     <i class="fa fa-tags fa-fw"></i>
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/slides">Slides</a>
     
   </div>
   
@@ -611,14 +588,405 @@ Sample script: function sample() {  const sheetName = &#34;Sheet1&#34;; // Pleas
   </header>
 
   <p>
-  Gists
-This is a sample script for splitting the binary data with search data using Google Apps Script.
-Sample script /** * Split byteArray by a search data. * @param {Array} baseData Input byteArray of base data. * @param {Array} searchData Input byteArray of search data using split. * @return {Array} An array including byteArray. */ function splitByteArrayBySearchData_(baseData, searchData) {  if (!Array.isArray(baseData) || !Array.isArray(searchData)) {  throw new Error(&#34;Please give byte array.
+  <p><a href="https://gist.github.com/tanaikech/04e7b7657f97ddd7c68b6a9ddc3cdf98">Gists</a></p>
+<p>This is a sample script for managing the texts on Google Slides using Google Apps Script. Recently, I got the request like this. I published this here, because I thought that this might be also useful for other users.</p>
+<h2 id="demo">Demo</h2>
+<p><img src="https://tanaikech.github.io/img/20200624a-fig1.gif" alt=""></p>
+<p>In this demonstration, the text of <code>{{baz}}</code> on Google Slides are searched and replaced to other text, and also, the text style is changed.</p>
+<h2 id="sample-situation">Sample situation</h2>
+<p>In this case, it supposes that there are 3 types of shapes in the slide. Those are the text box, the rectangle shape and the explosion shape. Each shape has the texts and the title of the shape like <code>shape1</code>, <code>shape2</code> and <code>shape3</code>. The sample script searches the shape using the title. You can see it at the following image.</p>
   </p>
 
   
   <footer>
-    <a href="https://tanaikech.github.io/2023/03/08/split-binary-data-with-search-data-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+    <a href="https://tanaikech.github.io/2020/06/24/managing-texts-on-google-slides-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+  </footer>
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2020/06/23/workaround-correctly-exporting-charts-on-google-spreadsheet-as-images-using-google-apps-script/">Workaround: Correctly Exporting Charts on Google Spreadsheet as Images using Google Apps Script</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>23 Jun 2020, 13:22</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/googlecharttips">GoogleChartTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/workaround">workaround</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">Spreadsheet</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/chart">chart</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <p><a href="https://gist.github.com/tanaikech/0237042dcdaf53d3164468ca37e08a80">Gists</a></p>
+<p>This is a sample script for correctly exporting the charts on Google Spreadsheet as the images using Google Apps Script. In the current stage, using Google Apps Script, when the charts on Google Spreadsheet are exported as the images, it seems that the exported images are not the same with the original one on Google Spreadsheet. About this, today, I could notice that I had answered for 2 questions. <a href="https://stackoverflow.com/q/55890392">Q1</a>, <a href="https://stackoverflow.com/q/62038597">Q2</a> And also, I had already been reported this at the issue tracker. <a href="https://issuetracker.google.com/issues/131557147">Ref</a></p>
+  </p>
+
+  
+  <footer>
+    <a href="https://tanaikech.github.io/2020/06/23/workaround-correctly-exporting-charts-on-google-spreadsheet-as-images-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+  </footer>
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2020/06/19/retrieving-difference-between-2-arrays-using-google-apps-script/">Retrieving Difference Between 2 Arrays using Google Apps Script</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>19 Jun 2020, 16:18</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/jstips">jstips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/nodetips">NodeTips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/javascript">Javascript</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/node.js">Node.js</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <p><a href="https://gist.github.com/tanaikech/cc7bdfe67c3b72c48c290fc11c231e72">Gists</a></p>
+<p>This is a sample script for retrieving the difference between 2 arrays, which are the old values and the new values, using Google Apps Script. In my environment, I sometimes have the situation that it is required to retrieve the difference between 2 arrays. So I prepared this as a sample script. I think that this can be also used at Javascript and Node.js. If this was also useful for your situation, I&rsquo;m glad.</p>
+  </p>
+
+  
+  <footer>
+    <a href="https://tanaikech.github.io/2020/06/19/retrieving-difference-between-2-arrays-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+  </footer>
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2020/06/17/updated-gas-library-richtextapp/">Updated: GAS Library - RichTextApp</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>17 Jun 2020, 20:48</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">Spreadsheet</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/rich-text">rich text</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <h2 id="richtextapp-was-updated-to-v113">RichTextApp was updated to v1.1.3</h2>
+<ul>
+<li>
+<p>v1.1.3 (June 17, 2020)</p>
+<ol>
+<li>The variable name for the error processing was not correct. The bug was removed.</li>
+<li>Added <a href="https://github.com/tanaikech/RichTextApp/blob/master/README.md#samples">a sample script</a> for using this library.</li>
+</ol>
+</li>
+</ul>
+<p><strong>You can see the detail information here <a href="https://github.com/tanaikech/RichTextApp">https://github.com/tanaikech/RichTextApp</a></strong></p>
+  </p>
+
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2020/06/16/updated-gas-library-richtextapp/">Updated: GAS Library - RichTextApp</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>16 Jun 2020, 15:11</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">Spreadsheet</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/rich-text">rich text</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <h2 id="richtextapp-was-updated-to-v112">RichTextApp was updated to v1.1.2</h2>
+<ul>
+<li>
+<p>v1.1.0 (June 16, 2020)</p>
+<ol>
+<li>Add new method of <code>RichTextToHTMLForSpreadsheet</code>. The method of <code>RichTextToHTMLForSpreadsheet</code> can convert the rich texts in the cells to the HTML format.</li>
+</ol>
+</li>
+<li>
+<p>v1.1.1 (June 16, 2020)</p>
+<ol>
+<li>About the method of <code>RichTextToHTMLForSpreadsheet</code>, I forgot to convert hyperlinks to HTML. This was modified.</li>
+</ol>
+</li>
+<li>
+<p>v1.1.2 (June 16, 2020)</p>
+<ol>
+<li>When one row and several columns are used as the range, only 1st column is returned. This bug was removed.</li>
+</ol>
+</li>
+</ul>
+<p><strong>You can see the detail information here <a href="https://github.com/tanaikech/RichTextApp">https://github.com/tanaikech/RichTextApp</a></strong></p>
+  </p>
+
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2020/06/15/transfer-of-owner-of-files-got-to-be-able-to-be-achieved-with-batch-requests-of-drive-api/">Transfer of owner of files got to be able to be achieved with batch requests of Drive API</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>15 Jun 2020, 14:37</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/news">news</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/permissions">permissions</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <p>Today, I could confirm that the transfer of owner of files got to be able to be achieved with batch requests of Drive API. When I had tested this at January 31, 2020, an error of <code>there is no function to change the owner of this item yet (currently under development)</code> had occurred.</p>
+<p>But today, I could confirm that this got to be able to be achieved by the batch requests. By this, the owner of a lot of files can be transferred by reducing both the process cost and the quota cost.</p>
+  </p>
+
+  
+  <footer>
+    <a href="https://tanaikech.github.io/2020/06/15/transfer-of-owner-of-files-got-to-be-able-to-be-achieved-with-batch-requests-of-drive-api/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+  </footer>
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2020/06/15/batch-requests-for-drive-api-using-google-apps-script/">Batch Requests for Drive API using Google Apps Script</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>15 Jun 2020, 11:33</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/drive-api">drive-api</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/batch-request">batch request</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <h2 id="overview">Overview</h2>
+<p><strong>These are the sample scripts of the batch requests for Drive API using Google Apps Script.</strong></p>
+<h2 id="description">Description</h2>
+<p>When we want to manage the files and folders on Google Drive, we have 2 ways. One is the use of <a href="https://developers.google.com/apps-script/reference/drive">Drive service</a>. Another is the use of <a href="https://developers.google.com/drive">Drive API</a>. In the case of them, when we want to manage a lot of files and folders, unfortunately, both ways have no batch requests. Namely, for example, the metadata of a lot of files are changed, <a href="https://developers.google.com/apps-script/reference/drive/file">the methods in Class File</a> and <a href="https://developers.google.com/drive/api/v3/reference/files/update">Files: update</a> are required to be used in the loop. In this case, the process cost will be high. On the other hand, Drive API can use <a href="https://developers.google.com/drive/api/v3/batch">the batch requests</a>. But in this case, in order to use this batch requests with Google Apps Script, it is required to create the request body of <code>multipart/mixed</code> by each user. Because there are no methods for automatically requests the batch requests. From this situation, here, I would like to introduce the simple sample scripts for creating, updating and deleting the files and folders on Google Drive using the batch requests with Google Apps Script.</p>
+  </p>
+
+  
+  <footer>
+    <a href="https://tanaikech.github.io/2020/06/15/batch-requests-for-drive-api-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
   </footer>
   
 </article>
@@ -632,7 +1000,7 @@ Sample script /** * Split byteArray by a search data. * @param {Array} baseData 
   
   <a href="https://tanaikech.github.io/page/57/"><i class="fa fa-chevron-left"></i></a>
   
-  <span>&nbsp;58 / 194&nbsp;</span>
+  <span>&nbsp;58 / 98&nbsp;</span>
   
   <a href="https://tanaikech.github.io/page/59/"><i class="fa fa-chevron-right"></i></a>
   

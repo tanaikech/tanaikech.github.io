@@ -9,7 +9,7 @@
   <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
 
   <meta name="description" content="Official profile of Kanshi Tanaike, a Google Developer Expert (GDE) in Google Workspace and Physicist. Specializing in Google Apps Script, Gemini API, and innovative IT solutions.">
-  <meta name="generator" content="Hugo 0.98.0" />
+  <meta name="generator" content="Hugo 0.157.0">
 
   <meta property="og:title" content="tanaike - Developer Blog">
   <meta property="og:description" content="Leverage Google APIs, GAS, and Gemini with specialized technical insights.">
@@ -331,13 +331,13 @@
   
     <article>
   <header>
-    <h2><a href="https://tanaikech.github.io/2023/01/23/replacing-u-00a0-with-u-0020-as-unicode-using-google-apps-script/">Replacing U&#43;00A0 with U&#43;0020 as Unicode using Google Apps Script</a></h2>
+    <h2><a href="https://tanaikech.github.io/2020/04/03/retrieving-overwrapped-cells-between-2-ranges-on-google-spreadsheet-using-google-apps-script/">Retrieving Overwrapped Cells Between 2 Ranges on Google Spreadsheet using Google Apps Script</a></h2>
 
     <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>23 Jan 2023, 08:45</time>
+    <time>03 Apr 2020, 14:11</time>
   </div>
 
   
@@ -350,7 +350,7 @@
     
       <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/jstips">jstips</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/spreadsheet">Spreadsheet</a>
     
   </div>
   
@@ -364,7 +364,7 @@
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/javascript">Javascript</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">Spreadsheet</a>
     
   </div>
   
@@ -375,14 +375,78 @@
   </header>
 
   <p>
-  Gists
-This is a sample script for checking and replacing a character of U+00A0 (no-break space) with U+0020 (space) as Unicode using Google Apps Script.
-When I&rsquo;m seeing the questions on Stackoverflow, I sometimes saw the situation that the script doesn&rsquo;t work while the script is correct. In this case, there is the case that the reason is due to U+00A0 being used as the spaces. When U+00A0 is used as the spaces, Google Apps Script and formulas cannot be correctly run.
+  <p><a href="https://gist.github.com/tanaikech/492cc2bb0b978fdb344aa821962baf53">Gists</a></p>
+<p>This is a sample script for retrieving the overwrapped cells between 2 ranges on Google Spreadsheet using Google Apps Script. Please use this with enabling V8.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">getOverwrappedRanges_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">rangeList1</span>, <span style="color:#a6e22e">rangeList2</span>) =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">rangeList1</span>.<span style="color:#a6e22e">toString</span>() <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#34;RangeList&#34;</span> <span style="color:#f92672">||</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">rangeList2</span>.<span style="color:#a6e22e">toString</span>() <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#34;RangeList&#34;</span>
+</span></span><span style="display:flex;"><span>  ) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">&#34;Input RangeList object.&#34;</span>);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Ref: https://stackoverflow.com/a/21231012/7108653
+</span></span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">columnToLetter</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">column</span> =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">temp</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">letter</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">column</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">column</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">%</span> <span style="color:#ae81ff">26</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">letter</span> <span style="color:#f92672">=</span> String.<span style="color:#a6e22e">fromCharCode</span>(<span style="color:#a6e22e">temp</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">65</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">letter</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">column</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">column</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">/</span> <span style="color:#ae81ff">26</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">letter</span>;
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Expand range1.
+</span></span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ar</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">rangeList1</span>.<span style="color:#a6e22e">getRanges</span>().<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">ar</span>, <span style="color:#a6e22e">r</span>) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">startRow1</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">getRow</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">endRow1</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">startRow1</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">getNumRows</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">startColumn1</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">getColumn</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">endColumn1</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">startColumn1</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">getNumColumns</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">j</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">startRow1</span>; <span style="color:#a6e22e">j</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">endRow1</span>; <span style="color:#a6e22e">j</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">k</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">startColumn1</span>; <span style="color:#a6e22e">k</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">endColumn1</span>; <span style="color:#a6e22e">k</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">columnToLetter</span>(<span style="color:#a6e22e">k</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">j</span>);
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ar</span>;
+</span></span><span style="display:flex;"><span>  }, []);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Expand range2.
+</span></span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">map</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">rangeList2</span>.<span style="color:#a6e22e">getRanges</span>().<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">m</span>, <span style="color:#a6e22e">r</span>) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">startRow2</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">getRow</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">endRow2</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">startRow2</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">getNumRows</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">startColumn2</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">getColumn</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">endColumn2</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">startColumn2</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">getNumColumns</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">j</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">startRow2</span>; <span style="color:#a6e22e">j</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">endRow2</span>; <span style="color:#a6e22e">j</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">k</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">startColumn2</span>; <span style="color:#a6e22e">k</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">endColumn2</span>; <span style="color:#a6e22e">k</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">m</span>.<span style="color:#a6e22e">set</span>(<span style="color:#a6e22e">columnToLetter</span>(<span style="color:#a6e22e">k</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">j</span>, <span style="color:#66d9ef">null</span>);
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">m</span>;
+</span></span><span style="display:flex;"><span>  }, <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Map</span>());
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">filter</span>(<span style="color:#a6e22e">e</span> =&gt; <span style="color:#a6e22e">map</span>.<span style="color:#a6e22e">has</span>(<span style="color:#a6e22e">e</span>));
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">main</span> <span style="color:#f92672">=</span> () =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">range1</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;B3:C7&#34;</span>, <span style="color:#e6db74">&#34;D6:E9&#34;</span>]; <span style="color:#75715e">// Please input range1 as a1Notation.
+</span></span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">range2</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;A2:B3&#34;</span>, <span style="color:#e6db74">&#34;C7:D10&#34;</span>]; <span style="color:#75715e">// Please input range2 as a1Notation.
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSheet</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">getOverwrappedRanges_</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRangeList</span>(<span style="color:#a6e22e">range1</span>),
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRangeList</span>(<span style="color:#a6e22e">range2</span>)
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>); <span style="color:#75715e">// &lt;--- [&#34;B3&#34;,&#34;C7&#34;,&#34;D7&#34;,&#34;D8&#34;,&#34;D9&#34;]
+</span></span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><ul>
+<li>
+<p>In this sample script, from the ranges of <code>&quot;B3:C7&quot;, &quot;D6:E9&quot;</code> and <code>&quot;A2:B3&quot;, &quot;C7:D10&quot;</code>, the overwrapped cells are returned. In this case, <code>[&quot;B3&quot;,&quot;C7&quot;,&quot;D7&quot;,&quot;D8&quot;,&quot;D9&quot;]</code> is returned.</p>
   </p>
 
   
   <footer>
-    <a href="https://tanaikech.github.io/2023/01/23/replacing-u-00a0-with-u-0020-as-unicode-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+    <a href="https://tanaikech.github.io/2020/04/03/retrieving-overwrapped-cells-between-2-ranges-on-google-spreadsheet-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
   </footer>
   
 </article>
@@ -390,13 +454,81 @@ When I&rsquo;m seeing the questions on Stackoverflow, I sometimes saw the situat
   
     <article>
   <header>
-    <h2><a href="https://tanaikech.github.io/2023/01/20/set-line-space-of-paragraph-on-google-document-using-google-apps-script/">Set Line Space of Paragraph on Google Document using Google Apps Script</a></h2>
+    <h2><a href="https://tanaikech.github.io/2020/03/22/benchmark-process-costs-under-v8-using-google-apps-script/">Benchmark: Process Costs under V8 using Google Apps Script</a></h2>
 
     <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>20 Jan 2023, 14:34</time>
+    <time>22 Mar 2020, 13:46</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/report">report</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/benchmark">Benchmark</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <p><a name="top"></a></p>
+<p><a href="https://gist.github.com/tanaikech/7198bc9019202f4080de8fd2e1b278fb">Gists</a></p>
+<ul>
+<li>March 22, 2020
+<ul>
+<li>Published.</li>
+</ul>
+</li>
+</ul>
+<p>Kanshi Tanaike</p>
+<h1 id="introduction">Introduction</h1>
+<p>V8 engine got to be able to be used at Google Apps Script. By this, I have reported about the process costs with and without using V8. <a href="https://gist.github.com/tanaikech/3331e1e631d619abef8f32c4be14ba3a">Ref</a> It is considered that knowing the process costs for various methods will be useful for creating the applications with Google Apps Script. Here, I would like to introduce the process costs of each situations under V8. The situations which measured the cost are as follows.</p>
+  </p>
+
+  
+  <footer>
+    <a href="https://tanaikech.github.io/2020/03/22/benchmark-process-costs-under-v8-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+  </footer>
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2020/03/13/retrieving-files-and-folders-without-parents-in-google-drive/">Retrieving Files and Folders without Parents in Google Drive</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>13 Mar 2020, 17:00</time>
   </div>
 
   
@@ -409,7 +541,7 @@ When I&rsquo;m seeing the questions on Stackoverflow, I sometimes saw the situat
     
       <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/document">document</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/driveapitips">DriveAPITips</a>
     
   </div>
   
@@ -423,7 +555,9 @@ When I&rsquo;m seeing the questions on Stackoverflow, I sometimes saw the situat
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/document">document</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-drive">Google Drive</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/drive-api">drive-api</a>
     
   </div>
   
@@ -434,16 +568,36 @@ When I&rsquo;m seeing the questions on Stackoverflow, I sometimes saw the situat
   </header>
 
   <p>
-  Gists
-This is a sample script for setting the line space of paragraphs on Google Documents using Google Apps Script.
-When the line space of a paragraph on Google Documents is manually set, you can do it as follows.
-When it is set with Google Apps Script, the following script can be used.
-function sample1() {  const doc = DocumentApp.getActiveDocument();  const body = doc.getBody();  const paragraph = body.
+  <p><a href="https://gist.github.com/tanaikech/459089e678bad943f0f33e497e04c36f">Gists</a></p>
+<p>This is a sample script for retrieving the files and folders which have no parents in own Google Drive.</p>
+<p>When you use this script, please enable Drive API at Advanced Google services.</p>
+<h2 id="sample-script">Sample script</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">myFunction</span> <span style="color:#f92672">=</span> () =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">token</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">getOAuthToken</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">fields</span> <span style="color:#f92672">=</span> decodeURIComponent(
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;nextPageToken,files(name,id,mimeType,parents)&#34;</span>
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">q</span> <span style="color:#f92672">=</span> decodeURIComponent(<span style="color:#e6db74">&#34;&#39;me&#39; in owners and trashed = false&#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">files</span> <span style="color:#f92672">=</span> [];
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">pageToken</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">do</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">`https://www.googleapis.com/drive/v3/files?pageSize=1000&amp;fields=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">fields</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&amp;q=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">q</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&amp;pageToken=</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">pageToken</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>,
+</span></span><span style="display:flex;"><span>      { <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">authorization</span><span style="color:#f92672">:</span> <span style="color:#e6db74">`Bearer </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">token</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span> } }
+</span></span><span style="display:flex;"><span>    );
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">res</span>);
+</span></span><span style="display:flex;"><span>    Array.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">push</span>.<span style="color:#a6e22e">apply</span>(<span style="color:#a6e22e">files</span>, <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">files</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">pageToken</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">nextPageToken</span>;
+</span></span><span style="display:flex;"><span>  } <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">pageToken</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">files</span>.<span style="color:#a6e22e">filter</span>(({ <span style="color:#a6e22e">parents</span> }) =&gt; <span style="color:#f92672">!</span><span style="color:#a6e22e">parents</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">result</span>);
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><p>When you run the script, the files and folders which have no parents in own Google Drive are retrieved.</p>
   </p>
 
   
   <footer>
-    <a href="https://tanaikech.github.io/2023/01/20/set-line-space-of-paragraph-on-google-document-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+    <a href="https://tanaikech.github.io/2020/03/13/retrieving-files-and-folders-without-parents-in-google-drive/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
   </footer>
   
 </article>
@@ -451,74 +605,13 @@ function sample1() {  const doc = DocumentApp.getActiveDocument();  const body =
   
     <article>
   <header>
-    <h2><a href="https://tanaikech.github.io/2023/01/18/opening-and-closing-google-forms-on-time-using-google-apps-script/">Opening and Closing Google Forms on Time using Google Apps Script</a></h2>
+    <h2><a href="https://tanaikech.github.io/2020/03/12/completed-web-application-for-searching-google-apps-script-library-from-database/">Completed: Web Application for searching Google Apps Script Library from Database</a></h2>
 
     <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>18 Jan 2023, 14:09</time>
-  </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
-    
-  </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/form">form</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/trigger">trigger</a>
-    
-  </div>
-  
-  
-
-</div>
-
-  </header>
-
-  <p>
-  Gists
-This is a sample script for opening and closing Google Forms on time using Google Apps Script.
-In order to test this sample script, please do the following flow.
-Usage 1. Create a new Google Form. Please create a new Google Form and set your sample questions. And, please open the script editor of Google Form.
-2. Prepare sample script. Please copy and paste the following script to the script editor of Google Form.
-  </p>
-
-  
-  <footer>
-    <a href="https://tanaikech.github.io/2023/01/18/opening-and-closing-google-forms-on-time-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2023/01/14/decrypting-salted-base64-of-finance.yahoo.com-using-google-apps-script/">Decrypting Salted Base64 of finance.yahoo.com using Google Apps Script</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>14 Jan 2023, 10:17</time>
+    <time>12 Mar 2020, 11:58</time>
   </div>
 
   
@@ -531,7 +624,7 @@ Usage 1. Create a new Google Form. Please create a new Google Form and set your 
     
       <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/jstips">jstips</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>
     
   </div>
   
@@ -545,9 +638,13 @@ Usage 1. Create a new Google Form. Please create a new Google Form and set your 
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/javascript">Javascript</a>&nbsp;&#47;
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/yahoo-finance">Yahoo Finance</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/database">database</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/search">search</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/webapps">WebApps</a>
     
   </div>
   
@@ -558,29 +655,22 @@ Usage 1. Create a new Google Form. Please create a new Google Form and set your 
   </header>
 
   <p>
-  Gists
-This sample script decrypts the salted base64 data of finance.yahoo.com using Google Apps Script.
-Recently, it seems that the specification of the key for decrypting the data has been changed at the server side. So. in this post, this post is updated. About this specification, I checked this thread.
-Sample script function myFunction() {  // Load crypto-js.min.js.  const cdnjs =  &#34;https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js&#34;;  eval(UrlFetchApp.fetch(cdnjs).getContentText());   // Retrieve HTML and retrieve salted base64.
+  <p>Web Application for searching Google Apps Script Library from Database was completed. So I published it as v1.0.0. Please check <a href="https://github.com/tanaikech/Google-Apps-Script-Library-Database">Google Apps Script Library Database</a>.</p>
   </p>
 
-  
-  <footer>
-    <a href="https://tanaikech.github.io/2023/01/14/decrypting-salted-base64-of-finance.yahoo.com-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
   
 </article>
 
   
     <article>
   <header>
-    <h2><a href="https://tanaikech.github.io/2023/01/11/converting-all-pages-in-pdf-file-to-png-images-using-google-apps-script/">Converting All Pages in PDF File to PNG Images using Google Apps Script</a></h2>
+    <h2><a href="https://tanaikech.github.io/2020/03/11/updated-ggsrun-to-v174/">Updated ggsrun to v174</a></h2>
 
     <div class="post-meta">
 
   <div>
     <i class="fa fa-calendar fa-fw"></i>
-    <time>11 Jan 2023, 11:09</time>
+    <time>11 Mar 2020, 15:48</time>
   </div>
 
   
@@ -591,7 +681,79 @@ Sample script function myFunction() {  // Load crypto-js.min.js.  const cdnjs = 
   <div>
     <i class="fa fa-folder fa-fw"></i>
     
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/clitool">CLITool</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/ggsrun">ggsrun</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/cli">CLI</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <ul>
+<li>
+<p><a href="https://github.com/tanaikech/ggsrun/blob/master/help/UpdateHistory.md#174">v1.7.4 (March 11, 2020)</a></p>
+<ol>
+<li>
+<p>Recently, I noticed that new Google Apps Script project of the standalone script type cannot be created by the create method of Drive API. From now, in order to create the standalone Google Apps Script project, only Google Apps Script API is required to be used. <a href="https://gist.github.com/tanaikech/0609f2cd989c28d6bd49d211b70b453d">Ref</a> By this, I updated ggsrun. So the command for creating new GAS project is not changed.</p>
+<ul>
+<li><code>$ ggsrun u -p ###folderId### -f sample.gs -pn sampleGASProjectName</code></li>
+</ul>
+</li>
+</ol>
+</li>
+</ul>
+<p><strong>You can check ggsrun at <a href="https://github.com/tanaikech/ggsrun">https://github.com/tanaikech/ggsrun</a>.</strong></p>
+  </p>
+
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2020/03/09/drive-api-cannot-create-google-apps-script-project-no-longer/">Drive API cannot create Google Apps Script project no longer</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>09 Mar 2020, 15:09</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/news">news</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/driveapitips">DriveAPITips</a>
     
   </div>
   
@@ -605,9 +767,7 @@ Sample script function myFunction() {  // Load crypto-js.min.js.  const cdnjs = 
     
       <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
     
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/pdf">PDF</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/image">image</a>
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/drive-api">drive-api</a>
     
   </div>
   
@@ -618,14 +778,277 @@ Sample script function myFunction() {  // Load crypto-js.min.js.  const cdnjs = 
   </header>
 
   <p>
-  Gists
-This is a sample script for converting all pages in a PDF file to PNG images using Google Apps Script.
-I have already published &ldquo;Merging Multiple PDF Files as a Single PDF File using Google Apps Script&rdquo;. In this post, it was found that pdf-lib can be used with Google Apps Script. From this, in this post, I would like to propose a sample script for converting all pages in a PDF file to PNG images using Google Apps Script.
+  <p><a href="https://gist.github.com/tanaikech/0609f2cd989c28d6bd49d211b70b453d">Gists</a></p>
+<p>Today, I noticed that new Google Apps Script project of the standalone script type cannot be created by the method of Files: create in Drive API. From now, in order to manage the Google Apps Script project, only Google Apps Script API is required to be used. By this, the following issues are brought.</p>
+<ul>
+<li>When the new standalone GAS project is created in the specific folder by uploading the local script, the following flow is required to be run.
+<ol>
+<li>Create new standalone GAS project by Apps Script API.</li>
+<li>Put the local script to the created GAS project by updating the project with Apps Script API.</li>
+<li>Move the GAS project from the root folder to the specific folder using Drive API.</li>
+</ol>
+</li>
+</ul>
+<p>From now, 3 API calls are required to be used like above. By the way, this had been able to be achieved by one API call of the method of files.create in Drive API before.</p>
   </p>
 
   
   <footer>
-    <a href="https://tanaikech.github.io/2023/01/11/converting-all-pages-in-pdf-file-to-png-images-using-google-apps-script/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+    <a href="https://tanaikech.github.io/2020/03/09/drive-api-cannot-create-google-apps-script-project-no-longer/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+  </footer>
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2020/03/05/simple-script-of-resumable-upload-with-google-drive-api-for-python/">Simple Script of Resumable Upload with Google Drive API for Python</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>05 Mar 2020, 14:10</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/pythontips">PythonTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/googleapitips">googleapitips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/python">python</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/resumable-upload">resumable-upload</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/upload">upload</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/drive-api">drive-api</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <p><a href="https://gist.github.com/tanaikech/f709a952ff6e286027950d0484f6c03e">Gists</a></p>
+<p>This is a simple sample script for achieving the resumable upload to Google Drive using Python. In order to achieve the resumable upload, at first, it is required to retrieve the location, which is the endpoint of upload. The location is included in the response headers. After the location was retrieved, the file can be uploaded to the location URL.</p>
+<p>In this sample, a PNG file is uploaded with the resumable upload using a single chunk.</p>
+  </p>
+
+  
+  <footer>
+    <a href="https://tanaikech.github.io/2020/03/05/simple-script-of-resumable-upload-with-google-drive-api-for-python/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+  </footer>
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2020/03/05/simple-script-of-resumable-upload-with-google-drive-api-for-node.js/">Simple Script of Resumable Upload with Google Drive API for Node.js</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>05 Mar 2020, 13:48</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/nodetips">NodeTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/googleapitips">googleapitips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/node.js">Node.js</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/resumable-upload">resumable-upload</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/upload">upload</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/drive-api">drive-api</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <p><a href="https://gist.github.com/tanaikech/ae451679e8220f3b2d48edb3f8c1a8d3">Gists</a></p>
+<p>This is a simple sample script for achieving the resumable upload to Google Drive using Node.js. In order to achieve the resumable upload, at first, it is required to retrieve the location, which is the endpoint of upload. The location is included in the response headers. After the location was retrieved, the file can be uploaded to the location URL.</p>
+<p>In this sample, a PNG file is uploaded with the resumable upload using a single chunk.</p>
+  </p>
+
+  
+  <footer>
+    <a href="https://tanaikech.github.io/2020/03/05/simple-script-of-resumable-upload-with-google-drive-api-for-node.js/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+  </footer>
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2020/03/04/web-apps-fields-builder-for-google-apis/">Web Apps: Fields Builder For Google APIs</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>04 Mar 2020, 16:08</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/googleapi">googleapi</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/api">API</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/developer_tool">Developer_tool</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/webapps">WebApps</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <h2 id="overview">Overview</h2>
+<p><strong><a href="https://sites.google.com/view/fields-builder">FieldsBuilderForGoogleAPIs</a> is a Web Application for building the fields value for using Google APIs. This is mainly used for developing the scripts for using Google APIs.</strong></p>
+<h2 id="demo">Demo</h2>
+<p><img src="https://github.com/tanaikech/FieldsBuilderForGoogleAPIs/raw/master/images/demo.gif" alt=""></p>
+<h2 id="description">Description</h2>
+<p>After the API explorer was updated, the fields of APIs cannot be created by the web interface. But it is important for using the fields property. Because when the fields property is used, only the required values can be retrieved. This leads to the low cost. And even when <code>*</code> is used, there are some cases that all fields cannot be retrieved. So I created this as a Web Application. This web application can run with the standalone. No authorization and no scopes are required. This only creates the fields value for Google APIs.</p>
+  </p>
+
+  
+  <footer>
+    <a href="https://tanaikech.github.io/2020/03/04/web-apps-fields-builder-for-google-apis/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
+  </footer>
+  
+</article>
+
+  
+    <article>
+  <header>
+    <h2><a href="https://tanaikech.github.io/2020/02/26/gas-library-gphotoapp/">GAS Library - GPhotoApp</a></h2>
+
+    <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>26 Feb 2020, 09:27</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/library">Library</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/library">library</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-photos">Google photos</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-photos-api">Google Photos API</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  </header>
+
+  <p>
+  <h2 id="overview">Overview</h2>
+<p><strong>This is a GAS library for retrieving and creating the albums and media items using Google Photo API using Google Apps Script (GAS).</strong></p>
+<h3 id="description">Description</h3>
+<p>In the current stage, Google Photo API is not included in Advanced Google services. But in order to use Google Photo API with Google Apps Script, I created this as a GAS library. So in the current stage, in order to use this library, the following flow is required.</p>
+  </p>
+
+  
+  <footer>
+    <a href="https://tanaikech.github.io/2020/02/26/gas-library-gphotoapp/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
   </footer>
   
 </article>
@@ -639,7 +1062,7 @@ I have already published &ldquo;Merging Multiple PDF Files as a Single PDF File 
   
   <a href="https://tanaikech.github.io/page/61/"><i class="fa fa-chevron-left"></i></a>
   
-  <span>&nbsp;62 / 194&nbsp;</span>
+  <span>&nbsp;62 / 98&nbsp;</span>
   
   <a href="https://tanaikech.github.io/page/63/"><i class="fa fa-chevron-right"></i></a>
   

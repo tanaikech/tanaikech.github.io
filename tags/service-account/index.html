@@ -9,7 +9,7 @@
   <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
 
   <meta name="description" content="Official profile of Kanshi Tanaike, a Google Developer Expert (GDE) in Google Workspace and Physicist. Specializing in Google Apps Script, Gemini API, and innovative IT solutions.">
-  <meta name="generator" content="Hugo 0.98.0" />
+  <meta name="generator" content="Hugo 0.157.0">
 
   <meta property="og:title" content="tanaike - Developer Blog">
   <meta property="og:description" content="Leverage Google APIs, GAS, and Gemini with specialized technical insights.">
@@ -386,9 +386,12 @@
   </header>
 
   <p>
-  Gists
-Abstract One day, you might have a situation where it is required to run Google Apps Script using the service account. Unfortunately, in the current stage, Google Apps Script cannot be directly run with the service account because of the current specification. So, this report introduces a workaround for executing Google Apps Script using the service account.
-Introduction When you want to execute Google Apps Script from outside of Google, as the basic approach, it can be achieved by Google Apps Script API.
+  <p><a href="https://gist.github.com/tanaikech/304fea821ca36b8e9ccebe9814eaed82">Gists</a></p>
+<p><img src="https://tanaikech.github.io/image-storage/20231019a/fig2.png" alt=""></p>
+<h2 id="abstract">Abstract</h2>
+<p>One day, you might have a situation where it is required to run Google Apps Script using the service account. Unfortunately, in the current stage, Google Apps Script cannot be directly run with the service account because of the current specification. So, this report introduces a workaround for executing Google Apps Script using the service account.</p>
+<h2 id="introduction">Introduction</h2>
+<p>When you want to execute Google Apps Script from outside of Google, as the basic approach, it can be achieved by Google Apps Script API. <a href="https://developers.google.com/apps-script/api/reference/rest/v1/scripts/run">Ref</a> In order to use Google Apps Script, it is required to link the Google Apps Script project with the Google Cloud Platform project. <a href="https://github.com/tanaikech/Linking-Google-Cloud-Platform-Project-to-Google-Apps-Script-Project-for-New-IDE">Ref</a> But, in the current stage, Google Apps Script can be executed by Google Apps Script API with only the access token obtained from OAuth2. Unfortunately, the access token obtained by the service account cannot used for executing Google Apps Script using Google Apps Script API. It seems that this is the current specification on the Google side. However, there might be a case that it is required to execute Google Apps Script using the service account. In this report, I would like to introduce a workaround for executing Google Apps Script using the service account. In this workaround, the Web Apps created by Google Apps Script is used. The Web Apps can be used for executing the preserved functions of <code>doGet</code> and <code>doPost</code> from outside of Google. <a href="https://developers.google.com/apps-script/guides/web">Ref</a> In this workaround, this Web Apps is used for executing the various functions.</p>
   </p>
 
   
@@ -447,8 +450,16 @@ Introduction When you want to execute Google Apps Script from outside of Google,
   </header>
 
   <p>
-  go-gettokenbyserviceaccount was updated to v1.0.1   v1.0.1 (October 12, 2023)
- Updated README.md and updated the script.    You can get this from https://github.com/tanaikech/go-gettokenbyserviceaccount
+  <h2 id="go-gettokenbyserviceaccount-was-updated-to-v101">go-gettokenbyserviceaccount was updated to v1.0.1</h2>
+<ul>
+<li>
+<p>v1.0.1 (October 12, 2023)</p>
+<ol>
+<li>Updated README.md and updated the script.</li>
+</ol>
+</li>
+</ul>
+<p><strong>You can get this from <a href="https://github.com/tanaikech/go-gettokenbyserviceaccount">https://github.com/tanaikech/go-gettokenbyserviceaccount</a></strong></p>
   </p>
 
   
@@ -501,9 +512,11 @@ Introduction When you want to execute Google Apps Script from outside of Google,
   </header>
 
   <p>
-  Gists
-When Google APIs are used with googleapis for Python, the client is obtained as follows.
-creds = service_account.Credentials.from_service_account_file(service_account_credential_file, scopes=scopes) service = build(&#34;drive&#34;, &#34;v3&#34;, credentials=creds) In this case, when the script is run, the access token is retrieved every time. But, the expiration time of the retrieved access token is 1 hour. Here, there might be the case that you want to use the access token until the expiration time. It is considered that effectively using the access token will lead to SDGs.
+  <p><a href="https://gist.github.com/tanaikech/b2d877e4e4d274b17876191d48204882">Gists</a></p>
+<p>When Google APIs are used with <a href="https://github.com/googleapis/google-api-python-client">googleapis for Python</a>, the client is obtained as follows.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>creds <span style="color:#f92672">=</span> service_account<span style="color:#f92672">.</span>Credentials<span style="color:#f92672">.</span>from_service_account_file(service_account_credential_file, scopes<span style="color:#f92672">=</span>scopes)
+</span></span><span style="display:flex;"><span>service <span style="color:#f92672">=</span> build(<span style="color:#e6db74">&#34;drive&#34;</span>, <span style="color:#e6db74">&#34;v3&#34;</span>, credentials<span style="color:#f92672">=</span>creds)
+</span></span></code></pre></div><p>In this case, when the script is run, the access token is retrieved every time. But, the expiration time of the retrieved access token is 1 hour. Here, there might be the case that you want to use the access token until the expiration time. It is considered that effectively using the access token will lead to SDGs. In this post, I would like to introduce a sample script for using the access token until the expiration time.</p>
   </p>
 
   
@@ -560,17 +573,42 @@ creds = service_account.Credentials.from_service_account_file(service_account_cr
   </header>
 
   <p>
-  Gists
-This is a sample script for retrieving the access token from the service account using oauth2client and google-auth with Python.
-Sample script 1 Use oauth2client.
-from oauth2client.service_account import ServiceAccountCredentials  SERVICE_ACCOUNT_FILE = &#34;credentials.json&#34; SCOPES = [&#34;https://www.googleapis.com/auth/drive&#34;]  creds = ServiceAccountCredentials.from_json_keyfile_name(SERVICE_ACCOUNT_FILE, scopes=SCOPES) res = creds.get_access_token() access_token = res.access_token  print(access_token) Sample script 2 Use google-auth. In the current stage, this method might be general.
-from google.oauth2 import service_account import google.auth.transport.requests  SERVICE_ACCOUNT_FILE = &#34;credentials.
+  <p><a href="https://gist.github.com/tanaikech/5196ed237812192539c4369000bc131b">Gists</a></p>
+<p>This is a sample script for retrieving the access token from the service account using oauth2client and google-auth with Python.</p>
+<h2 id="sample-script-1">Sample script 1</h2>
+<p>Use <code>oauth2client</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> oauth2client.service_account <span style="color:#f92672">import</span> ServiceAccountCredentials
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>SERVICE_ACCOUNT_FILE <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;credentials.json&#34;</span>
+</span></span><span style="display:flex;"><span>SCOPES <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;https://www.googleapis.com/auth/drive&#34;</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>creds <span style="color:#f92672">=</span> ServiceAccountCredentials<span style="color:#f92672">.</span>from_json_keyfile_name(SERVICE_ACCOUNT_FILE, scopes<span style="color:#f92672">=</span>SCOPES)
+</span></span><span style="display:flex;"><span>res <span style="color:#f92672">=</span> creds<span style="color:#f92672">.</span>get_access_token()
+</span></span><span style="display:flex;"><span>access_token <span style="color:#f92672">=</span> res<span style="color:#f92672">.</span>access_token
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(access_token)
+</span></span></code></pre></div><h2 id="sample-script-2">Sample script 2</h2>
+<p>Use <code>google-auth</code>. In the current stage, this method might be general.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> google.oauth2 <span style="color:#f92672">import</span> service_account
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> google.auth.transport.requests
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>SERVICE_ACCOUNT_FILE <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;credentials.json&#34;</span>
+</span></span><span style="display:flex;"><span>SCOPES <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;https://www.googleapis.com/auth/drive&#34;</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>creds <span style="color:#f92672">=</span> service_account<span style="color:#f92672">.</span>Credentials<span style="color:#f92672">.</span>from_service_account_file(SERVICE_ACCOUNT_FILE, scopes<span style="color:#f92672">=</span>SCOPES)
+</span></span><span style="display:flex;"><span>request <span style="color:#f92672">=</span> google<span style="color:#f92672">.</span>auth<span style="color:#f92672">.</span>transport<span style="color:#f92672">.</span>requests<span style="color:#f92672">.</span>Request()
+</span></span><span style="display:flex;"><span>creds<span style="color:#f92672">.</span>refresh(request)
+</span></span><span style="display:flex;"><span>access_token <span style="color:#f92672">=</span> creds<span style="color:#f92672">.</span>token
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(access_token)
+</span></span></code></pre></div><h2 id="references">References</h2>
+<ul>
+<li><a href="https://oauth2client.readthedocs.io/en/latest/source/oauth2client.service_account.html">oauth2client.service_account module</a></li>
+<li><a href="https://google-auth.readthedocs.io/en/master/reference/google.oauth2.service_account.html">google.oauth2.service_account module</a></li>
+<li><a href="https://google-auth.readthedocs.io/en/master/reference/google.auth.transport.requests.html">google.auth.transport.requests module</a></li>
+</ul>
   </p>
 
-  
-  <footer>
-    <a href="https://tanaikech.github.io/2023/02/15/retrieving-access-token-from-service-account-using-oauth2client-and-google-auth-with-python/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
   
 </article>
 
@@ -623,9 +661,9 @@ from google.oauth2 import service_account import google.auth.transport.requests 
   </header>
 
   <p>
-  Gists
-In the current stage, by the current specification, Google Apps Script cannot be directly run on Google Spreadsheet created by Service Account. But, there is a case in that we want to use the OnEdit trigger on the Spreadsheet that the service account is the owner. In this post, I would like to introduce the method for achieving this.
-Recently, I published &ldquo;Using OnEdit Trigger to Google Spreadsheet by Hiding Google Apps Script from Other Users&rdquo;.
+  <p><a href="https://gist.github.com/tanaikech/58891b5caaf49ebfdb5f8dde4637d8e6">Gists</a></p>
+<p>In the current stage, by the current specification, Google Apps Script cannot be directly run on Google Spreadsheet created by Service Account. But, there is a case in that we want to use the OnEdit trigger on the Spreadsheet that the service account is the owner. In this post, I would like to introduce the method for achieving this.</p>
+<p>Recently, I published &ldquo;<a href="https://tanaikech.github.io/2023/01/25/using-onedit-trigger-to-google-spreadsheet-by-hiding-google-apps-script-from-other-users/">Using OnEdit Trigger to Google Spreadsheet by Hiding Google Apps Script from Other Users</a>&rdquo;. Here, this method is used.</p>
   </p>
 
   
@@ -682,8 +720,8 @@ Recently, I published &ldquo;Using OnEdit Trigger to Google Spreadsheet by Hidin
   </header>
 
   <p>
-  Gists
-This is a sample script for using Google API Client Library (gapi) for JavaScript with the service account. Unfortunately, in the current stage, gapi cannot directly use the service account. So, in this case, it is required to implement the script for retrieving the access token from the service account. In this report, I would like to introduce the method for using gapi with the service account using a Javascript library.
+  <p><a href="https://gist.github.com/tanaikech/603102a64587cb9bff2e165994f6b6a1">Gists</a></p>
+<p>This is a sample script for using Google API Client Library (gapi) for JavaScript with the service account. Unfortunately, in the current stage, gapi cannot directly use the service account. So, in this case, it is required to implement the script for retrieving the access token from the service account. In this report, I would like to introduce the method for using gapi with the service account using a Javascript library.</p>
   </p>
 
   
@@ -742,16 +780,17 @@ This is a sample script for using Google API Client Library (gapi) for JavaScrip
   </header>
 
   <p>
-  Overview This is a Javascript library to retrieve the access token from the Google Service Account. Ref
-Description I have already posted the sample script for retrieving the access token from the Google Service Account. Ref But, when I use this script, I thought that when this was published as the Javascript library, it will be useful. So I created this.
-Install &lt;script src=&#34;getaccesstokengromserviceaccount_js.min.js&#34;&gt;&lt;/script&gt; Or, using jsdelivr cdn
-&lt;script src=&#34;https://cdn.jsdelivr.net/gh/tanaikech/GetAccessTokenFromServiceAccount_js@master/getaccesstokengromserviceaccount_js.min.js&#34;&gt;&lt;/script&gt; You can see the detail of this at https://github.
+  <h2 id="overview">Overview</h2>
+<p>This is a Javascript library to retrieve the access token from the Google Service Account. <a href="https://cloud.google.com/iam/docs/service-accounts">Ref</a></p>
+<h2 id="description">Description</h2>
+<p>I have already posted the sample script for retrieving the access token from the Google Service Account. <a href="https://tanaikech.github.io/2020/12/19/retrieving-access-token-for-service-account-using-javascript/">Ref</a> But, when I use this script, I thought that when this was published as the Javascript library, it will be useful. So I created this.</p>
+<h2 id="install">Install</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-html" data-lang="html"><span style="display:flex;"><span>&lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;getaccesstokengromserviceaccount_js.min.js&#34;</span>&gt;&lt;/<span style="color:#f92672">script</span>&gt;
+</span></span></code></pre></div><p>Or, using jsdelivr cdn</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-html" data-lang="html"><span style="display:flex;"><span>&lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;https://cdn.jsdelivr.net/gh/tanaikech/GetAccessTokenFromServiceAccount_js@master/getaccesstokengromserviceaccount_js.min.js&#34;</span>&gt;&lt;/<span style="color:#f92672">script</span>&gt;
+</span></span></code></pre></div><p><strong>You can see the detail of this at <a href="https://github.com/tanaikech/GetAccessTokenFromServiceAccount_js">https://github.com/tanaikech/GetAccessTokenFromServiceAccount_js</a></strong></p>
   </p>
 
-  
-  <footer>
-    <a href="https://tanaikech.github.io/2021/05/27/javascript-library-getaccesstokenfromserviceaccount_js/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
   
 </article>
 
@@ -802,15 +841,62 @@ Install &lt;script src=&#34;getaccesstokengromserviceaccount_js.min.js&#34;&gt;&
   </header>
 
   <p>
-  Gists
-This is a sample PHP script to retrieve the access token from Service Account of Google without using googleapis.
-Sample script &lt;?php  $private_key = &#34;-----BEGIN PRIVATE KEY-----\n###-----END PRIVATE KEY-----\n&#34;; // private_key of JSON file retrieved by creating Service Account $client_email = &#34;###&#34;; // client_email of JSON file retrieved by creating Service Account $scopes = [&#34;https://www.googleapis.com/auth/drive.readonly&#34;]; // Sample scope  $url = &#34;https://www.googleapis.com/oauth2/v4/token&#34;; $header = array(&#34;alg&#34; =&gt; &#34;RS256&#34;, &#34;typ&#34; =&gt; &#34;JWT&#34;); $now = floor(time()); $claim = array( 	&#34;iss&#34; =&gt; $client_email, 	&#34;sub&#34; =&gt; $client_email, 	&#34;scope&#34; =&gt; implode(&#34; &#34;, $scopes), 	&#34;aud&#34; =&gt; $url, 	&#34;exp&#34; =&gt; (string)($now + 3600), 	&#34;iat&#34; =&gt; (string)$now, ); $signature = base64_encode(json_encode($header, JSON_UNESCAPED_SLASHES)) .
+  <p><a href="https://gist.github.com/tanaikech/1b47cfec588454963ee40c5a50943194">Gists</a></p>
+<p>This is a sample PHP script to retrieve the access token from Service Account of Google without using googleapis.</p>
+<h2 id="sample-script">Sample script</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$private_key <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;-----BEGIN PRIVATE KEY-----</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">###-----END PRIVATE KEY-----</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>; <span style="color:#75715e">// private_key of JSON file retrieved by creating Service Account
+</span></span></span><span style="display:flex;"><span>$client_email <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// client_email of JSON file retrieved by creating Service Account
+</span></span></span><span style="display:flex;"><span>$scopes <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;https://www.googleapis.com/auth/drive.readonly&#34;</span>]; <span style="color:#75715e">// Sample scope
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$url <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://www.googleapis.com/oauth2/v4/token&#34;</span>;
+</span></span><span style="display:flex;"><span>$header <span style="color:#f92672">=</span> <span style="color:#66d9ef">array</span>(<span style="color:#e6db74">&#34;alg&#34;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#34;RS256&#34;</span>, <span style="color:#e6db74">&#34;typ&#34;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#34;JWT&#34;</span>);
+</span></span><span style="display:flex;"><span>$now <span style="color:#f92672">=</span> <span style="color:#a6e22e">floor</span>(<span style="color:#a6e22e">time</span>());
+</span></span><span style="display:flex;"><span>$claim <span style="color:#f92672">=</span> <span style="color:#66d9ef">array</span>(
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;iss&#34;</span> <span style="color:#f92672">=&gt;</span> $client_email,
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;sub&#34;</span> <span style="color:#f92672">=&gt;</span> $client_email,
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;scope&#34;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#a6e22e">implode</span>(<span style="color:#e6db74">&#34; &#34;</span>, $scopes),
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;aud&#34;</span> <span style="color:#f92672">=&gt;</span> $url,
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;exp&#34;</span> <span style="color:#f92672">=&gt;</span> (<span style="color:#a6e22e">string</span>)($now <span style="color:#f92672">+</span> <span style="color:#ae81ff">3600</span>),
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;iat&#34;</span> <span style="color:#f92672">=&gt;</span> (<span style="color:#a6e22e">string</span>)$now,
+</span></span><span style="display:flex;"><span>);
+</span></span><span style="display:flex;"><span>$signature <span style="color:#f92672">=</span> <span style="color:#a6e22e">base64_encode</span>(<span style="color:#a6e22e">json_encode</span>($header, <span style="color:#a6e22e">JSON_UNESCAPED_SLASHES</span>)) <span style="color:#f92672">.</span> <span style="color:#e6db74">&#34;.&#34;</span> <span style="color:#f92672">.</span> <span style="color:#a6e22e">base64_encode</span>(<span style="color:#a6e22e">json_encode</span>($claim, <span style="color:#a6e22e">JSON_UNESCAPED_SLASHES</span>));
+</span></span><span style="display:flex;"><span>$b <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">openssl_sign</span>($signature, $b, $private_key, <span style="color:#e6db74">&#34;SHA256&#34;</span>);
+</span></span><span style="display:flex;"><span>$jwt <span style="color:#f92672">=</span> $signature <span style="color:#f92672">.</span> <span style="color:#e6db74">&#34;.&#34;</span> <span style="color:#f92672">.</span> <span style="color:#a6e22e">base64_encode</span>($b);
+</span></span><span style="display:flex;"><span>$curl_handle <span style="color:#f92672">=</span> <span style="color:#a6e22e">curl_init</span>();
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">curl_setopt_array</span>($curl_handle, [
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">CURLOPT_URL</span> <span style="color:#f92672">=&gt;</span> $url,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">CURLOPT_RETURNTRANSFER</span> <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">CURLOPT_POST</span> <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">CURLOPT_POSTFIELDS</span> <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">array</span>(
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;assertion&#34;</span> <span style="color:#f92672">=&gt;</span> $jwt,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;grant_type&#34;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#34;urn:ietf:params:oauth:grant-type:jwt-bearer&#34;</span>
+</span></span><span style="display:flex;"><span>    ),
+</span></span><span style="display:flex;"><span>]);
+</span></span><span style="display:flex;"><span>$res <span style="color:#f92672">=</span> <span style="color:#a6e22e">curl_exec</span>($curl_handle);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">curl_close</span>($curl_handle);
+</span></span><span style="display:flex;"><span>$obj <span style="color:#f92672">=</span> <span style="color:#a6e22e">json_decode</span>($res);
+</span></span><span style="display:flex;"><span>$accessToken <span style="color:#f92672">=</span> $obj <span style="color:#f92672">-&gt;</span> {<span style="color:#e6db74">&#39;access_token&#39;</span>};
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">print</span>($accessToken <span style="color:#f92672">.</span> <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// This is the script for testing the access token. The file list of the service account&#39;s Drive is retrieved using Drive API.
+</span></span></span><span style="display:flex;"><span>$curl_test <span style="color:#f92672">=</span> <span style="color:#a6e22e">curl_init</span>();
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">curl_setopt</span>($curl_test, <span style="color:#a6e22e">CURLOPT_URL</span>, <span style="color:#e6db74">&#39;https://www.googleapis.com/drive/v3/files?access_token=&#39;</span> <span style="color:#f92672">.</span> $accessToken);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">curl_setopt</span>($curl_test, <span style="color:#a6e22e">CURLOPT_RETURNTRANSFER</span>, <span style="color:#66d9ef">true</span>);
+</span></span><span style="display:flex;"><span>$response <span style="color:#f92672">=</span> <span style="color:#a6e22e">curl_exec</span>($curl_test);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">print</span>($response);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">?&gt;</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><h2 id="references">References</h2>
+<ul>
+<li><a href="https://developers.google.com/identity/protocols/oauth2/service-account">Using OAuth 2.0 for Server to Server Applications</a></li>
+<li><a href="https://jwt.io/">jwt.io</a></li>
+<li>I answered this sample script for <a href="https://stackoverflow.com/q/67338219">this thread in Stackoverflow</a>.</li>
+</ul>
   </p>
 
-  
-  <footer>
-    <a href="https://tanaikech.github.io/2021/05/01/retrieving-access-token-using-service-account-for-php-without-using-googleapis/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
   
 </article>
 
@@ -865,8 +951,10 @@ Sample script &lt;?php  $private_key = &#34;-----BEGIN PRIVATE KEY-----\n###----
   </header>
 
   <p>
-  Overview This is a report for safe-uploading files to Google Drive by HTML put in the external server using Google Apps Script.
-Description When you want to make the user upload a file to your own Google Drive using the HTML put in the external server of Google side, when the file size is smaller than 50 MB, this can be achieved without using the access token. Ref (When the HTML is put in the internal server of Google side, you can also use google.
+  <h2 id="overview">Overview</h2>
+<p>This is a report for safe-uploading files to Google Drive by HTML put in the external server using Google Apps Script.</p>
+<h2 id="description">Description</h2>
+<p>When you want to make the user upload a file to your own Google Drive using the HTML put in the external server of Google side, when the file size is smaller than 50 MB, this can be achieved without using the access token. <a href="https://tanaikech.github.io/2020/08/13/uploading-file-to-google-drive-from-external-html-without-authorization/">Ref</a> (When the HTML is put in the internal server of Google side, you can also use <a href="https://tanaikech.github.io/2020/02/18/uploading-file-to-google-drive-using-html-and-google-apps-script/"><code>google.script.run</code></a>.) But, when the file size is over 50 MB, it is required to upload the file with the resumable upload. In this case, the access token is required to be used. In this case that the user uploads to your own Google Drive, when the access token is used in the upload, it is considered that this is the weak point of the security. In this report, I would like to propose the method for safe-uploading files to Google Drive by HTML put in the external server using Google Apps Script. Please think of this as one of several methods.</p>
   </p>
 
   
@@ -923,10 +1011,57 @@ Description When you want to make the user upload a file to your own Google Driv
   </header>
 
   <p>
-  Gists
-This is a sample script for retrieving the access token for Service Account using Javascript. The flow for using this script is as follows.
- At first, please create the Service Account and retrieve JSON file. Put Scopes, private_key and client_email to the script. Run the script.  Sample script In this script, 2 libraries of jsencrypt and crypto-js are used.
-&lt;script src=&#34;https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.0.0-rc.1/jsencrypt.min.js&#34;&gt;&lt;/script&gt; &lt;script src=&#34;https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js&#34;&gt;&lt;/script&gt;  &lt;script&gt;  async function sample() {  const private_key = &#34;###&#34;; // private_key of JSON file retrieved by creating Service Account  const client_email = &#34;###&#34;; // client_email of JSON file retrieved by creating Service Account  const scopes = [&#34;https://www.
+  <p><a href="https://gist.github.com/tanaikech/3c7f208cb352a807b3d30b9c1dcf0c82">Gists</a></p>
+<p>This is a sample script for retrieving the access token for Service Account using Javascript. The flow for using this script is as follows.</p>
+<ol>
+<li>At first, please create the Service Account and retrieve JSON file.</li>
+<li>Put Scopes, <code>private_key</code> and <code>client_email</code> to the script.</li>
+<li>Run the script.</li>
+</ol>
+<h2 id="sample-script">Sample script</h2>
+<p>In this script, 2 libraries of <a href="https://github.com/travist/jsencrypt">jsencrypt</a> and <a href="https://github.com/brix/crypto-js">crypto-js</a> are used.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-html" data-lang="html"><span style="display:flex;"><span>&lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.0.0-rc.1/jsencrypt.min.js&#34;</span>&gt;&lt;/<span style="color:#f92672">script</span>&gt;
+</span></span><span style="display:flex;"><span>&lt;<span style="color:#f92672">script</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js&#34;</span>&gt;&lt;/<span style="color:#f92672">script</span>&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>&lt;<span style="color:#f92672">script</span>&gt;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">async</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">sample</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">private_key</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// private_key of JSON file retrieved by creating Service Account
+</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">client_email</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// client_email of JSON file retrieved by creating Service Account
+</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">scopes</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;https://www.googleapis.com/auth/drive.readonly&#34;</span>]; <span style="color:#75715e">// Scopes
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://www.googleapis.com/oauth2/v4/token&#34;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">header</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">alg</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;RS256&#34;</span>, <span style="color:#a6e22e">typ</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;JWT&#34;</span> };
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">now</span> <span style="color:#f92672">=</span> Math.<span style="color:#a6e22e">floor</span>(Date.<span style="color:#a6e22e">now</span>() <span style="color:#f92672">/</span> <span style="color:#ae81ff">1000</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">claim</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">iss</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">client_email</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">scope</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">scopes</span>.<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34; &#34;</span>),
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">aud</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">url</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">exp</span><span style="color:#f92672">:</span> (<span style="color:#a6e22e">now</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">3600</span>).<span style="color:#a6e22e">toString</span>(),
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">iat</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">now</span>.<span style="color:#a6e22e">toString</span>(),
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">signature</span> <span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">btoa</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">header</span>)) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;.&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">btoa</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">claim</span>));
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sign</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">JSEncrypt</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">sign</span>.<span style="color:#a6e22e">setPrivateKey</span>(<span style="color:#a6e22e">private_key</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">jwt</span> <span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">signature</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;.&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">sign</span>.<span style="color:#a6e22e">sign</span>(<span style="color:#a6e22e">signature</span>, <span style="color:#a6e22e">CryptoJS</span>.<span style="color:#a6e22e">SHA256</span>, <span style="color:#e6db74">&#34;sha256&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;POST&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> { <span style="color:#e6db74">&#34;Content-Type&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/json&#34;</span> },
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">body</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>({
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">assertion</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">jwt</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">grant_type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;urn:ietf:params:oauth:grant-type:jwt-bearer&#34;</span>,
+</span></span><span style="display:flex;"><span>      }),
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> <span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">params</span>)
+</span></span><span style="display:flex;"><span>      .<span style="color:#a6e22e">then</span>((<span style="color:#a6e22e">res</span>) =&gt; <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">json</span>())
+</span></span><span style="display:flex;"><span>      .<span style="color:#66d9ef">catch</span>((<span style="color:#a6e22e">err</span>) =&gt; <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">err</span>));
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">obj</span>);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">sample</span>();
+</span></span><span style="display:flex;"><span>&lt;/<span style="color:#f92672">script</span>&gt;
+</span></span></code></pre></div><p>If the access token retrieved at above is used for retrieving file list, the sample script is as follows.</p>
   </p>
 
   
@@ -983,75 +1118,52 @@ This is a sample script for retrieving the access token for Service Account usin
   </header>
 
   <p>
-  Gists
-This is a sample Node.js script to retrieve access token from Service Account of Google without using googleapis.
-const cryptor = require(&#39;crypto&#39;); const request = require(&#39;request&#39;);  const privateKey = &#34;###&#34;; // private_key of JSON file retrieved by creating Service Account const clientEmail = &#34;###&#34;; // client_email of JSON file retrieved by creating Service Account const scopes = [&#34;https://www.googleapis.com/auth/drive.readonly&#34;]; // Sample scope  const url = &#34;https://www.googleapis.com/oauth2/v4/token&#34;; const header = {  alg: &#34;RS256&#34;,  typ: &#34;JWT&#34;, }; const now = Math.
+  <p><a href="https://gist.github.com/tanaikech/7aaf2276e4e6104b89802e85957e75ae">Gists</a></p>
+<p>This is a sample Node.js script to retrieve access token from Service Account of Google without using googleapis.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">cryptor</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;crypto&#39;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">request</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;request&#39;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">privateKey</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// private_key of JSON file retrieved by creating Service Account
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">clientEmail</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// client_email of JSON file retrieved by creating Service Account
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">scopes</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;https://www.googleapis.com/auth/drive.readonly&#34;</span>]; <span style="color:#75715e">// Sample scope
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://www.googleapis.com/oauth2/v4/token&#34;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">header</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">alg</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;RS256&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">typ</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;JWT&#34;</span>,
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">now</span> <span style="color:#f92672">=</span> Math.<span style="color:#a6e22e">floor</span>(Date.<span style="color:#a6e22e">now</span>() <span style="color:#f92672">/</span> <span style="color:#ae81ff">1000</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">claim</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">iss</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">clientEmail</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">scope</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">scopes</span>.<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34; &#34;</span>),
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">aud</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">url</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">exp</span><span style="color:#f92672">:</span> (<span style="color:#a6e22e">now</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">3600</span>).<span style="color:#a6e22e">toString</span>(),
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">iat</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">now</span>.<span style="color:#a6e22e">toString</span>(),
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">signature</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Buffer</span>.<span style="color:#a6e22e">from</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">header</span>)).<span style="color:#a6e22e">toString</span>(<span style="color:#e6db74">&#39;base64&#39;</span>) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;.&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">Buffer</span>.<span style="color:#a6e22e">from</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">claim</span>)).<span style="color:#a6e22e">toString</span>(<span style="color:#e6db74">&#39;base64&#39;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sign</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">cryptor</span>.<span style="color:#a6e22e">createSign</span>(<span style="color:#e6db74">&#39;RSA-SHA256&#39;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">sign</span>.<span style="color:#a6e22e">update</span>(<span style="color:#a6e22e">signature</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">jwt</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">signature</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;.&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">sign</span>.<span style="color:#a6e22e">sign</span>(<span style="color:#a6e22e">privateKey</span>, <span style="color:#e6db74">&#39;base64&#39;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">request</span>({
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;post&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">url</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">body</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>({
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">assertion</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">jwt</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">grant_type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;urn:ietf:params:oauth:grant-type:jwt-bearer&#34;</span>,
+</span></span><span style="display:flex;"><span>  }),
+</span></span><span style="display:flex;"><span>}, (<span style="color:#a6e22e">err</span>, <span style="color:#a6e22e">res</span>, <span style="color:#a6e22e">body</span>) =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">err</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">err</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">body</span>);
+</span></span><span style="display:flex;"><span>});
+</span></span></code></pre></div>
   </p>
 
-  
-  <footer>
-    <a href="https://tanaikech.github.io/2019/04/02/retrieving-access-token-using-service-account-for-node.js-without-using-googleapis/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
-  
-</article>
-
-  
-    <article>
-  <header>
-    <h2><a href="https://tanaikech.github.io/2018/12/11/retrieving-access-token-using-service-account-by-googles-oauth2-package-for-golang/">Retrieving Access Token using Service Account by Google&#39;s OAuth2 package for Golang</a></h2>
-
-    <div class="post-meta">
-
-  <div>
-    <i class="fa fa-calendar fa-fw"></i>
-    <time>11 Dec 2018, 14:47</time>
-  </div>
-
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-folder fa-fw"></i>
-    
-      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gotips">GoTips</a>
-    
-  </div>
-  
-  
-
-  
-  
-  
-  <div>
-    <i class="fa fa-tags fa-fw"></i>
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/service-account">Service Account </a>&nbsp;&#47;
-    
-      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/accesstoken">accesstoken</a>
-    
-  </div>
-  
-  
-
-</div>
-
-  </header>
-
-  <p>
-  Gists
-This is a sample golang script for retrieving access token using Service Account of Google by Google&rsquo;s OAuth2 package.
-The script without using Google&rsquo;s OAuth2 package is here.
-package mainimport (&#34;encoding/json&#34;&#34;fmt&#34;&#34;io/ioutil&#34;&#34;os&#34;&#34;golang.org/x/oauth2&#34;&#34;golang.org/x/oauth2/google&#34;&#34;golang.org/x/oauth2/jwt&#34;)func serviceAccount(credentialFile string) (*oauth2.Token, error) {b, err := ioutil.ReadFile(credentialFile)if err != nil {return nil, err}var c = struct {Email string `json:&#34;client_email&#34;`PrivateKey string `json:&#34;private_key&#34;`}{}json.
-  </p>
-
-  
-  <footer>
-    <a href="https://tanaikech.github.io/2018/12/11/retrieving-access-token-using-service-account-by-googles-oauth2-package-for-golang/">Read more<i class="fa fa-angle-double-right fa-fw"></i></a>
-  </footer>
   
 </article>
 
@@ -1106,8 +1218,9 @@ package mainimport (&#34;encoding/json&#34;&#34;fmt&#34;&#34;io/ioutil&#34;
   </header>
 
   <p>
-  Overview This is a Golang library to retrieve access token from Service Account of Google without using Google&rsquo;s OAuth2 package.
-You can get this from https://github.com/tanaikech/go-gettokenbyserviceaccount
+  <h2 id="overview">Overview</h2>
+<p>This is a Golang library to retrieve access token from <a href="https://developers.google.com/identity/protocols/OAuth2ServiceAccount">Service Account of Google</a> without using <a href="https://github.com/golang/oauth2">Google&rsquo;s OAuth2 package</a>.</p>
+<p><strong>You can get this from <a href="https://github.com/tanaikech/go-gettokenbyserviceaccount">https://github.com/tanaikech/go-gettokenbyserviceaccount</a></strong></p>
   </p>
 
   
@@ -1160,10 +1273,63 @@ You can get this from https://github.com/tanaikech/go-gettokenbyserviceaccount
   </header>
 
   <p>
-  Gists
-Updated on June 22, 2024
-This is a sample script for retrieving the access token for Service Account using Google Apps Script. The flow for using this script is as follows.
-Usage  Create the Service Account and retrieve JSON file. Put Scopes, private_key and client_email as an object.   If you want to use impersonate email, please set the value of impersonate_email.  Run the script.  /** * ### Description * Get access token from service account.
+  <p><a href="https://gist.github.com/tanaikech/20ea127a8e23a7c609f8d764c8b7ed7c">Gists</a></p>
+<p><strong>Updated on June 22, 2024</strong></p>
+<p>This is a sample script for retrieving the access token for Service Account using Google Apps Script. The flow for using this script is as follows.</p>
+<h2 id="usage">Usage</h2>
+<ol>
+<li>Create the Service Account and retrieve JSON file.</li>
+<li>Put Scopes, <code>private_key</code> and <code>client_email</code> as an object.</li>
+</ol>
+<ul>
+<li>If you want to use impersonate email, please set the value of <code>impersonate_email</code>.</li>
+</ul>
+<ol start="3">
+<li>Run the script.</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * ### Description
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Get access token from service account.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * ref: https://tanaikech.github.io/2018/12/07/retrieving-access-token-for-service-account-using-google-apps-script/
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param {Object} object Object including private_key, client_email, impersonate_email.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param {String} object.private_key
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param {String} object.client_email
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param {String} object.impersonate_email
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @param {Array} object.scopes
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * @returns {String} Access token.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getAccessTokenFromServiceAccount_</span>(<span style="color:#a6e22e">object</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">private_key</span>, <span style="color:#a6e22e">client_email</span>, <span style="color:#a6e22e">impersonate_email</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#a6e22e">scopes</span> <span style="color:#f92672">=</span> [] } <span style="color:#f92672">=</span> <span style="color:#a6e22e">object</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://www.googleapis.com/oauth2/v4/token&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">header</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">alg</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;RS256&#34;</span>, <span style="color:#a6e22e">typ</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;JWT&#34;</span> };
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">now</span> <span style="color:#f92672">=</span> Math.<span style="color:#a6e22e">floor</span>(Date.<span style="color:#a6e22e">now</span>() <span style="color:#f92672">/</span> <span style="color:#ae81ff">1000</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">claim</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">iss</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">client_email</span>, <span style="color:#a6e22e">scope</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">scopes</span>.<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34; &#34;</span>), <span style="color:#a6e22e">aud</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">exp</span><span style="color:#f92672">:</span> (<span style="color:#a6e22e">now</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">3600</span>).<span style="color:#a6e22e">toString</span>(), <span style="color:#a6e22e">iat</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">now</span>.<span style="color:#a6e22e">toString</span>() };
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">impersonate_email</span> <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#34;&#34;</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">claim</span>.<span style="color:#a6e22e">sub</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">impersonate_email</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">signature</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">header</span>)) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;.&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">claim</span>));
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">jwt</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">signature</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;.&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">base64Encode</span>(<span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">computeRsaSha256Signature</span>(<span style="color:#a6e22e">signature</span>, <span style="color:#a6e22e">private_key</span>));
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> { <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">assertion</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">jwt</span>, <span style="color:#a6e22e">grant_type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;urn:ietf:params:oauth:grant-type:jwt-bearer&#34;</span> } };
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">params</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">access_token</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getContentText</span>());
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">access_token</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Please run this script.
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">object</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">private_key</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;-----BEGIN PRIVATE KEY-----\n###-----END PRIVATE KEY-----\n&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">client_email</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;###&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// impersonate_email: &#34;###&#34;, // If you want to use an impersonate email, please set this.
+</span></span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">scopes</span><span style="color:#f92672">:</span> [<span style="color:#e6db74">&#34;###&#34;</span>, <span style="color:#e6db74">&#34;###&#34;</span>,,,],
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">accessToken</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">getAccessTokenFromServiceAccount_</span>(<span style="color:#a6e22e">object</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">accessToken</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="sample-script">Sample script</h2>
+<p>When you can obtain the access token by the above script, you can also use the following sample script. The following sample script retrieves the file list of the drive of the service account with <a href="https://developers.google.com/drive/api/reference/rest/v3/files/list">Method: files.list of Drive API v3</a>.</p>
   </p>
 
   
