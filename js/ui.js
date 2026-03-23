@@ -33,14 +33,29 @@
         toggleClass(menuLink, active);
     }
 
-    menuLink.onclick = function (e) {
-        toggleAll(e);
-    };
-
-    content.onclick = function(e) {
-        if (menu.className.indexOf('active') !== -1) {
+    if (menuLink) {
+        menuLink.onclick = function (e) {
             toggleAll(e);
-        }
-    };
+        };
+    }
+
+    if (content) {
+        content.onclick = function(e) {
+            if (menu.className.indexOf('active') !== -1) {
+                toggleAll(e);
+            }
+        };
+    }
+
+    // Reading Progress Bar Logic
+    var progressBar = document.getElementById('progress-bar');
+    if (progressBar) {
+        window.onscroll = function() {
+            var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            var scrolled = (winScroll / height) * 100;
+            progressBar.style.width = scrolled + "%";
+        };
+    }
 
 }(this, this.document));

@@ -1,317 +1,409 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Hugo 0.157.0">
+
+  
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+  
+  <meta name="theme-color" content="#050505">
 
   
   <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
 
-  <meta name="description" content="Official profile of Kanshi Tanaike, a Google Developer Expert (GDE) in Google Workspace and Physicist. Specializing in Google Apps Script, Gemini API, and innovative IT solutions.">
-  <meta name="generator" content="Hugo 0.157.0">
+  
+  
 
-  <meta property="og:title" content="tanaike - Developer Blog">
-  <meta property="og:description" content="Leverage Google APIs, GAS, and Gemini with specialized technical insights.">
-  <meta property="og:url" content="https://tanaikech.github.io/">
-  <meta property="og:type" content="website">
-  <meta property="og:image" content="https://tanaikech.github.io/img/og-main.png">
+  <meta name="keywords" content="golang, zip, compression">
+
+  <meta name="description" content="Gists
+This is a sample script for creating a downloaded file as a zip file using Golang. The downloaded file is not created to a file as a temporal file. The zip file is directly created. When you use this, please modify url, downloadedFileName and zipFileName.
+Sample script:
+package main
+
+import (
+    &#34;archive/zip&#34;
+    &#34;bytes&#34;
+    &#34;fmt&#34;
+    &#34;io&#34;
+    &#34;io/ioutil&#34;
+    &#34;log&#34;
+    &#34;net/http&#34;
+    &#34;os&#34;
+    &#34;time&#34;
+)
+
+func main() {
+    url := &#34;https://localhost/sample.png&#34;
+    downloadedFileName := &#34;sample.png&#34;
+    zipFileName := &#34;sample.zip&#34;
+
+    res, err := http.Get(url)
+    if err != nil {
+        log.Fatal(err)
+    }
+    body, err := ioutil.ReadAll(res.Body)
+    if err != nil {
+        fmt.Fprintf(os.Stderr, &#34;Error: %v. &#34;, err)
+        os.Exit(1)
+    }
+    defer res.Body.Close()
+    buf := new(bytes.Buffer)
+    w := zip.NewWriter(buf)
+    fh := &amp;zip.FileHeader{
+        Name:     downloadedFileName,
+        Modified: time.Now(),
+        Method:   8,
+    }
+    f, err := w.CreateHeader(fh)
+    if err != nil {
+        log.Fatal(err)
+    }
+    if _, err := f.Write(body); err != nil {
+        log.Fatal(err)
+    }
+    err = w.Close()
+    if err != nil {
+        log.Fatal(err)
+    }
+    file, err := os.Create(zipFileName)
+    if err != nil {
+        log.Fatal(err)
+    }
+    if _, err = io.Copy(file, buf); err != nil {
+        log.Fatal(err)
+    }
+    file.Close()
+    fmt.Println(&#34;Done.&#34;)
+}
+Note:
+As an important point, when the file is downloaded, os.FileInfo cannot be used. So in this situation, it uses zip.FileHeader. At that time, please remember to set Method. Method is 0 as the default. This means no compression. The sample script uses 8 to Method. This means the DEFLATE method.">
+
+  
+  <link rel="canonical" href="https://tanaikech.github.io/2018/10/23/zip-compression-of-downloaded-file-using-golang/">
+
+  
+  <title>Zip Compression of Downloaded File using Golang | tanaike - Google Apps Script, Gemini API, and Developer Tips</title>
+
+  
+  <meta property="og:title" content="Zip Compression of Downloaded File using Golang">
+  <meta property="og:description" content="Gists
+This is a sample script for creating a downloaded file as a zip file using Golang. The downloaded file is not created to a file as a temporal file. The zip file is directly created. When you use this, please modify url, downloadedFileName and zipFileName.
+Sample script:
+package main
+
+import (
+    &#34;archive/zip&#34;
+    &#34;bytes&#34;
+    &#34;fmt&#34;
+    &#34;io&#34;
+    &#34;io/ioutil&#34;
+    &#34;log&#34;
+    &#34;net/http&#34;
+    &#34;os&#34;
+    &#34;time&#34;
+)
+
+func main() {
+    url := &#34;https://localhost/sample.png&#34;
+    downloadedFileName := &#34;sample.png&#34;
+    zipFileName := &#34;sample.zip&#34;
+
+    res, err := http.Get(url)
+    if err != nil {
+        log.Fatal(err)
+    }
+    body, err := ioutil.ReadAll(res.Body)
+    if err != nil {
+        fmt.Fprintf(os.Stderr, &#34;Error: %v. &#34;, err)
+        os.Exit(1)
+    }
+    defer res.Body.Close()
+    buf := new(bytes.Buffer)
+    w := zip.NewWriter(buf)
+    fh := &amp;zip.FileHeader{
+        Name:     downloadedFileName,
+        Modified: time.Now(),
+        Method:   8,
+    }
+    f, err := w.CreateHeader(fh)
+    if err != nil {
+        log.Fatal(err)
+    }
+    if _, err := f.Write(body); err != nil {
+        log.Fatal(err)
+    }
+    err = w.Close()
+    if err != nil {
+        log.Fatal(err)
+    }
+    file, err := os.Create(zipFileName)
+    if err != nil {
+        log.Fatal(err)
+    }
+    if _, err = io.Copy(file, buf); err != nil {
+        log.Fatal(err)
+    }
+    file.Close()
+    fmt.Println(&#34;Done.&#34;)
+}
+Note:
+As an important point, when the file is downloaded, os.FileInfo cannot be used. So in this situation, it uses zip.FileHeader. At that time, please remember to set Method. Method is 0 as the default. This means no compression. The sample script uses 8 to Method. This means the DEFLATE method.">
+  <meta property="og:url" content="https://tanaikech.github.io/2018/10/23/zip-compression-of-downloaded-file-using-golang/">
+  <meta property="og:site_name" content="tanaike - Google Apps Script, Gemini API, and Developer Tips">
+  <meta property="og:type" content="article"><meta property="og:image" content="https://tanaikech.github.io/img/og-main.png">
+
+  
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@tanaikech">
+  <meta name="twitter:title" content="Zip Compression of Downloaded File using Golang">
+  <meta name="twitter:description" content="Gists
+This is a sample script for creating a downloaded file as a zip file using Golang. The downloaded file is not created to a file as a temporal file. The zip file is directly created. When you use this, please modify url, downloadedFileName and zipFileName.
+Sample script:
+package main
 
-  <title>tanaike - Google Apps Script, Gemini API Expert & Physicist</title>
+import (
+    &#34;archive/zip&#34;
+    &#34;bytes&#34;
+    &#34;fmt&#34;
+    &#34;io&#34;
+    &#34;io/ioutil&#34;
+    &#34;log&#34;
+    &#34;net/http&#34;
+    &#34;os&#34;
+    &#34;time&#34;
+)
 
-    
+func main() {
+    url := &#34;https://localhost/sample.png&#34;
+    downloadedFileName := &#34;sample.png&#34;
+    zipFileName := &#34;sample.zip&#34;
 
-  
-  
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/pure-min.css">
-
-  <!--[if lte IE 8]>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-old-ie-min.css">
-  <![endif]-->
-  <!--[if gt IE 8]><!-->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-min.css">
-  <!--<![endif]-->
-
-  <!--[if lte IE 8]>
-  <link rel="stylesheet" href="https://tanaikech.github.io/css/side-menu-old-ie.css">
-  <![endif]-->
-  <!--[if gt IE 8]><!-->
-  <link rel="stylesheet" href="https://tanaikech.github.io/css/side-menu.css">
-  <!--<![endif]-->
-
-  <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
-
-  
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.6.0/css/all.css">
-
-  
-  <link rel="preconnect" href="https://fonts.gstatic.com">
-  <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet" type="text/css">
-
-  
-  <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
- 
-  
-
-  
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/styles/androidstudio.min.css">
-  <script async src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/highlight.min.js"></script>
-  
-  <script>hljs.initHighlightingOnLoad();</script>
-  
-
-  <link rel="shortcut icon" href="https://tanaikech.github.io/img/favicon.ico" type="image/x-icon" />
-
-  
-  
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Person",
-  "name": "Kanshi Tanaike",
-  "alternateName": "tanaike",
-  "url": "https://tanaikech.github.io/",
-  "image": "https://tanaikech.github.io/img/og-main.png",
-  "jobTitle": "Google Developer Expert",
-  "honorificPrefix": "Ph.D.",
-  "description": "Japanese scientist, Physicist and Google Developer Expert for Google Workspace.",
-  "award": "First place in the Outstanding GDE Award 2025",
-  "sameAs": [
-    "https://twitter.com/tanaikech",
-    "https://github.com/tanaikech",
-    "https://stackoverflow.com/users/7108653/tanaike",
-    "https://developers.google.com/community/experts/directory?text=tanaike",
-    "https://zenn.dev/tanaike",
-    "https://medium.com/@tanaike"
-  ]
+    res, err := http.Get(url)
+    if err != nil {
+        log.Fatal(err)
+    }
+    body, err := ioutil.ReadAll(res.Body)
+    if err != nil {
+        fmt.Fprintf(os.Stderr, &#34;Error: %v. &#34;, err)
+        os.Exit(1)
+    }
+    defer res.Body.Close()
+    buf := new(bytes.Buffer)
+    w := zip.NewWriter(buf)
+    fh := &amp;zip.FileHeader{
+        Name:     downloadedFileName,
+        Modified: time.Now(),
+        Method:   8,
+    }
+    f, err := w.CreateHeader(fh)
+    if err != nil {
+        log.Fatal(err)
+    }
+    if _, err := f.Write(body); err != nil {
+        log.Fatal(err)
+    }
+    err = w.Close()
+    if err != nil {
+        log.Fatal(err)
+    }
+    file, err := os.Create(zipFileName)
+    if err != nil {
+        log.Fatal(err)
+    }
+    if _, err = io.Copy(file, buf); err != nil {
+        log.Fatal(err)
+    }
+    file.Close()
+    fmt.Println(&#34;Done.&#34;)
 }
-</script>
+Note:
+As an important point, when the file is downloaded, os.FileInfo cannot be used. So in this situation, it uses zip.FileHeader. At that time, please remember to set Method. Method is 0 as the default. This means no compression. The sample script uses 8 to Method. This means the DEFLATE method.">
+  <meta name="twitter:image" content="https://tanaikech.github.io/img/og-main.png">
 
+  
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [{
+        "@type": "BlogPosting",
+        "headline": "\"Zip Compression of Downloaded File using Golang\"",
+        "description": "\"\\u003cp\\u003e\\u003ca href=\\\"https://gist.github.com/tanaikech/0d91da9888393e6ee737a67c57eeab70\\\"\\u003eGists\\u003c/a\\u003e\\u003c/p\\u003e\\n\\u003cp\\u003eThis is a sample script for creating a downloaded file as a zip file using Golang. The downloaded file is not created to a file as a temporal file. The zip file is directly created. When you use this, please modify \\u003ccode\\u003eurl\\u003c/code\\u003e, \\u003ccode\\u003edownloadedFileName\\u003c/code\\u003e and \\u003ccode\\u003ezipFileName\\u003c/code\\u003e.\\u003c/p\\u003e\\n\\u003ch2 id=\\\"sample-script\\\"\\u003eSample script:\\u003c/h2\\u003e\\n\\u003cdiv class=\\\"highlight\\\"\\u003e\\u003cpre tabindex=\\\"0\\\" style=\\\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;\\\"\\u003e\\u003ccode class=\\\"language-go\\\" data-lang=\\\"go\\\"\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e\\u003cspan style=\\\"color:#f92672\\\"\\u003epackage\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003emain\\u003c/span\\u003e\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e\\u003cspan style=\\\"color:#f92672\\\"\\u003eimport\\u003c/span\\u003e (\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#e6db74\\\"\\u003e\\u0026#34;archive/zip\\u0026#34;\\u003c/span\\u003e\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#e6db74\\\"\\u003e\\u0026#34;bytes\\u0026#34;\\u003c/span\\u003e\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#e6db74\\\"\\u003e\\u0026#34;fmt\\u0026#34;\\u003c/span\\u003e\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#e6db74\\\"\\u003e\\u0026#34;io\\u0026#34;\\u003c/span\\u003e\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#e6db74\\\"\\u003e\\u0026#34;io/ioutil\\u0026#34;\\u003c/span\\u003e\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#e6db74\\\"\\u003e\\u0026#34;log\\u0026#34;\\u003c/span\\u003e\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#e6db74\\\"\\u003e\\u0026#34;net/http\\u0026#34;\\u003c/span\\u003e\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#e6db74\\\"\\u003e\\u0026#34;os\\u0026#34;\\u003c/span\\u003e\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#e6db74\\\"\\u003e\\u0026#34;time\\u0026#34;\\u003c/span\\u003e\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e)\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e\\u003cspan style=\\\"color:#66d9ef\\\"\\u003efunc\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003emain\\u003c/span\\u003e() {\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eurl\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e:=\\u003c/span\\u003e \\u003cspan style=\\\"color:#e6db74\\\"\\u003e\\u0026#34;https://localhost/sample.png\\u0026#34;\\u003c/span\\u003e\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#a6e22e\\\"\\u003edownloadedFileName\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e:=\\u003c/span\\u003e \\u003cspan style=\\\"color:#e6db74\\\"\\u003e\\u0026#34;sample.png\\u0026#34;\\u003c/span\\u003e\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ezipFileName\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e:=\\u003c/span\\u003e \\u003cspan style=\\\"color:#e6db74\\\"\\u003e\\u0026#34;sample.zip\\u0026#34;\\u003c/span\\u003e\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eres\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eerr\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e:=\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ehttp\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eGet\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eurl\\u003c/span\\u003e)\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#66d9ef\\\"\\u003eif\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eerr\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e!=\\u003c/span\\u003e \\u003cspan style=\\\"color:#66d9ef\\\"\\u003enil\\u003c/span\\u003e {\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e        \\u003cspan style=\\\"color:#a6e22e\\\"\\u003elog\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eFatal\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eerr\\u003c/span\\u003e)\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    }\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ebody\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eerr\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e:=\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eioutil\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eReadAll\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eres\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eBody\\u003c/span\\u003e)\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#66d9ef\\\"\\u003eif\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eerr\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e!=\\u003c/span\\u003e \\u003cspan style=\\\"color:#66d9ef\\\"\\u003enil\\u003c/span\\u003e {\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e        \\u003cspan style=\\\"color:#a6e22e\\\"\\u003efmt\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eFprintf\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eos\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eStderr\\u003c/span\\u003e, \\u003cspan style=\\\"color:#e6db74\\\"\\u003e\\u0026#34;Error: %v. \\u0026#34;\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eerr\\u003c/span\\u003e)\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e        \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eos\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eExit\\u003c/span\\u003e(\\u003cspan style=\\\"color:#ae81ff\\\"\\u003e1\\u003c/span\\u003e)\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    }\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#66d9ef\\\"\\u003edefer\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eres\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eBody\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eClose\\u003c/span\\u003e()\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ebuf\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e:=\\u003c/span\\u003e new(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ebytes\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eBuffer\\u003c/span\\u003e)\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ew\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e:=\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ezip\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eNewWriter\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ebuf\\u003c/span\\u003e)\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#a6e22e\\\"\\u003efh\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e:=\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e\\u0026amp;\\u003c/span\\u003e\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ezip\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eFileHeader\\u003c/span\\u003e{\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e        \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eName\\u003c/span\\u003e:     \\u003cspan style=\\\"color:#a6e22e\\\"\\u003edownloadedFileName\\u003c/span\\u003e,\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e        \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eModified\\u003c/span\\u003e: \\u003cspan style=\\\"color:#a6e22e\\\"\\u003etime\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eNow\\u003c/span\\u003e(),\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e        \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eMethod\\u003c/span\\u003e:   \\u003cspan style=\\\"color:#ae81ff\\\"\\u003e8\\u003c/span\\u003e,\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    }\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ef\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eerr\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e:=\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ew\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eCreateHeader\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003efh\\u003c/span\\u003e)\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#66d9ef\\\"\\u003eif\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eerr\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e!=\\u003c/span\\u003e \\u003cspan style=\\\"color:#66d9ef\\\"\\u003enil\\u003c/span\\u003e {\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e        \\u003cspan style=\\\"color:#a6e22e\\\"\\u003elog\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eFatal\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eerr\\u003c/span\\u003e)\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    }\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#66d9ef\\\"\\u003eif\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003e_\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eerr\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e:=\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ef\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eWrite\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ebody\\u003c/span\\u003e); \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eerr\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e!=\\u003c/span\\u003e \\u003cspan style=\\\"color:#66d9ef\\\"\\u003enil\\u003c/span\\u003e {\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e        \\u003cspan style=\\\"color:#a6e22e\\\"\\u003elog\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eFatal\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eerr\\u003c/span\\u003e)\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    }\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eerr\\u003c/span\\u003e = \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ew\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eClose\\u003c/span\\u003e()\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#66d9ef\\\"\\u003eif\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eerr\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e!=\\u003c/span\\u003e \\u003cspan style=\\\"color:#66d9ef\\\"\\u003enil\\u003c/span\\u003e {\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e        \\u003cspan style=\\\"color:#a6e22e\\\"\\u003elog\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eFatal\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eerr\\u003c/span\\u003e)\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    }\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#a6e22e\\\"\\u003efile\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eerr\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e:=\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eos\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eCreate\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ezipFileName\\u003c/span\\u003e)\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#66d9ef\\\"\\u003eif\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eerr\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e!=\\u003c/span\\u003e \\u003cspan style=\\\"color:#66d9ef\\\"\\u003enil\\u003c/span\\u003e {\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e        \\u003cspan style=\\\"color:#a6e22e\\\"\\u003elog\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eFatal\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eerr\\u003c/span\\u003e)\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    }\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#66d9ef\\\"\\u003eif\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003e_\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eerr\\u003c/span\\u003e = \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eio\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eCopy\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003efile\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ebuf\\u003c/span\\u003e); \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eerr\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e!=\\u003c/span\\u003e \\u003cspan style=\\\"color:#66d9ef\\\"\\u003enil\\u003c/span\\u003e {\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e        \\u003cspan style=\\\"color:#a6e22e\\\"\\u003elog\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eFatal\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eerr\\u003c/span\\u003e)\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    }\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#a6e22e\\\"\\u003efile\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eClose\\u003c/span\\u003e()\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#a6e22e\\\"\\u003efmt\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ePrintln\\u003c/span\\u003e(\\u003cspan style=\\\"color:#e6db74\\\"\\u003e\\u0026#34;Done.\\u0026#34;\\u003c/span\\u003e)\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e}\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003c/code\\u003e\\u003c/pre\\u003e\\u003c/div\\u003e\\u003ch2 id=\\\"note\\\"\\u003eNote:\\u003c/h2\\u003e\\n\\u003cp\\u003eAs an important point, when the file is downloaded, os.FileInfo cannot be used. So in this situation, it uses zip.FileHeader. At that time, please remember to set \\u003ccode\\u003eMethod\\u003c/code\\u003e. \\u003ccode\\u003eMethod\\u003c/code\\u003e is 0 as the default. This means no compression. The sample script uses 8 to \\u003ccode\\u003eMethod\\u003c/code\\u003e. This means the DEFLATE method.\\u003c/p\\u003e\"",
+        "url": "\"https://tanaikech.github.io/2018/10/23/zip-compression-of-downloaded-file-using-golang/\"",
+        "datePublished": "\"2018-10-23T16:59:51+09:00\"",
+        "dateModified": "\"2018-10-23T16:59:51+09:00\"",
+        "wordCount":  231 ,
+        "author": {
+          "@id": "https:\/\/tanaikech.github.io\/#person"
+        },
+        "publisher": {
+          "@id": "https:\/\/tanaikech.github.io\/#person"
+        },
+        "image": {
+          "@type": "ImageObject",
+          "url": "\"https://tanaikech.github.io/img/og-main.png\"",
+          "width": 1200,
+          "height": 630
+        },
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "\"https://tanaikech.github.io/2018/10/23/zip-compression-of-downloaded-file-using-golang/\""
+        }
+      },{
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "\"https://tanaikech.github.io/\""
+          },{
+            "@type": "ListItem",
+            "position": 2,
+            "name": "\"Zip Compression of Downloaded File using Golang\"",
+            "item": "\"https://tanaikech.github.io/2018/10/23/zip-compression-of-downloaded-file-using-golang/\""
+          }]
+      },
+      {
+        "@type": "Person",
+        "@id": "https:\/\/tanaikech.github.io\/#person",
+        "name": "Kanshi Tanaike",
+        "alternateName": "tanaike",
+        "url": "\"https://tanaikech.github.io/\"",
+        "image": "\"https://tanaikech.github.io/img/og-main.png\"",
+        "jobTitle": "Google Developer Expert",
+        "honorificPrefix": "Ph.D.",
+        "description": "Japanese scientist, Physicist and Google Developer Expert for Google Workspace.",
+        "award": "First place in the Outstanding GDE Award 2025",
+        "sameAs": [
+          "https://twitter.com/tanaikech",
+          "https://github.com/tanaikech",
+          "https://stackoverflow.com/users/7108653/tanaike",
+          "https://developers.google.com/community/experts/directory?text=tanaike",
+          "https://zenn.dev/tanaike",
+          "https://medium.com/@tanaike"
+        ]
+      }
+    ]
+  }
+  </script>
+
+  
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/eclipse.css">
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <link rel="shortcut icon" href="https://tanaikech.github.io/img/favicon.ico" type="image/x-icon" />
+  
+  
+  
+
+  
+  
+  
 </head>
 
 
 <body>
-<div id="layout">
-
+  <div id="progress-bar"></div>
   
-<a href="#menu" id="menuLink" class="menu-link">
-  
-  <span></span>
-</a>
-<div id="menu">
-
-  
-  <a class="pure-menu-heading brand" href="https://tanaikech.github.io/">TANAIKE</a>
-
-
-  <div class="pure-menu">
-    <ul class="pure-menu-list">
+  <header class="site-header">
+    <div class="header-container">
       
+      <div class="header-top">
+        <div class="site-title">
+          <a href="https://tanaikech.github.io/">TANAIKE</a>
+          
+            <div class="site-subtitle">The Thinker</div>
+          
+        </div>
+
+        
+        <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+
       
-        <li class="pure-menu-item">
-          <a class="pure-menu-link" href="https://tanaikech.github.io/about/"><i class='fa fa-user fa-fw'></i>About</a>
-      
-        </li>
-      
-      
-        <li class="pure-menu-item">
-          <a class="pure-menu-link" href="https://tanaikech.github.io/post/"><i class='fa fa-list fa-fw'></i>Posts</a>
-      
-        </li>
-      
-      
-        <li class="pure-menu-item">
-          <a class="pure-menu-link" href="https://tanaikech.github.io/topics/"><i class='fa fa-folder fa-fw'></i>Topics</a>
-      
-        </li>
-      
-      
-        <li class="pure-menu-item">
-          <a class="pure-menu-link" href="https://tanaikech.github.io/tags/"><i class='fa fa-tags fa-fw'></i>Tags</a>
-      
-        </li>
-      
-      
-        <li class="pure-menu-item">
-          <a class="pure-menu-link" href="https://tanaikech.github.io/contact/"><i class='fa fa-phone fa-fw'></i>Contact</a>
-      
-        </li>
-      
-      
-        <li class="pure-menu-item">
-          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
-      
-        </li>
-      
-      
-        <li class="pure-menu-item">
-          <a class="pure-menu-link" href="https://tanaikech.github.io/webapps/"><i class='fas fa-toolbox'></i>Web Applications</a>
-      
-        </li>
-      
-      
-        <li class="pure-menu-item">
-          <a class="pure-menu-link" href="https://tanaikech.github.io/donate/"><i class='fas fa-donate'></i>Donate</a>
-      
-        </li>
-      
-      
-        <li class="pure-menu-item">
-          <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
-      
-        </li>
-      
-    </ul>
-  </div>
+      <div id="mobile-menu" class="mobile-menu-content">
+        <div class="nav-row">
+          <div class="nav-links">
+            
+              <a href="https://tanaikech.github.io/about/" title="">
+                <i class='fa fa-user fa-fw'></i> About
+              </a>
+            
+              <a href="https://tanaikech.github.io/post/" title="">
+                <i class='fa fa-list fa-fw'></i> Articles
+              </a>
+            
+              <a href="https://tanaikech.github.io/topics/" title="">
+                <i class='fa fa-folder fa-fw'></i> Topics
+              </a>
+            
+              <a href="https://tanaikech.github.io/tags/" title="">
+                <i class='fa fa-tags fa-fw'></i> Tags
+              </a>
+            
+              <a href="https://tanaikech.github.io/contact/" title="">
+                <i class='fa fa-phone fa-fw'></i> Contact
+              </a>
+            
+              <a href="https://tanaikech.github.io/link/" title="">
+                <i class='fa fa-thumbs-up fa-fw'></i> Links
+              </a>
+            
+              <a href="https://tanaikech.github.io/webapps/" title="">
+                <i class='fas fa-toolbox'></i> Web Applications
+              </a>
+            
+              <a href="https://tanaikech.github.io/donate/" title="">
+                <i class='fas fa-donate'></i> Donate
+              </a>
+            
+              <a href="https://tanaikech.github.io/" title="">
+                <i class='fa fa-home fa-fw'></i> Home
+              </a>
+            
+          </div>
+        </div>
 
-  <div class="pure-menu social">
-  <ul class="pure-menu-list">
+        <div class="social-links-row"><a href="https://twitter.com/tanaikech" target="_blank" rel="me">
+                <i class="fab fa-x-twitter"></i> X
+              </a><a href="https://medium.com/@tanaike" target="_blank" rel="me">
+                <i class="fab fa-medium"></i> Medium
+              </a><a href="https://www.youtube.com/@tanaike" target="_blank" rel="me">
+                <i class="fab fa-youtube"></i> YouTube
+              </a><a href="https://linkedin.com/in/tanaike" target="_blank" rel="me">
+                <i class="fab fa-linkedin"></i> LinkedIn
+              </a><a href="https://github.com/tanaikech" target="_blank" rel="me">
+                <i class="fab fa-github"></i> GitHub
+              </a><a href="https://gist.github.com/tanaikech" target="_blank" rel="me">
+                <i class="fas fa-code"></i> Gists
+              </a><a href="https://stackoverflow.com/users/7108653" target="_blank" rel="me">
+                <i class="fab fa-stack-overflow"></i> Stack Overflow
+              </a><a href="https://dev.to/tanaike" target="_blank" rel="me">
+                <i class="fab fa-dev"></i> DEV
+              </a><a href="https://zenn.dev/tanaike" target="_blank" rel="me">
+                <i class="fas fa-edit"></i> Zenn
+              </a><a href="https://devpost.com/tanaike" target="_blank" rel="me">
+                <i class="fas fa-terminal"></i> Devpost
+              </a></div>
+      </div>
 
-    
+    </div>
+  </header>
 
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://twitter.com/tanaikech" rel="me" target="_blank"><i class="fa-brands fa-square-x-twitter"></i>X</a>
-    </li>
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://medium.com/@tanaike" rel="me" target="_blank"><i class="fa-brands fa-medium"></i>Medium</a>
-    </li>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://www.youtube.com/@tanaike" rel="me" target="_blank"><i class="fab fa-youtube-square fa-fw"></i>YouTube</a>
-    </li>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://linkedin.com/in/tanaike" rel="me" target="_blank"><i class="fab fa-linkedin fa-fw"></i>LinkedIn</a>
-    </li>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fa-brands fa-github"></i>GitHub</a>
-    </li>
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://gist.github.com/tanaikech" rel="me" target="_blank"><i class="fas fa-code fa-fw"></i>Gists</a>
-    </li>
-    
-
-    
-
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
-    </li>
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://dev.to/tanaike" rel="me" target="_blank"><i class="fa-brands fa-dev fa-fw"></i>DEV</a>
-    </li>
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://zenn.dev/tanaike" rel="me" target="_blank"><i class="fas fa-edit fa-fw"></i>Zenn</a>
-    </li>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://devpost.com/tanaike" rel="me" target="_blank"><i class="fas fa-code fa-fw"></i>Devpost</a>
-    </li>
-    
-
-  </ul>
-</div>
-
-
-  <div>
-  <div class="small-print">
-    <small>&copy; 2026. All rights reserved.</small>
-  </div>
-  <div class="small-print">
-    <small>Built with&nbsp;<a href="https://gohugo.io/" target="_blank">Hugo</a></small>
-    <small>Theme&nbsp;<a href="https://github.com/yoshiharuyamashita/blackburn" target="_blank">Blackburn</a></small>
-  </div>
-</div>
-
-</div>
-
-
-  <div id="main">
+  <main id="main">
 
 
 <div class="header">
@@ -468,35 +560,55 @@
 
 
   
-<div class="prev-next-post pure-g">
-  <div class="pure-u-1-24" style="text-align: left;">
+<nav class="prev-next-posts">
+  <div class="prev-post">
     
-    <a href="https://tanaikech.github.io/2018/10/12/benchmark-reading-and-writing-spreadsheet-using-google-apps-script/"><i class="fa fa-chevron-left"></i></a>
-    
-  </div>
-  <div class="pure-u-10-24">
-    
-    <nav class="prev">
+      <span class="nav-label">Previous Article</span>
       <a href="https://tanaikech.github.io/2018/10/12/benchmark-reading-and-writing-spreadsheet-using-google-apps-script/">Benchmark: Reading and Writing Spreadsheet using Google Apps Script</a>
-    </nav>
     
   </div>
-  <div class="pure-u-2-24">
-    &nbsp;
-  </div>
-  <div class="pure-u-10-24">
+  <div class="next-post">
     
-    <nav class="next">
+      <span class="nav-label">Next Article</span>
       <a href="https://tanaikech.github.io/2018/10/27/updated-ggsrun-to-v150/">Updated ggsrun to v150</a>
-    </nav>
     
   </div>
-  <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2018/10/27/updated-ggsrun-to-v150/"><i class="fa fa-chevron-right"></i></a>
-    
-  </div>
-</div>
+</nav>
+
+<style>
+.prev-next-posts {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+  gap: 2rem;
+}
+.prev-post, .next-post {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.next-post {
+  text-align: right;
+}
+.nav-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+.prev-next-posts a {
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-decoration: none;
+}
+@media (max-width: 600px) {
+  .prev-next-posts { flex-direction: column; text-align: left; }
+  .next-post { text-align: left; }
+}
+</style>
 
 
   
@@ -508,14 +620,44 @@
 
 </div>
 
-</div>
-</div>
-<script src="https://tanaikech.github.io/js/ui.js"></script>
-<script src="https://tanaikech.github.io/js/menus.js"></script>
+  </main>
 
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-social"><a href="https://twitter.com/tanaikech" target="_blank" rel="me" title="twitter">
+                  <i class="fab fa-x-twitter"></i>
+                </a><a href="https://github.com/tanaikech" target="_blank" rel="me" title="github">
+                  <i class="fab fa-github"></i>
+                </a><a href="https://linkedin.com/in/tanaike" target="_blank" rel="me" title="linkedin">
+                  <i class="fab fa-linkedin"></i>
+                </a><a href="https://www.youtube.com/@tanaike" target="_blank" rel="me" title="youtube">
+                  <i class="fab fa-youtube"></i>
+                </a><a href="https://medium.com/@tanaike" target="_blank" rel="me" title="medium">
+                  <i class="fab fa-medium"></i>
+                </a><a href="https://stackoverflow.com/users/7108653" target="_blank" rel="me" title="stackoverflow">
+                  <i class="fab fa-stack-overflow"></i>
+                </a><a href="https://zenn.dev/tanaike" target="_blank" rel="me" title="zenn">
+                  <i class="fas fa-edit"></i>
+                </a><a href="https://dev.to/tanaike" target="_blank" rel="me" title="devto">
+                  <i class="fab fa-dev"></i>
+                </a>
+      </div>
+      
+      <p class="copyright">
+        &copy; 2026 tanaike - Google Apps Script, Gemini API, and Developer Tips. Built with <a href="https://gohugo.io" target="_blank">Hugo</a>.
+      </p>
+    </div>
+  </footer>
 
+  <script src="https://tanaikech.github.io/js/eclipse.js"></script>
 
+  
+  
 
+  
+  
+
+  
 
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
@@ -531,10 +673,9 @@
 
 
 
+  
 
-
-
-
+  
 
 </body>
 </html>

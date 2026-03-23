@@ -1,317 +1,541 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Hugo 0.157.0">
+
+  
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+  
+  <meta name="theme-color" content="#050505">
 
   
   <meta name="google-site-verification" content="1BvDMY90ui0jRLHkrpqdQ_x62h5VNEMuK6mQsDvVQH0" />
 
-  <meta name="description" content="Official profile of Kanshi Tanaike, a Google Developer Expert (GDE) in Google Workspace and Physicist. Specializing in Google Apps Script, Gemini API, and innovative IT solutions.">
-  <meta name="generator" content="Hugo 0.157.0">
+  
+  
 
-  <meta property="og:title" content="tanaike - Developer Blog">
-  <meta property="og:description" content="Leverage Google APIs, GAS, and Gemini with specialized technical insights.">
-  <meta property="og:url" content="https://tanaikech.github.io/">
-  <meta property="og:type" content="website">
-  <meta property="og:image" content="https://tanaikech.github.io/img/og-main.png">
+  <meta name="keywords" content="Google Apps Script, Spreadsheet">
+
+  <meta name="description" content="Gists
+This sample script is for expanding a1Notations using Google Apps Script. This was updated from this sample script.
+Sample script
+function expandA1Notations_(a1Notations, maxRow, maxColumn) {
+  maxRow = maxRow || &#34;1000&#34;;
+  maxColumn = maxColumn || &#34;Z&#34;;
+
+  // Ref: https://stackoverflow.com/a/21231012/7108653
+  const columnToLetter = column =&gt; {
+    let temp,
+      letter = &#34;&#34;;
+    while (column &gt; 0) {
+      temp = (column - 1) % 26;
+      letter = String.fromCharCode(temp &#43; 65) &#43; letter;
+      column = (column - temp - 1) / 26;
+    }
+    return letter;
+  };
+  const letterToColumn = letter =&gt; {
+    let column = 0,
+      length = letter.length;
+    for (let i = 0; i &lt; length; i&#43;&#43;) {
+      column &#43;= (letter.charCodeAt(i) - 64) * Math.pow(26, length - i - 1);
+    }
+    return column;
+  };
+
+  const reg1 = new RegExp(&#34;^([A-Z]&#43;)([0-9]&#43;)$&#34;);
+  const reg2 = new RegExp(&#34;^([A-Z]&#43;)$&#34;);
+  const reg3 = new RegExp(&#34;^([0-9]&#43;)$&#34;);
+  return a1Notations.map(e =&gt; {
+    const a1 = e.split(&#34;!&#34;);
+    const r = a1.length &gt; 1 ? a1[1] : a1[0];
+    const [r1, r2] = r.split(&#34;:&#34;);
+    if (!r2) return [r1];
+    let rr;
+    if (reg1.test(r1) &amp;&amp; reg1.test(r2)) {
+      rr = [r1.toUpperCase().match(reg1), r2.toUpperCase().match(reg1)];
+    } else if (reg2.test(r1) &amp;&amp; reg2.test(r2)) {
+      rr = [
+        [null, r1, 1],
+        [null, r2, maxRow]
+      ];
+    } else if (reg1.test(r1) &amp;&amp; reg2.test(r2)) {
+      rr = [r1.toUpperCase().match(reg1), [null, r2, maxRow]];
+    } else if (reg2.test(r1) &amp;&amp; reg1.test(r2)) {
+      rr = [[null, r1, maxRow], r2.toUpperCase().match(reg1)];
+    } else if (reg3.test(r1) &amp;&amp; reg3.test(r2)) {
+      rr =
+        Number(r1) &gt; Number(r2)
+          ? [
+              [null, &#34;A&#34;, r2],
+              [null, maxColumn, r1]
+            ]
+          : [
+              [null, &#34;A&#34;, r1],
+              [null, maxColumn, r2]
+            ];
+    } else if (reg1.test(r1) &amp;&amp; reg3.test(r2)) {
+      rr = [r1.toUpperCase().match(reg1), [null, maxColumn, r2]];
+    } else if (reg3.test(r1) &amp;&amp; reg1.test(r2)) {
+      let temp = r2.toUpperCase().match(reg1);
+      rr =
+        Number(temp[2]) &gt; Number(r1)
+          ? [
+              [null, temp[1], r1],
+              [null, maxColumn, temp[2]]
+            ]
+          : [temp, [null, maxColumn, r1]];
+    } else {
+      throw new Error(`Wrong a1Notation: ${r}`);
+    }
+    const obj = {
+      startRowIndex: Number(rr[0][2]),
+      endRowIndex: rr.length == 1 ? Number(rr[0][2]) &#43; 1 : Number(rr[1][2]) &#43; 1,
+      startColumnIndex: letterToColumn(rr[0][1]),
+      endColumnIndex:
+        rr.length == 1
+          ? letterToColumn(rr[0][1]) &#43; 1
+          : letterToColumn(rr[1][1]) &#43; 1
+    };
+    let temp = [];
+    for (let i = obj.startRowIndex; i &lt; obj.endRowIndex; i&#43;&#43;) {
+      for (let j = obj.startColumnIndex; j &lt; obj.endColumnIndex; j&#43;&#43;) {
+        temp.push(columnToLetter(j) &#43; i);
+      }
+    }
+    return temp;
+  });
+}
+
+// When you use this script, please run main().
+function main() {
+  const a1Notations = [&#34;A1:E3&#34;, &#34;B10:W13&#34;, &#34;EZ5:FA8&#34;, &#34;AAA1:AAB3&#34;];
+  const res = expandA1Notations_(a1Notations);
+  console.log(res);
+}
+Result
+[
+    [&#34;A1&#34;,&#34;B1&#34;,&#34;C1&#34;,&#34;D1&#34;,&#34;E1&#34;,&#34;A2&#34;,&#34;B2&#34;,&#34;C2&#34;,&#34;D2&#34;,&#34;E2&#34;,&#34;A3&#34;,&#34;B3&#34;,&#34;C3&#34;,&#34;D3&#34;,&#34;E3&#34;],
+    [&#34;B10&#34;,&#34;C10&#34;,&#34;D10&#34;,&#34;E10&#34;,&#34;F10&#34;,&#34;G10&#34;,&#34;H10&#34;,&#34;I10&#34;,&#34;J10&#34;,&#34;K10&#34;,&#34;L10&#34;,&#34;M10&#34;,&#34;N10&#34;,&#34;O10&#34;,&#34;P10&#34;,&#34;Q10&#34;,&#34;R10&#34;,&#34;S10&#34;,&#34;T10&#34;,&#34;U10&#34;,&#34;V10&#34;,&#34;W10&#34;,&#34;B11&#34;,&#34;C11&#34;,&#34;D11&#34;,&#34;E11&#34;,&#34;F11&#34;,&#34;G11&#34;,&#34;H11&#34;,&#34;I11&#34;,&#34;J11&#34;,&#34;K11&#34;,&#34;L11&#34;,&#34;M11&#34;,&#34;N11&#34;,&#34;O11&#34;,&#34;P11&#34;,&#34;Q11&#34;,&#34;R11&#34;,&#34;S11&#34;,&#34;T11&#34;,&#34;U11&#34;,&#34;V11&#34;,&#34;W11&#34;,&#34;B12&#34;,&#34;C12&#34;,&#34;D12&#34;,&#34;E12&#34;,&#34;F12&#34;,&#34;G12&#34;,&#34;H12&#34;,&#34;I12&#34;,&#34;J12&#34;,&#34;K12&#34;,&#34;L12&#34;,&#34;M12&#34;,&#34;N12&#34;,&#34;O12&#34;,&#34;P12&#34;,&#34;Q12&#34;,&#34;R12&#34;,&#34;S12&#34;,&#34;T12&#34;,&#34;U12&#34;,&#34;V12&#34;,&#34;W12&#34;,&#34;B13&#34;,&#34;C13&#34;,&#34;D13&#34;,&#34;E13&#34;,&#34;F13&#34;,&#34;G13&#34;,&#34;H13&#34;,&#34;I13&#34;,&#34;J13&#34;,&#34;K13&#34;,&#34;L13&#34;,&#34;M13&#34;,&#34;N13&#34;,&#34;O13&#34;,&#34;P13&#34;,&#34;Q13&#34;,&#34;R13&#34;,&#34;S13&#34;,&#34;T13&#34;,&#34;U13&#34;,&#34;V13&#34;,&#34;W13&#34;],
+    [&#34;EZ5&#34;,&#34;FA5&#34;,&#34;EZ6&#34;,&#34;FA6&#34;,&#34;EZ7&#34;,&#34;FA7&#34;,&#34;EZ8&#34;,&#34;FA8&#34;],
+    [&#34;AAA1&#34;,&#34;AAB1&#34;,&#34;AAA2&#34;,&#34;AAB2&#34;,&#34;AAA3&#34;,&#34;AAB3&#34;]
+]
+Retrieve duplicated cells
+When this script is used, the duplicated cells can be retrieved as follows.">
+
+  
+  <link rel="canonical" href="https://tanaikech.github.io/2020/04/04/updated-expanding-a1notations-using-google-apps-script/">
+
+  
+  <title>Updated: Expanding A1Notations using Google Apps Script | tanaike - Google Apps Script, Gemini API, and Developer Tips</title>
+
+  
+  <meta property="og:title" content="Updated: Expanding A1Notations using Google Apps Script">
+  <meta property="og:description" content="Gists
+This sample script is for expanding a1Notations using Google Apps Script. This was updated from this sample script.
+Sample script
+function expandA1Notations_(a1Notations, maxRow, maxColumn) {
+  maxRow = maxRow || &#34;1000&#34;;
+  maxColumn = maxColumn || &#34;Z&#34;;
+
+  // Ref: https://stackoverflow.com/a/21231012/7108653
+  const columnToLetter = column =&gt; {
+    let temp,
+      letter = &#34;&#34;;
+    while (column &gt; 0) {
+      temp = (column - 1) % 26;
+      letter = String.fromCharCode(temp &#43; 65) &#43; letter;
+      column = (column - temp - 1) / 26;
+    }
+    return letter;
+  };
+  const letterToColumn = letter =&gt; {
+    let column = 0,
+      length = letter.length;
+    for (let i = 0; i &lt; length; i&#43;&#43;) {
+      column &#43;= (letter.charCodeAt(i) - 64) * Math.pow(26, length - i - 1);
+    }
+    return column;
+  };
+
+  const reg1 = new RegExp(&#34;^([A-Z]&#43;)([0-9]&#43;)$&#34;);
+  const reg2 = new RegExp(&#34;^([A-Z]&#43;)$&#34;);
+  const reg3 = new RegExp(&#34;^([0-9]&#43;)$&#34;);
+  return a1Notations.map(e =&gt; {
+    const a1 = e.split(&#34;!&#34;);
+    const r = a1.length &gt; 1 ? a1[1] : a1[0];
+    const [r1, r2] = r.split(&#34;:&#34;);
+    if (!r2) return [r1];
+    let rr;
+    if (reg1.test(r1) &amp;&amp; reg1.test(r2)) {
+      rr = [r1.toUpperCase().match(reg1), r2.toUpperCase().match(reg1)];
+    } else if (reg2.test(r1) &amp;&amp; reg2.test(r2)) {
+      rr = [
+        [null, r1, 1],
+        [null, r2, maxRow]
+      ];
+    } else if (reg1.test(r1) &amp;&amp; reg2.test(r2)) {
+      rr = [r1.toUpperCase().match(reg1), [null, r2, maxRow]];
+    } else if (reg2.test(r1) &amp;&amp; reg1.test(r2)) {
+      rr = [[null, r1, maxRow], r2.toUpperCase().match(reg1)];
+    } else if (reg3.test(r1) &amp;&amp; reg3.test(r2)) {
+      rr =
+        Number(r1) &gt; Number(r2)
+          ? [
+              [null, &#34;A&#34;, r2],
+              [null, maxColumn, r1]
+            ]
+          : [
+              [null, &#34;A&#34;, r1],
+              [null, maxColumn, r2]
+            ];
+    } else if (reg1.test(r1) &amp;&amp; reg3.test(r2)) {
+      rr = [r1.toUpperCase().match(reg1), [null, maxColumn, r2]];
+    } else if (reg3.test(r1) &amp;&amp; reg1.test(r2)) {
+      let temp = r2.toUpperCase().match(reg1);
+      rr =
+        Number(temp[2]) &gt; Number(r1)
+          ? [
+              [null, temp[1], r1],
+              [null, maxColumn, temp[2]]
+            ]
+          : [temp, [null, maxColumn, r1]];
+    } else {
+      throw new Error(`Wrong a1Notation: ${r}`);
+    }
+    const obj = {
+      startRowIndex: Number(rr[0][2]),
+      endRowIndex: rr.length == 1 ? Number(rr[0][2]) &#43; 1 : Number(rr[1][2]) &#43; 1,
+      startColumnIndex: letterToColumn(rr[0][1]),
+      endColumnIndex:
+        rr.length == 1
+          ? letterToColumn(rr[0][1]) &#43; 1
+          : letterToColumn(rr[1][1]) &#43; 1
+    };
+    let temp = [];
+    for (let i = obj.startRowIndex; i &lt; obj.endRowIndex; i&#43;&#43;) {
+      for (let j = obj.startColumnIndex; j &lt; obj.endColumnIndex; j&#43;&#43;) {
+        temp.push(columnToLetter(j) &#43; i);
+      }
+    }
+    return temp;
+  });
+}
+
+// When you use this script, please run main().
+function main() {
+  const a1Notations = [&#34;A1:E3&#34;, &#34;B10:W13&#34;, &#34;EZ5:FA8&#34;, &#34;AAA1:AAB3&#34;];
+  const res = expandA1Notations_(a1Notations);
+  console.log(res);
+}
+Result
+[
+    [&#34;A1&#34;,&#34;B1&#34;,&#34;C1&#34;,&#34;D1&#34;,&#34;E1&#34;,&#34;A2&#34;,&#34;B2&#34;,&#34;C2&#34;,&#34;D2&#34;,&#34;E2&#34;,&#34;A3&#34;,&#34;B3&#34;,&#34;C3&#34;,&#34;D3&#34;,&#34;E3&#34;],
+    [&#34;B10&#34;,&#34;C10&#34;,&#34;D10&#34;,&#34;E10&#34;,&#34;F10&#34;,&#34;G10&#34;,&#34;H10&#34;,&#34;I10&#34;,&#34;J10&#34;,&#34;K10&#34;,&#34;L10&#34;,&#34;M10&#34;,&#34;N10&#34;,&#34;O10&#34;,&#34;P10&#34;,&#34;Q10&#34;,&#34;R10&#34;,&#34;S10&#34;,&#34;T10&#34;,&#34;U10&#34;,&#34;V10&#34;,&#34;W10&#34;,&#34;B11&#34;,&#34;C11&#34;,&#34;D11&#34;,&#34;E11&#34;,&#34;F11&#34;,&#34;G11&#34;,&#34;H11&#34;,&#34;I11&#34;,&#34;J11&#34;,&#34;K11&#34;,&#34;L11&#34;,&#34;M11&#34;,&#34;N11&#34;,&#34;O11&#34;,&#34;P11&#34;,&#34;Q11&#34;,&#34;R11&#34;,&#34;S11&#34;,&#34;T11&#34;,&#34;U11&#34;,&#34;V11&#34;,&#34;W11&#34;,&#34;B12&#34;,&#34;C12&#34;,&#34;D12&#34;,&#34;E12&#34;,&#34;F12&#34;,&#34;G12&#34;,&#34;H12&#34;,&#34;I12&#34;,&#34;J12&#34;,&#34;K12&#34;,&#34;L12&#34;,&#34;M12&#34;,&#34;N12&#34;,&#34;O12&#34;,&#34;P12&#34;,&#34;Q12&#34;,&#34;R12&#34;,&#34;S12&#34;,&#34;T12&#34;,&#34;U12&#34;,&#34;V12&#34;,&#34;W12&#34;,&#34;B13&#34;,&#34;C13&#34;,&#34;D13&#34;,&#34;E13&#34;,&#34;F13&#34;,&#34;G13&#34;,&#34;H13&#34;,&#34;I13&#34;,&#34;J13&#34;,&#34;K13&#34;,&#34;L13&#34;,&#34;M13&#34;,&#34;N13&#34;,&#34;O13&#34;,&#34;P13&#34;,&#34;Q13&#34;,&#34;R13&#34;,&#34;S13&#34;,&#34;T13&#34;,&#34;U13&#34;,&#34;V13&#34;,&#34;W13&#34;],
+    [&#34;EZ5&#34;,&#34;FA5&#34;,&#34;EZ6&#34;,&#34;FA6&#34;,&#34;EZ7&#34;,&#34;FA7&#34;,&#34;EZ8&#34;,&#34;FA8&#34;],
+    [&#34;AAA1&#34;,&#34;AAB1&#34;,&#34;AAA2&#34;,&#34;AAB2&#34;,&#34;AAA3&#34;,&#34;AAB3&#34;]
+]
+Retrieve duplicated cells
+When this script is used, the duplicated cells can be retrieved as follows.">
+  <meta property="og:url" content="https://tanaikech.github.io/2020/04/04/updated-expanding-a1notations-using-google-apps-script/">
+  <meta property="og:site_name" content="tanaike - Google Apps Script, Gemini API, and Developer Tips">
+  <meta property="og:type" content="article"><meta property="og:image" content="https://tanaikech.github.io/img/og-main.png">
+
+  
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@tanaikech">
+  <meta name="twitter:title" content="Updated: Expanding A1Notations using Google Apps Script">
+  <meta name="twitter:description" content="Gists
+This sample script is for expanding a1Notations using Google Apps Script. This was updated from this sample script.
+Sample script
+function expandA1Notations_(a1Notations, maxRow, maxColumn) {
+  maxRow = maxRow || &#34;1000&#34;;
+  maxColumn = maxColumn || &#34;Z&#34;;
 
-  <title>tanaike - Google Apps Script, Gemini API Expert & Physicist</title>
+  // Ref: https://stackoverflow.com/a/21231012/7108653
+  const columnToLetter = column =&gt; {
+    let temp,
+      letter = &#34;&#34;;
+    while (column &gt; 0) {
+      temp = (column - 1) % 26;
+      letter = String.fromCharCode(temp &#43; 65) &#43; letter;
+      column = (column - temp - 1) / 26;
+    }
+    return letter;
+  };
+  const letterToColumn = letter =&gt; {
+    let column = 0,
+      length = letter.length;
+    for (let i = 0; i &lt; length; i&#43;&#43;) {
+      column &#43;= (letter.charCodeAt(i) - 64) * Math.pow(26, length - i - 1);
+    }
+    return column;
+  };
 
-    
-
-  
-  
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/pure-min.css">
-
-  <!--[if lte IE 8]>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-old-ie-min.css">
-  <![endif]-->
-  <!--[if gt IE 8]><!-->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-min.css">
-  <!--<![endif]-->
-
-  <!--[if lte IE 8]>
-  <link rel="stylesheet" href="https://tanaikech.github.io/css/side-menu-old-ie.css">
-  <![endif]-->
-  <!--[if gt IE 8]><!-->
-  <link rel="stylesheet" href="https://tanaikech.github.io/css/side-menu.css">
-  <!--<![endif]-->
-
-  <link rel="stylesheet" href="https://tanaikech.github.io/css/blackburn.css">
-
-  
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.6.0/css/all.css">
-
-  
-  <link rel="preconnect" href="https://fonts.gstatic.com">
-  <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet" type="text/css">
-
-  
-  <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
- 
-  
-
-  
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/styles/androidstudio.min.css">
-  <script async src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/highlight.min.js"></script>
-  
-  <script>hljs.initHighlightingOnLoad();</script>
-  
-
-  <link rel="shortcut icon" href="https://tanaikech.github.io/img/favicon.ico" type="image/x-icon" />
-
-  
-  
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Person",
-  "name": "Kanshi Tanaike",
-  "alternateName": "tanaike",
-  "url": "https://tanaikech.github.io/",
-  "image": "https://tanaikech.github.io/img/og-main.png",
-  "jobTitle": "Google Developer Expert",
-  "honorificPrefix": "Ph.D.",
-  "description": "Japanese scientist, Physicist and Google Developer Expert for Google Workspace.",
-  "award": "First place in the Outstanding GDE Award 2025",
-  "sameAs": [
-    "https://twitter.com/tanaikech",
-    "https://github.com/tanaikech",
-    "https://stackoverflow.com/users/7108653/tanaike",
-    "https://developers.google.com/community/experts/directory?text=tanaike",
-    "https://zenn.dev/tanaike",
-    "https://medium.com/@tanaike"
-  ]
+  const reg1 = new RegExp(&#34;^([A-Z]&#43;)([0-9]&#43;)$&#34;);
+  const reg2 = new RegExp(&#34;^([A-Z]&#43;)$&#34;);
+  const reg3 = new RegExp(&#34;^([0-9]&#43;)$&#34;);
+  return a1Notations.map(e =&gt; {
+    const a1 = e.split(&#34;!&#34;);
+    const r = a1.length &gt; 1 ? a1[1] : a1[0];
+    const [r1, r2] = r.split(&#34;:&#34;);
+    if (!r2) return [r1];
+    let rr;
+    if (reg1.test(r1) &amp;&amp; reg1.test(r2)) {
+      rr = [r1.toUpperCase().match(reg1), r2.toUpperCase().match(reg1)];
+    } else if (reg2.test(r1) &amp;&amp; reg2.test(r2)) {
+      rr = [
+        [null, r1, 1],
+        [null, r2, maxRow]
+      ];
+    } else if (reg1.test(r1) &amp;&amp; reg2.test(r2)) {
+      rr = [r1.toUpperCase().match(reg1), [null, r2, maxRow]];
+    } else if (reg2.test(r1) &amp;&amp; reg1.test(r2)) {
+      rr = [[null, r1, maxRow], r2.toUpperCase().match(reg1)];
+    } else if (reg3.test(r1) &amp;&amp; reg3.test(r2)) {
+      rr =
+        Number(r1) &gt; Number(r2)
+          ? [
+              [null, &#34;A&#34;, r2],
+              [null, maxColumn, r1]
+            ]
+          : [
+              [null, &#34;A&#34;, r1],
+              [null, maxColumn, r2]
+            ];
+    } else if (reg1.test(r1) &amp;&amp; reg3.test(r2)) {
+      rr = [r1.toUpperCase().match(reg1), [null, maxColumn, r2]];
+    } else if (reg3.test(r1) &amp;&amp; reg1.test(r2)) {
+      let temp = r2.toUpperCase().match(reg1);
+      rr =
+        Number(temp[2]) &gt; Number(r1)
+          ? [
+              [null, temp[1], r1],
+              [null, maxColumn, temp[2]]
+            ]
+          : [temp, [null, maxColumn, r1]];
+    } else {
+      throw new Error(`Wrong a1Notation: ${r}`);
+    }
+    const obj = {
+      startRowIndex: Number(rr[0][2]),
+      endRowIndex: rr.length == 1 ? Number(rr[0][2]) &#43; 1 : Number(rr[1][2]) &#43; 1,
+      startColumnIndex: letterToColumn(rr[0][1]),
+      endColumnIndex:
+        rr.length == 1
+          ? letterToColumn(rr[0][1]) &#43; 1
+          : letterToColumn(rr[1][1]) &#43; 1
+    };
+    let temp = [];
+    for (let i = obj.startRowIndex; i &lt; obj.endRowIndex; i&#43;&#43;) {
+      for (let j = obj.startColumnIndex; j &lt; obj.endColumnIndex; j&#43;&#43;) {
+        temp.push(columnToLetter(j) &#43; i);
+      }
+    }
+    return temp;
+  });
 }
-</script>
 
+// When you use this script, please run main().
+function main() {
+  const a1Notations = [&#34;A1:E3&#34;, &#34;B10:W13&#34;, &#34;EZ5:FA8&#34;, &#34;AAA1:AAB3&#34;];
+  const res = expandA1Notations_(a1Notations);
+  console.log(res);
+}
+Result
+[
+    [&#34;A1&#34;,&#34;B1&#34;,&#34;C1&#34;,&#34;D1&#34;,&#34;E1&#34;,&#34;A2&#34;,&#34;B2&#34;,&#34;C2&#34;,&#34;D2&#34;,&#34;E2&#34;,&#34;A3&#34;,&#34;B3&#34;,&#34;C3&#34;,&#34;D3&#34;,&#34;E3&#34;],
+    [&#34;B10&#34;,&#34;C10&#34;,&#34;D10&#34;,&#34;E10&#34;,&#34;F10&#34;,&#34;G10&#34;,&#34;H10&#34;,&#34;I10&#34;,&#34;J10&#34;,&#34;K10&#34;,&#34;L10&#34;,&#34;M10&#34;,&#34;N10&#34;,&#34;O10&#34;,&#34;P10&#34;,&#34;Q10&#34;,&#34;R10&#34;,&#34;S10&#34;,&#34;T10&#34;,&#34;U10&#34;,&#34;V10&#34;,&#34;W10&#34;,&#34;B11&#34;,&#34;C11&#34;,&#34;D11&#34;,&#34;E11&#34;,&#34;F11&#34;,&#34;G11&#34;,&#34;H11&#34;,&#34;I11&#34;,&#34;J11&#34;,&#34;K11&#34;,&#34;L11&#34;,&#34;M11&#34;,&#34;N11&#34;,&#34;O11&#34;,&#34;P11&#34;,&#34;Q11&#34;,&#34;R11&#34;,&#34;S11&#34;,&#34;T11&#34;,&#34;U11&#34;,&#34;V11&#34;,&#34;W11&#34;,&#34;B12&#34;,&#34;C12&#34;,&#34;D12&#34;,&#34;E12&#34;,&#34;F12&#34;,&#34;G12&#34;,&#34;H12&#34;,&#34;I12&#34;,&#34;J12&#34;,&#34;K12&#34;,&#34;L12&#34;,&#34;M12&#34;,&#34;N12&#34;,&#34;O12&#34;,&#34;P12&#34;,&#34;Q12&#34;,&#34;R12&#34;,&#34;S12&#34;,&#34;T12&#34;,&#34;U12&#34;,&#34;V12&#34;,&#34;W12&#34;,&#34;B13&#34;,&#34;C13&#34;,&#34;D13&#34;,&#34;E13&#34;,&#34;F13&#34;,&#34;G13&#34;,&#34;H13&#34;,&#34;I13&#34;,&#34;J13&#34;,&#34;K13&#34;,&#34;L13&#34;,&#34;M13&#34;,&#34;N13&#34;,&#34;O13&#34;,&#34;P13&#34;,&#34;Q13&#34;,&#34;R13&#34;,&#34;S13&#34;,&#34;T13&#34;,&#34;U13&#34;,&#34;V13&#34;,&#34;W13&#34;],
+    [&#34;EZ5&#34;,&#34;FA5&#34;,&#34;EZ6&#34;,&#34;FA6&#34;,&#34;EZ7&#34;,&#34;FA7&#34;,&#34;EZ8&#34;,&#34;FA8&#34;],
+    [&#34;AAA1&#34;,&#34;AAB1&#34;,&#34;AAA2&#34;,&#34;AAB2&#34;,&#34;AAA3&#34;,&#34;AAB3&#34;]
+]
+Retrieve duplicated cells
+When this script is used, the duplicated cells can be retrieved as follows.">
+  <meta name="twitter:image" content="https://tanaikech.github.io/img/og-main.png">
+
+  
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [{
+        "@type": "BlogPosting",
+        "headline": "\"Updated: Expanding A1Notations using Google Apps Script\"",
+        "description": "\"\\u003cp\\u003e\\u003ca href=\\\"https://gist.github.com/tanaikech/4fd7d66771d552ed83166df314cb0024\\\"\\u003eGists\\u003c/a\\u003e\\u003c/p\\u003e\\n\\u003cp\\u003eThis sample script is for expanding a1Notations using Google Apps Script. This was updated from \\u003ca href=\\\"https://gist.github.com/tanaikech/c59b90324c90935b13f9e7b26cbf436a\\\"\\u003ethis sample script\\u003c/a\\u003e.\\u003c/p\\u003e\\n\\u003ch2 id=\\\"sample-script\\\"\\u003eSample script\\u003c/h2\\u003e\\n\\u003cdiv class=\\\"highlight\\\"\\u003e\\u003cpre tabindex=\\\"0\\\" style=\\\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;\\\"\\u003e\\u003ccode class=\\\"language-javascript\\\" data-lang=\\\"javascript\\\"\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e\\u003cspan style=\\\"color:#66d9ef\\\"\\u003efunction\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eexpandA1Notations_\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ea1Notations\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003emaxRow\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003emaxColumn\\u003c/span\\u003e) {\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e  \\u003cspan style=\\\"color:#a6e22e\\\"\\u003emaxRow\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e=\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003emaxRow\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e||\\u003c/span\\u003e \\u003cspan style=\\\"color:#e6db74\\\"\\u003e\\u0026#34;1000\\u0026#34;\\u003c/span\\u003e;\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e  \\u003cspan style=\\\"color:#a6e22e\\\"\\u003emaxColumn\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e=\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003emaxColumn\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e||\\u003c/span\\u003e \\u003cspan style=\\\"color:#e6db74\\\"\\u003e\\u0026#34;Z\\u0026#34;\\u003c/span\\u003e;\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e  \\u003cspan style=\\\"color:#75715e\\\"\\u003e// Ref: https://stackoverflow.com/a/21231012/7108653\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e  \\u003cspan style=\\\"color:#66d9ef\\\"\\u003econst\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ecolumnToLetter\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e=\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ecolumn\\u003c/span\\u003e =\\u0026gt; {\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#66d9ef\\\"\\u003elet\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003etemp\\u003c/span\\u003e,\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e      \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eletter\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e=\\u003c/span\\u003e \\u003cspan style=\\\"color:#e6db74\\\"\\u003e\\u0026#34;\\u0026#34;\\u003c/span\\u003e;\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#66d9ef\\\"\\u003ewhile\\u003c/span\\u003e (\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ecolumn\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e\\u0026gt;\\u003c/span\\u003e \\u003cspan style=\\\"color:#ae81ff\\\"\\u003e0\\u003c/span\\u003e) {\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e      \\u003cspan style=\\\"color:#a6e22e\\\"\\u003etemp\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e=\\u003c/span\\u003e (\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ecolumn\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e-\\u003c/span\\u003e \\u003cspan style=\\\"color:#ae81ff\\\"\\u003e1\\u003c/span\\u003e) \\u003cspan style=\\\"color:#f92672\\\"\\u003e%\\u003c/span\\u003e \\u003cspan style=\\\"color:#ae81ff\\\"\\u003e26\\u003c/span\\u003e;\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e      \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eletter\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e=\\u003c/span\\u003e String.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003efromCharCode\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003etemp\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e+\\u003c/span\\u003e \\u003cspan style=\\\"color:#ae81ff\\\"\\u003e65\\u003c/span\\u003e) \\u003cspan style=\\\"color:#f92672\\\"\\u003e+\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eletter\\u003c/span\\u003e;\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e      \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ecolumn\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e=\\u003c/span\\u003e (\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ecolumn\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e-\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003etemp\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e-\\u003c/span\\u003e \\u003cspan style=\\\"color:#ae81ff\\\"\\u003e1\\u003c/span\\u003e) \\u003cspan style=\\\"color:#f92672\\\"\\u003e/\\u003c/span\\u003e \\u003cspan style=\\\"color:#ae81ff\\\"\\u003e26\\u003c/span\\u003e;\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    }\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#66d9ef\\\"\\u003ereturn\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eletter\\u003c/span\\u003e;\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e  };\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e  \\u003cspan style=\\\"color:#66d9ef\\\"\\u003econst\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eletterToColumn\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e=\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eletter\\u003c/span\\u003e =\\u0026gt; {\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#66d9ef\\\"\\u003elet\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ecolumn\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e=\\u003c/span\\u003e \\u003cspan style=\\\"color:#ae81ff\\\"\\u003e0\\u003c/span\\u003e,\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e      \\u003cspan style=\\\"color:#a6e22e\\\"\\u003elength\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e=\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eletter\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003elength\\u003c/span\\u003e;\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#66d9ef\\\"\\u003efor\\u003c/span\\u003e (\\u003cspan style=\\\"color:#66d9ef\\\"\\u003elet\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ei\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e=\\u003c/span\\u003e \\u003cspan style=\\\"color:#ae81ff\\\"\\u003e0\\u003c/span\\u003e; \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ei\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e\\u0026lt;\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003elength\\u003c/span\\u003e; \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ei\\u003c/span\\u003e\\u003cspan style=\\\"color:#f92672\\\"\\u003e++\\u003c/span\\u003e) {\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e      \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ecolumn\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e+=\\u003c/span\\u003e (\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eletter\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003echarCodeAt\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ei\\u003c/span\\u003e) \\u003cspan style=\\\"color:#f92672\\\"\\u003e-\\u003c/span\\u003e \\u003cspan style=\\\"color:#ae81ff\\\"\\u003e64\\u003c/span\\u003e) \\u003cspan style=\\\"color:#f92672\\\"\\u003e*\\u003c/span\\u003e Math.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003epow\\u003c/span\\u003e(\\u003cspan style=\\\"color:#ae81ff\\\"\\u003e26\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003elength\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e-\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ei\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e-\\u003c/span\\u003e \\u003cspan style=\\\"color:#ae81ff\\\"\\u003e1\\u003c/span\\u003e);\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    }\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#66d9ef\\\"\\u003ereturn\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ecolumn\\u003c/span\\u003e;\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e  };\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e  \\u003cspan style=\\\"color:#66d9ef\\\"\\u003econst\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ereg1\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e=\\u003c/span\\u003e \\u003cspan style=\\\"color:#66d9ef\\\"\\u003enew\\u003c/span\\u003e RegExp(\\u003cspan style=\\\"color:#e6db74\\\"\\u003e\\u0026#34;^([A-Z]+)([0-9]+)$\\u0026#34;\\u003c/span\\u003e);\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e  \\u003cspan style=\\\"color:#66d9ef\\\"\\u003econst\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ereg2\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e=\\u003c/span\\u003e \\u003cspan style=\\\"color:#66d9ef\\\"\\u003enew\\u003c/span\\u003e RegExp(\\u003cspan style=\\\"color:#e6db74\\\"\\u003e\\u0026#34;^([A-Z]+)$\\u0026#34;\\u003c/span\\u003e);\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e  \\u003cspan style=\\\"color:#66d9ef\\\"\\u003econst\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ereg3\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e=\\u003c/span\\u003e \\u003cspan style=\\\"color:#66d9ef\\\"\\u003enew\\u003c/span\\u003e RegExp(\\u003cspan style=\\\"color:#e6db74\\\"\\u003e\\u0026#34;^([0-9]+)$\\u0026#34;\\u003c/span\\u003e);\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e  \\u003cspan style=\\\"color:#66d9ef\\\"\\u003ereturn\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ea1Notations\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003emap\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ee\\u003c/span\\u003e =\\u0026gt; {\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#66d9ef\\\"\\u003econst\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ea1\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e=\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ee\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003esplit\\u003c/span\\u003e(\\u003cspan style=\\\"color:#e6db74\\\"\\u003e\\u0026#34;!\\u0026#34;\\u003c/span\\u003e);\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#66d9ef\\\"\\u003econst\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003er\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e=\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ea1\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003elength\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e\\u0026gt;\\u003c/span\\u003e \\u003cspan style=\\\"color:#ae81ff\\\"\\u003e1\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e?\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ea1\\u003c/span\\u003e[\\u003cspan style=\\\"color:#ae81ff\\\"\\u003e1\\u003c/span\\u003e] \\u003cspan style=\\\"color:#f92672\\\"\\u003e:\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ea1\\u003c/span\\u003e[\\u003cspan style=\\\"color:#ae81ff\\\"\\u003e0\\u003c/span\\u003e];\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#66d9ef\\\"\\u003econst\\u003c/span\\u003e [\\u003cspan style=\\\"color:#a6e22e\\\"\\u003er1\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003er2\\u003c/span\\u003e] \\u003cspan style=\\\"color:#f92672\\\"\\u003e=\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003er\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003esplit\\u003c/span\\u003e(\\u003cspan style=\\\"color:#e6db74\\\"\\u003e\\u0026#34;:\\u0026#34;\\u003c/span\\u003e);\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#66d9ef\\\"\\u003eif\\u003c/span\\u003e (\\u003cspan style=\\\"color:#f92672\\\"\\u003e!\\u003c/span\\u003e\\u003cspan style=\\\"color:#a6e22e\\\"\\u003er2\\u003c/span\\u003e) \\u003cspan style=\\\"color:#66d9ef\\\"\\u003ereturn\\u003c/span\\u003e [\\u003cspan style=\\\"color:#a6e22e\\\"\\u003er1\\u003c/span\\u003e];\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#66d9ef\\\"\\u003elet\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003err\\u003c/span\\u003e;\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#66d9ef\\\"\\u003eif\\u003c/span\\u003e (\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ereg1\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003etest\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003er1\\u003c/span\\u003e) \\u003cspan style=\\\"color:#f92672\\\"\\u003e\\u0026amp;\\u0026amp;\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ereg1\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003etest\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003er2\\u003c/span\\u003e)) {\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e      \\u003cspan style=\\\"color:#a6e22e\\\"\\u003err\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e=\\u003c/span\\u003e [\\u003cspan style=\\\"color:#a6e22e\\\"\\u003er1\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003etoUpperCase\\u003c/span\\u003e().\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ematch\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ereg1\\u003c/span\\u003e), \\u003cspan style=\\\"color:#a6e22e\\\"\\u003er2\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003etoUpperCase\\u003c/span\\u003e().\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ematch\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ereg1\\u003c/span\\u003e)];\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    } \\u003cspan style=\\\"color:#66d9ef\\\"\\u003eelse\\u003c/span\\u003e \\u003cspan style=\\\"color:#66d9ef\\\"\\u003eif\\u003c/span\\u003e (\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ereg2\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003etest\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003er1\\u003c/span\\u003e) \\u003cspan style=\\\"color:#f92672\\\"\\u003e\\u0026amp;\\u0026amp;\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ereg2\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003etest\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003er2\\u003c/span\\u003e)) {\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e      \\u003cspan style=\\\"color:#a6e22e\\\"\\u003err\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e=\\u003c/span\\u003e [\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e        [\\u003cspan style=\\\"color:#66d9ef\\\"\\u003enull\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003er1\\u003c/span\\u003e, \\u003cspan style=\\\"color:#ae81ff\\\"\\u003e1\\u003c/span\\u003e],\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e        [\\u003cspan style=\\\"color:#66d9ef\\\"\\u003enull\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003er2\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003emaxRow\\u003c/span\\u003e]\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e      ];\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    } \\u003cspan style=\\\"color:#66d9ef\\\"\\u003eelse\\u003c/span\\u003e \\u003cspan style=\\\"color:#66d9ef\\\"\\u003eif\\u003c/span\\u003e (\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ereg1\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003etest\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003er1\\u003c/span\\u003e) \\u003cspan style=\\\"color:#f92672\\\"\\u003e\\u0026amp;\\u0026amp;\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ereg2\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003etest\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003er2\\u003c/span\\u003e)) {\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e      \\u003cspan style=\\\"color:#a6e22e\\\"\\u003err\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e=\\u003c/span\\u003e [\\u003cspan style=\\\"color:#a6e22e\\\"\\u003er1\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003etoUpperCase\\u003c/span\\u003e().\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ematch\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ereg1\\u003c/span\\u003e), [\\u003cspan style=\\\"color:#66d9ef\\\"\\u003enull\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003er2\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003emaxRow\\u003c/span\\u003e]];\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    } \\u003cspan style=\\\"color:#66d9ef\\\"\\u003eelse\\u003c/span\\u003e \\u003cspan style=\\\"color:#66d9ef\\\"\\u003eif\\u003c/span\\u003e (\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ereg2\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003etest\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003er1\\u003c/span\\u003e) \\u003cspan style=\\\"color:#f92672\\\"\\u003e\\u0026amp;\\u0026amp;\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ereg1\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003etest\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003er2\\u003c/span\\u003e)) {\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e      \\u003cspan style=\\\"color:#a6e22e\\\"\\u003err\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e=\\u003c/span\\u003e [[\\u003cspan style=\\\"color:#66d9ef\\\"\\u003enull\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003er1\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003emaxRow\\u003c/span\\u003e], \\u003cspan style=\\\"color:#a6e22e\\\"\\u003er2\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003etoUpperCase\\u003c/span\\u003e().\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ematch\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ereg1\\u003c/span\\u003e)];\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    } \\u003cspan style=\\\"color:#66d9ef\\\"\\u003eelse\\u003c/span\\u003e \\u003cspan style=\\\"color:#66d9ef\\\"\\u003eif\\u003c/span\\u003e (\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ereg3\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003etest\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003er1\\u003c/span\\u003e) \\u003cspan style=\\\"color:#f92672\\\"\\u003e\\u0026amp;\\u0026amp;\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ereg3\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003etest\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003er2\\u003c/span\\u003e)) {\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e      \\u003cspan style=\\\"color:#a6e22e\\\"\\u003err\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e=\\u003c/span\\u003e\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e        Number(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003er1\\u003c/span\\u003e) \\u003cspan style=\\\"color:#f92672\\\"\\u003e\\u0026gt;\\u003c/span\\u003e Number(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003er2\\u003c/span\\u003e)\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e          \\u003cspan style=\\\"color:#f92672\\\"\\u003e?\\u003c/span\\u003e [\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e              [\\u003cspan style=\\\"color:#66d9ef\\\"\\u003enull\\u003c/span\\u003e, \\u003cspan style=\\\"color:#e6db74\\\"\\u003e\\u0026#34;A\\u0026#34;\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003er2\\u003c/span\\u003e],\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e              [\\u003cspan style=\\\"color:#66d9ef\\\"\\u003enull\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003emaxColumn\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003er1\\u003c/span\\u003e]\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e            ]\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e          \\u003cspan style=\\\"color:#f92672\\\"\\u003e:\\u003c/span\\u003e [\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e              [\\u003cspan style=\\\"color:#66d9ef\\\"\\u003enull\\u003c/span\\u003e, \\u003cspan style=\\\"color:#e6db74\\\"\\u003e\\u0026#34;A\\u0026#34;\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003er1\\u003c/span\\u003e],\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e              [\\u003cspan style=\\\"color:#66d9ef\\\"\\u003enull\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003emaxColumn\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003er2\\u003c/span\\u003e]\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e            ];\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    } \\u003cspan style=\\\"color:#66d9ef\\\"\\u003eelse\\u003c/span\\u003e \\u003cspan style=\\\"color:#66d9ef\\\"\\u003eif\\u003c/span\\u003e (\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ereg1\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003etest\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003er1\\u003c/span\\u003e) \\u003cspan style=\\\"color:#f92672\\\"\\u003e\\u0026amp;\\u0026amp;\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ereg3\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003etest\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003er2\\u003c/span\\u003e)) {\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e      \\u003cspan style=\\\"color:#a6e22e\\\"\\u003err\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e=\\u003c/span\\u003e [\\u003cspan style=\\\"color:#a6e22e\\\"\\u003er1\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003etoUpperCase\\u003c/span\\u003e().\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ematch\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ereg1\\u003c/span\\u003e), [\\u003cspan style=\\\"color:#66d9ef\\\"\\u003enull\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003emaxColumn\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003er2\\u003c/span\\u003e]];\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    } \\u003cspan style=\\\"color:#66d9ef\\\"\\u003eelse\\u003c/span\\u003e \\u003cspan style=\\\"color:#66d9ef\\\"\\u003eif\\u003c/span\\u003e (\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ereg3\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003etest\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003er1\\u003c/span\\u003e) \\u003cspan style=\\\"color:#f92672\\\"\\u003e\\u0026amp;\\u0026amp;\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ereg1\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003etest\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003er2\\u003c/span\\u003e)) {\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e      \\u003cspan style=\\\"color:#66d9ef\\\"\\u003elet\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003etemp\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e=\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003er2\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003etoUpperCase\\u003c/span\\u003e().\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ematch\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ereg1\\u003c/span\\u003e);\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e      \\u003cspan style=\\\"color:#a6e22e\\\"\\u003err\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e=\\u003c/span\\u003e\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e        Number(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003etemp\\u003c/span\\u003e[\\u003cspan style=\\\"color:#ae81ff\\\"\\u003e2\\u003c/span\\u003e]) \\u003cspan style=\\\"color:#f92672\\\"\\u003e\\u0026gt;\\u003c/span\\u003e Number(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003er1\\u003c/span\\u003e)\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e          \\u003cspan style=\\\"color:#f92672\\\"\\u003e?\\u003c/span\\u003e [\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e              [\\u003cspan style=\\\"color:#66d9ef\\\"\\u003enull\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003etemp\\u003c/span\\u003e[\\u003cspan style=\\\"color:#ae81ff\\\"\\u003e1\\u003c/span\\u003e], \\u003cspan style=\\\"color:#a6e22e\\\"\\u003er1\\u003c/span\\u003e],\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e              [\\u003cspan style=\\\"color:#66d9ef\\\"\\u003enull\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003emaxColumn\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003etemp\\u003c/span\\u003e[\\u003cspan style=\\\"color:#ae81ff\\\"\\u003e2\\u003c/span\\u003e]]\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e            ]\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e          \\u003cspan style=\\\"color:#f92672\\\"\\u003e:\\u003c/span\\u003e [\\u003cspan style=\\\"color:#a6e22e\\\"\\u003etemp\\u003c/span\\u003e, [\\u003cspan style=\\\"color:#66d9ef\\\"\\u003enull\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003emaxColumn\\u003c/span\\u003e, \\u003cspan style=\\\"color:#a6e22e\\\"\\u003er1\\u003c/span\\u003e]];\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    } \\u003cspan style=\\\"color:#66d9ef\\\"\\u003eelse\\u003c/span\\u003e {\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e      \\u003cspan style=\\\"color:#66d9ef\\\"\\u003ethrow\\u003c/span\\u003e \\u003cspan style=\\\"color:#66d9ef\\\"\\u003enew\\u003c/span\\u003e Error(\\u003cspan style=\\\"color:#e6db74\\\"\\u003e`Wrong a1Notation: \\u003c/span\\u003e\\u003cspan style=\\\"color:#e6db74\\\"\\u003e${\\u003c/span\\u003e\\u003cspan style=\\\"color:#a6e22e\\\"\\u003er\\u003c/span\\u003e\\u003cspan style=\\\"color:#e6db74\\\"\\u003e}\\u003c/span\\u003e\\u003cspan style=\\\"color:#e6db74\\\"\\u003e`\\u003c/span\\u003e);\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    }\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#66d9ef\\\"\\u003econst\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eobj\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e=\\u003c/span\\u003e {\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e      \\u003cspan style=\\\"color:#a6e22e\\\"\\u003estartRowIndex\\u003c/span\\u003e\\u003cspan style=\\\"color:#f92672\\\"\\u003e:\\u003c/span\\u003e Number(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003err\\u003c/span\\u003e[\\u003cspan style=\\\"color:#ae81ff\\\"\\u003e0\\u003c/span\\u003e][\\u003cspan style=\\\"color:#ae81ff\\\"\\u003e2\\u003c/span\\u003e]),\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e      \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eendRowIndex\\u003c/span\\u003e\\u003cspan style=\\\"color:#f92672\\\"\\u003e:\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003err\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003elength\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e==\\u003c/span\\u003e \\u003cspan style=\\\"color:#ae81ff\\\"\\u003e1\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e?\\u003c/span\\u003e Number(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003err\\u003c/span\\u003e[\\u003cspan style=\\\"color:#ae81ff\\\"\\u003e0\\u003c/span\\u003e][\\u003cspan style=\\\"color:#ae81ff\\\"\\u003e2\\u003c/span\\u003e]) \\u003cspan style=\\\"color:#f92672\\\"\\u003e+\\u003c/span\\u003e \\u003cspan style=\\\"color:#ae81ff\\\"\\u003e1\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e:\\u003c/span\\u003e Number(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003err\\u003c/span\\u003e[\\u003cspan style=\\\"color:#ae81ff\\\"\\u003e1\\u003c/span\\u003e][\\u003cspan style=\\\"color:#ae81ff\\\"\\u003e2\\u003c/span\\u003e]) \\u003cspan style=\\\"color:#f92672\\\"\\u003e+\\u003c/span\\u003e \\u003cspan style=\\\"color:#ae81ff\\\"\\u003e1\\u003c/span\\u003e,\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e      \\u003cspan style=\\\"color:#a6e22e\\\"\\u003estartColumnIndex\\u003c/span\\u003e\\u003cspan style=\\\"color:#f92672\\\"\\u003e:\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eletterToColumn\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003err\\u003c/span\\u003e[\\u003cspan style=\\\"color:#ae81ff\\\"\\u003e0\\u003c/span\\u003e][\\u003cspan style=\\\"color:#ae81ff\\\"\\u003e1\\u003c/span\\u003e]),\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e      \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eendColumnIndex\\u003c/span\\u003e\\u003cspan style=\\\"color:#f92672\\\"\\u003e:\\u003c/span\\u003e\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e        \\u003cspan style=\\\"color:#a6e22e\\\"\\u003err\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003elength\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e==\\u003c/span\\u003e \\u003cspan style=\\\"color:#ae81ff\\\"\\u003e1\\u003c/span\\u003e\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e          \\u003cspan style=\\\"color:#f92672\\\"\\u003e?\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eletterToColumn\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003err\\u003c/span\\u003e[\\u003cspan style=\\\"color:#ae81ff\\\"\\u003e0\\u003c/span\\u003e][\\u003cspan style=\\\"color:#ae81ff\\\"\\u003e1\\u003c/span\\u003e]) \\u003cspan style=\\\"color:#f92672\\\"\\u003e+\\u003c/span\\u003e \\u003cspan style=\\\"color:#ae81ff\\\"\\u003e1\\u003c/span\\u003e\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e          \\u003cspan style=\\\"color:#f92672\\\"\\u003e:\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eletterToColumn\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003err\\u003c/span\\u003e[\\u003cspan style=\\\"color:#ae81ff\\\"\\u003e1\\u003c/span\\u003e][\\u003cspan style=\\\"color:#ae81ff\\\"\\u003e1\\u003c/span\\u003e]) \\u003cspan style=\\\"color:#f92672\\\"\\u003e+\\u003c/span\\u003e \\u003cspan style=\\\"color:#ae81ff\\\"\\u003e1\\u003c/span\\u003e\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    };\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#66d9ef\\\"\\u003elet\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003etemp\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e=\\u003c/span\\u003e [];\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#66d9ef\\\"\\u003efor\\u003c/span\\u003e (\\u003cspan style=\\\"color:#66d9ef\\\"\\u003elet\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ei\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e=\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eobj\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003estartRowIndex\\u003c/span\\u003e; \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ei\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e\\u0026lt;\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eobj\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eendRowIndex\\u003c/span\\u003e; \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ei\\u003c/span\\u003e\\u003cspan style=\\\"color:#f92672\\\"\\u003e++\\u003c/span\\u003e) {\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e      \\u003cspan style=\\\"color:#66d9ef\\\"\\u003efor\\u003c/span\\u003e (\\u003cspan style=\\\"color:#66d9ef\\\"\\u003elet\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ej\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e=\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eobj\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003estartColumnIndex\\u003c/span\\u003e; \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ej\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e\\u0026lt;\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eobj\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eendColumnIndex\\u003c/span\\u003e; \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ej\\u003c/span\\u003e\\u003cspan style=\\\"color:#f92672\\\"\\u003e++\\u003c/span\\u003e) {\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e        \\u003cspan style=\\\"color:#a6e22e\\\"\\u003etemp\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003epush\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ecolumnToLetter\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ej\\u003c/span\\u003e) \\u003cspan style=\\\"color:#f92672\\\"\\u003e+\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ei\\u003c/span\\u003e);\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e      }\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    }\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    \\u003cspan style=\\\"color:#66d9ef\\\"\\u003ereturn\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003etemp\\u003c/span\\u003e;\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e  });\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e}\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e\\u003cspan style=\\\"color:#75715e\\\"\\u003e// When you use this script, please run main().\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e\\u003cspan style=\\\"color:#66d9ef\\\"\\u003efunction\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003emain\\u003c/span\\u003e() {\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e  \\u003cspan style=\\\"color:#66d9ef\\\"\\u003econst\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003ea1Notations\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e=\\u003c/span\\u003e [\\u003cspan style=\\\"color:#e6db74\\\"\\u003e\\u0026#34;A1:E3\\u0026#34;\\u003c/span\\u003e, \\u003cspan style=\\\"color:#e6db74\\\"\\u003e\\u0026#34;B10:W13\\u0026#34;\\u003c/span\\u003e, \\u003cspan style=\\\"color:#e6db74\\\"\\u003e\\u0026#34;EZ5:FA8\\u0026#34;\\u003c/span\\u003e, \\u003cspan style=\\\"color:#e6db74\\\"\\u003e\\u0026#34;AAA1:AAB3\\u0026#34;\\u003c/span\\u003e];\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e  \\u003cspan style=\\\"color:#66d9ef\\\"\\u003econst\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eres\\u003c/span\\u003e \\u003cspan style=\\\"color:#f92672\\\"\\u003e=\\u003c/span\\u003e \\u003cspan style=\\\"color:#a6e22e\\\"\\u003eexpandA1Notations_\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003ea1Notations\\u003c/span\\u003e);\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e  \\u003cspan style=\\\"color:#a6e22e\\\"\\u003econsole\\u003c/span\\u003e.\\u003cspan style=\\\"color:#a6e22e\\\"\\u003elog\\u003c/span\\u003e(\\u003cspan style=\\\"color:#a6e22e\\\"\\u003eres\\u003c/span\\u003e);\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e}\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003c/code\\u003e\\u003c/pre\\u003e\\u003c/div\\u003e\\u003ch3 id=\\\"result\\\"\\u003eResult\\u003c/h3\\u003e\\n\\u003cdiv class=\\\"highlight\\\"\\u003e\\u003cpre tabindex=\\\"0\\\" style=\\\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;\\\"\\u003e\\u003ccode class=\\\"language-text\\\" data-lang=\\\"text\\\"\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e[\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    [\\u0026#34;A1\\u0026#34;,\\u0026#34;B1\\u0026#34;,\\u0026#34;C1\\u0026#34;,\\u0026#34;D1\\u0026#34;,\\u0026#34;E1\\u0026#34;,\\u0026#34;A2\\u0026#34;,\\u0026#34;B2\\u0026#34;,\\u0026#34;C2\\u0026#34;,\\u0026#34;D2\\u0026#34;,\\u0026#34;E2\\u0026#34;,\\u0026#34;A3\\u0026#34;,\\u0026#34;B3\\u0026#34;,\\u0026#34;C3\\u0026#34;,\\u0026#34;D3\\u0026#34;,\\u0026#34;E3\\u0026#34;],\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    [\\u0026#34;B10\\u0026#34;,\\u0026#34;C10\\u0026#34;,\\u0026#34;D10\\u0026#34;,\\u0026#34;E10\\u0026#34;,\\u0026#34;F10\\u0026#34;,\\u0026#34;G10\\u0026#34;,\\u0026#34;H10\\u0026#34;,\\u0026#34;I10\\u0026#34;,\\u0026#34;J10\\u0026#34;,\\u0026#34;K10\\u0026#34;,\\u0026#34;L10\\u0026#34;,\\u0026#34;M10\\u0026#34;,\\u0026#34;N10\\u0026#34;,\\u0026#34;O10\\u0026#34;,\\u0026#34;P10\\u0026#34;,\\u0026#34;Q10\\u0026#34;,\\u0026#34;R10\\u0026#34;,\\u0026#34;S10\\u0026#34;,\\u0026#34;T10\\u0026#34;,\\u0026#34;U10\\u0026#34;,\\u0026#34;V10\\u0026#34;,\\u0026#34;W10\\u0026#34;,\\u0026#34;B11\\u0026#34;,\\u0026#34;C11\\u0026#34;,\\u0026#34;D11\\u0026#34;,\\u0026#34;E11\\u0026#34;,\\u0026#34;F11\\u0026#34;,\\u0026#34;G11\\u0026#34;,\\u0026#34;H11\\u0026#34;,\\u0026#34;I11\\u0026#34;,\\u0026#34;J11\\u0026#34;,\\u0026#34;K11\\u0026#34;,\\u0026#34;L11\\u0026#34;,\\u0026#34;M11\\u0026#34;,\\u0026#34;N11\\u0026#34;,\\u0026#34;O11\\u0026#34;,\\u0026#34;P11\\u0026#34;,\\u0026#34;Q11\\u0026#34;,\\u0026#34;R11\\u0026#34;,\\u0026#34;S11\\u0026#34;,\\u0026#34;T11\\u0026#34;,\\u0026#34;U11\\u0026#34;,\\u0026#34;V11\\u0026#34;,\\u0026#34;W11\\u0026#34;,\\u0026#34;B12\\u0026#34;,\\u0026#34;C12\\u0026#34;,\\u0026#34;D12\\u0026#34;,\\u0026#34;E12\\u0026#34;,\\u0026#34;F12\\u0026#34;,\\u0026#34;G12\\u0026#34;,\\u0026#34;H12\\u0026#34;,\\u0026#34;I12\\u0026#34;,\\u0026#34;J12\\u0026#34;,\\u0026#34;K12\\u0026#34;,\\u0026#34;L12\\u0026#34;,\\u0026#34;M12\\u0026#34;,\\u0026#34;N12\\u0026#34;,\\u0026#34;O12\\u0026#34;,\\u0026#34;P12\\u0026#34;,\\u0026#34;Q12\\u0026#34;,\\u0026#34;R12\\u0026#34;,\\u0026#34;S12\\u0026#34;,\\u0026#34;T12\\u0026#34;,\\u0026#34;U12\\u0026#34;,\\u0026#34;V12\\u0026#34;,\\u0026#34;W12\\u0026#34;,\\u0026#34;B13\\u0026#34;,\\u0026#34;C13\\u0026#34;,\\u0026#34;D13\\u0026#34;,\\u0026#34;E13\\u0026#34;,\\u0026#34;F13\\u0026#34;,\\u0026#34;G13\\u0026#34;,\\u0026#34;H13\\u0026#34;,\\u0026#34;I13\\u0026#34;,\\u0026#34;J13\\u0026#34;,\\u0026#34;K13\\u0026#34;,\\u0026#34;L13\\u0026#34;,\\u0026#34;M13\\u0026#34;,\\u0026#34;N13\\u0026#34;,\\u0026#34;O13\\u0026#34;,\\u0026#34;P13\\u0026#34;,\\u0026#34;Q13\\u0026#34;,\\u0026#34;R13\\u0026#34;,\\u0026#34;S13\\u0026#34;,\\u0026#34;T13\\u0026#34;,\\u0026#34;U13\\u0026#34;,\\u0026#34;V13\\u0026#34;,\\u0026#34;W13\\u0026#34;],\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    [\\u0026#34;EZ5\\u0026#34;,\\u0026#34;FA5\\u0026#34;,\\u0026#34;EZ6\\u0026#34;,\\u0026#34;FA6\\u0026#34;,\\u0026#34;EZ7\\u0026#34;,\\u0026#34;FA7\\u0026#34;,\\u0026#34;EZ8\\u0026#34;,\\u0026#34;FA8\\u0026#34;],\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e    [\\u0026#34;AAA1\\u0026#34;,\\u0026#34;AAB1\\u0026#34;,\\u0026#34;AAA2\\u0026#34;,\\u0026#34;AAB2\\u0026#34;,\\u0026#34;AAA3\\u0026#34;,\\u0026#34;AAB3\\u0026#34;]\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003cspan style=\\\"display:flex;\\\"\\u003e\\u003cspan\\u003e]\\n\\u003c/span\\u003e\\u003c/span\\u003e\\u003c/code\\u003e\\u003c/pre\\u003e\\u003c/div\\u003e\\u003ch2 id=\\\"retrieve-duplicated-cells\\\"\\u003eRetrieve duplicated cells\\u003c/h2\\u003e\\n\\u003cp\\u003eWhen this script is used, the duplicated cells can be retrieved as follows.\\u003c/p\\u003e\"",
+        "url": "\"https://tanaikech.github.io/2020/04/04/updated-expanding-a1notations-using-google-apps-script/\"",
+        "datePublished": "\"2020-04-04T15:07:11+09:00\"",
+        "dateModified": "\"2020-04-04T15:07:11+09:00\"",
+        "wordCount":  473 ,
+        "author": {
+          "@id": "https:\/\/tanaikech.github.io\/#person"
+        },
+        "publisher": {
+          "@id": "https:\/\/tanaikech.github.io\/#person"
+        },
+        "image": {
+          "@type": "ImageObject",
+          "url": "\"https://tanaikech.github.io/img/og-main.png\"",
+          "width": 1200,
+          "height": 630
+        },
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "\"https://tanaikech.github.io/2020/04/04/updated-expanding-a1notations-using-google-apps-script/\""
+        }
+      },{
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "\"https://tanaikech.github.io/\""
+          },{
+            "@type": "ListItem",
+            "position": 2,
+            "name": "\"Updated: Expanding A1Notations using Google Apps Script\"",
+            "item": "\"https://tanaikech.github.io/2020/04/04/updated-expanding-a1notations-using-google-apps-script/\""
+          }]
+      },
+      {
+        "@type": "Person",
+        "@id": "https:\/\/tanaikech.github.io\/#person",
+        "name": "Kanshi Tanaike",
+        "alternateName": "tanaike",
+        "url": "\"https://tanaikech.github.io/\"",
+        "image": "\"https://tanaikech.github.io/img/og-main.png\"",
+        "jobTitle": "Google Developer Expert",
+        "honorificPrefix": "Ph.D.",
+        "description": "Japanese scientist, Physicist and Google Developer Expert for Google Workspace.",
+        "award": "First place in the Outstanding GDE Award 2025",
+        "sameAs": [
+          "https://twitter.com/tanaikech",
+          "https://github.com/tanaikech",
+          "https://stackoverflow.com/users/7108653/tanaike",
+          "https://developers.google.com/community/experts/directory?text=tanaike",
+          "https://zenn.dev/tanaike",
+          "https://medium.com/@tanaike"
+        ]
+      }
+    ]
+  }
+  </script>
+
+  
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/eclipse.css">
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <link rel="shortcut icon" href="https://tanaikech.github.io/img/favicon.ico" type="image/x-icon" />
+  
+  
+  
+
+  
+  
+  
 </head>
 
 
 <body>
-<div id="layout">
-
+  <div id="progress-bar"></div>
   
-<a href="#menu" id="menuLink" class="menu-link">
-  
-  <span></span>
-</a>
-<div id="menu">
-
-  
-  <a class="pure-menu-heading brand" href="https://tanaikech.github.io/">TANAIKE</a>
-
-
-  <div class="pure-menu">
-    <ul class="pure-menu-list">
+  <header class="site-header">
+    <div class="header-container">
       
+      <div class="header-top">
+        <div class="site-title">
+          <a href="https://tanaikech.github.io/">TANAIKE</a>
+          
+            <div class="site-subtitle">The Thinker</div>
+          
+        </div>
+
+        
+        <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+
       
-        <li class="pure-menu-item">
-          <a class="pure-menu-link" href="https://tanaikech.github.io/about/"><i class='fa fa-user fa-fw'></i>About</a>
-      
-        </li>
-      
-      
-        <li class="pure-menu-item">
-          <a class="pure-menu-link" href="https://tanaikech.github.io/post/"><i class='fa fa-list fa-fw'></i>Posts</a>
-      
-        </li>
-      
-      
-        <li class="pure-menu-item">
-          <a class="pure-menu-link" href="https://tanaikech.github.io/topics/"><i class='fa fa-folder fa-fw'></i>Topics</a>
-      
-        </li>
-      
-      
-        <li class="pure-menu-item">
-          <a class="pure-menu-link" href="https://tanaikech.github.io/tags/"><i class='fa fa-tags fa-fw'></i>Tags</a>
-      
-        </li>
-      
-      
-        <li class="pure-menu-item">
-          <a class="pure-menu-link" href="https://tanaikech.github.io/contact/"><i class='fa fa-phone fa-fw'></i>Contact</a>
-      
-        </li>
-      
-      
-        <li class="pure-menu-item">
-          <a class="pure-menu-link" href="https://tanaikech.github.io/link/"><i class='fa fa-thumbs-up fa-fw'></i>Links</a>
-      
-        </li>
-      
-      
-        <li class="pure-menu-item">
-          <a class="pure-menu-link" href="https://tanaikech.github.io/webapps/"><i class='fas fa-toolbox'></i>Web Applications</a>
-      
-        </li>
-      
-      
-        <li class="pure-menu-item">
-          <a class="pure-menu-link" href="https://tanaikech.github.io/donate/"><i class='fas fa-donate'></i>Donate</a>
-      
-        </li>
-      
-      
-        <li class="pure-menu-item">
-          <a class="pure-menu-link" href="https://tanaikech.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
-      
-        </li>
-      
-    </ul>
-  </div>
+      <div id="mobile-menu" class="mobile-menu-content">
+        <div class="nav-row">
+          <div class="nav-links">
+            
+              <a href="https://tanaikech.github.io/about/" title="">
+                <i class='fa fa-user fa-fw'></i> About
+              </a>
+            
+              <a href="https://tanaikech.github.io/post/" title="">
+                <i class='fa fa-list fa-fw'></i> Articles
+              </a>
+            
+              <a href="https://tanaikech.github.io/topics/" title="">
+                <i class='fa fa-folder fa-fw'></i> Topics
+              </a>
+            
+              <a href="https://tanaikech.github.io/tags/" title="">
+                <i class='fa fa-tags fa-fw'></i> Tags
+              </a>
+            
+              <a href="https://tanaikech.github.io/contact/" title="">
+                <i class='fa fa-phone fa-fw'></i> Contact
+              </a>
+            
+              <a href="https://tanaikech.github.io/link/" title="">
+                <i class='fa fa-thumbs-up fa-fw'></i> Links
+              </a>
+            
+              <a href="https://tanaikech.github.io/webapps/" title="">
+                <i class='fas fa-toolbox'></i> Web Applications
+              </a>
+            
+              <a href="https://tanaikech.github.io/donate/" title="">
+                <i class='fas fa-donate'></i> Donate
+              </a>
+            
+              <a href="https://tanaikech.github.io/" title="">
+                <i class='fa fa-home fa-fw'></i> Home
+              </a>
+            
+          </div>
+        </div>
 
-  <div class="pure-menu social">
-  <ul class="pure-menu-list">
+        <div class="social-links-row"><a href="https://twitter.com/tanaikech" target="_blank" rel="me">
+                <i class="fab fa-x-twitter"></i> X
+              </a><a href="https://medium.com/@tanaike" target="_blank" rel="me">
+                <i class="fab fa-medium"></i> Medium
+              </a><a href="https://www.youtube.com/@tanaike" target="_blank" rel="me">
+                <i class="fab fa-youtube"></i> YouTube
+              </a><a href="https://linkedin.com/in/tanaike" target="_blank" rel="me">
+                <i class="fab fa-linkedin"></i> LinkedIn
+              </a><a href="https://github.com/tanaikech" target="_blank" rel="me">
+                <i class="fab fa-github"></i> GitHub
+              </a><a href="https://gist.github.com/tanaikech" target="_blank" rel="me">
+                <i class="fas fa-code"></i> Gists
+              </a><a href="https://stackoverflow.com/users/7108653" target="_blank" rel="me">
+                <i class="fab fa-stack-overflow"></i> Stack Overflow
+              </a><a href="https://dev.to/tanaike" target="_blank" rel="me">
+                <i class="fab fa-dev"></i> DEV
+              </a><a href="https://zenn.dev/tanaike" target="_blank" rel="me">
+                <i class="fas fa-edit"></i> Zenn
+              </a><a href="https://devpost.com/tanaike" target="_blank" rel="me">
+                <i class="fas fa-terminal"></i> Devpost
+              </a></div>
+      </div>
 
-    
+    </div>
+  </header>
 
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://twitter.com/tanaikech" rel="me" target="_blank"><i class="fa-brands fa-square-x-twitter"></i>X</a>
-    </li>
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://medium.com/@tanaike" rel="me" target="_blank"><i class="fa-brands fa-medium"></i>Medium</a>
-    </li>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://www.youtube.com/@tanaike" rel="me" target="_blank"><i class="fab fa-youtube-square fa-fw"></i>YouTube</a>
-    </li>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://linkedin.com/in/tanaike" rel="me" target="_blank"><i class="fab fa-linkedin fa-fw"></i>LinkedIn</a>
-    </li>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://github.com/tanaikech" rel="me" target="_blank"><i class="fa-brands fa-github"></i>GitHub</a>
-    </li>
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://gist.github.com/tanaikech" rel="me" target="_blank"><i class="fas fa-code fa-fw"></i>Gists</a>
-    </li>
-    
-
-    
-
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://stackoverflow.com/users/7108653" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
-    </li>
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://dev.to/tanaike" rel="me" target="_blank"><i class="fa-brands fa-dev fa-fw"></i>DEV</a>
-    </li>
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://zenn.dev/tanaike" rel="me" target="_blank"><i class="fas fa-edit fa-fw"></i>Zenn</a>
-    </li>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <li class="pure-menu-item">
-      <a class="pure-menu-link" href="https://devpost.com/tanaike" rel="me" target="_blank"><i class="fas fa-code fa-fw"></i>Devpost</a>
-    </li>
-    
-
-  </ul>
-</div>
-
-
-  <div>
-  <div class="small-print">
-    <small>&copy; 2026. All rights reserved.</small>
-  </div>
-  <div class="small-print">
-    <small>Built with&nbsp;<a href="https://gohugo.io/" target="_blank">Hugo</a></small>
-    <small>Theme&nbsp;<a href="https://github.com/yoshiharuyamashita/blackburn" target="_blank">Blackburn</a></small>
-  </div>
-</div>
-
-</div>
-
-
-  <div id="main">
+  <main id="main">
 
 
 <div class="header">
@@ -521,35 +745,55 @@
 
 
   
-<div class="prev-next-post pure-g">
-  <div class="pure-u-1-24" style="text-align: left;">
+<nav class="prev-next-posts">
+  <div class="prev-post">
     
-    <a href="https://tanaikech.github.io/2020/04/03/drawing-objects-on-spreadsheet-got-to-be-able-to-be-managed/"><i class="fa fa-chevron-left"></i></a>
-    
-  </div>
-  <div class="pure-u-10-24">
-    
-    <nav class="prev">
+      <span class="nav-label">Previous Article</span>
       <a href="https://tanaikech.github.io/2020/04/03/drawing-objects-on-spreadsheet-got-to-be-able-to-be-managed/">Drawing objects on Spreadsheet got to be able to be managed</a>
-    </nav>
     
   </div>
-  <div class="pure-u-2-24">
-    &nbsp;
-  </div>
-  <div class="pure-u-10-24">
+  <div class="next-post">
     
-    <nav class="next">
+      <span class="nav-label">Next Article</span>
       <a href="https://tanaikech.github.io/2020/04/13/updated-gas-library-fetchapp/">Updated: GAS Library - FetchApp</a>
-    </nav>
     
   </div>
-  <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="https://tanaikech.github.io/2020/04/13/updated-gas-library-fetchapp/"><i class="fa fa-chevron-right"></i></a>
-    
-  </div>
-</div>
+</nav>
+
+<style>
+.prev-next-posts {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+  gap: 2rem;
+}
+.prev-post, .next-post {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.next-post {
+  text-align: right;
+}
+.nav-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+.prev-next-posts a {
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-decoration: none;
+}
+@media (max-width: 600px) {
+  .prev-next-posts { flex-direction: column; text-align: left; }
+  .next-post { text-align: left; }
+}
+</style>
 
 
   
@@ -561,14 +805,44 @@
 
 </div>
 
-</div>
-</div>
-<script src="https://tanaikech.github.io/js/ui.js"></script>
-<script src="https://tanaikech.github.io/js/menus.js"></script>
+  </main>
 
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-social"><a href="https://twitter.com/tanaikech" target="_blank" rel="me" title="twitter">
+                  <i class="fab fa-x-twitter"></i>
+                </a><a href="https://github.com/tanaikech" target="_blank" rel="me" title="github">
+                  <i class="fab fa-github"></i>
+                </a><a href="https://linkedin.com/in/tanaike" target="_blank" rel="me" title="linkedin">
+                  <i class="fab fa-linkedin"></i>
+                </a><a href="https://www.youtube.com/@tanaike" target="_blank" rel="me" title="youtube">
+                  <i class="fab fa-youtube"></i>
+                </a><a href="https://medium.com/@tanaike" target="_blank" rel="me" title="medium">
+                  <i class="fab fa-medium"></i>
+                </a><a href="https://stackoverflow.com/users/7108653" target="_blank" rel="me" title="stackoverflow">
+                  <i class="fab fa-stack-overflow"></i>
+                </a><a href="https://zenn.dev/tanaike" target="_blank" rel="me" title="zenn">
+                  <i class="fas fa-edit"></i>
+                </a><a href="https://dev.to/tanaike" target="_blank" rel="me" title="devto">
+                  <i class="fab fa-dev"></i>
+                </a>
+      </div>
+      
+      <p class="copyright">
+        &copy; 2026 tanaike - Google Apps Script, Gemini API, and Developer Tips. Built with <a href="https://gohugo.io" target="_blank">Hugo</a>.
+      </p>
+    </div>
+  </footer>
 
+  <script src="https://tanaikech.github.io/js/eclipse.js"></script>
 
+  
+  
 
+  
+  
+
+  
 
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
@@ -584,13 +858,12 @@
 
 
 
+  
 
-
-
+  
 <script src="https://tanaikech.github.io/js/math-code.js"></script>
   <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
   
-
 
 </body>
 </html>
