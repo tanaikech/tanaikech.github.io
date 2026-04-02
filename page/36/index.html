@@ -202,6 +202,71 @@
   
     <article class="post-item">
       <div class="post-meta">
+        <i class="far fa-calendar-alt"></i> September 23, 2022
+      </div>
+      <h2><a href="https://tanaikech.github.io/2022/09/23/retrying-urlfetchapp-by-an-error-using-google-apps-script-retryfetch/">Retrying UrlFetchApp by an Error using Google Apps Script (RetryFetch)</a></h2>
+      <div class="post-summary">
+        
+          <p><a href="https://gist.github.com/tanaikech/ff431dacecc9af58d5e3c1b2aee53d5a">Gists</a></p>
+<p>This is a sample script for retrying UrlFetchApp of Google Apps Script when an error occurs.</p>
+<p>When the HTTP request is run using UrlFetchApp, there is a case that an error occurs in various situations. And, there is a case that when the request is run again, no error occurs. This sample script can automatically retry the requests using Google Apps Script.</p>
+<h2 id="sample-script">Sample script</h2>
+<p>This is Class RetryFetch.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * UrlFetchApp is run by retrying when an error occurs.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">RetryFetch</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @param {string} url URL
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @param {object} params Object
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @param {number} numberOfRetr Number of retry when an error occurs with the HTTP request.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @param {number} waitTime Wait time between the HTTP request.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @return {UrlFetchApp.HTTPResponse}
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   */</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">constructor</span>(<span style="color:#a6e22e">url</span>, <span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> {}, <span style="color:#a6e22e">numberOfRetry</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>, <span style="color:#a6e22e">waitTime</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">url</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">params</span>.<span style="color:#a6e22e">muteHttpExceptions</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">params</span>.<span style="color:#a6e22e">muteHttpExceptions</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">params</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">params</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">numberOfRetry</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">numberOfRetry</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">waitTime</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">waitTime</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">his</span> <span style="color:#f92672">=</span> [];
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">fetch</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">url</span>, <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">params</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">statusCode</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getResponseCode</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">his</span>.<span style="color:#a6e22e">push</span>({ <span style="color:#a6e22e">date</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">new</span> Date(), <span style="color:#a6e22e">params</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">params</span>, <span style="color:#a6e22e">statusCode</span> });
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">statusCode</span> <span style="color:#f92672">!=</span> <span style="color:#ae81ff">200</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">numberOfRetry</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">`Status code: </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">statusCode</span><span style="color:#e6db74">}</span><span style="color:#e6db74">, Retry: </span><span style="color:#e6db74">${</span><span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">numberOfRetry</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">idx</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">his</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">his</span>[<span style="color:#a6e22e">idx</span>].<span style="color:#a6e22e">responseHeader</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getAllHeaders</span>();
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">his</span>[<span style="color:#a6e22e">idx</span>].<span style="color:#a6e22e">error</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">getContentText</span>();
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">numberOfRetry</span><span style="color:#f92672">--</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">sleep</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">waitTime</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1000</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">fetch</span>();
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">numberOfRetry</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">res</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * Return history of fetch requesting in this Class.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   * @return {array} History.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   */</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">get</span> <span style="color:#a6e22e">history</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">his</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This is a sample script for using Class RetryFetch.</p>
+        
+      </div>
+    </article>
+  
+    <article class="post-item">
+      <div class="post-meta">
         <i class="far fa-calendar-alt"></i> September 22, 2022
       </div>
       <h2><a href="https://tanaikech.github.io/2022/09/22/requesting-with-keeping-cookies-using-google-apps-script-sessionfetch/">Requesting with Keeping Cookies using Google Apps Script (SessionFetch)</a></h2>
@@ -395,26 +460,6 @@
      decoding="async">
 </p>
 <p>Today, I found a question ( <a href="https://stackoverflow.com/q/73540735">https://stackoverflow.com/q/73540735</a> ) in Stackoverflow by Max Makhrov. When I saw this question, I thought that this is a good raising question. In this question, it has reported that when the Spreadsheet includes the formulas of the large calculation, when a Google Apps Script is run during the calculation of the formulas is running, the processing time of the script becomes long.</p>
-        
-      </div>
-    </article>
-  
-    <article class="post-item">
-      <div class="post-meta">
-        <i class="far fa-calendar-alt"></i> August 25, 2022
-      </div>
-      <h2><a href="https://tanaikech.github.io/2022/08/25/updating-same-position-on-google-document-using-google-apps-script/">Updating Same Position on Google Document using Google Apps Script</a></h2>
-      <div class="post-summary">
-        
-          <p><a href="https://gist.github.com/tanaikech/36a2a9d393f42274a833e5660bfe4ce0">Gists</a></p>
-<p><img src="https://tanaikech.github.io/image-storage/20220825a/fig1.gif"
-     alt="Updating Same Position on Google Document using Google Apps Script"
-     
-     loading="lazy"
-     decoding="async">
-</p>
-<p>This is a sample script for updating the same position on Google Document using Google Apps Script.</p>
-<p>In this case, the named range is used. About the named range on Google Document, in the current stage, unfortunately, this cannot be used with the UI on Google Document. And, when I saw the official document of named range, I thought that this might be a bit difficult. <a href="https://developers.google.com/apps-script/reference/spreadsheet/named-range">Ref</a> <a href="https://developers.google.com/docs/api/how-tos/named-ranges">Ref</a> So, I have created a Google Apps Script for managing the named range on Google Document. <a href="https://github.com/tanaikech/DocNamedRangeApp">Ref</a> In this post, I would like to introduce a sample script for updating the same position on Google Document using this GAS library.</p>
         
       </div>
     </article>
