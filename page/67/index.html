@@ -202,6 +202,21 @@
   
     <article class="post-item">
       <div class="post-meta">
+        <i class="far fa-calendar-alt"></i> September 12, 2019
+      </div>
+      <h2><a href="https://tanaikech.github.io/2019/09/12/javascript-library-getfilelist_js/">Javascript library - GetFileList_js</a></h2>
+      <div class="post-summary">
+        
+          <h2 id="overview">Overview</h2>
+<p>This is a Javascript library to retrieve the file list with the folder tree from the specific folder (publicly shared folders and own folders) of Google Drive.</p>
+<h2 id="description">Description</h2>
+<p>The library for retrieving the file list with the folder tree from the specific folder of Google Drive has already been published for Google Apps Script, golang, node.js and python as GetFileList. <a href="https://gist.github.com/tanaikech/4fca197b8ec45c8ac6300b1531c2489d">Ref</a> Here, this GetFileList was released as the library of Javascript.</p>
+        
+      </div>
+    </article>
+  
+    <article class="post-item">
+      <div class="post-meta">
         <i class="far fa-calendar-alt"></i> August 28, 2019
       </div>
       <h2><a href="https://tanaikech.github.io/2019/08/28/benchmark-importing-csv-data-to-spreadsheet-using-google-apps-script/">Benchmark: Importing CSV Data to Spreadsheet using Google Apps Script</a></h2>
@@ -357,99 +372,6 @@ August 28, 2019
 <p><strong>This is a GAS library for unzipping a Zip file protected by a password using Google Apps Script.</strong></p>
 <h1 id="description">Description</h1>
 <p>Recently, I had a situation that it is required to unzip a Zip file protected with the password. But unfortunately, in the current stage, the method of <a href="https://developers.google.com/apps-script/reference/utilities/utilities#unzipblob"><code>Utilities.unzip()</code></a> cannot unzip such protected files. So when I had been looking for the other workarounds, I found <a href="https://github.com/imaya/zlib.js"><code>zlib.js</code></a>. Especially, it&rsquo;s <a href="https://github.com/imaya/zlib.js/blob/develop/bin/unzip.min.js"><code>unzip.min.js</code></a>. This is created for Javascript. So when I used this using Google Apps Script, it was found that it didn&rsquo;t work for Google Apps Script. So I prepared a wrapper script for running it with Google Apps Script. And when I created the wrapper script, I thought that under the current stage, if the protected Zip file can be unzipped, this will be useful for other users. So I created this as a GAS library.</p>
-        
-      </div>
-    </article>
-  
-    <article class="post-item">
-      <div class="post-meta">
-        <i class="far fa-calendar-alt"></i> July 23, 2019
-      </div>
-      <h2><a href="https://tanaikech.github.io/2019/07/23/resumable-uploading-files-to-google-drive-using-golang/">Resumable Uploading Files to Google Drive using Golang</a></h2>
-      <div class="post-summary">
-        
-          <p><a href="https://gist.github.com/tanaikech/19655a8130bac1ba510b29c9c44bbd97">Gists</a></p>
-<p>This is a sample script for the resumable upload of Files to Google Drive using Golang. This script uses the library of <a href="https://github.com/googleapis/google-api-go-client">google-api-go-client</a>. About the installation of google-api-go-client, please check <a href="https://developers.google.com/docs/api/quickstart/go">the Quickstart</a> for golang at the official site.</p>
-<h2 id="sample-script">Sample script:</h2>
-<pre tabindex="0"><code>package main
-
-import (
-	&#34;context&#34;
-	&#34;encoding/json&#34;
-	&#34;fmt&#34;
-	&#34;io/ioutil&#34;
-	&#34;log&#34;
-	&#34;net/http&#34;
-	&#34;os&#34;
-
-	drive &#34;google.golang.org/api/drive/v3&#34;
-
-	&#34;golang.org/x/oauth2&#34;
-	&#34;golang.org/x/oauth2/google&#34;
-	&#34;golang.org/x/oauth2/jwt&#34;
-)
-
-// ServiceAccount : Use Service account
-func ServiceAccount(credentialFile string) *http.Client {
-	b, err := ioutil.ReadFile(credentialFile)
-	if err != nil {
-		log.Fatal(err)
-	}
-	var c = struct {
-		Email      string `json:&#34;client_email&#34;`
-		PrivateKey string `json:&#34;private_key&#34;`
-	}{}
-	json.Unmarshal(b, &amp;c)
-	config := &amp;jwt.Config{
-		Email:      c.Email,
-		PrivateKey: []byte(c.PrivateKey),
-		Scopes: []string{
-			drive.DriveScope,
-		},
-		TokenURL: google.JWTTokenURL,
-	}
-	client := config.Client(oauth2.NoContext)
-	return client
-}
-
-func main() {
-	filename := &#34;sample.txt&#34;     // Filename
-	baseMimeType := &#34;text/plain&#34; // MimeType
-	client := ServiceAccount(&#34;credential.json&#34;) // Please set the json file of Service account.
-
-	srv, err := drive.New(client)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	file, err := os.Open(filename)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	fileInf, err := file.Stat()
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer file.Close()
-	f := &amp;drive.File{Name: filename}
-	res, err := srv.Files.
-		Create(f).
-		ResumableMedia(context.Background(), file, fileInf.Size(), baseMimeType).
-		ProgressUpdater(func(now, size int64) { fmt.Printf(&#34;%d, %d\r&#34;, now, size) }).
-		Do()
-	if err != nil {
-		log.Fatalln(err)
-	}
-	fmt.Printf(&#34;%s\n&#34;, res.Id)
-}
-</code></pre><h2 id="note">Note:</h2>
-<ul>
-<li>In this sample, the Service account is used. So the file is uploaded to the Service account&rsquo;s Drive. When <code>client</code> retrieved from OAuth2 is used, the file is uploaded to owner&rsquo;s Drive.</li>
-</ul>
-<h2 id="references">References:</h2>
-<ul>
-<li><a href="https://github.com/googleapis/google-api-go-client/blob/master/drive/v3/drive-gen.go">google-api-go-client</a></li>
-<li><a href="https://godoc.org/google.golang.org/api/drive/v3">package drive</a></li>
-</ul>
         
       </div>
     </article>

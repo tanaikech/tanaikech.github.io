@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Hugo 0.157.0">
+
+  
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+  
+  <meta name="theme-color" content="#050505">
+
+  
+  <meta name="google-site-verification" content="googleccbde819fe280caa.html" />
+
+  
+  
+
+  <meta name="keywords" content="Google Apps Script, Google workspace, spreadsheet">
+
+  <meta name="description" content="Gists
+Abstract
+Google Sheets recently introduced the SHEET and SHEETS functions. Because they automatically recalculate upon structural changes, developers can utilize them as custom triggers. This article demonstrates how to leverage these functions to detect sheet insertions, deletions, renames, and movements without requiring cumbersome installable triggers in Google Apps Script.
+Introduction
+On February 23, 2026, Google introduced two pivotal built-in functions to Google Sheets: SHEET and SHEETS Ref. The SHEET function returns the index (sheet number) of a specified sheet or reference Ref. Meanwhile, the SHEETS function provides the total count of sheets within a spreadsheet Ref.">
+
+  
+  <link rel="canonical" href="https://tanaikech.github.io/2026/04/08/bypassing-installable-triggers-monitoring-sheet-changes-with-new-sheet-and-sheets-functions/">
+
+  
+  <title>Bypassing Installable Triggers: Monitoring Sheet Changes with New SHEET and SHEETS Functions | tanaike - Google Apps Script, Gemini API, and Developer Tips</title>
+
+  
+  <meta property="og:title" content="Bypassing Installable Triggers: Monitoring Sheet Changes with New SHEET and SHEETS Functions">
+  <meta property="og:description" content="Gists
+Abstract
+Google Sheets recently introduced the SHEET and SHEETS functions. Because they automatically recalculate upon structural changes, developers can utilize them as custom triggers. This article demonstrates how to leverage these functions to detect sheet insertions, deletions, renames, and movements without requiring cumbersome installable triggers in Google Apps Script.
+Introduction
+On February 23, 2026, Google introduced two pivotal built-in functions to Google Sheets: SHEET and SHEETS Ref. The SHEET function returns the index (sheet number) of a specified sheet or reference Ref. Meanwhile, the SHEETS function provides the total count of sheets within a spreadsheet Ref.">
+  <meta property="og:url" content="https://tanaikech.github.io/2026/04/08/bypassing-installable-triggers-monitoring-sheet-changes-with-new-sheet-and-sheets-functions/">
+  <meta property="og:site_name" content="tanaike - Google Apps Script, Gemini API, and Developer Tips">
+  <meta property="og:type" content="article"><meta property="og:image" content="https://tanaikech.github.io/img/og-main.png">
+
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@tanaikech">
+  <meta name="twitter:title" content="Bypassing Installable Triggers: Monitoring Sheet Changes with New SHEET and SHEETS Functions">
+  <meta name="twitter:description" content="Gists
+Abstract
+Google Sheets recently introduced the SHEET and SHEETS functions. Because they automatically recalculate upon structural changes, developers can utilize them as custom triggers. This article demonstrates how to leverage these functions to detect sheet insertions, deletions, renames, and movements without requiring cumbersome installable triggers in Google Apps Script.
+Introduction
+On February 23, 2026, Google introduced two pivotal built-in functions to Google Sheets: SHEET and SHEETS Ref. The SHEET function returns the index (sheet number) of a specified sheet or reference Ref. Meanwhile, the SHEETS function provides the total count of sheets within a spreadsheet Ref.">
+  <meta name="twitter:image" content="https://tanaikech.github.io/img/og-main.png">
+
+  
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [{
+        "@type": "BlogPosting",
+        "headline": "\"Bypassing Installable Triggers: Monitoring Sheet Changes with New SHEET and SHEETS Functions\"",
+        "description": "\"\\u003cp\\u003e\\u003ca href=\\\"https://gist.github.com/tanaikech/372e01545e3f8640b4656443335a81d0\\\"\\u003eGists\\u003c/a\\u003e\\u003c/p\\u003e\\n\\u003ch2 id=\\\"abstract\\\"\\u003eAbstract\\u003c/h2\\u003e\\n\\u003cp\\u003eGoogle Sheets recently introduced the \\u003ccode\\u003eSHEET\\u003c/code\\u003e and \\u003ccode\\u003eSHEETS\\u003c/code\\u003e functions. Because they automatically recalculate upon structural changes, developers can utilize them as custom triggers. This article demonstrates how to leverage these functions to detect sheet insertions, deletions, renames, and movements without requiring cumbersome installable triggers in Google Apps Script.\\u003c/p\\u003e\\n\\u003ch2 id=\\\"introduction\\\"\\u003eIntroduction\\u003c/h2\\u003e\\n\\u003cp\\u003eOn February 23, 2026, Google introduced two pivotal built-in functions to Google Sheets: \\u003ccode\\u003eSHEET\\u003c/code\\u003e and \\u003ccode\\u003eSHEETS\\u003c/code\\u003e \\u003ca href=\\\"https://workspaceupdates.googleblog.com/2026/02/two-new-functions-in-google-sheets.html\\\"\\u003eRef\\u003c/a\\u003e. The \\u003ccode\\u003eSHEET\\u003c/code\\u003e function returns the index (sheet number) of a specified sheet or reference \\u003ca href=\\\"https://support.google.com/docs/answer/16865249?dark=1\\u0026amp;hl=en\\\"\\u003eRef\\u003c/a\\u003e. Meanwhile, the \\u003ccode\\u003eSHEETS\\u003c/code\\u003e function provides the total count of sheets within a spreadsheet \\u003ca href=\\\"https://support.google.com/docs/answer/16865347?dark=1\\u0026amp;hl=en\\\"\\u003eRef\\u003c/a\\u003e.\\u003c/p\\u003e\"",
+        "url": "\"https://tanaikech.github.io/2026/04/08/bypassing-installable-triggers-monitoring-sheet-changes-with-new-sheet-and-sheets-functions/\"",
+        "datePublished": "\"2026-04-08T14:22:18+09:00\"",
+        "dateModified": "\"2026-04-08T14:22:18+09:00\"",
+        "wordCount":  1028 ,
+        "author": {
+          "@id": "https:\/\/tanaikech.github.io\/#person"
+        },
+        "publisher": {
+          "@id": "https:\/\/tanaikech.github.io\/#person"
+        },
+        "image": {
+          "@type": "ImageObject",
+          "url": "\"https://tanaikech.github.io/img/og-main.png\"",
+          "width": 1200,
+          "height": 630
+        },
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "\"https://tanaikech.github.io/2026/04/08/bypassing-installable-triggers-monitoring-sheet-changes-with-new-sheet-and-sheets-functions/\""
+        }
+      },{
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "\"https://tanaikech.github.io/\""
+          },{
+            "@type": "ListItem",
+            "position": 2,
+            "name": "\"Bypassing Installable Triggers: Monitoring Sheet Changes with New SHEET and SHEETS Functions\"",
+            "item": "\"https://tanaikech.github.io/2026/04/08/bypassing-installable-triggers-monitoring-sheet-changes-with-new-sheet-and-sheets-functions/\""
+          }]
+      },      {
+        "@type": "Person",
+        "@id": "https:\/\/tanaikech.github.io\/#person",
+        "name": "Kanshi Tanaike",
+        "alternateName": "tanaike",
+        "url": "\"https://tanaikech.github.io/\"",
+        "image": "\"https://tanaikech.github.io/img/og-main.png\"",
+        "jobTitle": "Google Developer Expert",
+        "honorificPrefix": "Ph.D.",
+        "description": "Japanese scientist, Physicist and Google Developer Expert for Google Workspace.",
+        "award": "First place in the Outstanding GDE Award 2025",
+        "sameAs": [
+          "https://twitter.com/tanaikech",
+          "https://github.com/tanaikech",
+          "https://stackoverflow.com/users/7108653/tanaike",
+          "https://developers.google.com/community/experts/directory?text=tanaike",
+          "https://zenn.dev/tanaike",
+          "https://medium.com/@tanaike"
+        ]
+      }
+    ]
+  }
+  </script>
+
+  
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/eclipse.css">
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <link rel="shortcut icon" href="https://tanaikech.github.io/img/favicon.ico" type="image/x-icon" />
+  
+  
+  
+
+  
+  
+  
+</head>
+
+
+<body>
+  <div id="progress-bar"></div>
+  
+  <header class="site-header">
+    <div class="header-container">
+      
+      <div class="header-top">
+        <div class="site-title">
+          <a href="https://tanaikech.github.io/">TANAIKE</a>
+          
+            <div class="site-subtitle">The Thinker</div>
+          
+        </div>
+
+        
+        <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+
+      
+      <div id="mobile-menu" class="mobile-menu-content">
+        <div class="nav-row">
+          <div class="nav-links">
+            
+              <a href="https://tanaikech.github.io/about/" title="">
+                <i class='fa fa-user fa-fw'></i> About
+              </a>
+            
+              <a href="https://tanaikech.github.io/post/" title="">
+                <i class='fa fa-list fa-fw'></i> Articles
+              </a>
+            
+              <a href="https://tanaikech.github.io/topics/" title="">
+                <i class='fa fa-folder fa-fw'></i> Topics
+              </a>
+            
+              <a href="https://tanaikech.github.io/tags/" title="">
+                <i class='fa fa-tags fa-fw'></i> Tags
+              </a>
+            
+              <a href="https://tanaikech.github.io/contact/" title="">
+                <i class='fa fa-phone fa-fw'></i> Contact
+              </a>
+            
+              <a href="https://tanaikech.github.io/link/" title="">
+                <i class='fa fa-thumbs-up fa-fw'></i> Links
+              </a>
+            
+              <a href="https://tanaikech.github.io/webapps/" title="">
+                <i class='fas fa-toolbox'></i> Web Applications
+              </a>
+            
+              <a href="https://tanaikech.github.io/donate/" title="">
+                <i class='fas fa-donate'></i> Donate
+              </a>
+            
+              <a href="https://tanaikech.github.io/" title="">
+                <i class='fa fa-home fa-fw'></i> Home
+              </a>
+            
+          </div>
+        </div>
+
+        <div class="social-links-row"><a href="https://twitter.com/tanaikech" target="_blank" rel="me">
+                <i class="fab fa-x-twitter"></i> X
+              </a><a href="https://medium.com/@tanaike" target="_blank" rel="me">
+                <i class="fab fa-medium"></i> Medium
+              </a><a href="https://www.youtube.com/@tanaike" target="_blank" rel="me">
+                <i class="fab fa-youtube"></i> YouTube
+              </a><a href="https://linkedin.com/in/tanaike" target="_blank" rel="me">
+                <i class="fab fa-linkedin"></i> LinkedIn
+              </a><a href="https://github.com/tanaikech" target="_blank" rel="me">
+                <i class="fab fa-github"></i> GitHub
+              </a><a href="https://gist.github.com/tanaikech" target="_blank" rel="me">
+                <i class="fas fa-code"></i> Gists
+              </a><a href="https://stackoverflow.com/users/7108653" target="_blank" rel="me">
+                <i class="fab fa-stack-overflow"></i> Stack Overflow
+              </a><a href="https://dev.to/tanaike" target="_blank" rel="me">
+                <i class="fab fa-dev"></i> DEV
+              </a><a href="https://zenn.dev/tanaike" target="_blank" rel="me">
+                <i class="fas fa-edit"></i> Zenn
+              </a><a href="https://devpost.com/tanaike" target="_blank" rel="me">
+                <i class="fas fa-terminal"></i> Devpost
+              </a></div>
+      </div>
+
+    </div>
+  </header>
+
+  <main id="main">
+
+
+<div class="header">
+  <h1>Bypassing Installable Triggers: Monitoring Sheet Changes with New SHEET and SHEETS Functions</h1>
+  <h2></h2>
+</div>
+<div class="content">
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>08 Apr 2026, 14:22</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-workspace">Google workspace</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  <p><a href="https://gist.github.com/tanaikech/372e01545e3f8640b4656443335a81d0">Gists</a></p>
+<h2 id="abstract">Abstract</h2>
+<p>Google Sheets recently introduced the <code>SHEET</code> and <code>SHEETS</code> functions. Because they automatically recalculate upon structural changes, developers can utilize them as custom triggers. This article demonstrates how to leverage these functions to detect sheet insertions, deletions, renames, and movements without requiring cumbersome installable triggers in Google Apps Script.</p>
+<h2 id="introduction">Introduction</h2>
+<p>On February 23, 2026, Google introduced two pivotal built-in functions to Google Sheets: <code>SHEET</code> and <code>SHEETS</code> <a href="https://workspaceupdates.googleblog.com/2026/02/two-new-functions-in-google-sheets.html">Ref</a>. The <code>SHEET</code> function returns the index (sheet number) of a specified sheet or reference <a href="https://support.google.com/docs/answer/16865249?dark=1&amp;hl=en">Ref</a>. Meanwhile, the <code>SHEETS</code> function provides the total count of sheets within a spreadsheet <a href="https://support.google.com/docs/answer/16865347?dark=1&amp;hl=en">Ref</a>.</p>
+<p>A critical technical characteristic of these functions is their volatility and automatic recalculation based on the spreadsheet&rsquo;s structural metadata. Specifically:</p>
+<ul>
+<li><code>SHEET</code> triggers a recalculation when a sheet is renamed or its position is changed via drag-and-drop.</li>
+<li><code>SHEETS</code> triggers a recalculation whenever a sheet is inserted, duplicated, or removed.</li>
+</ul>
+<p>Historically, detecting such structural changes necessitated the use of an <strong>installable OnChange trigger</strong> in Google Apps Script (GAS). This posed a significant barrier for template distribution, as installable triggers require manual authorization by each user and do not persist through simple file copies.</p>
+<p>By leveraging these new functions as &ldquo;custom triggers,&rdquo; we can effectively bypass the need for installable triggers. When a custom function or formula containing <code>SHEET</code> or <code>SHEETS</code> recalculates, it serves as a catalyst for GAS execution. This enables the creation of self-contained spreadsheets where advanced sheet monitoring logic is activated immediately upon copying the file, significantly improving the user experience and portability of GAS-based solutions.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260408a/fig1.jpg"
+     alt="fig1"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<h2 id="implementation-guide">Implementation Guide</h2>
+<h3 id="1-spreadsheet-initialization">1. Spreadsheet Initialization</h3>
+<p>Create a new Google Sheets file to serve as your testing environment.</p>
+<h3 id="2-google-apps-script-configuration">2. Google Apps Script Configuration</h3>
+<p>Open the Google Apps Script editor bound to your new spreadsheet. Copy and paste the following script, replacing any default code, and save your project.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Global constant defining the Script Properties storage key.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">STORAGE_KEY</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;SHEET_STATUS_CACHE&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Simple trigger to initialize the cached sheet metadata upon opening the spreadsheet.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">onOpen</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">updateStoredSheetData_</span>();
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Custom function wrapper to retrieve an array of all current sheet names.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getAllSheetNames</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>()
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">getSheets</span>()
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">s</span>) =&gt; <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getName</span>());
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Core custom function for detecting structural alterations.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Priority: If any structural change (Add/Remove/Rename) occurs,
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * subsequent &#34;move&#34; reports are suppressed to avoid noise from index shifting.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getSheetStatus</span>(<span style="color:#a6e22e">_trigger1</span>, <span style="color:#a6e22e">_trigger2</span>, <span style="color:#a6e22e">returnRawObject</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">propService</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">PropertiesService</span>.<span style="color:#a6e22e">getScriptProperties</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">oldDataJson</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">propService</span>.<span style="color:#a6e22e">getProperty</span>(<span style="color:#a6e22e">STORAGE_KEY</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">currentSheets</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getSheets</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">newData</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">currentSheets</span>.<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">s</span>, <span style="color:#a6e22e">i</span>) =&gt; ({
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getName</span>(),
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">id</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getSheetId</span>(),
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">index</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>,
+</span></span><span style="display:flex;"><span>  }));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">oldDataJson</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">updateStoredSheetData_</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Initial state recorded.&#34;</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">oldData</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">oldDataJson</span>).<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">s</span>, <span style="color:#a6e22e">i</span>) =&gt; ({
+</span></span><span style="display:flex;"><span>    ...<span style="color:#a6e22e">s</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">index</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>,
+</span></span><span style="display:flex;"><span>  }));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Categorize detected modifications into structural changes or simple index moves.
+</span></span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">structural</span>, <span style="color:#a6e22e">moves</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">detectCategorizedChanges_</span>(<span style="color:#a6e22e">oldData</span>, <span style="color:#a6e22e">newData</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Persist the newly fetched metadata to Script Properties.
+</span></span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">propService</span>.<span style="color:#a6e22e">setProperty</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">STORAGE_KEY</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">newData</span>.<span style="color:#a6e22e">map</span>(({ <span style="color:#a6e22e">name</span>, <span style="color:#a6e22e">id</span> }) =&gt; ({ <span style="color:#a6e22e">name</span>, <span style="color:#a6e22e">id</span> }))),
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Evaluate which results to return based on change priority.
+</span></span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Ignore index movement noise if a primary structural change (addition, removal, rename) occurred.
+</span></span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">finalDiffs</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">structural</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">structural</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">moves</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">finalDiffs</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">===</span> <span style="color:#ae81ff">0</span>) <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;No change&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">returnRawObject</span>) <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">finalDiffs</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">finalDiffs</span>.<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">d</span>) =&gt; <span style="color:#a6e22e">d</span>.<span style="color:#a6e22e">message</span>).<span style="color:#a6e22e">join</span>(<span style="color:#e6db74">&#34;\n&#34;</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Retrieves current spreadsheet metadata and persists it to the properties cache.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">updateStoredSheetData_</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheetData</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getSheets</span>().<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">s</span>) =&gt; ({
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getName</span>(),
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">id</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">getSheetId</span>(),
+</span></span><span style="display:flex;"><span>  }));
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">PropertiesService</span>.<span style="color:#a6e22e">getScriptProperties</span>().<span style="color:#a6e22e">setProperty</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">STORAGE_KEY</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">sheetData</span>),
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">sheetData</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Differentiates between core structural changes and simple index shifts.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">detectCategorizedChanges_</span>(<span style="color:#a6e22e">oldData</span>, <span style="color:#a6e22e">newData</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">structural</span> <span style="color:#f92672">=</span> [];
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">moves</span> <span style="color:#f92672">=</span> [];
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">oldMap</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Map</span>(<span style="color:#a6e22e">oldData</span>.<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">s</span>) =&gt; [<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">id</span>, <span style="color:#a6e22e">s</span>]));
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">newMap</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Map</span>(<span style="color:#a6e22e">newData</span>.<span style="color:#a6e22e">map</span>((<span style="color:#a6e22e">s</span>) =&gt; [<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">id</span>, <span style="color:#a6e22e">s</span>]));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 1. Identify removed sheets (Structural change).
+</span></span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">oldData</span>.<span style="color:#a6e22e">forEach</span>((<span style="color:#a6e22e">oldSheet</span>) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">newMap</span>.<span style="color:#a6e22e">has</span>(<span style="color:#a6e22e">oldSheet</span>.<span style="color:#a6e22e">id</span>)) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">structural</span>.<span style="color:#a6e22e">push</span>({
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;removed&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">message</span><span style="color:#f92672">:</span> <span style="color:#e6db74">`&#34;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">oldSheet</span>.<span style="color:#a6e22e">name</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34; was removed.`</span>,
+</span></span><span style="display:flex;"><span>      });
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 2. Identify added, renamed, or repositioned sheets.
+</span></span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">newData</span>.<span style="color:#a6e22e">forEach</span>((<span style="color:#a6e22e">newSheet</span>) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">oldSheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">oldMap</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">newSheet</span>.<span style="color:#a6e22e">id</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">oldSheet</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e">// Handle added sheets (Structural change).
+</span></span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">structural</span>.<span style="color:#a6e22e">push</span>({
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;added&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">message</span><span style="color:#f92672">:</span> <span style="color:#e6db74">`&#34;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">newSheet</span>.<span style="color:#a6e22e">name</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34; was inserted at tab </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">newSheet</span>.<span style="color:#a6e22e">index</span><span style="color:#e6db74">}</span><span style="color:#e6db74">.`</span>,
+</span></span><span style="display:flex;"><span>      });
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">isRenamed</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">oldSheet</span>.<span style="color:#a6e22e">name</span> <span style="color:#f92672">!==</span> <span style="color:#a6e22e">newSheet</span>.<span style="color:#a6e22e">name</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">isMoved</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">oldSheet</span>.<span style="color:#a6e22e">index</span> <span style="color:#f92672">!==</span> <span style="color:#a6e22e">newSheet</span>.<span style="color:#a6e22e">index</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">isRenamed</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Handle renamed sheets (Structural change).
+</span></span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">structural</span>.<span style="color:#a6e22e">push</span>({
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;renamed&#34;</span>,
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">message</span><span style="color:#f92672">:</span> <span style="color:#e6db74">`&#34;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">oldSheet</span>.<span style="color:#a6e22e">name</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34; was renamed to &#34;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">newSheet</span>.<span style="color:#a6e22e">name</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;.`</span>,
+</span></span><span style="display:flex;"><span>        });
+</span></span><span style="display:flex;"><span>      } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">isMoved</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Handle pure index movements (Non-structural change).
+</span></span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">moves</span>.<span style="color:#a6e22e">push</span>({
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;moved&#34;</span>,
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">message</span><span style="color:#f92672">:</span> <span style="color:#e6db74">`&#34;</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">newSheet</span>.<span style="color:#a6e22e">name</span><span style="color:#e6db74">}</span><span style="color:#e6db74">&#34; was moved from tab </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">oldSheet</span>.<span style="color:#a6e22e">index</span><span style="color:#e6db74">}</span><span style="color:#e6db74"> to </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">newSheet</span>.<span style="color:#a6e22e">index</span><span style="color:#e6db74">}</span><span style="color:#e6db74">.`</span>,
+</span></span><span style="display:flex;"><span>        });
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> { <span style="color:#a6e22e">structural</span>, <span style="color:#a6e22e">moves</span> };
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Optional callback for installable OnChange triggers.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * If utilized, do not use the custom formula in the sheet.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">onChange</span>(<span style="color:#a6e22e">e</span> <span style="color:#f92672">=</span> {}) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">changeType</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> ([<span style="color:#e6db74">&#34;OTHER&#34;</span>, <span style="color:#e6db74">&#34;INSERT_GRID&#34;</span>, <span style="color:#e6db74">&#34;REMOVE_GRID&#34;</span>].<span style="color:#a6e22e">includes</span>(<span style="color:#a6e22e">changeType</span>)) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">getSheetStatus</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Browser</span>.<span style="color:#a6e22e">msgBox</span>(<span style="color:#a6e22e">res</span>);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="3-applying-the-custom-formula">3. Applying the Custom Formula</h3>
+<p>Return to your Google Sheets interface. In the first sheet, copy and paste the following formula into cell <code>A1</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>=getSheetStatus(SHEETS(),MAP(getAllSheetNames(),lambda(sheetname,SHEET(sheetname))))
+</span></span></code></pre></div><h3 id="4-testing-the-workflow">4. Testing the Workflow</h3>
+<p>Once the formula is in place, the cell will actively monitor the document&rsquo;s structure. The demonstration below illustrates the expected behavior:</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260408a/fig2.gif"
+     alt="fig2"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<p>During the demonstration, the following actions trigger a status update in the cell:</p>
+<ol>
+<li>Renaming an existing sheet.</li>
+<li>Adding a new sheet to the workbook.</li>
+<li>Changing the order (moving) of a sheet.</li>
+<li>Deleting a sheet.</li>
+</ol>
+<h2 id="appendix-using-traditional-triggers">Appendix: Using Traditional Triggers</h2>
+<p>If you prefer to use the traditional installable <code>onChange</code> trigger method, you can utilize the <code>onChange</code> function provided at the bottom of the script. In this scenario, you must manually bind the trigger to the <code>onChange</code> function via the Apps Script dashboard and <strong>remove</strong> the custom formula (<code>=getSheetStatus(...)</code>) from cell <code>A1</code>. The underlying logic handles the detection identically, routing the output to a browser message box instead of a cell.</p>
+<h2 id="summary">Summary</h2>
+<ul>
+<li>The introduction of <code>SHEET</code> and <code>SHEETS</code> functions enables automatic formula recalculation based on structural metadata changes.</li>
+<li>These built-in functions can be passed into custom Google Apps Script functions to act as volatile execution triggers.</li>
+<li>This methodology eliminates the traditional dependency on installable <code>onChange</code> triggers for monitoring tab modifications.</li>
+<li>Removing installable triggers drastically improves script portability and the user experience when distributing spreadsheet templates.</li>
+<li>The provided script successfully categorizes and logs structural alterations versus simple index shifts for comprehensive monitoring.</li>
+</ul>
+
+  
+  <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2026%2f04%2f08%2fbypassing-installable-triggers-monitoring-sheet-changes-with-new-sheet-and-sheets-functions%2f" target="_blank" title="Share on Facebook"><i class="fab fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2026%2f04%2f08%2fbypassing-installable-triggers-monitoring-sheet-changes-with-new-sheet-and-sheets-functions%2f" target="_blank" title="Tweet"><i class="fab fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f04%2f08%2fbypassing-installable-triggers-monitoring-sheet-changes-with-new-sheet-and-sheets-functions%2f" target="_blank" title="Share on Google+"><i class="fab fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2026%2f04%2f08%2fbypassing-installable-triggers-monitoring-sheet-changes-with-new-sheet-and-sheets-functions%2f" target="_blank" title="Post to Tumblr"><i class="fab fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f04%2f08%2fbypassing-installable-triggers-monitoring-sheet-changes-with-new-sheet-and-sheets-functions%2f" target="_blank" title="Pin it"><i class="fab fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f04%2f08%2fbypassing-installable-triggers-monitoring-sheet-changes-with-new-sheet-and-sheets-functions%2f" target="_blank" title="Submit to Reddit"><i class="fab fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
+
+
+  
+<nav class="prev-next-posts">
+  <div class="prev-post">
+    
+      <span class="nav-label">Previous Article</span>
+      <a href="https://tanaikech.github.io/2026/04/02/recursive-knowledge-crystallization-enabling-persistent-evolution-and-zero-shot-transfer-in-ai-agents/">Recursive Knowledge Crystallization: Enabling Persistent Evolution and Zero-Shot Transfer in AI Agents</a>
+    
+  </div>
+  <div class="next-post">
+    
+  </div>
+</nav>
+
+<style>
+.prev-next-posts {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+  gap: 2rem;
+}
+.prev-post, .next-post {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.next-post {
+  text-align: right;
+}
+.nav-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+.prev-next-posts a {
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-decoration: none;
+}
+@media (max-width: 600px) {
+  .prev-next-posts { flex-direction: column; text-align: left; }
+  .next-post { text-align: left; }
+}
+</style>
+
+
+  
+  
+  
+  
+
+  
+
+</div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-social"><a href="https://twitter.com/tanaikech" target="_blank" rel="me" title="twitter">
+                  <i class="fab fa-x-twitter"></i>
+                </a><a href="https://github.com/tanaikech" target="_blank" rel="me" title="github">
+                  <i class="fab fa-github"></i>
+                </a><a href="https://linkedin.com/in/tanaike" target="_blank" rel="me" title="linkedin">
+                  <i class="fab fa-linkedin"></i>
+                </a><a href="https://www.youtube.com/@tanaike" target="_blank" rel="me" title="youtube">
+                  <i class="fab fa-youtube"></i>
+                </a><a href="https://medium.com/@tanaike" target="_blank" rel="me" title="medium">
+                  <i class="fab fa-medium"></i>
+                </a><a href="https://stackoverflow.com/users/7108653" target="_blank" rel="me" title="stackoverflow">
+                  <i class="fab fa-stack-overflow"></i>
+                </a><a href="https://zenn.dev/tanaike" target="_blank" rel="me" title="zenn">
+                  <i class="fas fa-edit"></i>
+                </a><a href="https://dev.to/tanaike" target="_blank" rel="me" title="devto">
+                  <i class="fab fa-dev"></i>
+                </a>
+      </div>
+      
+      <p class="copyright">
+        &copy; 2026 tanaike - Google Apps Script, Gemini API, and Developer Tips. Built with <a href="https://gohugo.io" target="_blank">Hugo</a>.
+      </p>
+    </div>
+  </footer>
+
+  <script src="https://tanaikech.github.io/js/eclipse.js"></script>
+
+  
+  
+
+  
+  
+
+  
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
+<script>
+  
+  if (window.location.hostname != "localhost") {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-J3Z6T50WL5');
+  }
+</script>
+
+
+
+  
+
+  
+<script src="https://tanaikech.github.io/js/math-code.js"></script>
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  
+
+</body>
+</html>
+

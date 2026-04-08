@@ -202,6 +202,99 @@
   
     <article class="post-item">
       <div class="post-meta">
+        <i class="far fa-calendar-alt"></i> July 23, 2019
+      </div>
+      <h2><a href="https://tanaikech.github.io/2019/07/23/resumable-uploading-files-to-google-drive-using-golang/">Resumable Uploading Files to Google Drive using Golang</a></h2>
+      <div class="post-summary">
+        
+          <p><a href="https://gist.github.com/tanaikech/19655a8130bac1ba510b29c9c44bbd97">Gists</a></p>
+<p>This is a sample script for the resumable upload of Files to Google Drive using Golang. This script uses the library of <a href="https://github.com/googleapis/google-api-go-client">google-api-go-client</a>. About the installation of google-api-go-client, please check <a href="https://developers.google.com/docs/api/quickstart/go">the Quickstart</a> for golang at the official site.</p>
+<h2 id="sample-script">Sample script:</h2>
+<pre tabindex="0"><code>package main
+
+import (
+	&#34;context&#34;
+	&#34;encoding/json&#34;
+	&#34;fmt&#34;
+	&#34;io/ioutil&#34;
+	&#34;log&#34;
+	&#34;net/http&#34;
+	&#34;os&#34;
+
+	drive &#34;google.golang.org/api/drive/v3&#34;
+
+	&#34;golang.org/x/oauth2&#34;
+	&#34;golang.org/x/oauth2/google&#34;
+	&#34;golang.org/x/oauth2/jwt&#34;
+)
+
+// ServiceAccount : Use Service account
+func ServiceAccount(credentialFile string) *http.Client {
+	b, err := ioutil.ReadFile(credentialFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	var c = struct {
+		Email      string `json:&#34;client_email&#34;`
+		PrivateKey string `json:&#34;private_key&#34;`
+	}{}
+	json.Unmarshal(b, &amp;c)
+	config := &amp;jwt.Config{
+		Email:      c.Email,
+		PrivateKey: []byte(c.PrivateKey),
+		Scopes: []string{
+			drive.DriveScope,
+		},
+		TokenURL: google.JWTTokenURL,
+	}
+	client := config.Client(oauth2.NoContext)
+	return client
+}
+
+func main() {
+	filename := &#34;sample.txt&#34;     // Filename
+	baseMimeType := &#34;text/plain&#34; // MimeType
+	client := ServiceAccount(&#34;credential.json&#34;) // Please set the json file of Service account.
+
+	srv, err := drive.New(client)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	file, err := os.Open(filename)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	fileInf, err := file.Stat()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer file.Close()
+	f := &amp;drive.File{Name: filename}
+	res, err := srv.Files.
+		Create(f).
+		ResumableMedia(context.Background(), file, fileInf.Size(), baseMimeType).
+		ProgressUpdater(func(now, size int64) { fmt.Printf(&#34;%d, %d\r&#34;, now, size) }).
+		Do()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	fmt.Printf(&#34;%s\n&#34;, res.Id)
+}
+</code></pre><h2 id="note">Note:</h2>
+<ul>
+<li>In this sample, the Service account is used. So the file is uploaded to the Service account&rsquo;s Drive. When <code>client</code> retrieved from OAuth2 is used, the file is uploaded to owner&rsquo;s Drive.</li>
+</ul>
+<h2 id="references">References:</h2>
+<ul>
+<li><a href="https://github.com/googleapis/google-api-go-client/blob/master/drive/v3/drive-gen.go">google-api-go-client</a></li>
+<li><a href="https://godoc.org/google.golang.org/api/drive/v3">package drive</a></li>
+</ul>
+        
+      </div>
+    </article>
+  
+    <article class="post-item">
+      <div class="post-meta">
         <i class="far fa-calendar-alt"></i> July 21, 2019
       </div>
       <h2><a href="https://tanaikech.github.io/2019/07/21/creating-a-table-to-google-document-by-retrieving-values-from-google-spreadsheet-for-python/">Creating a Table to Google Document by Retrieving Values from Google Spreadsheet for Python</a></h2>
@@ -486,36 +579,6 @@ func main() {
 	}
 }
 </code></pre>
-        
-      </div>
-    </article>
-  
-    <article class="post-item">
-      <div class="post-meta">
-        <i class="far fa-calendar-alt"></i> June 20, 2019
-      </div>
-      <h2><a href="https://tanaikech.github.io/2019/06/20/sorting-for-slice-using-golang/">Sorting for Slice using Golang</a></h2>
-      <div class="post-summary">
-        
-          <p><a href="https://gist.github.com/tanaikech/4d0075dc21b643245be03d661e8d5f54">Gists</a></p>
-<p>This is a sample script for sorting a slice using Golang. Recently, I had a situation for sorting the coordinates of cells of Spreadsheet. As a test case, it thinks of the situation that the randomized cells are sorted. I think that this can be also used for a table except for Spreadsheet.</p>
-<h2 id="sample-slice">Sample slice:</h2>
-<p>The sample slice is as follows.</p>
-<pre tabindex="0"><code>ar := []struct {
-    row   int
-    col   int
-    value string
-}{
-    {0, 0, &#34;A1&#34;},
-    {0, 1, &#34;B1&#34;},
-    {0, 2, &#34;C1&#34;},
-    {1, 0, &#34;A2&#34;},
-    {1, 1, &#34;B2&#34;},
-    {1, 3, &#34;D2&#34;},
-    {2, 0, &#34;A3&#34;},
-    {2, 2, &#34;C3&#34;},
-}
-</code></pre><p>When each element of above slice is put to a Spreadsheet, it becomes as follows.</p>
         
       </div>
     </article>
