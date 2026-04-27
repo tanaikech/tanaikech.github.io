@@ -202,6 +202,29 @@
   
     <article class="post-item">
       <div class="post-meta">
+        <i class="far fa-calendar-alt"></i> September 21, 2017
+      </div>
+      <h2><a href="https://tanaikech.github.io/2017/09/21/uploading-csv-file-as-spreadsheet-and-modifying-permissions-using-golang/">Uploading CSV File as Spreadsheet and Modifying Permissions using Golang</a></h2>
+      <div class="post-summary">
+        
+          <p><a href="https://gist.github.com/tanaikech/7ee103c80759a8297da198a5d1e92fc8">Gists</a></p>
+<p>This sample script is for uploading CSV file as Spreadsheet and modifying permissions using Golang.</p>
+<p>I think that the detail information of <strong>google-api-go-client</strong> is a bit little. The sample scripts are so little. It retrieves most information from only <a href="https://godoc.org/google.golang.org/api/drive/v3">godoc</a> and <a href="https://github.com/google/google-api-go-client/tree/master/drive">GitHub</a>. So I publish such sample scripts here. If this is useful for you, I&rsquo;m glad.</p>
+<h2 id="important-points-">Important points :</h2>
+<ol>
+<li>Give mimeType of file that it wants to upload to <code>options</code> of <code>Media(r io.Reader, options ...googleapi.MediaOption)</code>.</li>
+<li>In order to give <code>options</code>, use <code>googleapi.ContentType()</code>.</li>
+<li>Give mimeType of file that it wants to convert, when it uploads it to Google Drive, to <code>file</code> of <code>Create(file *File)</code>.</li>
+<li>In order to give <code>file</code>, use <code>&amp;drive.File{}</code>.</li>
+<li>For installing permissions, use <code>&amp;drive.Permission{}</code>. Each parameter is the same to them for Python.</li>
+</ol>
+<p><strong>This sample script uses <a href="https://developers.google.com/drive/v3/web/quickstart/go">Quickstart</a>. So in order to use this sample script, at first, please do Step 1 and Step 2 of the Quickstart.</strong></p>
+        
+      </div>
+    </article>
+  
+    <article class="post-item">
+      <div class="post-meta">
         <i class="far fa-calendar-alt"></i> September 17, 2017
       </div>
       <h2><a href="https://tanaikech.github.io/2017/09/17/selecting-files-in-google-drive-using-select-box-for-google-apps-script/">Selecting Files in Google Drive using Select Box for Google Apps Script</a></h2>
@@ -391,82 +414,6 @@
 <li>When a project is downloaded, the filename of HTML file had become <code>.gs</code>. This bug was modified.</li>
 </ol>
 <p><strong>The usage is <a href="https://github.com/tanaikech/ggsrun#DownloadBoundScript">here</a>.</strong></p>
-        
-      </div>
-    </article>
-  
-    <article class="post-item">
-      <div class="post-meta">
-        <i class="far fa-calendar-alt"></i> August 27, 2017
-      </div>
-      <h2><a href="https://tanaikech.github.io/2017/08/27/retrieving-values-by-header-title-for-spreadsheet/">Retrieving Values By Header Title for Spreadsheet</a></h2>
-      <div class="post-summary">
-        
-          <p><a href="https://gist.github.com/tanaikech/3036ee0199e2261f377aacbd7e458d1c">Gists</a></p>
-<p>This is a sample script for retrieving values by header title for Spreadsheet. This is created by Google Apps Script. The main script is as follows.</p>
-<h2 id="main-script-">Main script :</h2>
-<p>When the instance is retrieved, all data of the sheet is analyzed. So when the each value is retrieved, the speed is fast.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">GetValueByKey</span>(<span style="color:#a6e22e">sheetname</span>) {
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">getValueByKey</span>(<span style="color:#a6e22e">sheetname</span>);
-</span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">r</span>) {
-</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">getValueByKey</span>;
-</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">getValueByKey</span> <span style="color:#f92672">=</span> (<span style="color:#66d9ef">function</span>() {
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">getValueByKey</span>.<span style="color:#a6e22e">name</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;getValueByKey&#34;</span>;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getValueByKey</span>(<span style="color:#a6e22e">sheetname</span>) {
-</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">alldata</span>, <span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">header</span>, <span style="color:#a6e22e">ss</span>;
-</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">try</span> {
-</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>().<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#a6e22e">sheetname</span>);
-</span></span><span style="display:flex;"><span>      } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">error</span>) {
-</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">e</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">error</span>;
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">&#34;Error: No sheetname (&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">sheetname</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;).&#34;</span>);
-</span></span><span style="display:flex;"><span>      }
-</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">alldata</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getDataRange</span>().<span style="color:#a6e22e">getValues</span>();
-</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">header</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">alldata</span>[<span style="color:#ae81ff">0</span>];
-</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">alldata</span>.<span style="color:#a6e22e">shift</span>();
-</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">manageddata</span> <span style="color:#f92672">=</span> (<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">header</span>, <span style="color:#a6e22e">alldata</span>) {
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">j</span>, <span style="color:#a6e22e">k</span>, <span style="color:#a6e22e">key</span>, <span style="color:#a6e22e">len</span>, <span style="color:#a6e22e">len1</span>, <span style="color:#a6e22e">result</span>, <span style="color:#a6e22e">temp</span>, <span style="color:#a6e22e">value</span>;
-</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> [];
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> (<span style="color:#a6e22e">j</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">len</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">alldata</span>.<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">j</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">len</span>; <span style="color:#a6e22e">j</span><span style="color:#f92672">++</span>) {
-</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">value</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">alldata</span>[<span style="color:#a6e22e">j</span>];
-</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> {};
-</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">for</span> (<span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">k</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">len1</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">header</span>.<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">k</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">len1</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#f92672">++</span><span style="color:#a6e22e">k</span>) {
-</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">key</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">header</span>[<span style="color:#a6e22e">i</span>];
-</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">temp</span>[<span style="color:#a6e22e">key</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">value</span>[<span style="color:#a6e22e">i</span>];
-</span></span><span style="display:flex;"><span>          }
-</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">result</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">temp</span>);
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> {
-</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">values</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">result</span>,
-</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">headerLength</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">header</span>.<span style="color:#a6e22e">length</span>,
-</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">dataLength</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">alldata</span>.<span style="color:#a6e22e">length</span>
-</span></span><span style="display:flex;"><span>        };
-</span></span><span style="display:flex;"><span>      })(<span style="color:#a6e22e">header</span>, <span style="color:#a6e22e">alldata</span>);
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">getValueByKey</span>.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">getValue</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">index</span>, <span style="color:#a6e22e">key</span>) {
-</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">manageddata</span>.<span style="color:#a6e22e">values</span>[<span style="color:#a6e22e">index</span>][<span style="color:#a6e22e">key</span>];
-</span></span><span style="display:flex;"><span>    };
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">getValueByKey</span>.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">getAllValues</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>() {
-</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">manageddata</span>;
-</span></span><span style="display:flex;"><span>    };
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">getValueByKey</span>;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  })();
-</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">getValueByKey</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">getValueByKey</span>;
-</span></span><span style="display:flex;"><span>})(<span style="color:#66d9ef">this</span>);
-</span></span></code></pre></div><h2 id="demo">Demo</h2>
-<p>Following sheet is a sample sheet for this.
-<img src="https://tanaikech.github.io/img/20170827fig1.png"
-     alt="Retrieving Values By Header Title for Spreadsheet"
-     
-     loading="lazy"
-     decoding="async">
-</p>
         
       </div>
     </article>
