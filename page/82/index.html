@@ -202,6 +202,64 @@
   
     <article class="post-item">
       <div class="post-meta">
+        <i class="far fa-calendar-alt"></i> February 5, 2018
+      </div>
+      <h2><a href="https://tanaikech.github.io/2018/02/05/parsing-json-object-keys-are-number-and-changing-every-time/">Parsing JSON object (keys are number and changing every time)</a></h2>
+      <div class="post-summary">
+        
+          <p><a href="https://gist.github.com/tanaikech/62cb5d89bdf2cc596e97ee604431e35f">Gists</a></p>
+<p>This sample script is for parsing JSON object. In the object, the keys are number and changing every time.</p>
+<h2 id="object">Object:</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;key1&#34;</span>: {
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;key2&#34;</span>: [
+</span></span><span style="display:flex;"><span>            {<span style="color:#f92672">&#34;0&#34;</span>: [{<span style="color:#f92672">&#34;key3&#34;</span>: <span style="color:#e6db74">&#34;value3a&#34;</span>}, {<span style="color:#f92672">&#34;key3&#34;</span>: <span style="color:#e6db74">&#34;value3b&#34;</span>}]},
+</span></span><span style="display:flex;"><span>            {<span style="color:#f92672">&#34;1&#34;</span>: [{<span style="color:#f92672">&#34;key3&#34;</span>: <span style="color:#e6db74">&#34;value3c&#34;</span>}, {<span style="color:#f92672">&#34;key3&#34;</span>: <span style="color:#e6db74">&#34;value3d&#34;</span>}]}
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="script">Script:</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-golang" data-lang="golang"><span style="display:flex;"><span><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> (
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;encoding/json&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;strconv&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">key1</span> <span style="color:#66d9ef">struct</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Key1</span> <span style="color:#a6e22e">key2</span> <span style="color:#e6db74">`json:&#34;key1&#34;`</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">key2</span> <span style="color:#66d9ef">struct</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Key2</span> []<span style="color:#66d9ef">interface</span>{} <span style="color:#e6db74">`json:&#34;key2&#34;`</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">data</span> <span style="color:#f92672">:=</span> <span style="color:#e6db74">`{&#34;key1&#34;: {&#34;key2&#34;: [{&#34;0&#34;: [{&#34;key3&#34;: &#34;value3a&#34;}, {&#34;key3&#34;: &#34;value3b&#34;}]},{&#34;1&#34;: [{&#34;key3&#34;: &#34;value3c&#34;}, {&#34;key3&#34;: &#34;value3d&#34;}]}]}}`</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">k1</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">key1</span>{}
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">json</span>.<span style="color:#a6e22e">Unmarshal</span>([]byte(<span style="color:#a6e22e">data</span>), <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">k1</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">e</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">k1</span>.<span style="color:#a6e22e">Key1</span>.<span style="color:#a6e22e">Key2</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">key</span>, <span style="color:#a6e22e">ok</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">e</span>.(<span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">string</span>]<span style="color:#66d9ef">interface</span>{})[<span style="color:#a6e22e">strconv</span>.<span style="color:#a6e22e">Itoa</span>(<span style="color:#a6e22e">i</span>)].([]<span style="color:#66d9ef">interface</span>{}); <span style="color:#a6e22e">ok</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">f</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">key</span> {
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;%+v\n&#34;</span>, <span style="color:#a6e22e">f</span>.(<span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">string</span>]<span style="color:#66d9ef">interface</span>{})[<span style="color:#e6db74">&#34;key3&#34;</span>])
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="result">Result:</h2>
+<pre tabindex="0"><code>value3a
+value3b
+value3c
+value3d
+</code></pre><h2 id="the-go-playground">The Go Playground</h2>
+<p><a href="https://play.golang.org/p/xm2KvgOIkKH">https://play.golang.org/p/xm2KvgOIkKH</a></p>
+        
+      </div>
+    </article>
+  
+    <article class="post-item">
+      <div class="post-meta">
         <i class="far fa-calendar-alt"></i> February 3, 2018
       </div>
       <h2><a href="https://tanaikech.github.io/2018/02/03/updated-add-on-rearrangescripts-to-v210/">Updated Add-on - RearrangeScripts to v210</a></h2>
@@ -440,62 +498,6 @@
         
           <p><a href="https://gist.github.com/tanaikech/f167b9280a8e710804e4061571b53fb9">Gists</a></p>
 <p>There is <a href="https://developers.google.com/drive/v3/web/batch">the bathing requests</a> in the Google APIs. The bathing requests can use the several API calls as a single HTTP request. By using this, for example, users can modify filenames of a lot of files on Google Drive. But there are limitations for the number of API calls which can process in one batch request. For example, Drive API can be used the maximum of 100 calls in one batch request.</p>
-        
-      </div>
-    </article>
-  
-    <article class="post-item">
-      <div class="post-meta">
-        <i class="far fa-calendar-alt"></i> January 15, 2018
-      </div>
-      <h2><a href="https://tanaikech.github.io/2018/01/15/zaif-api-for-google-apps-script/">Zaif API for Google Apps Script</a></h2>
-      <div class="post-summary">
-        
-          <p><a href="https://gist.github.com/tanaikech/77481c2621dc7429449194c0f1dbd58c">Gists</a></p>
-<p>This sample script is for using <a href="http://techbureau-api-document.readthedocs.io/ja/latest/index.html">Zaif API</a> by Google Apps Script.</p>
-<p>The following go script is a sample at <a href="http://techbureau-api-document.readthedocs.io/ja/latest/trade/3_how_to_implement/2_go.html">Zaif API</a>.</p>
-<pre tabindex="0"><code>package main
-
-import (
-    &#34;fmt&#34;
-    &#34;time&#34;
-    &#34;strconv&#34;
-    &#34;crypto/hmac&#34;
-    &#34;crypto/sha512&#34;
-    &#34;io/ioutil&#34;
-    &#34;net/http&#34;
-    &#34;encoding/hex&#34;
-    &#34;net/url&#34;
-    &#34;strings&#34;
-)
-
-var key = &#34;&lt;your_key&gt;&#34;
-var secret = &#34;&lt;your_secret&gt;&#34;
-
-func main() {
-
-    uri := &#34;https://api.zaif.jp/tapi&#34;
-    values := url.Values{}
-    values.Add(&#34;method&#34;, &#34;get_info&#34;)
-    values.Add(&#34;nonce&#34;, strconv.FormatInt(time.Now().Unix(), 10))
-
-    encodedParams := values.Encode()
-    req, _ := http.NewRequest(&#34;POST&#34;, uri, strings.NewReader(encodedParams))
-
-    hash := hmac.New(sha512.New, []byte(secret))
-    hash.Write([]byte(encodedParams))
-    signature := hex.EncodeToString(hash.Sum(nil))
-
-    req.Header.Add(&#34;Key&#34;, key)
-    req.Header.Add(&#34;Sign&#34;, signature)
-    client := new(http.Client)
-    resp, _ := client.Do(req)
-    defer resp.Body.Close()
-
-    byteArray, _ := ioutil.ReadAll(resp.Body)
-    fmt.Println(string(byteArray))
-}
-</code></pre><p>When this is converted to GAS, the script is as follows.</p>
         
       </div>
     </article>

@@ -202,6 +202,56 @@
   
     <article class="post-item">
       <div class="post-meta">
+        <i class="far fa-calendar-alt"></i> August 15, 2017
+      </div>
+      <h2><a href="https://tanaikech.github.io/2017/08/15/uploading-files-to-onedrive-using-node.js/">Uploading Files to OneDrive Using Node.js</a></h2>
+      <div class="post-summary">
+        
+          <p><a href="https://gist.github.com/tanaikech/22bfb05e61f0afb8beed29dd668bdce9">Gists</a></p>
+<h1 id="upload-contents-for-an-item-on-onedrive"><a href="https://dev.onedrive.com/items/upload.htm">Upload contents for an item on OneDrive</a></h1>
+<p>In order to use this script, please retrieve client id, client secret and refresh token before. About this, you can see the detail information at <a href="https://gist.github.com/tanaikech/d9674f0ead7e3320c5e3184f5d1b05cc">https://gist.github.com/tanaikech/d9674f0ead7e3320c5e3184f5d1b05cc</a>.</p>
+<h2 id="1-simple-item-upload">1. Simple item upload</h2>
+<p>This is for the simple item upload is available for items with less than 4 MB of content. The detail information is <a href="https://dev.onedrive.com/items/upload_put.htm">https://dev.onedrive.com/items/upload_put.htm</a>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">fs</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;fs&#39;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">mime</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;mime&#39;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">request</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;request&#39;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">file</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;./sample.zip&#39;</span>; <span style="color:#75715e">// Filename you want to upload on your local PC
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">onedrive_folder</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;SampleFolder&#39;</span>; <span style="color:#75715e">// Folder name on OneDrive
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">onedrive_filename</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;sample.zip&#39;</span>; <span style="color:#75715e">// Filename on OneDrive
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">request</span>.<span style="color:#a6e22e">post</span>({
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;https://login.microsoftonline.com/common/oauth2/v2.0/token&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">form</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">redirect_uri</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;http://localhost/dashboard&#39;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">client_id</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">onedrive_client_id</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">client_secret</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">onedrive_client_secret</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">refresh_token</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">onedrive_refresh_token</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">grant_type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;refresh_token&#39;</span>
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>}, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">error</span>, <span style="color:#a6e22e">response</span>, <span style="color:#a6e22e">body</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fs</span>.<span style="color:#a6e22e">readFile</span>(<span style="color:#a6e22e">file</span>, <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">read</span>(<span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">f</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">request</span>.<span style="color:#a6e22e">put</span>({
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;https://graph.microsoft.com/v1.0/drive/root:/&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">onedrive_folder</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;/&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">onedrive_filename</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;:/content&#39;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#39;Authorization&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">body</span>).<span style="color:#a6e22e">access_token</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#39;Content-Type&#39;</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">mime</span>.<span style="color:#a6e22e">getType</span>(<span style="color:#a6e22e">file</span>), <span style="color:#75715e">// When you use old version, please modify this to &#34;mime.lookup(file)&#34;,
+</span></span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">body</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">f</span>,
+</span></span><span style="display:flex;"><span>        }, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">er</span>, <span style="color:#a6e22e">re</span>, <span style="color:#a6e22e">bo</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">bo</span>);
+</span></span><span style="display:flex;"><span>        });
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>});
+</span></span></code></pre></div><h2 id="2-resumable-item-upload">2. Resumable item upload</h2>
+<p>This is for the resumable item upload is provided for large files or when a resumable transfer may be necessary.
+The detail information is <a href="https://dev.onedrive.com/items/upload_large_files.htm">https://dev.onedrive.com/items/upload_large_files.htm</a>.</p>
+        
+      </div>
+    </article>
+  
+    <article class="post-item">
+      <div class="post-meta">
         <i class="far fa-calendar-alt"></i> August 12, 2017
       </div>
       <h2><a href="https://tanaikech.github.io/2017/08/12/netatmo-api-had-been-down-3/">Netatmo API Had Been Down 3</a></h2>
@@ -432,36 +482,6 @@
 <h2 id="1-uploading-files-from-google-drive-to-slack">1. Uploading Files From Google Drive To Slack</h2>
 <h3 id="curl-code">Curl Code</h3>
 <p>In order to use this sample, please retrieve access token for uploading file to Slack.</p>
-        
-      </div>
-    </article>
-  
-    <article class="post-item">
-      <div class="post-meta">
-        <i class="far fa-calendar-alt"></i> July 21, 2017
-      </div>
-      <h2><a href="https://tanaikech.github.io/2017/07/21/retrieving-images-on-spreadsheet/">Retrieving Images on Spreadsheet</a></h2>
-      <div class="post-summary">
-        
-          <p><a href="https://gist.github.com/tanaikech/d6594dc5c6c49a015c7d408c90e58bdc">Gist</a></p>
-<p>This is a sample script for retrieving images on Spreadsheet.</p>
-<p>Unfortunately, there are no methods for retrieving directly images on spreadsheet using GAS. So I use the method which retrieves URL from <code>=image(URL)</code> and retrieves the image from the URL.</p>
-<p><strong>In this case, <code>=image(URL)</code> has to be in the cell. Images embedded by <code>insertImage()</code> cannot be retrieved.</strong></p>
-<p>At first, please confirm them.</p>
-<h2 id="sample-script-">Sample script :</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">cell</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;A1&#34;</span>; <span style="color:#75715e">// Cell address with the function of &#34;=image()&#34;
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">filename</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;samplename&#34;</span>; <span style="color:#75715e">// Output filename
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">image</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSheet</span>().<span style="color:#a6e22e">getRange</span>(<span style="color:#a6e22e">cell</span>).<span style="color:#a6e22e">getFormula</span>();
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">blob</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">image</span>.<span style="color:#a6e22e">match</span>(<span style="color:#e6db74">/\&#34;(.+)\&#34;/</span>)[<span style="color:#ae81ff">1</span>]).<span style="color:#a6e22e">getBlob</span>();
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">createFile</span>(<span style="color:#a6e22e">blob</span>.<span style="color:#a6e22e">setName</span>(<span style="color:#a6e22e">filename</span>));
-</span></span></code></pre></div><h3 id="flow-">Flow :</h3>
-<ol>
-<li>Retrieve <code>=image(URL)</code> using <code>getFormula()</code>.</li>
-<li>Retrieve URL from <code>=image(URL)</code>.</li>
-<li>Retrieve file blob using <code>UrlFetchApp.fetch()</code> from the URL.</li>
-<li>Output the file blob as a file.</li>
-</ol>
         
       </div>
     </article>

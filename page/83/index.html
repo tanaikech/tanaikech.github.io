@@ -202,6 +202,62 @@
   
     <article class="post-item">
       <div class="post-meta">
+        <i class="far fa-calendar-alt"></i> January 15, 2018
+      </div>
+      <h2><a href="https://tanaikech.github.io/2018/01/15/zaif-api-for-google-apps-script/">Zaif API for Google Apps Script</a></h2>
+      <div class="post-summary">
+        
+          <p><a href="https://gist.github.com/tanaikech/77481c2621dc7429449194c0f1dbd58c">Gists</a></p>
+<p>This sample script is for using <a href="http://techbureau-api-document.readthedocs.io/ja/latest/index.html">Zaif API</a> by Google Apps Script.</p>
+<p>The following go script is a sample at <a href="http://techbureau-api-document.readthedocs.io/ja/latest/trade/3_how_to_implement/2_go.html">Zaif API</a>.</p>
+<pre tabindex="0"><code>package main
+
+import (
+    &#34;fmt&#34;
+    &#34;time&#34;
+    &#34;strconv&#34;
+    &#34;crypto/hmac&#34;
+    &#34;crypto/sha512&#34;
+    &#34;io/ioutil&#34;
+    &#34;net/http&#34;
+    &#34;encoding/hex&#34;
+    &#34;net/url&#34;
+    &#34;strings&#34;
+)
+
+var key = &#34;&lt;your_key&gt;&#34;
+var secret = &#34;&lt;your_secret&gt;&#34;
+
+func main() {
+
+    uri := &#34;https://api.zaif.jp/tapi&#34;
+    values := url.Values{}
+    values.Add(&#34;method&#34;, &#34;get_info&#34;)
+    values.Add(&#34;nonce&#34;, strconv.FormatInt(time.Now().Unix(), 10))
+
+    encodedParams := values.Encode()
+    req, _ := http.NewRequest(&#34;POST&#34;, uri, strings.NewReader(encodedParams))
+
+    hash := hmac.New(sha512.New, []byte(secret))
+    hash.Write([]byte(encodedParams))
+    signature := hex.EncodeToString(hash.Sum(nil))
+
+    req.Header.Add(&#34;Key&#34;, key)
+    req.Header.Add(&#34;Sign&#34;, signature)
+    client := new(http.Client)
+    resp, _ := client.Do(req)
+    defer resp.Body.Close()
+
+    byteArray, _ := ioutil.ReadAll(resp.Body)
+    fmt.Println(string(byteArray))
+}
+</code></pre><p>When this is converted to GAS, the script is as follows.</p>
+        
+      </div>
+    </article>
+  
+    <article class="post-item">
+      <div class="post-meta">
         <i class="far fa-calendar-alt"></i> January 12, 2018
       </div>
       <h2><a href="https://tanaikech.github.io/2018/01/12/bittrex-api-for-google-apps-script/">Bittrex API for Google Apps Script</a></h2>
@@ -543,29 +599,6 @@
         
           <p>I have reported because I found a bug for scopes of Slides. The detail is the following URL.</p>
 <p><a href="https://issuetracker.google.com/issues/71448583">https://issuetracker.google.com/issues/71448583</a></p>
-        
-      </div>
-    </article>
-  
-    <article class="post-item">
-      <div class="post-meta">
-        <i class="far fa-calendar-alt"></i> December 31, 2017
-      </div>
-      <h2><a href="https://tanaikech.github.io/2017/12/31/bitfinex-api-for-google-apps-script/">Bitfinex API for Google Apps Script</a></h2>
-      <div class="post-summary">
-        
-          <p><a href="https://gist.github.com/tanaikech/1104d039341f198f95eee66af57c0abf">Gists</a></p>
-<p>This sample script is converted <a href="https://docs.bitfinex.com/v2/docs/rest-auth">this sample script (javascript)</a> to Google Apps Script. The point for converting is <code>signature</code> as shown in the following sample script.</p>
-<ul>
-<li>At Bitfinex API, after <code>&quot;/api/&quot; + apiPath + nonce + rawBody</code> is encrypted using HMAC SHA-384, the data of byte array is converted to HEX.
-<ul>
-<li>In Google Apps Script, there is no the method for this.</li>
-<li>The data which was encrypted by <code>Utilities.computeHmacSignature()</code> is the bytes array of the signed hexadecimal.</li>
-<li>On the other hand, at <a href="https://docs.bitfinex.com/v2/docs/rest-auth">this sample script</a> for javascript, the data which was encrypted by <code>crypto.createHmac('sha384', apiSecret).update(signature).digest('hex')</code> is the string of the unsigned hexadecimal.</li>
-</ul>
-</li>
-</ul>
-<p>In order to achieve above, I made the method of <code>bytesToHex()</code>.</p>
         
       </div>
     </article>

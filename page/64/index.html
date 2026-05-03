@@ -202,6 +202,43 @@
   
     <article class="post-item">
       <div class="post-meta">
+        <i class="far fa-calendar-alt"></i> February 18, 2020
+      </div>
+      <h2><a href="https://tanaikech.github.io/2020/02/18/uploading-file-to-google-drive-using-html-and-google-apps-script/">Uploading File to Google Drive using HTML and Google Apps Script</a></h2>
+      <div class="post-summary">
+        
+          <p><a href="https://gist.github.com/tanaikech/280b782ee0518aa083a4fe0d71384823">Gists</a></p>
+<p>This is a simple sample script for uploading a file using the file input tag of HTML. As the important point, the file is sent as the byte array for using Google Apps Script. By this, at Google Apps Script side, the byte array can be converted to a blob using a simple script.</p>
+<h3 id="html--javascript">HTML &amp; Javascript</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-html" data-lang="html"><span style="display:flex;"><span>&lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;file&#34;</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;file&#34;</span> <span style="color:#a6e22e">onchange</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;saveFile(this)&#34;</span> /&gt;
+</span></span><span style="display:flex;"><span>&lt;<span style="color:#f92672">script</span>&gt;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">saveFile</span>(<span style="color:#a6e22e">f</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">file</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">files</span>[<span style="color:#ae81ff">0</span>];
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">fr</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">FileReader</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fr</span>.<span style="color:#a6e22e">onload</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">filename</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">name</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">mimeType</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">type</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">bytes</span><span style="color:#f92672">:</span> [...<span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Int8Array</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">result</span>)]
+</span></span><span style="display:flex;"><span>      };
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">google</span>.<span style="color:#a6e22e">script</span>.<span style="color:#a6e22e">run</span>.<span style="color:#a6e22e">withSuccessHandler</span>(<span style="color:#a6e22e">e</span> =&gt; <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">e</span>)).<span style="color:#a6e22e">saveFile</span>(<span style="color:#a6e22e">obj</span>);
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fr</span>.<span style="color:#a6e22e">readAsArrayBuffer</span>(<span style="color:#a6e22e">file</span>);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>&lt;/<span style="color:#f92672">script</span>&gt;
+</span></span></code></pre></div><h3 id="google-apps-script">Google Apps Script</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">saveFile</span>(<span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">blob</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">newBlob</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">bytes</span>, <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">mimeType</span>, <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">filename</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">DriveApp</span>.<span style="color:#a6e22e">createFile</span>(<span style="color:#a6e22e">blob</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Done.&#34;</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div>
+        
+      </div>
+    </article>
+  
+    <article class="post-item">
+      <div class="post-meta">
         <i class="far fa-calendar-alt"></i> February 17, 2020
       </div>
       <h2><a href="https://tanaikech.github.io/2020/02/17/google-apps-script-library-database-and-search-application/">Google Apps Script Library Database and Search Application</a></h2>
@@ -385,41 +422,6 @@
           <p><a href="https://gist.github.com/tanaikech/f23755d7e024fea9c0f0e036853484d4">Gists</a></p>
 <p>This is a sample script for achieving the URL encode with Shift-JIS using Google Apps Script.</p>
 <p>Unfortunately, there are no methods for directly achieving above in the methods of Google Apps Script. So it is required to prepare it as the script. In order to use <code>Shift-JIS</code> of the character set at Google Apps Script, it is required to use it as the binary data. Because, when the value of <code>Shift-JIS</code> is retrieved as the string by Google Apps Script, the character set is automatically changed to <code>UTF-8</code>. Please be careful this.</p>
-        
-      </div>
-    </article>
-  
-    <article class="post-item">
-      <div class="post-meta">
-        <i class="far fa-calendar-alt"></i> January 22, 2020
-      </div>
-      <h2><a href="https://tanaikech.github.io/2020/01/22/libraries-of-gdoctableapp-for-golang-node.js-and-python-were-updated-to-v110/">Libraries of gdoctableapp for golang, Node.js and python were updated to v110</a></h2>
-      <div class="post-summary">
-        
-          <h2 id="libraries-of-gdoctableapp-for-golang-nodejs-and-python-were-updated-to-v110">Libraries of gdoctableapp for golang, Node.js and python were updated to v1.1.0</h2>
-<ul>
-<li>
-<p><a href="https://github.com/tanaikech/go-gdoctableapp">go-gdoctableapp</a></p>
-<ul>
-<li>v1.1.0 (January 22, 2020)
-<ol>
-<li><a href="https://github.com/tanaikech/go-gdoctableapp#replacetexts">2 new methods were added.</a> From this version, the texts can be replaced by images. The direct link and local file can be used as the image.</li>
-</ol>
-</li>
-</ul>
-</li>
-<li>
-<p><a href="https://github.com/tanaikech/node-gdoctableapp">node-gdoctableapp</a></p>
-<ul>
-<li>v1.1.0 (January 22, 2020)
-<ol>
-<li><a href="https://github.com/tanaikech/node-gdoctableapp#replacetexts">New method was added.</a> From this version, the texts can be replaced by images. The direct link and local file can be used as the image.</li>
-</ol>
-</li>
-</ul>
-</li>
-<li>
-<p><a href="https://github.com/tanaikech/gdoctableapppy">gdoctableapppy</a></p>
         
       </div>
     </article>
