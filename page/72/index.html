@@ -202,6 +202,66 @@
   
     <article class="post-item">
       <div class="post-meta">
+        <i class="far fa-calendar-alt"></i> April 2, 2019
+      </div>
+      <h2><a href="https://tanaikech.github.io/2019/04/02/creating-new-google-docs-and-overwriting-existing-google-docs-by-text-with-node.js-without-using-googleapis/">Creating New Google Docs and Overwriting Existing Google Docs by Text with Node.js without using googleapis</a></h2>
+      <div class="post-summary">
+        
+          <p><a href="https://gist.github.com/tanaikech/915f1034749b8b2f451556167663ea19">Gists</a></p>
+<p>There are 2 sample scripts.</p>
+<ol>
+<li>Create new Spreadsheet using a text value as CSV data.</li>
+<li>Overwrite the existing Google Document using a text value.</li>
+</ol>
+<p>When you use these script, please enable Drive API and retrieve your access token.</p>
+<h2 id="create-new-spreadsheet-using-text-value">Create New Spreadsheet using Text Value</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">request</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;request&#39;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">textData</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;a1, b1, c1, d1, e1&#34;</span>; <span style="color:#75715e">// This is used as CSV data.
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">orgMimeType</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;text/csv&#34;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">orgFileName</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;sample.csv&#34;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">accessToken</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span>; <span style="color:#75715e">// Access token
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">metadata</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;convertedSampleCSV&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">mimeType</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;application/vnd.google-apps.spreadsheet&#34;</span>,
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&#34;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">boundary</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;xxxxxxxxxxx&#34;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;--&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">boundary</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;\r\n&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">data</span> <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#34;Content-Disposition: form-data; name=\&#34;metadata\&#34;\r\n&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">data</span> <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#34;Content-Type: application/json; charset=UTF-8\r\n\r\n&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">data</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">metadata</span>) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;\r\n&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">data</span> <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#34;--&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">boundary</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;\r\n&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">data</span> <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#34;Content-Disposition: form-data; name=\&#34;file\&#34;; filename=\&#34;&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">orgFileName</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;\&#34;\r\n&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">data</span> <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#34;Content-Type: &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">orgMimeType</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;\r\n\r\n&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">payload</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Buffer</span>.<span style="color:#a6e22e">concat</span>([
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">Buffer</span>.<span style="color:#a6e22e">from</span>(<span style="color:#a6e22e">data</span>, <span style="color:#e6db74">&#34;utf8&#34;</span>),
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Buffer</span>(<span style="color:#a6e22e">textData</span>, <span style="color:#e6db74">&#39;binary&#39;</span>),
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">Buffer</span>.<span style="color:#a6e22e">from</span>(<span style="color:#e6db74">&#34;\r\n--&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">boundary</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;--&#34;</span>, <span style="color:#e6db74">&#34;utf8&#34;</span>),
+</span></span><span style="display:flex;"><span>]);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">options</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;post&#39;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">url</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">headers</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;Content-Type&#34;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;multipart/related; boundary=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">boundary</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;Authorization&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;Bearer &#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">accessToken</span>,
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">body</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">payload</span>,
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">request</span>(<span style="color:#a6e22e">options</span>, (<span style="color:#a6e22e">error</span>, <span style="color:#a6e22e">response</span>, <span style="color:#a6e22e">body</span>) =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">body</span>);
+</span></span><span style="display:flex;"><span>});
+</span></span></code></pre></div><h2 id="overwrite-existing-google-document-using-text-value">Overwrite Existing Google Document using Text Value</h2>
+<p>This can be used when you don&rsquo;t want to update the existing Google Docs without changing the file ID.</p>
+        
+      </div>
+    </article>
+  
+    <article class="post-item">
+      <div class="post-meta">
         <i class="far fa-calendar-alt"></i> April 1, 2019
       </div>
       <h2><a href="https://tanaikech.github.io/2019/04/01/deleting-positioned-images-on-google-document-using-google-apps-script/">Deleting Positioned Images on Google Document using Google Apps Script</a></h2>
@@ -382,26 +442,6 @@ March 25, 2019
         
           <p><a href="https://gist.github.com/tanaikech/4125cc280e15c0fc726cb2fe4f35a3f7">Gists</a></p>
 <p>When a chart is created by using EmbeddedChartBuilder of Spreadsheet service, the title of vAxis which is put by <code>setOption(&quot;vAxis&quot;, {title: &quot;y axis&quot;})</code> doesn&rsquo;t work. It is considered that this is a bug. Because I have confirmed that this had worked fine. <a href="https://tanaikech.github.io/2017/02/13/making-charts-at-spreadsheet/">Ref</a> But this specification had been changed. So I would like to introduce the method for adding the title of vAxis when a chart is created using Google Apps Script.</p>
-        
-      </div>
-    </article>
-  
-    <article class="post-item">
-      <div class="post-meta">
-        <i class="far fa-calendar-alt"></i> February 27, 2019
-      </div>
-      <h2><a href="https://tanaikech.github.io/2019/02/27/tarunarchiver-for-google-apps-script/">tarUnarchiver for Google Apps Script</a></h2>
-      <div class="post-summary">
-        
-          <h1 id="overview">Overview</h1>
-<p><strong>This is a script for extracting files from a tar file using Google Apps Script.</strong> This script was created by native Google Apps Script.</p>
-<p>The following 3 situations gave me the motivarion for creating this script.</p>
-<ol>
-<li>Although I had been looking for the script for extracting files from a tar file from before, I have still not been able to find it.</li>
-<li>Unfortunately, there are no methods for extracting the files from the tar file in Google Apps Script. But fortunately, from <a href="https://en.wikipedia.org/wiki/Tar_(computing)">wiki of tar</a>, I could retrieve the structure information of the tar data. And I can also study by creating this script.</li>
-<li>I found <a href="https://stackoverflow.com/questions/54850028/how-to-extract-files-from-tar-archive-with-google-apps-script">this thread</a> at Stackoverflow. By this, I could understand that other users also want the script for extracting files from the tar file.</li>
-</ol>
-<p>So I created this.</p>
         
       </div>
     </article>
