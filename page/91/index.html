@@ -202,6 +202,38 @@
   
     <article class="post-item">
       <div class="post-meta">
+        <i class="far fa-calendar-alt"></i> July 5, 2017
+      </div>
+      <h2><a href="https://tanaikech.github.io/2017/07/05/pseudo-browser-with-google-spreadsheet/">Pseudo Browser with Google Spreadsheet</a></h2>
+      <div class="post-summary">
+        
+          <p><a href="https://gist.github.com/tanaikech/a290509e3d3f6997d248b88763fc69b9">Gist</a></p>
+<h2 id="overview">Overview</h2>
+<p>This is a sample script for creating the pseudo browser using Google Spreadsheet.</p>
+<h2 id="description">Description</h2>
+<p>I unexpectedly noticed this. I think that this is for off-line browsing using HTML data. So there are many limitations. At first, please confirm them.</p>
+<ul>
+<li><strong>Limitations</strong>
+<ul>
+<li>It cannot move from opened site to other outside site. If the outer site is opened as a new wind, your own browser is opened and move there.</li>
+<li>For URL, it can move directories which is one low. But it cannot move directories more than two deeper.
+<ul>
+<li><strong>Because it retrieves the HTML data from the inputted URL using <code>UrlFetchApp</code>. It cannot move to the out side of data retrieved by <code>UrlFetchApp</code>.</strong></li>
+</ul>
+</li>
+<li>The access to the site opened by inputting URL is run at Google side.</li>
+<li>Javascript on the opened site is run at your local PC side.</li>
+<li><code>User-Agent</code> cannot be changed from <code>Mozilla/5.0 (compatible; Google-Apps-Script)</code>.</li>
+</ul>
+</li>
+</ul>
+<p>What I thought the interesting is that the appearance of the site has been maintained at this pseudo browser. And, by using this, the sites which are slow speed at your environment might be able to be opened smoothly.</p>
+        
+      </div>
+    </article>
+  
+    <article class="post-item">
+      <div class="post-meta">
         <i class="far fa-calendar-alt"></i> July 4, 2017
       </div>
       <h2><a href="https://tanaikech.github.io/2017/07/04/downloading-files-from-google-drive-under-no-authorization-using-browser/">Downloading Files From Google Drive Under No Authorization Using Browser</a></h2>
@@ -393,73 +425,6 @@
         
           <p>SOUWA means summing in Japanese. SOUWA can sum string elements in an array at the high speed. The speed of SOUWA with <strong>the pyramid algorithm is about 380 times faster than that of the standard method</strong>. New algorithm for summing array elements was developed for SOUWA. You can see the detailed report of this library at here. If you are interested in this, I&rsquo;m glad.</p>
 <p>It was updated to v1.0.2. Please check it out. <a href="https://github.com/tanaikech/SOUWA_GAS">https://github.com/tanaikech/SOUWA_GAS</a></p>
-        
-      </div>
-    </article>
-  
-    <article class="post-item">
-      <div class="post-meta">
-        <i class="far fa-calendar-alt"></i> June 17, 2017
-      </div>
-      <h2><a href="https://tanaikech.github.io/2017/06/17/benchmark-retrieving-values-from-deep-nested-json-at-golang/">Benchmark: Retrieving Values from Deep Nested JSON at Golang</a></h2>
-      <div class="post-summary">
-        
-          <p>This sample script is for retrieving values from a deep nested JSON. There are 2 patterns. So for these, the benchmark were measured.</p>
-<h2 id="script-">Script :</h2>
-<pre tabindex="0"><code>package main
-
-import (
-    &#34;encoding/json&#34;
-    &#34;testing&#34;
-)
-
-const (
-    data = `{
-      &#34;A_key1&#34;: {
-        &#34;B_key1&#34;: {
-          &#34;C_key&#34;: &#34;value&#34;
-        }
-      }
-    }`
-)
-
-func BenchmarkB1(b *testing.B) {
-    b.ResetTimer()
-    for i := 0; i &lt; b.N; i++ {
-        var p map[string]interface{}
-        json.Unmarshal([]byte(data), &amp;p)
-        a1 := p[&#34;A_key1&#34;]
-        a2 := p[&#34;A_key1&#34;].(map[string]interface{})[&#34;B_key1&#34;]
-        a3 := p[&#34;A_key1&#34;].(map[string]interface{})[&#34;B_key1&#34;].(map[string]interface{})[&#34;C_key&#34;]
-        _ = a1 // --&gt; map[B_key1:map[C_key:value]]
-        _ = a2 // --&gt; map[C_key:value]
-        _ = a3 // --&gt; value
-    }
-}
-
-func BenchmarkB2(b *testing.B) {
-    b.ResetTimer()
-    for i := 0; i &lt; b.N; i++ {
-        var p map[string]interface{}
-        json.Unmarshal([]byte(data), &amp;p)
-        b1 := p[&#34;A_key1&#34;]
-        temp, _ := json.Marshal(b1)
-        json.Unmarshal(temp, &amp;p)
-        b2 := p[&#34;B_key1&#34;]
-        temp, _ = json.Marshal(b2)
-        json.Unmarshal(temp, &amp;p)
-        b3 := p[&#34;C_key&#34;]
-        _ = b1 // --&gt; map[B_key1:map[C_key:value]]
-        _ = b2 // --&gt; map[C_key:value]
-        _ = b3 // --&gt; value
-    }
-}
-</code></pre><h2 id="result-">Result :</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ go test -bench .
-</span></span><span style="display:flex;"><span>BenchmarkB1-4             <span style="color:#ae81ff">300000</span>              <span style="color:#ae81ff">4177</span> ns/op
-</span></span><span style="display:flex;"><span>BenchmarkB2-4             <span style="color:#ae81ff">100000</span>             <span style="color:#ae81ff">13619</span> ns/op
-</span></span><span style="display:flex;"><span>PASS
-</span></span></code></pre></div><p>It was found that the process cost of <code>json.Unmarshal()</code> was high. <code>json.Unmarshal()</code> for test 2 is 3 times larger than that for test 1.</p>
         
       </div>
     </article>
