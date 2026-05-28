@@ -204,6 +204,82 @@
       <div class="post-meta">
         <i class="far fa-calendar-alt"></i> August 27, 2017
       </div>
+      <h2><a href="https://tanaikech.github.io/2017/08/27/retrieving-values-by-header-title-for-spreadsheet/">Retrieving Values By Header Title for Spreadsheet</a></h2>
+      <div class="post-summary">
+        
+          <p><a href="https://gist.github.com/tanaikech/3036ee0199e2261f377aacbd7e458d1c">Gists</a></p>
+<p>This is a sample script for retrieving values by header title for Spreadsheet. This is created by Google Apps Script. The main script is as follows.</p>
+<h2 id="main-script-">Main script :</h2>
+<p>When the instance is retrieved, all data of the sheet is analyzed. So when the each value is retrieved, the speed is fast.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">GetValueByKey</span>(<span style="color:#a6e22e">sheetname</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">getValueByKey</span>(<span style="color:#a6e22e">sheetname</span>);
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">r</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">getValueByKey</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">getValueByKey</span> <span style="color:#f92672">=</span> (<span style="color:#66d9ef">function</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">getValueByKey</span>.<span style="color:#a6e22e">name</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;getValueByKey&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getValueByKey</span>(<span style="color:#a6e22e">sheetname</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">alldata</span>, <span style="color:#a6e22e">e</span>, <span style="color:#a6e22e">header</span>, <span style="color:#a6e22e">ss</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">ss</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>().<span style="color:#a6e22e">getSheetByName</span>(<span style="color:#a6e22e">sheetname</span>);
+</span></span><span style="display:flex;"><span>      } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">error</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">e</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">error</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">&#34;Error: No sheetname (&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">sheetname</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;).&#34;</span>);
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">alldata</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">ss</span>.<span style="color:#a6e22e">getDataRange</span>().<span style="color:#a6e22e">getValues</span>();
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">header</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">alldata</span>[<span style="color:#ae81ff">0</span>];
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">alldata</span>.<span style="color:#a6e22e">shift</span>();
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">manageddata</span> <span style="color:#f92672">=</span> (<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">header</span>, <span style="color:#a6e22e">alldata</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">j</span>, <span style="color:#a6e22e">k</span>, <span style="color:#a6e22e">key</span>, <span style="color:#a6e22e">len</span>, <span style="color:#a6e22e">len1</span>, <span style="color:#a6e22e">result</span>, <span style="color:#a6e22e">temp</span>, <span style="color:#a6e22e">value</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> [];
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> (<span style="color:#a6e22e">j</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">len</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">alldata</span>.<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">j</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">len</span>; <span style="color:#a6e22e">j</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">value</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">alldata</span>[<span style="color:#a6e22e">j</span>];
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> {};
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">for</span> (<span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">k</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">len1</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">header</span>.<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">k</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">len1</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#f92672">++</span><span style="color:#a6e22e">k</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">key</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">header</span>[<span style="color:#a6e22e">i</span>];
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">temp</span>[<span style="color:#a6e22e">key</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">value</span>[<span style="color:#a6e22e">i</span>];
+</span></span><span style="display:flex;"><span>          }
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">result</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">temp</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">values</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">result</span>,
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">headerLength</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">header</span>.<span style="color:#a6e22e">length</span>,
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">dataLength</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">alldata</span>.<span style="color:#a6e22e">length</span>
+</span></span><span style="display:flex;"><span>        };
+</span></span><span style="display:flex;"><span>      })(<span style="color:#a6e22e">header</span>, <span style="color:#a6e22e">alldata</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">getValueByKey</span>.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">getValue</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">index</span>, <span style="color:#a6e22e">key</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">manageddata</span>.<span style="color:#a6e22e">values</span>[<span style="color:#a6e22e">index</span>][<span style="color:#a6e22e">key</span>];
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">getValueByKey</span>.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">getAllValues</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>() {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">manageddata</span>;
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">getValueByKey</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  })();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">getValueByKey</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">getValueByKey</span>;
+</span></span><span style="display:flex;"><span>})(<span style="color:#66d9ef">this</span>);
+</span></span></code></pre></div><h2 id="demo">Demo</h2>
+<p>Following sheet is a sample sheet for this.
+<img src="https://tanaikech.github.io/img/20170827fig1.png"
+     alt="Retrieving Values By Header Title for Spreadsheet"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+        
+      </div>
+    </article>
+  
+    <article class="post-item">
+      <div class="post-meta">
+        <i class="far fa-calendar-alt"></i> August 27, 2017
+      </div>
       <h2><a href="https://tanaikech.github.io/2017/08/27/exporting-project-on-google-drive-using-golang-quickstart/">Exporting Project on Google Drive using Golang Quickstart</a></h2>
       <div class="post-summary">
         
@@ -465,19 +541,6 @@
 </span></span></code></pre></div><h2 id="2-resumable-item-upload">2. Resumable item upload</h2>
 <p>This is for the resumable item upload is provided for large files or when a resumable transfer may be necessary.
 The detail information is <a href="https://dev.onedrive.com/items/upload_large_files.htm">https://dev.onedrive.com/items/upload_large_files.htm</a>.</p>
-        
-      </div>
-    </article>
-  
-    <article class="post-item">
-      <div class="post-meta">
-        <i class="far fa-calendar-alt"></i> August 12, 2017
-      </div>
-      <h2><a href="https://tanaikech.github.io/2017/08/12/netatmo-api-had-been-down-3/">Netatmo API Had Been Down 3</a></h2>
-      <div class="post-summary">
-        
-          <h2 id="report">Report</h2>
-<p>Netatmo API had been down from Aug. 10, 2017 19:30 JST to Aug. 11, 2017 19:00 JST. Now it&rsquo;s working.</p>
         
       </div>
     </article>
