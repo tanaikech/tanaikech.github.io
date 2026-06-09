@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Hugo 0.157.0">
+
+  
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+  
+  <meta name="theme-color" content="#050505">
+
+  
+  <meta name="google-site-verification" content="googleccbde819fe280caa.html" />
+
+  
+  
+
+  <meta name="keywords" content="Google Apps Script, Google Workspace, Gemini, AI, parallel process, asynchronous process, Google workspace">
+
+  <meta name="description" content="Gists
+
+
+Abstract
+This paper presents a serverless architecture that overcomes the stateless nature and 6-minute execution limit of Google Apps Script (GAS). By configuring a 1-second immediate timeout in UrlFetchApp loopback calls, an orchestrator dispatches background tasks and terminates immediately. This design frees up the caller&rsquo;s execution quota while the target Web App runs to completion in an isolated container. Combined with a transactional Google Sheets state machine, this design supports self-perpetuating parallel MapReduce runs and multi-turn, state-hydrated generative AI agent networks without external compute infrastructure.">
+
+  
+  <link rel="canonical" href="https://tanaikech.github.io/2026/06/09/the-1-second-timeout-hack-running-infinite-parallel-workloads-natively-on-google-apps-script/">
+
+  
+  <title>The 1-Second Timeout Hack: Running Infinite Parallel Workloads Natively on Google Apps Script | tanaike - Google Apps Script, Gemini API, and Developer Tips</title>
+
+  
+  <meta property="og:title" content="The 1-Second Timeout Hack: Running Infinite Parallel Workloads Natively on Google Apps Script">
+  <meta property="og:description" content="Gists
+
+
+Abstract
+This paper presents a serverless architecture that overcomes the stateless nature and 6-minute execution limit of Google Apps Script (GAS). By configuring a 1-second immediate timeout in UrlFetchApp loopback calls, an orchestrator dispatches background tasks and terminates immediately. This design frees up the caller&rsquo;s execution quota while the target Web App runs to completion in an isolated container. Combined with a transactional Google Sheets state machine, this design supports self-perpetuating parallel MapReduce runs and multi-turn, state-hydrated generative AI agent networks without external compute infrastructure.">
+  <meta property="og:url" content="https://tanaikech.github.io/2026/06/09/the-1-second-timeout-hack-running-infinite-parallel-workloads-natively-on-google-apps-script/">
+  <meta property="og:site_name" content="tanaike - Google Apps Script, Gemini API, and Developer Tips">
+  <meta property="og:type" content="article"><meta property="og:image" content="https://tanaikech.github.io/img/og-main.png">
+
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@tanaikech">
+  <meta name="twitter:title" content="The 1-Second Timeout Hack: Running Infinite Parallel Workloads Natively on Google Apps Script">
+  <meta name="twitter:description" content="Gists
+
+
+Abstract
+This paper presents a serverless architecture that overcomes the stateless nature and 6-minute execution limit of Google Apps Script (GAS). By configuring a 1-second immediate timeout in UrlFetchApp loopback calls, an orchestrator dispatches background tasks and terminates immediately. This design frees up the caller&rsquo;s execution quota while the target Web App runs to completion in an isolated container. Combined with a transactional Google Sheets state machine, this design supports self-perpetuating parallel MapReduce runs and multi-turn, state-hydrated generative AI agent networks without external compute infrastructure.">
+  <meta name="twitter:image" content="https://tanaikech.github.io/img/og-main.png">
+
+  
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [{
+        "@type": "BlogPosting",
+        "headline": "\"The 1-Second Timeout Hack: Running Infinite Parallel Workloads Natively on Google Apps Script\"",
+        "description": "\"\\u003cp\\u003e\\u003ca href=\\\"https://gist.github.com/tanaikech/343a86fbe631fdc3eda0987d5bb1f44a\\\"\\u003eGists\\u003c/a\\u003e\\u003c/p\\u003e\\n\\u003cp\\u003e\\u003cimg src=\\\"https://tanaikech.github.io/image-storage/20260609a/fig1a.jpg\\\"\\n     alt=\\\"Infographic\\\"\\n     \\n     loading=\\\"lazy\\\"\\n     decoding=\\\"async\\\"\\u003e\\n\\u003c/p\\u003e\\n\\u003ch1 id=\\\"abstract\\\"\\u003eAbstract\\u003c/h1\\u003e\\n\\u003cp\\u003eThis paper presents a serverless architecture that overcomes the stateless nature and 6-minute execution limit of Google Apps Script (GAS). By configuring a 1-second immediate timeout in UrlFetchApp loopback calls, an orchestrator dispatches background tasks and terminates immediately. This design frees up the caller\\u0026rsquo;s execution quota while the target Web App runs to completion in an isolated container. Combined with a transactional Google Sheets state machine, this design supports self-perpetuating parallel MapReduce runs and multi-turn, state-hydrated generative AI agent networks without external compute infrastructure.\\u003c/p\\u003e\"",
+        "url": "\"https://tanaikech.github.io/2026/06/09/the-1-second-timeout-hack-running-infinite-parallel-workloads-natively-on-google-apps-script/\"",
+        "datePublished": "\"2026-06-09T14:49:38+09:00\"",
+        "dateModified": "\"2026-06-09T14:49:38+09:00\"",
+        "wordCount":  3100 ,
+        "author": {
+          "@id": "https:\/\/tanaikech.github.io\/#person"
+        },
+        "publisher": {
+          "@id": "https:\/\/tanaikech.github.io\/#person"
+        },
+        "image": {
+          "@type": "ImageObject",
+          "url": "\"https://tanaikech.github.io/img/og-main.png\"",
+          "width": 1200,
+          "height": 630
+        },
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "\"https://tanaikech.github.io/2026/06/09/the-1-second-timeout-hack-running-infinite-parallel-workloads-natively-on-google-apps-script/\""
+        }
+      },{
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "\"https://tanaikech.github.io/\""
+          },{
+            "@type": "ListItem",
+            "position": 2,
+            "name": "\"The 1-Second Timeout Hack: Running Infinite Parallel Workloads Natively on Google Apps Script\"",
+            "item": "\"https://tanaikech.github.io/2026/06/09/the-1-second-timeout-hack-running-infinite-parallel-workloads-natively-on-google-apps-script/\""
+          }]
+      },      {
+        "@type": "Person",
+        "@id": "https:\/\/tanaikech.github.io\/#person",
+        "name": "Kanshi Tanaike",
+        "alternateName": "tanaike",
+        "url": "\"https://tanaikech.github.io/\"",
+        "image": "\"https://tanaikech.github.io/img/og-main.png\"",
+        "jobTitle": "Google Developer Expert",
+        "honorificPrefix": "Ph.D.",
+        "description": "Japanese scientist, Physicist and Google Developer Expert for Google Workspace.",
+        "award": "First place in the Outstanding GDE Award 2025",
+        "sameAs": [
+          "https://twitter.com/tanaikech",
+          "https://github.com/tanaikech",
+          "https://stackoverflow.com/users/7108653/tanaike",
+          "https://developers.google.com/community/experts/directory?text=tanaike",
+          "https://zenn.dev/tanaike",
+          "https://medium.com/@tanaike"
+        ]
+      }
+    ]
+  }
+  </script>
+
+  
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/eclipse.css">
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <link rel="shortcut icon" href="https://tanaikech.github.io/img/favicon.ico" type="image/x-icon" />
+  
+  
+  
+
+  
+  
+  
+</head>
+
+
+<body>
+  <div id="progress-bar"></div>
+  
+  <header class="site-header">
+    <div class="header-container">
+      
+      <div class="header-top">
+        <div class="site-title">
+          <a href="https://tanaikech.github.io/">TANAIKE</a>
+          
+            <div class="site-subtitle">The Thinker</div>
+          
+        </div>
+
+        
+        <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+
+      
+      <div id="mobile-menu" class="mobile-menu-content">
+        <div class="nav-row">
+          <div class="nav-links">
+            
+              <a href="https://tanaikech.github.io/about/" title="">
+                <i class='fa fa-user fa-fw'></i> About
+              </a>
+            
+              <a href="https://tanaikech.github.io/post/" title="">
+                <i class='fa fa-list fa-fw'></i> Articles
+              </a>
+            
+              <a href="https://tanaikech.github.io/topics/" title="">
+                <i class='fa fa-folder fa-fw'></i> Topics
+              </a>
+            
+              <a href="https://tanaikech.github.io/tags/" title="">
+                <i class='fa fa-tags fa-fw'></i> Tags
+              </a>
+            
+              <a href="https://tanaikech.github.io/contact/" title="">
+                <i class='fa fa-phone fa-fw'></i> Contact
+              </a>
+            
+              <a href="https://tanaikech.github.io/link/" title="">
+                <i class='fa fa-thumbs-up fa-fw'></i> Links
+              </a>
+            
+              <a href="https://tanaikech.github.io/webapps/" title="">
+                <i class='fas fa-toolbox'></i> Web Applications
+              </a>
+            
+              <a href="https://tanaikech.github.io/donate/" title="">
+                <i class='fas fa-donate'></i> Donate
+              </a>
+            
+              <a href="https://tanaikech.github.io/" title="">
+                <i class='fa fa-home fa-fw'></i> Home
+              </a>
+            
+          </div>
+        </div>
+
+        <div class="social-links-row"><a href="https://twitter.com/tanaikech" target="_blank" rel="me">
+                <i class="fab fa-x-twitter"></i> X
+              </a><a href="https://medium.com/@tanaike" target="_blank" rel="me">
+                <i class="fab fa-medium"></i> Medium
+              </a><a href="https://www.youtube.com/@tanaike" target="_blank" rel="me">
+                <i class="fab fa-youtube"></i> YouTube
+              </a><a href="https://linkedin.com/in/tanaike" target="_blank" rel="me">
+                <i class="fab fa-linkedin"></i> LinkedIn
+              </a><a href="https://github.com/tanaikech" target="_blank" rel="me">
+                <i class="fab fa-github"></i> GitHub
+              </a><a href="https://gist.github.com/tanaikech" target="_blank" rel="me">
+                <i class="fas fa-code"></i> Gists
+              </a><a href="https://stackoverflow.com/users/7108653" target="_blank" rel="me">
+                <i class="fab fa-stack-overflow"></i> Stack Overflow
+              </a><a href="https://dev.to/tanaike" target="_blank" rel="me">
+                <i class="fab fa-dev"></i> DEV
+              </a><a href="https://zenn.dev/tanaike" target="_blank" rel="me">
+                <i class="fas fa-edit"></i> Zenn
+              </a><a href="https://devpost.com/tanaike" target="_blank" rel="me">
+                <i class="fas fa-terminal"></i> Devpost
+              </a></div>
+      </div>
+
+    </div>
+  </header>
+
+  <main id="main">
+
+
+<div class="header">
+  <h1>The 1-Second Timeout Hack: Running Infinite Parallel Workloads Natively on Google Apps Script</h1>
+  <h2></h2>
+</div>
+<div class="content">
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>09 Jun 2026, 14:49</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/report">report</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-workspace">Google Workspace</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/gemini">Gemini</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/ai">AI</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/parallel-process">parallel process</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/asynchronous-process">asynchronous process</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-workspace">Google workspace</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  <p><a href="https://gist.github.com/tanaikech/343a86fbe631fdc3eda0987d5bb1f44a">Gists</a></p>
+<p><img src="https://tanaikech.github.io/image-storage/20260609a/fig1a.jpg"
+     alt="Infographic"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<h1 id="abstract">Abstract</h1>
+<p>This paper presents a serverless architecture that overcomes the stateless nature and 6-minute execution limit of Google Apps Script (GAS). By configuring a 1-second immediate timeout in UrlFetchApp loopback calls, an orchestrator dispatches background tasks and terminates immediately. This design frees up the caller&rsquo;s execution quota while the target Web App runs to completion in an isolated container. Combined with a transactional Google Sheets state machine, this design supports self-perpetuating parallel MapReduce runs and multi-turn, state-hydrated generative AI agent networks without external compute infrastructure.</p>
+<h1 id="introduction">Introduction</h1>
+<p>Google Apps Script (GAS) is the premier low-code platform for integrating, automating, and extending Google Workspace <a href="https://workspace.google.com/products/apps-script">Ref</a>. While universally accessible and free, GAS is constrained by strict runtime limits—most notably a hard 6-minute execution cap per script instance and a synchronous, stateless container lifecycle <a href="https://developers.google.com/apps-script/guides/services/quotas">Ref</a>.</p>
+<p>Although the compilation shift to the V8 engine significantly reduced processing costs, handling large-scale ETL pipelines, parallel computations, or multi-agent generative AI simulations remains highly challenging. Traditional workarounds, such as time-driven triggers, suffer from high initialization latency, trigger omissions, and strict platform quotas.</p>
+<p>Earlier asynchronous attempts, such as the fetchAll-based <a href="https://github.com/tanaikech/RunAll">RunAll</a> framework, still remained bound by the parent container&rsquo;s 6-minute ceiling. However, the addition of the timeoutSeconds parameter to the UrlFetchApp utility <a href="https://developers.google.com/apps-script/reference/url-fetch/url-fetch-app#fetch(String,Object)">Ref</a> enables a new approach. Integrating aggressive timeouts, self-referential Web App loopbacks <a href="https://github.com/tanaikech/taking-advantage-of-Web-Apps-with-google-apps-script">Ref</a>, and a shared spreadsheet state ledger makes it possible to execute highly parallel, self-perpetuating, and infinite MapReduce operations that easily bypass the 6-minute wall.</p>
+<h1 id="repository">Repository</h1>
+<p>The complete, refactored production source code, containing full implementations of the asynchronous engine, concurrency controllers, and state preservation layers, is hosted on GitHub:</p>
+<p><a href="https://github.com/tanaikech/gas-asynchronous-mapreduce-broker">https://github.com/tanaikech/gas-asynchronous-mapreduce-broker</a></p>
+<h1 id="theoretical-foundations-bypassing-the-6-minute-wall">Theoretical Foundations: Bypassing the 6-Minute Wall</h1>
+<p>To model this bypass mathematically, let N represent the total number of long-running computational or inferential tasks, and T_task represent the processing duration of a single task. In a traditional, single-threaded synchronous execution model, the total execution time T_sync is represented by:</p>
+<pre tabindex="0"><code>T_sync = T_task,1 + T_task,2 + ... + T_task,N + T_overhead_sync
+</code></pre><p>Under Google&rsquo;s runtime policies <a href="https://developers.google.com/apps-script/guides/services/quotas">Ref</a>, execution is forcefully terminated if:</p>
+<pre tabindex="0"><code>T_sync &gt;= 360 seconds
+</code></pre><p>Even with synchronous parallelization utilizing UrlFetchApp.fetchAll <a href="https://developers.google.com/apps-script/reference/url-fetch/url-fetch-app#fetchall(Object)">Ref</a>, the system remains bound by the slowest worker in the batch:</p>
+<pre tabindex="0"><code>T_para = max(T_task,1, T_task,2, ..., T_task,N) + T_overhead_para
+</code></pre><p>If the slowest task exceeds 360 seconds, or if the parent thread&rsquo;s aggregation overhead exceeds the limit, the parent container crashes, causing data loss.</p>
+<h2 id="a-the-1-second-immediate-timeout-hack">A. The 1-Second Immediate Timeout Hack</h2>
+<p>Our paradigm bypasses this constraint by introducing a non-blocking asynchronous dispatch model. We configure UrlFetchApp.fetch with a parameter configuration of timeoutSeconds: 1 and muteHttpExceptions: true. When pointed at the script&rsquo;s own Web App URL <a href="https://github.com/tanaikech/taking-advantage-of-Web-Apps-with-google-apps-script">Ref</a>, the following sequence occurs:</p>
+<ol>
+<li>The orchestrator dispatches an HTTP POST request to the Web App container.</li>
+<li>The HTTP request is established on Google&rsquo;s internal infrastructure, triggering the initialization of a separate, isolated target Web App container (Worker).</li>
+<li>At exactly 1.0 seconds, the orchestrator&rsquo;s UrlFetchApp client raises a local timeout exception. This exception is caught and suppressed.</li>
+<li>Crucially, the target Web App container does not terminate. Because the HTTP handshake was completed and the payload was accepted, Google&rsquo;s infrastructure executes the target doPost function to completion, granting it an isolated 6-minute execution window.</li>
+</ol>
+<p>Let T_hop represent the combined latency of the Web App invocation, authorization handshake, and spreadsheet state-saving. Because the orchestrator dispatches tasks asynchronously with a 1-second timeout, the orchestrator&rsquo;s active running time T_orch scales at O(1) relative to task execution:</p>
+<pre tabindex="0"><code>T_orch = sum(T_timeoutSeconds for j from 1 to M) + T_overhead_orch ≈ M \* 1s + T_overhead_orch
+</code></pre><p>where M is the number of active dispatches in the current batch. The actual heavy computational tasks run entirely in parallel background containers:</p>
+<pre tabindex="0"><code>T_background = max(T_task,1, T_task,2, ..., T_task,C) + T_hop
+</code></pre><p>where C is the concurrency limit. Once a worker finishes, it writes its state to the Shared Sheet and executes an autonomous loopback HTTP call to wake up the Dispatcher. The orchestrator container is thus recycled continuously, dodging the 360-second limit entirely.</p>
+<h2 id="b-decoupling-time-driven-triggers">B. Decoupling Time-Driven Triggers</h2>
+<p>Consequently, when this loopback mechanism is initiated via a Time-driven Trigger, the trigger execution context terminates cleanly within 1.0 seconds (consuming virtually zero quota), while the background Web App container obtains a full, independent execution window that bypasses the trigger&rsquo;s inherent time limits. This represents an important optimization for building highly resilient, long-running systems within Google Workspace.</p>
+<h1 id="pioneering-architectural-innovations">Pioneering Architectural Innovations</h1>
+<p>This parallel execution framework relies on six core engineering innovations to manage state, concurrency, and error handling.</p>
+<h2 id="1-self-perpetuating-token-bucket-queue">1. Self-Perpetuating Token Bucket Queue</h2>
+<p>To prevent API rate limits (such as Google’s HTTP 429 exceptions or lock contention), tasks are not dispatched all at once. Instead, an independent background daemon (the <code>Dispatcher</code>) acts as a load balancer, continuously auditing the active queue and enforcing a strict concurrency cap (e.g., maximum of 5 concurrent workers). When a worker completes its task, it executes an autonomous loopback HTTP call to wake up the <code>Dispatcher</code>, which then launches the next pending task in the queue.</p>
+<h2 id="2-persistent-memory-state-machine">2. Persistent Memory State Machine</h2>
+<p>Since GAS Web App containers are stateless and initialize a clean memory space on every <code>doPost</code> invocation, in-memory state tracking is impossible. Our design repurposes Google Sheets as a persistent, transactional memory engine. Every task state (PENDING, RUNNING, COMPLETED, ERROR, CANCELLED) and historical conversation log is written directly to the sheet, providing a durable ledger that survives container restarts.</p>
+<h2 id="3-fan-in-race-condition-immunity">3. Fan-In Race Condition Immunity</h2>
+<p>In the Reducer phase, when multiple workers finish almost simultaneously, they all attempt to wake up the <code>Dispatcher</code> to trigger the final consolidation step. This introduces a race condition where multiple threads might try to run the reduction logic concurrently. Our architecture resolves this by using the GAS sheet creation API as a mutex. The code attempts to programmatically insert a uniquely named results sheet (<code>insertSheet</code>). If a duplicate sheet creation is attempted, the underlying engine throws a catchable exception, which immediate aborts duplicate threads and ensures only one thread executes the final reduction.</p>
+<h2 id="4-lock-free-parallel-llm-inference">4. Lock-Free Parallel LLM Inference</h2>
+<p>In multi-agent environments, blocking execution while waiting for external API calls dramatically reduces throughput. Our framework completely bypasses global script locks during long-lived LLM network communications. Instead, workers execute their API queries in parallel, holding a localized <code>DocumentLock</code> only during the sub-second write-back operations to the shared spreadsheet, maximizing concurrency.</p>
+<h2 id="5-dynamic-llm-driven-self-correction">5. Dynamic LLM-Driven Self-Correction</h2>
+<p>If a worker encounters an error (such as an API timeout, JSON parsing fault, or safety block), it writes the failure trace to the queue log. Rather than crashing the entire pipeline, the <code>Dispatcher</code> intercepts the failure and launches a specialized error-correction LLM loop. This sub-agent analyzes the failed prompt and the resulting error message, dynamically rewrites the prompt to bypass the issue, and queues the task for an automated retry.</p>
+<h2 id="6-immortal-log-rotation">6. Immortal Log Rotation</h2>
+<p>Continuous logging can quickly exceed the physical limit of Google Sheets (10 million cells), degrading performance. To prevent this, the logging engine monitors raw log row counts in real-time. If the log sheet exceeds a safe operating threshold (e.g., 1000 rows), the engine automatically truncates and rotates older entries, maintaining fast, lightweight write operations indefinitely.</p>
+<h1 id="system-topologies--workflows">System Topologies &amp; Workflows</h1>
+<p>Our research validates this architecture across two distinct design patterns.</p>
+<h2 id="topology-1-asynchronous-mapreduce-broker">Topology 1: Asynchronous MapReduce Broker</h2>
+<p>This topology establishes a decentralized broker that processes heavy synthetic tasks concurrently, using a Shared Google Sheet as an atomic transactional queue ledger <a href="https://github.com/tanaikech/RunAll">Ref</a>.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260609a/fig2a.png"
+     alt="Mermaid Chart 1"
+     
+     loading="lazy"
+     decoding="async">
+
+<a href="https://mermaid.ai/play?utm_source=mermaid_live_editor&amp;utm_medium=share#pako:eNqdVm1v4kYQ_isrn3RKpCS1DQTqnlJRw92hIyTlRWmvVNGyHmCF8fp210m4KP_9ZtcGDE2grb_gNbvPMy_PzOyzw0QETuDMJE3nZNgay3FC8GExVaoFU6I0lTo0KzLlcRy8i6oQRfRMaSkWELzzG7RerRXL80ce6Xngp09nTMRCBu9c1_3lH5ipFAyUKqMyBrXpdIPqulW3sYfqHUFVWkg6gzLqdDqtsGiD2qhdVt3qf0OlMez6P21E9ZL_dd9j_nHMNe7AhPNk7NiwDkHp6r13ckquaZLRmIQ0jsfOaRAEpbCfn1-RTsL1YA6g_xo75p3TmH8H8nsGGXTFjNj_yHsSxkAl-YKGksEj12w-dv5GtHLA15ZsIC3Bbabmt5BEPJkhhVkR3yVDqhaKaFHgU0Vu271Wp_fpbdgSkAW-owtocZVSNAYkYmvJZzOQ229NtUrYPQbhw0T-dEVONF-CyPQAmEgiFRDv9G229e8uiyXeLrtCpEgMT8AyXdp2n8c-p-WJ4hGQO5iQZpqSUCSa8gTkcW6VTfLqGTvDOZAbidgoB4pyJIZ67Kx3mmfXLGtpOAe2MDl7HjufYjFBIXzpdLv3g7vOMPxc2Ndkmj9QDdGvY-flDYvMswFDaLToT1Bjx7I0J0LqZhxjJAYml7ijSCbR6zSHzV7Y7nbbrYJ0CHLJE2QlbRs8LpI8HtuqOMDdEwV1H2hkpYrc5r2Qk_1kKgLxi9xj6OMVaQmWLSHRXcEWRfLLxV2mLL9vaApSJh5AfhXLCQeFzM0s4prILEmMNq3PQcHbmW6-XxHPXZ4RCXhWm5gcVXxOXSaz_O0HGmfomq0hzGxTAtGY9rWvO8E_ktTy-w7ufpJRtiyTEhK2sslA3o4i_cK3OyEXIFVhwAdy3fzjPrzphaN-v90bkpPa6TFx7cHv06_FnRMVSsNWpjMrr_6o1zMu5_zrzYVZ5IFTMpLxRzDf_kcveNvAkhCxPyowurJStCtiltg720lEhnOJIjrMcSQZGzJbsXAgDVfEPRLvEsR-qEuuHDxR8j3KGMjbOZ4y1cC-ZVxunA_RbyzDj1jtcR9UFuuiSItE9CkDE10sIWwCpLNcZjg_VjZp2DqxVuz2038furI91sAB9qf2EzZOZqacWZHw5vq22x5iP5KoABkpouBbhp0B5x_2icK2a4p1taSaM-yc5hwG-YghJa58SkmuwTqP1HZBUHFKxDwyPZdQKekq13ApOIc5tpi5e0BjHNUm9GmKA5I0scWvHSwVyTVVGszkmL0Nj8f3p9Bu6eVO2VdU3Xb45Z92Bt8JblCYQ8LRXevsegZOKFvMpMiS6EA0NyR508tpPgN9WCFrKJYpLm2PC8hI8xjlA-pCxQDpiefj7cg9gF1G26bpN2qrdy3g8rAoXMoTWIR0q6H3ZJRwlA8ZjTqtza3m7fmyYXvlImOG9yQ35OiFpplpkYilyBRq9hFhVOkWcCi0rzK-crkxB5wzvMPzyAm0zODMWeLkpmbpPBswtBJLBMZOgK8RlQu8lCQveCalyVchlutjmO3Z3AmmNFa4ylKj_haneL_ZbkHxgQxRFtoJ6r6FcIJn58kJvMblhV9zK5WK13Brly7-uXKCc_PZq1Rdr37p-9XGz_Xay5nz3bJ6F17Db1QaFd-tV3zPq7_8AOz_I2M">Mermaid Chart Playground</a></p>
+<h2 id="topology-2-stateful-multi-turn-agent-network">Topology 2: Stateful Multi-Turn Agent Network</h2>
+<p>This configuration manages conversational states across multi-step execution. Using the <code>GASADK</code> library <a href="https://github.com/tanaikech/adk-gas">Ref</a>, it orchestrates multiple specialized AI agents (<code>Lead Engineer</code>, <code>Resource Director</code>, <code>Colony Governor</code>) through progressive conversational turns, maintaining context and execution histories on a shared ledger.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260609a/fig2b.png"
+     alt="Mermaid Chart 1"
+     
+     loading="lazy"
+     decoding="async">
+
+<a href="https://mermaid.ai/play?utm_source=mermaid_live_editor&amp;utm_medium=share#pako:eNqVV-1u2kgUfZWRK1WJlGSNIYF6q1254BA2QFJDlHbLCk3sa_DGeLzjcVIa5d33ztjGBoKr8iN4zMw5d879zIvmMg80U1twGi_JtDfjs4jgxw1pkvTAJ4mgXHTlivhBGJrvvBZ4Hj1JBGePYL4zOrTdOs-Xp8-BJ5amEX8_cVnIuPlO1_Xf9zBjzlxIkiqq68K5729Qdb2ld3ZQGz9BTQTjdAFVVN_3m663Qe2cX7T01q-h0hC27-93vHbl_m2j4Ro_xyxwJ1LOo5mmZL2LAj8AD98J8NNwRGMHvNSFo-OZdmyaZkX709M_yAREGk-WACL5NtO6HPAY-ZxCCkO2OCEOfcZv8vGB_5bvJX17NBgP5tbtYH5tf51p_yBoVfyNVSWyYlKgEwFxA4nUgsgVaZBbzlYx7spYfMZJk_TYigYRsRYQ4S80Ibf2uDcY9w_zlfiK7jpwH3sUVixCOsGDxQJ4L0hiKtwlcCtZR-5canIIrvhO0ocsjlEdxoHccDyPnqEiYBHJGGZasVt-SmZlyMYI-A5uKqA0oo5efiogl4AnlE8RaMioRwoFqUgL5Y56zE1XKNiQuY9k4rIYvJyiGsdViupzyaEo7ScapuqWt3joZablLyBnc9izoodkpr3W3KL6vI2JNKjq5zv7zu7NL2-c-dj-Mp1pih1jYsERbppyqd0gcjnIq2FGYswcqcgxiAyV49yeQfQvuIJM75zx_Na5Gd1OJ4WlkIDAvxgFkBDBiF6v-1tW2o5z4-S2dZfgPuZwqEsB_DGnG1lf5o49dQb2hBwZx3_Wy1MFy6i-SkULETAxMOw43ixQQeSkEeFptPsLhnIRBMPhiHjriK4Cl4bhmnB45gF6SVZIPFPsy-JHJpskX9crsm_kmOU2jtgT9IB6QxACOFo45TRKApUdHEME5e7ZVm8-tKdT28nJr2goSJYPct8DHnGXmQllbfyVIJpeOZKki25HIju3rTTlnuJXtHjTvHtrMMXKMrf6fcfuW9PBzbhejepzNU6z4GCrVSBGmLl8LSuqWpKVWhN3SaNFFoOTGGutl8j6WJ-iu67eY6lu3rtx7e4tF1f2ZJ0BK-QnytHlHIPcCkOsykU5Frkf35DuJ-FeQd2N9k9pEHpZs-KqymERe09E6S-asaN4G75xP7fEimOIPJIfJ2OcQMiRvBONPODH8pCK-HrP7lm3CfMui9wUXRC5a5UM35QkzJX1EJsiwjdJEjI0T6ZU3qxy2_ZDzrkbj2ub2a53qtq8ac9ht27vU4ctDKSnTSOSV5HtcMlZxNIES4YvOwF5ZvwReEKwDceUYy2BkDwFlNzxULWKouCIYAUsFRNwWeQlJmnUtDX00W6D3TZG2XevmAeRD9JwKHtn9kNZ7IY33evTS8e2K8WE-WQYrlSknmGlrGuyOzyK-2rtYW-HotfmS7IMZH7Kkkrwmk-oSzYAJKLsiGkiE65vTaze9WHSKoFixJLeh1UQBUiXCRtsLEJd41QQH2sAyTaRSwRbng6xpB_m2EDm7v4vDTjIhLqXrUA6PHtFtiaG7BaflBvS2JP2yXjNbXhPEuABDYMf4OVyrDcNNgSaAJEoh4tZ6fBtczKX00fI5p0hY_EDVRl2cGwryg8eSkj5c42n9-Ars9mugZW5S-XMX-zhErXEWu29qIoehyBQhOLyWVbiPFRT-3aBdosfvqehtcBesqB5q8_EGVFMwRHFsYfjFw73OHyynBof1DkccFJsqGrYLmoOcPQ_PRQk2gn-dxZ4mil4CifaCndTudRepLmo_BKnrZlm4qNHOTp1Fr3imZhGfzO2Ko5xli6WmunTMMFVFjK9gOK8XG4BWX-7LI2EZjYahsLQzBftu2YanfaZca4bH_RmR79od1on2lozT43Gh7NGs6Xr5-cf2i292b54PdF-KNrGWaNjdJqdpqG3m0ajcdF-_R_CfMWP">Mermaid Chart Playground</a></p>
+<h3 id="conversational-state-transitions">Conversational State Transitions</h3>
+<p>The diagram below shows how conversational state ($\mathcal{H}$) accumulates across progressive execution turns, demonstrating how history is preserved and serialized across stateless containers.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260609a/fig2c.png"
+     alt="Mermaid Chart 1"
+     
+     loading="lazy"
+     decoding="async">
+
+<a href="https://mermaid.ai/play?utm_source=mermaid_live_editor&amp;utm_medium=share#pako:eNqtlWFv2jAQhv_KyZ9gAoZtCijSJqGSAVILFII6ramQlxjICg5ynKoU8d9np4QGwta1mr8kZ937nu8exdkiL_Q5slCkmOLtgM0lW5UfiStdAXrdfbqHcvkrjB17OMXTod1v9_odsEDnSzURwSzg_thoZ_Hymq1H3I89Xiim-vSZ2IOLnFgKwGA_cS9WQSjgbqz4GvBneu8iYBGYBAzbVGfWSe3McUaTfv_lODwx1A1Ea6a8BZeFIui8ND5jl2ozdpeD6-GV7djtV8PbUD6kZlfLVWvOharIWLx2aJYIdXMymC8UhLOcWzbTrG4QqVBuoAtf4G4_kEnEZQmuNYslDGK1jtV9VsaFnxRJ93an8811cGiLZKD9YUo3E3tit6ffBqNp3_7u_JUdybEjR-zIGXYkz45k2KXHgUJ340tTq1s845EDRo6AHdOBQk_84p4Ce8Wl3vY2MFn72vstbuTD3EqwH1Bm7wMQyTmI9P9CpDmI9AgiPQOR5iHS90KkeYj0XyCOuBc-cj364YJFbyKk70J4Qu84pB_nSE843rZ6ju582up0Rnan5fQGfd2wI5mIggSEIRRHqce5dGNziJOpjzfCg59MyoBL8JacSe6nDtlMozRXuQUvF7SEaCPUgkfBM49gFgi2hDC5dowaldBcBj6ylIx5CekvaMVMiLbG2UVauOIusvSrz-SDi1yx05o1Ez_CcJXKZBjPF8iasWWkozj5-vY_mEOKHiWXl2EsFLIwqSYeyNqiJ2SRZr1CLqo1jBsXTVxr1mkJbZBVJgRXMK1Vca1K6rhBL3Yl9JyU1ftN0qRNSqoNSjCuN3a_AeVBDOU">Mermaid Chart Playground</a></p>
+<h1 id="practical-deployment--verification-guide">Practical Deployment &amp; Verification Guide</h1>
+<p>Follow these steps to deploy and verify this architecture within a Google Workspace environment.</p>
+<h2 id="a-step-by-step-configuration-and-deployment">A. Step-by-Step Configuration and Deployment</h2>
+<h3 id="1-host-ledger-setup">1. Host Ledger Setup</h3>
+<ul>
+<li>Create a new Google Spreadsheet to serve as the shared, persistent state ledger.</li>
+<li>Open <strong>Extensions</strong> &gt; <strong>Apps Script</strong>, and clear all boilerplate code from the editor.</li>
+</ul>
+<h3 id="2-external-library-integration-required-for-topology-2">2. External Library Integration (Required for Topology 2)</h3>
+<ul>
+<li>In the left-hand sidebar of the GAS editor, click the <strong>Add a library (+)</strong> icon.</li>
+<li>In the lookup field, enter the official <code>GASADK</code> Project Key <a href="https://github.com/tanaikech/adk-gas">Ref</a>: <code>1w2mwhWQd4_6rom-UBRPD8gayBoqGH_87awSBVqGI8DdaQI_pOeSuGYDu</code></li>
+<li>Select the latest release version, set the Identifier to <code>GASADK</code>, and click <strong>Add</strong>.</li>
+</ul>
+<h3 id="3-credential-storage">3. Credential Storage</h3>
+<ul>
+<li>Navigate to <strong>Project Settings</strong> (the gear icon on the left panel).</li>
+<li>Add a script property named <code>GEMINI_API_KEY</code> and populate it with a valid API key obtained from Google AI Studio.</li>
+</ul>
+<h3 id="4-code-provisioning">4. Code Provisioning</h3>
+<ul>
+<li>Copy the relevant script files (obtained from the GitHub repository <a href="https://github.com/tanaikech/gas-asynchronous-mapreduce-broker">Ref</a>) into the editor.</li>
+</ul>
+<h3 id="5-web-app-publishing">5. Web App Publishing</h3>
+<ul>
+<li>Click <strong>Deploy</strong> &gt; <strong>New Deployment</strong> in the upper right.</li>
+<li>Click the gear icon and choose <strong>Web App</strong>.</li>
+<li>Configure the deployment parameters:
+<ul>
+<li><em>Execute as:</em> <strong>Me</strong> (the author account, ensuring access to local sheets and property services)</li>
+<li><em>Who has access:</em> <strong>Anyone</strong> (allowing the loopback HTTP calls to communicate with the <code>/exec</code> endpoint anonymously)</li>
+</ul>
+</li>
+<li>Click <strong>Deploy</strong>, authorize the requested Drive, Spreadsheet, and External URL scopes, and copy the generated Web App URL.</li>
+</ul>
+<h3 id="6-loopback-target-mapping">6. Loopback Target Mapping</h3>
+<ul>
+<li>Return to the script editor and paste the copied Web App URL into the global <code>WEB_APP_URL</code> variable.</li>
+<li><em>Critical Step:</em> Because Web App versions are frozen on deployment, any modification to code requires creating a new version. Click <strong>Manage Deployments</strong>, select the active deployment, click the pencil icon, set the version to <strong>New version</strong>, and redeploy.</li>
+</ul>
+<h2 id="b-verification-testing">B. Verification Testing</h2>
+<ul>
+<li><strong>Execution Verification:</strong> In the script editor, select <code>startTest4_1</code> (for Topology 1) or <code>startUnifiedStatefulMapReduce</code> (for Topology 2) and click <strong>Run</strong>. Navigate back to the spreadsheet. You will see the real-time creation of the log sheets and the concurrent execution of tasks as they transition from <code>PENDING</code> to <code>RUNNING</code> and <code>COMPLETED</code>.</li>
+<li><strong>Emergency Halt Verification:</strong> While background tasks are active, run the <code>emergencyHaltNetwork</code> function. Verify that all remaining <code>PENDING</code> queue entries immediately transition to <code>CANCELLED</code> and execution halts gracefully within one cycle.</li>
+</ul>
+<h2 id="c-modular-task-customization-decoupled-mission-profiling">C. Modular Task Customization (Decoupled Mission Profiling)</h2>
+<p>To modify the task definitions or agent roles, you do not need to rewrite the underlying execution engine. The engine is completely decoupled from the execution logic by parsing a declarative <code>MISSION_BLUEPRINT</code> configuration.</p>
+<p>For instance, to re-engineer the system from the Martian colonization task to an <strong>AI Venture Strategy Startup Roadmap</strong>, you can update the <code>MISSION_BLUEPRINT</code> object as follows:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * MISSION_BLUEPRINT
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Declaratively defines the agent structure, step counts, prompts, and reduction rules.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">MISSION_BLUEPRINT</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">MAX_TURNS</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">3</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">MAX_RETRIES</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">2</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">AGENTS</span><span style="color:#f92672">:</span> [
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">id</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;CHAIN-STARTUP-CEO&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">initialPrompt</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;You are the CEO of a medical AI startup. Detail the core business model, value proposition, and customer acquisition strategy.&#34;</span>,
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">id</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;CHAIN-STARTUP-CTO&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">initialPrompt</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;You are the CTO of a medical AI startup. Detail the software architecture, data privacy measures, and chosen model pipeline.&#34;</span>,
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">id</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;CHAIN-STARTUP-CMO&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">initialPrompt</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;You are the CMO of a medical AI startup. Detail the product launch marketing strategy, branding, and conversion funnel.&#34;</span>,
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>  ],
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">TURN_PROMPTS</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#ae81ff">2</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;COMPETITION UPDATE: A tech giant has announced a similar free medical AI feature. Based on your previous plans, how do we pivot and build a defensive moat?&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#ae81ff">3</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;PITCH STAGE: The pivot is finalized. Write your department&#39;s definitive operational plan, synthesizing the baseline startup idea with the new defensive moat strategies.&#34;</span>,
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">REDUCER</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">id</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;CHAIN-VC-LEAD-INVESTOR&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">prompt</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;You are the Lead VC Investor analyzing this startup. Synthesize the pitch reports from the CEO, CTO, and CMO into a single &#39;Start-up Investment Prospectus &amp; 12-Month Execution Roadmap&#39;. Highlight risk mitigations.\n\n&#34;</span>,
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><p>Saving this configuration and running the initializer dynamically launches the CEO, CTO, and CMO agents in parallel, injects the competitive pivot threat on Turn 2, and aggregates the results into a cohesive VC prospectus in <code>FinalResult_Plan3</code>.</p>
+<h1 id="experimental-results--forensic-analysis">Experimental Results &amp; Forensic Analysis</h1>
+<p>We evaluate both topologies using empirical runtime execution data.</p>
+<h2 id="a-quantitative-analysis-topology-1">A. Quantitative Analysis: Topology 1</h2>
+<p>We configured Topology 1 with 20 heavy synthetic tasks, each simulating a 120-second workload. Using our token-bucket design, the concurrency limit C was capped at 5.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260609a/fig3a.jpg"
+     alt="Result 1"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<p>Analyzing the execution ledger <code>QueueLog_4_1</code>, we observe highly coordinated state progression:</p>
+<ul>
+<li><strong>Batch 1 (Tasks 1–5):</strong> Dispatched at <code>06:06:45.401Z</code> through <code>06:06:45.434Z</code>. Each of these five worker threads executed in parallel.</li>
+<li><strong>Batch 2 (Tasks 6–10):</strong> Registered completed states exactly 120 seconds later, with the next batch dispatched at <code>06:08:49.712Z</code>.</li>
+<li><strong>Batch 3 (Tasks 11–15):</strong> Dispatched at <code>06:10:54.481Z</code>.</li>
+<li><strong>Batch 4 (Tasks 16–20):</strong> Dispatched at <code>06:12:58.694Z</code> and completed at <code>06:12:58.739Z</code>.</li>
+<li><strong>Reducer Aggregation:</strong> The final merge step was executed at <code>06:15:05.096Z</code>.</li>
+</ul>
+<p>Total elapsed wall time was <strong>500 seconds (8 minutes and 20 seconds)</strong>. In a standard synchronous thread, this execution would have suffered a hard crash at exactly 360 seconds. Our asynchronous architecture sustained operations past the execution wall, completing all 20 tasks, sorting the resulting cryptographic tokens sequentially, and outputting a structured manifest in <code>FinalResult_4_1</code>.</p>
+<h2 id="b-quantitative-analysis-topology-2">B. Quantitative Analysis: Topology 2</h2>
+<p>We evaluated the multi-agent coordination of Topology 2 under dynamic environmental shifts using execution logs from Plan 3.3.</p>
+<h3 id="1-latency-analysis">1. Latency Analysis</h3>
+<p>The entire state-space transitioned from initial manual trigger to finalized manifesto synthesis in <strong>53.39 seconds</strong> (from the start log at <code>02:47:46.791Z</code> to the system complete log at <code>02:48:40.181Z</code>). Under the legacy synchronous paradigm (Plan 3.0), the identical workflow required <strong>71.34 seconds</strong>, demonstrating an absolute speedup of <strong>25.16%</strong>. By reducing the idle worker loopback delay (<code>WORKER_START_DELAY_MS</code>) from 3000ms to 1000ms in Plan 3.3, we eliminated 8.0 seconds of unnecessary container wait states, driving the system close to its mathematical minimum latency bound.</p>
+<h3 id="2-verification-of-parallelism">2. Verification of Parallelism</h3>
+<p>To confirm actual multi-threaded execution within Google’s infrastructure, we audited the start/end timestamps of Turn 1 (Step 1/3) agents:</p>
+<ul>
+<li><code>CHAIN-MARS-ENGINEER</code>: Executed from <code>02:47:52.709Z</code> to <code>02:47:55.350Z</code> (duration = 2.641 seconds)</li>
+<li><code>CHAIN-MARS-GOVERNOR</code>: Executed from <code>02:47:52.789Z</code> to <code>02:47:56.323Z</code> (duration = 3.534 seconds)</li>
+<li><code>CHAIN-MARS-RESOURCES</code>: Executed from <code>02:47:54.663Z</code> to <code>02:47:57.695Z</code> (duration = 3.032 seconds)</li>
+</ul>
+<p>Because all three workers started execution within an 1.8-second window and processed their tasks concurrently, the total step duration was bounded by the slowest task:</p>
+<p>T_Step1 = max(2.641, 3.534, 3.032) = 3.534 seconds</p>
+<p>In a sequential, single-threaded engine, this step would require the sum of all tasks:</p>
+<p>T_Sequential = 2.641 + 3.534 + 3.032 = 9.207 seconds</p>
+<p>Our parallel dispatcher achieved a <strong>61.6% latency reduction</strong> on Turn 1 alone. This efficiency gain compounded across subsequent turns, demonstrating the scalability of our approach.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260609a/fig3b.jpg"
+     alt="Result 2"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<h3 id="3-output-synthesis--semantic-integrity">3. Output Synthesis &amp; Semantic Integrity</h3>
+<p>The synthesis step was evaluated using the final strategic manifesto written to <code>FinalResult_Plan3</code>. The Reducer successfully hydrated and reconciled the outputs of the three agents:</p>
+<ul>
+<li>The Lead Engineer&rsquo;s recommendation of <em>Decentralized Grid Isolation</em>.</li>
+<li>The Resource Director&rsquo;s proposal of migrating farming into <em>Subterranean Lava Tubes</em>.</li>
+<li>The Colony Governor&rsquo;s implementation of <em>Habitat Consolidation</em>.</li>
+</ul>
+<p>The resulting &ldquo;Mars Master Manifesto&rdquo; synthesized these domain-specific strategic recommendations into a unified, chronological action plan (Phases I–III). This successful aggregation confirms the semantic consistency and preservation of conversational history throughout the parallel, stateless execution cycles of the network.</p>
+<h1 id="practical-considerations-security-and-trade-offs">Practical Considerations, Security, and Trade-offs</h1>
+<p>Evaluating this framework for production workloads requires analyzing its performance characteristics and operational trade-offs compared to traditional cloud environments.</p>
+<h2 id="a-the-last-resort-theorem">A. The &ldquo;Last Resort&rdquo; Theorem</h2>
+<p>Executing complex applications entirely within Google Apps Script introduces significant operational overhead compared to dedicated cloud compute engines such as AWS Lambda, GCP Cloud Run, or Cloud Functions. Spawning GAS Web Apps, validating OAuth tokens, initiating Spreadsheet or Property service I/O, calling LLM endpoints, and writing state back to the shared ledger introduces a latency penalty of approximately <strong>3 to 5 seconds per execution hop</strong>. This latency is caused by container cold starts, authorization handshakes, and API serialization.</p>
+<p>Consequently, this architecture is computationally inefficient and should not be used when native external cloud options are viable. Instead, it serves as <strong>&ldquo;The Ultimate Last Resort&rdquo;</strong> for compliance-restricted enterprise scenarios. When strict organizational regulations prohibit data egress to external, non-Workspace cloud environments, this framework allows developers to build secure, parallel, and self-healing systems directly within the compliant Workspace boundary.</p>
+<h2 id="b-system-quotas-and-concurrency-limits">B. System Quotas and Concurrency Limits</h2>
+<p>Architectural planning must account for the platform&rsquo;s execution and storage limits:</p>
+<ul>
+<li><strong>Web App Concurrency Throttling:</strong> Google limits concurrent connections to deployed Web Apps to 30. Our implementation caps active workers at <strong>10</strong> (Exp 1) or <strong>3</strong> (Exp 2) to maintain a safe operating margin and prevent connection dropouts.</li>
+<li><strong>Document Lock Scaling:</strong> <code>LockService</code> timeouts are set to 30 seconds. While sufficient for low-concurrency runs, lock contention scales non-linearly with task volume. We mitigate this by holding document-level locks only during sub-second write-back operations, bypassing script-level locks entirely during long API calls.</li>
+<li><strong>API Allotments:</strong> Operational life depends on the host&rsquo;s daily <code>UrlFetchApp</code> quotas (20,000 requests for consumer accounts; 100,000 requests for Google Workspace accounts).</li>
+<li><strong>Persistent Ledger Limits:</strong> Writing comprehensive execution logs can lead to spreadsheet bloating, eventually hitting Google Sheets&rsquo; limit of 10 million cells. Our architecture resolves this by monitoring log row counts and dynamically rotating older entries to maintain optimal I/O speeds.</li>
+</ul>
+<h1 id="conclusion--future-outlook">Conclusion &amp; Future Outlook</h1>
+<p>We have presented an asynchronous, self-healing, and self-perpetuating MapReduce framework designed to run natively within Google Apps Script. By utilizing a 1-second timeout loopback protocol, our design bypasses the legacy 6-minute wall-time limit, allowing workflows to scale indefinitely.</p>
+<p>This design opens up new development possibilities for secure, in-suite architectures. Future work will investigate integrating this loopback model with the Model Context Protocol (MCP) and Agent-to-Agent (A2A) networks. This will lay the groundwork for secure, federated agent networks capable of autonomous negotiation and execution entirely within enterprise office suites.</p>
+<h1 id="summary">Summary</h1>
+<p>This paper presents an asynchronous serverless framework that overcomes the stateless nature and 6-minute execution limit of Google Apps Script (GAS) <a href="https://developers.google.com/apps-script/guides/services/quotas">Ref</a>. By configuring a 1-second timeout parameter in UrlFetchApp loopback calls <a href="https://developers.google.com/apps-script/reference/url-fetch/url-fetch-app#fetch(String,Object)">Ref</a>, the orchestrator can dispatch background tasks and terminate immediately. This frees up the caller&rsquo;s execution quota while the target Web App runs to completion in an isolated container. Combined with a transactional Google Sheets state machine <a href="https://github.com/tanaikech/RunAll">Ref</a>, this design supports self-perpetuating parallel MapReduce runs and multi-turn, state-hydrated generative AI agent networks without external compute infrastructure.</p>
+<h2 id="key-takeaways">Key Takeaways</h2>
+<ul>
+<li><strong>Temporal Bypass:</strong> A 1-second immediate timeout loopback call allows the orchestrator to dispatch background worker threads and terminate immediately, dodging the 6-minute execution limit.</li>
+<li><strong>Shared Memory Ledger:</strong> Google Sheets serves as a persistent, transactional memory engine, enabling state-machine tracking and conversation history hydration across isolated execution contexts.</li>
+<li><strong>Dynamic Self-Healing:</strong> Integrated LLM exception handlers analyze execution errors (such as formatting faults or API limits) and dynamically rewrite prompt strategies to auto-retry and heal failing threads.</li>
+<li><strong>Decoupled Workload Architecture:</strong> The orchestration engine is fully decoupled from task specifications, allowing developers to redefine entire multi-agent behaviors by updating a declarative configuration.</li>
+<li><strong>Secure Enterprise Compliance:</strong> Despite a 3-to-5 second latency overhead per execution hop, this architecture provides a secure, compliant serverless platform for organizations that restrict data egress to external cloud systems.</li>
+</ul>
+
+  
+  <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2026%2f06%2f09%2fthe-1-second-timeout-hack-running-infinite-parallel-workloads-natively-on-google-apps-script%2f" target="_blank" title="Share on Facebook"><i class="fab fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2026%2f06%2f09%2fthe-1-second-timeout-hack-running-infinite-parallel-workloads-natively-on-google-apps-script%2f" target="_blank" title="Tweet"><i class="fab fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f06%2f09%2fthe-1-second-timeout-hack-running-infinite-parallel-workloads-natively-on-google-apps-script%2f" target="_blank" title="Share on Google+"><i class="fab fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2026%2f06%2f09%2fthe-1-second-timeout-hack-running-infinite-parallel-workloads-natively-on-google-apps-script%2f" target="_blank" title="Post to Tumblr"><i class="fab fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f06%2f09%2fthe-1-second-timeout-hack-running-infinite-parallel-workloads-natively-on-google-apps-script%2f" target="_blank" title="Pin it"><i class="fab fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f06%2f09%2fthe-1-second-timeout-hack-running-infinite-parallel-workloads-natively-on-google-apps-script%2f" target="_blank" title="Submit to Reddit"><i class="fab fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
+
+
+  
+<nav class="prev-next-posts">
+  <div class="prev-post">
+    
+      <span class="nav-label">Previous Article</span>
+      <a href="https://tanaikech.github.io/2026/06/04/updated-gas-library-gasadk/">Updated: GAS Library - GASADK</a>
+    
+  </div>
+  <div class="next-post">
+    
+  </div>
+</nav>
+
+<style>
+.prev-next-posts {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+  gap: 2rem;
+}
+.prev-post, .next-post {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.next-post {
+  text-align: right;
+}
+.nav-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+.prev-next-posts a {
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-decoration: none;
+}
+@media (max-width: 600px) {
+  .prev-next-posts { flex-direction: column; text-align: left; }
+  .next-post { text-align: left; }
+}
+</style>
+
+
+  
+  
+  
+  
+
+  
+
+</div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-social"><a href="https://twitter.com/tanaikech" target="_blank" rel="me" title="twitter">
+                  <i class="fab fa-x-twitter"></i>
+                </a><a href="https://github.com/tanaikech" target="_blank" rel="me" title="github">
+                  <i class="fab fa-github"></i>
+                </a><a href="https://linkedin.com/in/tanaike" target="_blank" rel="me" title="linkedin">
+                  <i class="fab fa-linkedin"></i>
+                </a><a href="https://www.youtube.com/@tanaike" target="_blank" rel="me" title="youtube">
+                  <i class="fab fa-youtube"></i>
+                </a><a href="https://medium.com/@tanaike" target="_blank" rel="me" title="medium">
+                  <i class="fab fa-medium"></i>
+                </a><a href="https://stackoverflow.com/users/7108653" target="_blank" rel="me" title="stackoverflow">
+                  <i class="fab fa-stack-overflow"></i>
+                </a><a href="https://zenn.dev/tanaike" target="_blank" rel="me" title="zenn">
+                  <i class="fas fa-edit"></i>
+                </a><a href="https://dev.to/tanaike" target="_blank" rel="me" title="devto">
+                  <i class="fab fa-dev"></i>
+                </a>
+      </div>
+      
+      <p class="copyright">
+        &copy; 2026 tanaike - Google Apps Script, Gemini API, and Developer Tips. Built with <a href="https://gohugo.io" target="_blank">Hugo</a>.
+      </p>
+    </div>
+  </footer>
+
+  <script src="https://tanaikech.github.io/js/eclipse.js"></script>
+
+  
+  
+
+  
+  
+
+  
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
+<script>
+  
+  if (window.location.hostname != "localhost") {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-J3Z6T50WL5');
+  }
+</script>
+
+
+
+  
+
+  
+<script src="https://tanaikech.github.io/js/math-code.js"></script>
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  
+
+</body>
+</html>
+
