@@ -202,6 +202,61 @@
   
     <article class="post-item">
       <div class="post-meta">
+        <i class="far fa-calendar-alt"></i> March 26, 2019
+      </div>
+      <h2><a href="https://tanaikech.github.io/2019/03/26/gastips/">Parsing Query Parameters from URL using Google Apps Script</a></h2>
+      <div class="post-summary">
+        
+          <p><a href="https://gist.github.com/tanaikech/34437522f3ce777bd060458b9cc02bdf">Gists</a></p>
+<p>This is a sample script for parsing query parameters from an URL using Google Apps Script. Also this can be used at Javascript. The process cost becomes a bit lower than that of the script using the regular expression.</p>
+<h2 id="sample-script">Sample script</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">parseQuery</span>(<span style="color:#a6e22e">url</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">query</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">url</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;?&#34;</span>)[<span style="color:#ae81ff">1</span>];
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">query</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">query</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;&amp;&#34;</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">reduce</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">o</span>, <span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;=&#34;</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">key</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">temp</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">trim</span>();
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">value</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">temp</span>[<span style="color:#ae81ff">1</span>].<span style="color:#a6e22e">trim</span>();
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">value</span> <span style="color:#f92672">=</span> isNaN(<span style="color:#a6e22e">value</span>) <span style="color:#f92672">?</span> <span style="color:#a6e22e">value</span> <span style="color:#f92672">:</span> Number(<span style="color:#a6e22e">value</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">o</span>[<span style="color:#a6e22e">key</span>]) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">o</span>[<span style="color:#a6e22e">key</span>].<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">value</span>);
+</span></span><span style="display:flex;"><span>      } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">o</span>[<span style="color:#a6e22e">key</span>] <span style="color:#f92672">=</span> [<span style="color:#a6e22e">value</span>];
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">o</span>;
+</span></span><span style="display:flex;"><span>    }, {});
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Please run this function when you test this script.
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://sampleUrl.com/sample?key1=value1&amp;key2=value2&amp;key1=value3&amp;key3=value4&amp;key2=value5&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">parseQuery</span>(<span style="color:#a6e22e">url</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">Logger</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="result">Result</h2>
+<pre tabindex="0"><code>{
+  &#34;key1&#34;: [
+    &#34;value1&#34;,
+    &#34;value3&#34;
+  ],
+  &#34;key2&#34;: [
+    &#34;value2&#34;,
+    &#34;value5&#34;
+  ],
+  &#34;key3&#34;: [
+    &#34;value4&#34;
+  ]
+}
+</code></pre>
+        
+      </div>
+    </article>
+  
+    <article class="post-item">
+      <div class="post-meta">
         <i class="far fa-calendar-alt"></i> March 25, 2019
       </div>
       <h2><a href="https://tanaikech.github.io/2019/03/25/trend-of-google-apps-script-tag-on-stackoverflow-2019/">Trend of google-apps-script Tag on Stackoverflow 2019</a></h2>
@@ -402,53 +457,6 @@ end5
 <li>When you deploy Web Apps, you can see the link labeled latest code. The link is like <code>https://script.google.com/macros/s/###/dev</code>. When you access to the link of latest code using your browser under you login to Google, you can access to Web Apps with the dev mode. But if you want to access to Web Apps with the dev mode from outside, there are no documents for the method. Here, it introduces such method.</li>
 </ul>
 <p><font color="#3366CC"><strong>You can check this at <a href="https://github.com/tanaikech/taking-advantage-of-Web-Apps-with-google-apps-script">https://github.com/tanaikech/taking-advantage-of-Web-Apps-with-google-apps-script</a>.</strong></font></p>
-        
-      </div>
-    </article>
-  
-    <article class="post-item">
-      <div class="post-meta">
-        <i class="far fa-calendar-alt"></i> January 13, 2019
-      </div>
-      <h2><a href="https://tanaikech.github.io/2019/01/13/opening-dialog-box-during-calculation-and-retrieving-calculated-result-using-google-apps-script/">Opening Dialog Box during Calculation and Retrieving Calculated Result using Google Apps Script</a></h2>
-      <div class="post-summary">
-        
-          <p><a href="https://gist.github.com/tanaikech/3a4837d4ef0d31522cd9ff29c085c786">Gists</a></p>
-<ol>
-<li>When it starts a calculation, open a dialog box.</li>
-<li>When the calculation is finished, close the dialog and retrieve the calculated result.</li>
-</ol>
-<p>This is a sample script for achieving above flow. This sample script supposes to use the container-bound script of Spreadsheet. When you use this, please run the function of <code>run()</code>.</p>
-<h2 id="sample-script">Sample script:</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">doSomething</span>(<span style="color:#a6e22e">e</span>) {
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Scripts for calculating.
-</span></span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">Utilities</span>.<span style="color:#a6e22e">sleep</span>(<span style="color:#ae81ff">3000</span>); <span style="color:#75715e">// This is a sample wait time.
-</span></span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;data&#34;</span>;
-</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">main</span>({<span style="color:#a6e22e">result</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">data</span>});
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">openDialogue</span>() {
-</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">html</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&lt;script&gt;google.script.run.withSuccessHandler(function() {google.script.host.close()}).doSomething();&lt;/script&gt;&#34;</span>;
-</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">h</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">HtmlService</span>.<span style="color:#a6e22e">createHtmlOutput</span>(<span style="color:#a6e22e">html</span>);
-</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getUi</span>().<span style="color:#a6e22e">showModalDialog</span>(<span style="color:#a6e22e">h</span>, <span style="color:#e6db74">&#34;Sample&#34;</span>);
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>(<span style="color:#a6e22e">e</span>) {
-</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#e6db74">&#34;result&#34;</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">e</span>) <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">result</span>;
-</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">openDialogue</span>(<span style="color:#a6e22e">e</span>);
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// Please run this function.
-</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">run</span>() {
-</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">main</span>({});
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Logger</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>);
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h2 id="note">Note:</h2>
-<ul>
-<li>This can be also used for the sidebar and other Google Docs.</li>
-</ul>
         
       </div>
     </article>

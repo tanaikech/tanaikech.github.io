@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Hugo 0.157.0">
+
+  
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+  
+  <meta name="theme-color" content="#050505">
+
+  
+  <meta name="google-site-verification" content="googleccbde819fe280caa.html" />
+
+  
+  
+
+  <meta name="keywords" content="Gemini, AI, Antigravity">
+
+  <meta name="description" content="Gists
+
+
+Motivation
+To be quite honest, &ldquo;Hooks&rdquo;—the shell commands we trigger at specific points when generative AI agents process tasks—were something I used blindly for a long time. Whenever colleagues asked me about them, I realized I lacked any real confidence in explaining how they actually work. However, when I migrated from Gemini CLI to the new Antigravity CLI, I noticed that the hooks system carried over. This felt like the right moment to stop guessing and finally develop a precise, deep understanding of the mechanism. I went back to the basics to analyze exactly how hooks operate under the hood and how we can use them effectively in the Antigravity environment. My goal is to demystify hooks so we can write them with confidence, and if this guide proves useful to your own workflows as well, I would be very glad.">
+
+  
+  <link rel="canonical" href="https://tanaikech.github.io/2026/06/26/a-developers-guide-to-agent-hooks-in-antigravity-cli/">
+
+  
+  <title>A Developer&#39;s Guide to Agent Hooks in Antigravity CLI | tanaike - Google Apps Script, Gemini API, and Developer Tips</title>
+
+  
+  <meta property="og:title" content="A Developer&#39;s Guide to Agent Hooks in Antigravity CLI">
+  <meta property="og:description" content="Gists
+
+
+Motivation
+To be quite honest, &ldquo;Hooks&rdquo;—the shell commands we trigger at specific points when generative AI agents process tasks—were something I used blindly for a long time. Whenever colleagues asked me about them, I realized I lacked any real confidence in explaining how they actually work. However, when I migrated from Gemini CLI to the new Antigravity CLI, I noticed that the hooks system carried over. This felt like the right moment to stop guessing and finally develop a precise, deep understanding of the mechanism. I went back to the basics to analyze exactly how hooks operate under the hood and how we can use them effectively in the Antigravity environment. My goal is to demystify hooks so we can write them with confidence, and if this guide proves useful to your own workflows as well, I would be very glad.">
+  <meta property="og:url" content="https://tanaikech.github.io/2026/06/26/a-developers-guide-to-agent-hooks-in-antigravity-cli/">
+  <meta property="og:site_name" content="tanaike - Google Apps Script, Gemini API, and Developer Tips">
+  <meta property="og:type" content="article"><meta property="og:image" content="https://tanaikech.github.io/img/og-main.png">
+
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@tanaikech">
+  <meta name="twitter:title" content="A Developer&#39;s Guide to Agent Hooks in Antigravity CLI">
+  <meta name="twitter:description" content="Gists
+
+
+Motivation
+To be quite honest, &ldquo;Hooks&rdquo;—the shell commands we trigger at specific points when generative AI agents process tasks—were something I used blindly for a long time. Whenever colleagues asked me about them, I realized I lacked any real confidence in explaining how they actually work. However, when I migrated from Gemini CLI to the new Antigravity CLI, I noticed that the hooks system carried over. This felt like the right moment to stop guessing and finally develop a precise, deep understanding of the mechanism. I went back to the basics to analyze exactly how hooks operate under the hood and how we can use them effectively in the Antigravity environment. My goal is to demystify hooks so we can write them with confidence, and if this guide proves useful to your own workflows as well, I would be very glad.">
+  <meta name="twitter:image" content="https://tanaikech.github.io/img/og-main.png">
+
+  
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [{
+        "@type": "BlogPosting",
+        "headline": "\"A Developer's Guide to Agent Hooks in Antigravity CLI\"",
+        "description": "\"\\u003cp\\u003e\\u003ca href=\\\"https://gist.github.com/tanaikech/004f4bcdb530f1a07706c85c13dc8205\\\"\\u003eGists\\u003c/a\\u003e\\u003c/p\\u003e\\n\\u003cp\\u003e\\u003cimg src=\\\"https://tanaikech.github.io/image-storage/20260626a/fig1a.jpg\\\"\\n     alt=\\\"Core operational flow of the Antigravity CLI hooks subsystem, detailing lifecycle interception, out-of-band validation, and the execution response cycle.\\\"\\n     \\n     loading=\\\"lazy\\\"\\n     decoding=\\\"async\\\"\\u003e\\n\\u003c/p\\u003e\\n\\u003ch2 id=\\\"motivation\\\"\\u003eMotivation\\u003c/h2\\u003e\\n\\u003cp\\u003eTo be quite honest, \\u0026ldquo;Hooks\\u0026rdquo;—the shell commands we trigger at specific points when generative AI agents process tasks—were something I used blindly for a long time. Whenever colleagues asked me about them, I realized I lacked any real confidence in explaining how they actually work. However, when I migrated from Gemini CLI to the new Antigravity CLI, I noticed that the hooks system carried over. This felt like the right moment to stop guessing and finally develop a precise, deep understanding of the mechanism. I went back to the basics to analyze exactly how hooks operate under the hood and how we can use them effectively in the Antigravity environment. My goal is to demystify hooks so we can write them with confidence, and if this guide proves useful to your own workflows as well, I would be very glad.\\u003c/p\\u003e\"",
+        "url": "\"https://tanaikech.github.io/2026/06/26/a-developers-guide-to-agent-hooks-in-antigravity-cli/\"",
+        "datePublished": "\"2026-06-26T15:52:38+09:00\"",
+        "dateModified": "\"2026-06-26T15:52:38+09:00\"",
+        "wordCount":  4553 ,
+        "author": {
+          "@id": "https:\/\/tanaikech.github.io\/#person"
+        },
+        "publisher": {
+          "@id": "https:\/\/tanaikech.github.io\/#person"
+        },
+        "image": {
+          "@type": "ImageObject",
+          "url": "\"https://tanaikech.github.io/img/og-main.png\"",
+          "width": 1200,
+          "height": 630
+        },
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "\"https://tanaikech.github.io/2026/06/26/a-developers-guide-to-agent-hooks-in-antigravity-cli/\""
+        }
+      },{
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "\"https://tanaikech.github.io/\""
+          },{
+            "@type": "ListItem",
+            "position": 2,
+            "name": "\"A Developer's Guide to Agent Hooks in Antigravity CLI\"",
+            "item": "\"https://tanaikech.github.io/2026/06/26/a-developers-guide-to-agent-hooks-in-antigravity-cli/\""
+          }]
+      },      {
+        "@type": "Person",
+        "@id": "https:\/\/tanaikech.github.io\/#person",
+        "name": "Kanshi Tanaike",
+        "alternateName": "tanaike",
+        "url": "\"https://tanaikech.github.io/\"",
+        "image": "\"https://tanaikech.github.io/img/og-main.png\"",
+        "jobTitle": "Google Developer Expert",
+        "honorificPrefix": "Ph.D.",
+        "description": "Japanese scientist, Physicist and Google Developer Expert for Google Workspace.",
+        "award": "First place in the Outstanding GDE Award 2025",
+        "sameAs": [
+          "https://twitter.com/tanaikech",
+          "https://github.com/tanaikech",
+          "https://stackoverflow.com/users/7108653/tanaike",
+          "https://developers.google.com/community/experts/directory?text=tanaike",
+          "https://zenn.dev/tanaike",
+          "https://medium.com/@tanaike"
+        ]
+      }
+    ]
+  }
+  </script>
+
+  
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/eclipse.css">
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <link rel="shortcut icon" href="https://tanaikech.github.io/img/favicon.ico" type="image/x-icon" />
+  
+  
+  
+
+  
+  
+  
+</head>
+
+
+<body>
+  <div id="progress-bar"></div>
+  
+  <header class="site-header">
+    <div class="header-container">
+      
+      <div class="header-top">
+        <div class="site-title">
+          <a href="https://tanaikech.github.io/">TANAIKE</a>
+          
+            <div class="site-subtitle">The Thinker</div>
+          
+        </div>
+
+        
+        <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+
+      
+      <div id="mobile-menu" class="mobile-menu-content">
+        <div class="nav-row">
+          <div class="nav-links">
+            
+              <a href="https://tanaikech.github.io/about/" title="">
+                <i class='fa fa-user fa-fw'></i> About
+              </a>
+            
+              <a href="https://tanaikech.github.io/post/" title="">
+                <i class='fa fa-list fa-fw'></i> Articles
+              </a>
+            
+              <a href="https://tanaikech.github.io/topics/" title="">
+                <i class='fa fa-folder fa-fw'></i> Topics
+              </a>
+            
+              <a href="https://tanaikech.github.io/tags/" title="">
+                <i class='fa fa-tags fa-fw'></i> Tags
+              </a>
+            
+              <a href="https://tanaikech.github.io/contact/" title="">
+                <i class='fa fa-phone fa-fw'></i> Contact
+              </a>
+            
+              <a href="https://tanaikech.github.io/link/" title="">
+                <i class='fa fa-thumbs-up fa-fw'></i> Links
+              </a>
+            
+              <a href="https://tanaikech.github.io/webapps/" title="">
+                <i class='fas fa-toolbox'></i> Web Applications
+              </a>
+            
+              <a href="https://tanaikech.github.io/donate/" title="">
+                <i class='fas fa-donate'></i> Donate
+              </a>
+            
+              <a href="https://tanaikech.github.io/" title="">
+                <i class='fa fa-home fa-fw'></i> Home
+              </a>
+            
+          </div>
+        </div>
+
+        <div class="social-links-row"><a href="https://twitter.com/tanaikech" target="_blank" rel="me">
+                <i class="fab fa-x-twitter"></i> X
+              </a><a href="https://medium.com/@tanaike" target="_blank" rel="me">
+                <i class="fab fa-medium"></i> Medium
+              </a><a href="https://www.youtube.com/@tanaike" target="_blank" rel="me">
+                <i class="fab fa-youtube"></i> YouTube
+              </a><a href="https://linkedin.com/in/tanaike" target="_blank" rel="me">
+                <i class="fab fa-linkedin"></i> LinkedIn
+              </a><a href="https://github.com/tanaikech" target="_blank" rel="me">
+                <i class="fab fa-github"></i> GitHub
+              </a><a href="https://gist.github.com/tanaikech" target="_blank" rel="me">
+                <i class="fas fa-code"></i> Gists
+              </a><a href="https://stackoverflow.com/users/7108653" target="_blank" rel="me">
+                <i class="fab fa-stack-overflow"></i> Stack Overflow
+              </a><a href="https://dev.to/tanaike" target="_blank" rel="me">
+                <i class="fab fa-dev"></i> DEV
+              </a><a href="https://zenn.dev/tanaike" target="_blank" rel="me">
+                <i class="fas fa-edit"></i> Zenn
+              </a><a href="https://devpost.com/tanaike" target="_blank" rel="me">
+                <i class="fas fa-terminal"></i> Devpost
+              </a></div>
+      </div>
+
+    </div>
+  </header>
+
+  <main id="main">
+
+
+<div class="header">
+  <h1>A Developer&#39;s Guide to Agent Hooks in Antigravity CLI</h1>
+  <h2></h2>
+</div>
+<div class="content">
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>26 Jun 2026, 15:52</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/report">report</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/gemini">Gemini</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/ai">AI</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/antigravity">Antigravity</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  <p><a href="https://gist.github.com/tanaikech/004f4bcdb530f1a07706c85c13dc8205">Gists</a></p>
+<p><img src="https://tanaikech.github.io/image-storage/20260626a/fig1a.jpg"
+     alt="Core operational flow of the Antigravity CLI hooks subsystem, detailing lifecycle interception, out-of-band validation, and the execution response cycle."
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<h2 id="motivation">Motivation</h2>
+<p>To be quite honest, &ldquo;Hooks&rdquo;—the shell commands we trigger at specific points when generative AI agents process tasks—were something I used blindly for a long time. Whenever colleagues asked me about them, I realized I lacked any real confidence in explaining how they actually work. However, when I migrated from Gemini CLI to the new Antigravity CLI, I noticed that the hooks system carried over. This felt like the right moment to stop guessing and finally develop a precise, deep understanding of the mechanism. I went back to the basics to analyze exactly how hooks operate under the hood and how we can use them effectively in the Antigravity environment. My goal is to demystify hooks so we can write them with confidence, and if this guide proves useful to your own workflows as well, I would be very glad.</p>
+<h2 id="abstract">Abstract</h2>
+<p>As autonomous AI coding agents transition from sandbox environments to production workspaces, establishing robust, deterministic execution guardrails becomes paramount. This paper analyzes the architectural mechanics of agent lifecycle hooks, tracking their execution flow from legacy open-source implementations to the modern Go-based Google Antigravity CLI. We dissect the hook lifecycle, including input generation, regular expression matching, and sequential result aggregation. Furthermore, we provide concrete, production-ready Shell and Node.js implementation patterns for blocking dangerous shell command executions and regulating Model Context Protocol (MCP) tool dispatches, establishing deterministic security guardrails for terminal-first autonomous developers.</p>
+<h2 id="introduction">Introduction</h2>
+<p>In the summer of 2025, Anthropic introduced &ldquo;Hooks&rdquo; into its terminal agent lifecycle <a href="https://code.claude.com/docs/en/hooks-guide">Ref</a>. This development represented a shift from relying on LLM decision-making to using deterministic execution boundaries. Rather than trying to persuade an agent to avoid destructive actions, hooks enforce hard, programmatically defined rules at key lifecycle events.</p>
+<p>This technical framework was subsequently adopted and refined by Google within its developer agent ecosystems, culminating in the release of the Go-based Antigravity CLI <a href="https://antigravity.google/docs/hooks">Ref</a>. To build secure, high-throughput autonomous development workflows, engineers must move away from soft prompting and adopt strict, runtime-level interception. This paper analyzes the internal mechanics of these hook architectures, examines the transition from legacy setups to modern engines, and offers reference implementations for production guardrails.</p>
+<h2 id="architectural-blueprint-of-lifecycle-interception-lessons-from-gemini-cli">Architectural Blueprint of Lifecycle Interception: Lessons from Gemini CLI</h2>
+<p>To construct reliable guardrails, we must first analyze the execution loop of the hook subsystem. By examining the structural designs preserved from the open-source Gemini CLI, we can map the exact routing of context, decision-making, and output aggregation.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260626a/fig1b.png"
+     alt="fig1b"
+     
+     loading="lazy"
+     decoding="async">
+
+<a href="https://mermaid.ai/play?utm_source=mermaid_live_editor&amp;utm_medium=share#pako:eNqVld9v2jAQx_8V5KdWgwoGgZKHSR2l6svUqkyatGUPXnIEq47Nzs4ERfzvPYeExeHHGE_4_Dnf3ffuYMNinQALWSy5MfeCp8izCCPVok9haz1q_TpbGwtZa1PduM8HoYQVXIo3uLr2LlKw0z-g7CNXiQS8ui7eqJua-Aukwlhcl2h19LC5QJiBMUKrmeW4C9GI7JjPMNcIX7WWp4i7uQX8QnU3ie1h5VUqfu0dckMBJvSYKRnXP35eJhIWToDugUP9nNU8aCwTPBfmSNLPkisF2OhXjMAtTFcQ55ZEdFDVmrrNqzPjNl6AmWhlYeUS-UW6wl_omGL5kdhQRICirBn8zqkqUqVRdx165silhAbSKZGJzjKapEPtKoCSsCIDHziS7F2aUiO41c2EeXkBL2ByaQ2VXrGQ7Lrh7L5YgCl8E3bxhPcQCzepjez2xIMAmbzAUvIYsoMp3XFuhGcgIXadecrtMndpnCmmvmGNcv5jMU4B9e400qgOtZ-KTueTvz9hK9YaE6FIQHPOYTc-l-K1Bl7qUm3Hpbwn60knjzoSqlg-01rWNuyk216DUvN_B_Jk2M9u4cfaLEWRsNBiDm1Go5Vxd2Qb92bE7IImMGIhfU04vkYsUlvyWXL1XeusckOdpwsWzrk0dMqXCT1f_l3sEVAJ4ETT6rFwEBRPsHDDViwc3d4M-r3RYNQPgv74Y3_YZmsW9rrDm9vRYDzsBeNRd9gdB9s2eyuCduki2L4DMhYrQQ">Mermaid Chart Playground</a></p>
+<p>The hook subsystem is split into dedicated, object-oriented modules that isolate registration, matching, running, and aggregation:</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">Component</th>
+          <th style="text-align: left">Source File</th>
+          <th style="text-align: left">Responsibility</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left"><strong><code>HookSystem</code></strong></td>
+          <td style="text-align: left"><code>hookSystem.ts</code></td>
+          <td style="text-align: left">The main facade acting as the entry point. It exposes high-level event methods and coordinates the lower-level sub-modules.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong><code>HookRegistry</code></strong></td>
+          <td style="text-align: left"><code>hookRegistry.ts</code></td>
+          <td style="text-align: left">Discovers, validates, and stores hooks declared in system, user, and project-level settings, maintaining their execution priorities.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong><code>HookPlanner</code></strong></td>
+          <td style="text-align: left"><code>hookPlanner.ts</code></td>
+          <td style="text-align: left">Resolves target context against user-defined regular expressions (matchers) to construct a deduplicated, ordered execution plan.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong><code>HookRunner</code></strong></td>
+          <td style="text-align: left"><code>hookRunner.ts</code></td>
+          <td style="text-align: left">Executes the resolved plan, spawning out-of-band shell processes (Command Hooks) or executing JS/TS modules (Runtime Hooks).</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong><code>HookAggregator</code></strong></td>
+          <td style="text-align: left"><code>hookAggregator.ts</code></td>
+          <td style="text-align: left">Merges outcomes from multiple concurrent or serial hooks into a single consolidated decision structure using event-specific logic.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong><code>HookEventHandler</code></strong></td>
+          <td style="text-align: left"><code>hookEventHandler.ts</code></td>
+          <td style="text-align: left">Constructs the base context payload (<code>HookInput</code>), manages telemetry, and triggers the orchestrator when agent lifecycle shifts occur.</td>
+      </tr>
+  </tbody>
+</table>
+<p>The sequential interaction between these core classes during an interception loop is detailed below:</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260626a/fig1c.png"
+     alt="fig1c"
+     
+     loading="lazy"
+     decoding="async">
+
+<a href="https://mermaid.ai/play?utm_source=mermaid_live_editor&amp;utm_medium=share#pako:eNqtVlFz4jYQ_is7eomZIQ4ccOQ8HWYckhnSuUsZuKeWPgh7cdTYkivJXLhM_ntXAjtO6rT3cLxgS99-u_tp9cETS1SKLGIG_65QJngteKZ5sdEbCfThlVWyKrao65WSaysSUXJpYa40AjfH7_nnW7iAOEPa-KxU2RWwWDv4QqmH9cFYLDoxN4sadLMnsgWXad6df7GskcucS_kOaFWDVtV7mKVWSY3yL2gMBHNVFJS818ka1_g4yzRm3CrPXGOdJOez2WIdwU5ovMIdLXxVKvc9BZae7niBfRCyrGyTYrF2QTeL7qgwDBskT6zYc4tOr3biO0Vrao8aPM0whLlGh0uoGyWP-UBt_8LEQuAauPUV0L60XEghM7CaS5NoUVqC7xSQCLAmSQTF3163s1EOV_AygsRnuXnEpLKEcwcSvNTfhyeoe4bnjiaWHfUT64cQvnCb3NOrK8LViI8WcM_zirs8v2z1xWwUwjWmVZmLxJHdU1PGb4zdhkVdCIlwHHEreH5BJ8nzHHPY5TwzTTPL81p9P33tXtw0yJ3ITL_F0_SR4ptOmgZz28KDMKRthfVuS8FVBOjzoUtt1k1MkNR5X0_Ka_lW7eWWhEQ7CeGF7ZSkFs7PewznMwi-oM4oqrJuPKyC01TQlgddvap51QjViLRCU-XW_PFnG9jWpSkRc4NvRNlxtxYsT8fS-3-BaujPkKfmehGHStGqEAZD2ui9aX02cw4RgSn5tyPS20X8g7irXncxR_DHEFaYoNgj_Lr-7Q52VAcYmwrpL0B5JGkzuLjzk0IEpBOEwIdeAA2ukF_pwvR-4unJtMMA4gj4yQfxxBX8m7xPF5cO3ZlAhwXEHRZAvNMQ4rLMD1CiPvfxUPhZNWRTFrNDU0rc9FV7Mqbe933-rrsav23lZNn_FU8WTSjn7z-e5z2LPrJckkeTsQlZ0bKGba6SB--WrYHccoMp0EOKifBGHJzRbKpvZ3TOZynKw5mXlPVZpkXKIuczfUZKFdy9sieXe8PsPRa4YRE9plw_bNhGPlMM_ab9rlRRh2lVZfcs8teyz6oypS5O_wwaCA0C6rmqpGXRdOIpWPTEHlk0HI7C8Wg4_TAcTS4Ho-Gnyz470PJgFF5Ox5_G0-ng42QyHgyf--y7zzqgjcmg9Rk-_wNubNDS">Mermaid Chart Playground</a></p>
+<h3 id="detailed-hook-pipeline-mechanics">Detailed Hook Pipeline Mechanics</h3>
+<h4 id="1-context-object-generation-hookinput">1. Context Object Generation (<code>HookInput</code>)</h4>
+<p>Upon event detection, the system initiates <code>HookEventHandler.createBaseInput()</code>, assembling a standardized, environment-aware context payload:</p>
+<ul>
+<li><code>session_id</code>: Unique cryptographic identifier of the current execution session.</li>
+<li><code>transcript_path</code>: Absolute file path to the session&rsquo;s active JSON conversation transcript.</li>
+<li><code>cwd</code>: The agent&rsquo;s current working directory.</li>
+<li><code>timestamp</code>: ISO 8601 representation of the exact event time.</li>
+<li><code>hook_event_name</code>: The triggered lifecycle event type.</li>
+</ul>
+<h4 id="2-pattern-matching-and-deduplication">2. Pattern Matching and Deduplication</h4>
+<p><code>HookPlanner</code> evaluates the user&rsquo;s <code>matcher</code> parameters:</p>
+<ul>
+<li><strong>Tool Events</strong>: Matchers are treated as regular expressions and compared to the target tool (e.g., <code>write_file</code>).</li>
+<li><strong>Standard Lifecycle Events</strong>: Matchers map to startup or resume triggers.</li>
+<li><strong>Deduplication</strong>: Identical command-string definitions are pruned to prevent redundant execution within the same turn.</li>
+</ul>
+<h4 id="3-execution-topology-and-state-chaining">3. Execution Topology and State Chaining</h4>
+<ul>
+<li><strong>Parallel Mode</strong>: Spawns concurrent processes via <code>Promise.all</code> to minimize latency.</li>
+<li><strong>Sequential Mode</strong>: Executes hooks in serial order. If an upstream hook yields output, <code>applyHookOutputToInput</code> merges this feedback directly into the stdin context payload of the next hook down the chain. For example, a <code>BeforeAgent</code> hook can append environment-specific guidelines to the user&rsquo;s prompt before a downstream security analyzer evaluates it.</li>
+</ul>
+<h4 id="4-subprocess-isolation-and-output-handling">4. Subprocess Isolation and Output Handling</h4>
+<p>The runner handles external commands using <code>HookRunner.executeCommandHook()</code> under strict operational parameters:</p>
+<ul>
+<li><strong>Workspace Verification</strong>: Local project hooks are ignored unless the workspace directory is explicitly marked as trusted.</li>
+<li><strong>Environment Injection</strong>: Exposes host details via dedicated environment variables including <code>$GEMINI_PROJECT_DIR</code>, <code>$GEMINI_SESSION_ID</code>, and <code>$GEMINI_CWD</code>.</li>
+<li><strong>JSON Pipeline</strong>: The context payload is piped directly to the subprocess via standard input (<code>stdin</code>).</li>
+<li><strong>Standard Output (<code>stdout</code>) Parsing Fallbacks</strong>: The runner expects a structured JSON response on <code>stdout</code>. If a hook returns non-JSON plain text, the engine executes fallback parsing:
+<ul>
+<li><strong>Exit Code 0</strong>: Interpreted as <code>decision: 'allow'</code>. Any printed text is displayed to the user as a system message.</li>
+<li><strong>Exit Code 1</strong>: Evaluates as <code>decision: 'allow'</code> but prints a diagnostic warning.</li>
+<li><strong>Non-Zero Exit Code</strong>: Evaluates as <code>decision: 'deny'</code>, treating the stdout text as the block reason.</li>
+</ul>
+</li>
+<li><strong>Subprocess Timeout</strong>: If the process exceeds its configured duration (default: 60 seconds), the engine terminates the subprocess using <code>SIGTERM</code> (or <code>taskkill</code> on Windows) and aborts the turn.</li>
+</ul>
+<h4 id="5-output-aggregation">5. Output Aggregation</h4>
+<p><code>HookAggregator</code> processes multiple execution results based on the event context:</p>
+<ul>
+<li><strong>Veto-Power Logic (<code>BeforeTool</code>, <code>AfterTool</code>, <code>BeforeAgent</code>, <code>AfterAgent</code>, <code>SessionStart</code>)</strong>: If even a single hook returns a block or deny decision, the entire operation is blocked. Text fields (<code>reason</code>, <code>systemMessage</code>, <code>additionalContext</code>) are joined using newline characters and returned to the core loop.</li>
+<li><strong>Last-Write-Wins Logic (<code>BeforeModel</code>, <code>AfterModel</code>)</strong>: The output of the last hook in the execution sequence overrides all preceding outputs.</li>
+<li><strong>Union Tool Selection (<code>BeforeToolSelection</code>)</strong>: Merges all allowed tools across all hooks, taking the union of <code>allowedFunctionNames</code> to construct the final tool configurations passed to the model.</li>
+</ul>
+<hr>
+<h3 id="a-concrete-execution-scenario-the-lifecycle-of-a-file-write-request">A Concrete Execution Scenario: The Lifecycle of a File Write Request</h3>
+<p>To illustrate these components in action, consider a local agent processing a file modification request under active hook surveillance:</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260626a/fig1d.png"
+     alt="fig1d"
+     
+     loading="lazy"
+     decoding="async">
+
+<a href="https://mermaid.ai/play?utm_source=mermaid_live_editor&amp;utm_medium=share#pako:eNqtVWtP2zAU_StXlhBFS0OfPKKpEuMhkNhAlIe0dZpMctsakjizHR6r-t937TZtWspj0vIhbezj-zjn2B6xUEbIAqbxd45piAeCDxRPeqqXAj08NzLNk1tUs5HQSAVXGhVw7X6LmYwrI0KR8dTA5dWJnaafzf3TE6hcIK2Dk_R-YxV6b4D0Jrz7s3l6-hVOpcxWQY-7Fncs5X33WRtMVmGOHOZIxAivg84ciN6Vb9KIvgi5ETKFfSoAlauyWGV7rHY61EsA50ommQGRZrkJoMdulDAI68cYxxJupIqjdTASKGfmmyfTY0UQWk0xXH8BdDGNIHOhyonW1uAL9qXCCR_nQ66xmFNI_KnBbaXRqnkwebXbMzbtQ30gyAcSxq33iKsAfryI-LO8xo1TYRbaFwpL6MMHelU-0OIrRdiQ3Yw_psTWHVVfNSJB_06X0cfd6pyVEUQYCk0qBLDOKdvjugdDq3RG46TQWW4c7SPgUSSsXDzel6TXk9Pi8AnD3IloMwXQqDW2qrWtaqPl-36PwRjGRW7iv0z8EnNTgSZlY-TCQThJBJ9AKjEQlHqqoCWDHOt_vlWbHWtd20WE2o6jKwnh0XL4q28daaSM_ZWqX9LMm6K32075D4s-D_gBzS24kHxebo95RHfGzdAyPNfcm_CROuJL1rA0v-sHTaRQhudqOMTw3tdDqFzzWEScoFwN8oTi6o1_8cmryhK5joWZN4qJgoQjqmrebmWxx6XWZiUdLZaj8zBErQMwKsdJKa866wJNrlLnApJX5_FL_xAQFXGhSR1rM4JlMtU4OW_k25tx2Vp7fTrO3jxPpq76qLWWA75prTm4sJbbit7qTtzcu-5JS8e1887C-R3LgQiXvdPpnHWnm5oO_HKA_2Kyomt3Q1zQJNW7KF35FiCgvVECuBY6L2HoZDlAfW9ktlChVQrFA7qMzGMDJSIWWKd5LEGVcPvJRjY-mXeICe1Z65QI-5zcRTdQOqZldOd9lzIpViqZD4Ys6PNY01ee2b03vfpno8p1si_z1LBgZ8fFYMGIPbGgXm_6rWZ9u1FvtndqzfouzT7TcK3p72y3dlvb27WtdrtVq4899selrdFEe_wXRPS4IA">Mermaid Chart Playground</a></p>
+<ol>
+<li><strong>BeforeAgent Execution</strong>: The user&rsquo;s prompt is processed by <code>inject-time.js</code>. The script outputs the current timestamp via <code>additionalContext</code>, which is merged into the LLM prompt. The model processes the instructions and decides to call the <code>write_file</code> tool.</li>
+<li><strong>BeforeTool Verification</strong>: Before the tool runs, <code>security-check.sh</code> receives the tool argument payload: <code>{ &quot;path&quot;: &quot;temp.txt&quot;, &quot;content&quot;: &quot;Hello World&quot; }</code>. It verifies that the path lies within safe workspace limits and returns <code>{ &quot;decision&quot;: &quot;allow&quot; }</code>.</li>
+<li><strong>Execution &amp; Finalization</strong>: The file write completes. The agent loop processes the tool output, generates a final response, and triggers <code>notification.sh</code> via the <code>AfterAgent</code> event. This script issues a desktop alert to notify the developer before the terminal renders the final response.</li>
+</ol>
+<hr>
+<h3 id="lifecycle-hook-events-directory">Lifecycle Hook Events Directory</h3>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">Event Name</th>
+          <th style="text-align: left">Timing</th>
+          <th style="text-align: left">Intercept/Block (decision) Support</th>
+          <th style="text-align: left">Purpose and Key Use Cases</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left"><strong><code>SessionStart</code></strong></td>
+          <td style="text-align: left">At session start, resume, or clear</td>
+          <td style="text-align: left">No</td>
+          <td style="text-align: left">Initialize resources, pre-load domain context, display welcome messages.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong><code>SessionEnd</code></strong></td>
+          <td style="text-align: left">At session close or exit</td>
+          <td style="text-align: left">No</td>
+          <td style="text-align: left">Resource cleanup, session logging, pushing metrics to telemetry endpoints.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong><code>BeforeAgent</code></strong></td>
+          <td style="text-align: left">Immediately after user input, before planning</td>
+          <td style="text-align: left"><strong>Yes</strong></td>
+          <td style="text-align: left">User prompt validation, dynamic injection of active environment context (e.g., git branch, workspace state), blocking malicious prompts.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong><code>AfterAgent</code></strong></td>
+          <td style="text-align: left">Once the agent loop completes a turn</td>
+          <td style="text-align: left"><strong>Yes</strong></td>
+          <td style="text-align: left">Auditing output, forcing retries (<code>decision: 'deny'</code>), or clearing context via <code>clearContext: true</code>.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong><code>BeforeModel</code></strong></td>
+          <td style="text-align: left">Immediately prior to dispatching an LLM request</td>
+          <td style="text-align: left"><strong>Yes</strong></td>
+          <td style="text-align: left">Modifying systemic instructions, replacing models dynamically, mocking responses to bypass API consumption.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong><code>AfterModel</code></strong></td>
+          <td style="text-align: left">Upon receiving the model response (per stream chunk)</td>
+          <td style="text-align: left"><strong>Yes</strong></td>
+          <td style="text-align: left">Content filtering, redacting sensitive parameters, scanning for API tokens before user display.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong><code>BeforeToolSelection</code></strong></td>
+          <td style="text-align: left">Prior to the LLM determining tool configurations</td>
+          <td style="text-align: left">No (Tool-filtering only)</td>
+          <td style="text-align: left">Dynamically limiting or altering the set of active functions (overwriting <code>toolConfig</code>).</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong><code>BeforeTool</code></strong></td>
+          <td style="text-align: left">Immediately before tool dispatch</td>
+          <td style="text-align: left"><strong>Yes</strong></td>
+          <td style="text-align: left">Intercepting execution arguments, blocking high-risk commands, or rewriting input values on-the-fly.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong><code>AfterTool</code></strong></td>
+          <td style="text-align: left">Immediately post-tool execution</td>
+          <td style="text-align: left"><strong>Yes</strong></td>
+          <td style="text-align: left">Modifying tool output streams, hiding error trace logs, or executing auxiliary trailing commands (<code>tailToolCallRequest</code>).</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong><code>PreCompress</code></strong></td>
+          <td style="text-align: left">Immediately before summarizing context history</td>
+          <td style="text-align: left">No</td>
+          <td style="text-align: left">Saving raw history pre-summarization, notifying the developer of context reduction.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong><code>Notification</code></strong></td>
+          <td style="text-align: left">Triggered by wait-states (e.g., waiting for user permission)</td>
+          <td style="text-align: left">No</td>
+          <td style="text-align: left"><strong>Monitoring &amp; Notification Only.</strong> Broadcasting active wait status or blocking loops to messaging APIs (Slack, Discord) or desktop notifications.</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="evolutionary-jump-porting-hooks-to-the-antigravity-cli">Evolutionary Jump: Porting Hooks to the Antigravity CLI</h2>
+<p>With the transition to the Antigravity CLI (<code>agy</code>), the execution pipeline was optimized for speed and multi-agent coordination <a href="https://antigravity.google/docs/hooks">Ref</a>. The extensive list of eleven legacy hooks was consolidated into five core, high-efficiency checkpoints.</p>
+<h3 id="the-five-antigravity-hook-events">The Five Antigravity Hook Events</h3>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">Event Name</th>
+          <th style="text-align: left">Matcher Support</th>
+          <th style="text-align: left">Description &amp; Trigger Timing</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left"><strong><code>PreToolUse</code></strong></td>
+          <td style="text-align: left"><strong>Yes</strong> (Regex supported)</td>
+          <td style="text-align: left">Fires immediately before tool dispatch. Uses the <code>matcher</code> parameter to isolate target commands or APIs (e.g., <code>&quot;run_command&quot;</code>). Primarily used to intercept and block unsafe operations.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong><code>PostToolUse</code></strong></td>
+          <td style="text-align: left"><strong>Yes</strong> (Regex supported)</td>
+          <td style="text-align: left">Fires immediately after a tool completes execution. Useful for cleanup, format linting, or telemetry tracking.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong><code>PreInvocation</code></strong></td>
+          <td style="text-align: left">No</td>
+          <td style="text-align: left">Intercepts execution immediately prior to an LLM invocation. Typically used to append workspace context or security policies to system prompts.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong><code>PostInvocation</code></strong></td>
+          <td style="text-align: left">No</td>
+          <td style="text-align: left">Evaluates response payloads immediately after receiving data from the model. Useful for auditing or scanning responses for secret leaks.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong><code>Stop</code></strong></td>
+          <td style="text-align: left">No</td>
+          <td style="text-align: left">Triggers when the agent finishes its plan and prepares to exit the active session. Typically used for workspace cleanup and session logging.</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="valid-matcher-profiles-for-pretooluse-and-posttooluse">Valid Matcher Profiles (for <code>PreToolUse</code> and <code>PostToolUse</code>)</h3>
+<p>For tool-level interception, the <code>matcher</code> setting accepts a regular expression to target specific agent capabilities:</p>
+<ul>
+<li><strong>Catch-All Wildcard</strong>: <code>&quot;*&quot;</code> or <code>&quot;&quot;</code> (Matches every tool execution).</li>
+<li><strong>Specific Shell Tools</strong>: <code>&quot;run_command&quot;</code>: Catches local shell executions.</li>
+<li><strong>File Management Tools</strong>: <code>&quot;view_file&quot;</code>, <code>&quot;write_to_file&quot;</code>, <code>&quot;replace_file_content&quot;</code>, <code>&quot;multi_replace_file_content&quot;</code>, <code>&quot;list_dir&quot;</code>, <code>&quot;grep_search&quot;</code>.</li>
+<li><strong>Context &amp; Multi-Agent Operations</strong>: <code>&quot;define_subagent&quot;</code>, <code>&quot;invoke_subagent&quot;</code>, <code>&quot;send_message&quot;</code>, <code>&quot;manage_subagents&quot;</code>.</li>
+<li><strong>User Permission &amp; Interaction</strong>: <code>&quot;ask_permission&quot;</code>, <code>&quot;list_permissions&quot;</code>, <code>&quot;ask_question&quot;</code>.</li>
+<li><strong>Model Context Protocol (MCP)</strong>: <code>&quot;call_mcp_tool&quot;</code>: Captures all operations handled by external MCP servers.</li>
+<li><strong>Regex Combinations</strong>: <code>&quot;run_command|write_to_file&quot;</code>: Captures both shell executions and file modifications. <code>&quot;.*_file.*&quot;</code>: Matches any tool containing &ldquo;file&rdquo; in its identifier.</li>
+</ul>
+<hr>
+<h2 id="environment-configuration-and-integration-setup">Environment Configuration and Integration Setup</h2>
+<p>To use hooks in your development environment, ensure you meet the following prerequisites:</p>
+<ol>
+<li>Google Antigravity CLI (<code>agy</code>) must be installed and authenticated via your Google account or enterprise GCP project.</li>
+<li>The target workspace must be verified and trusted in your client settings.</li>
+</ol>
+<h3 id="configuration-scopes">Configuration Scopes</h3>
+<ul>
+<li><strong>Global Config Path</strong>: <code>~/.gemini/antigravity-cli/hooks.json</code> (Applies across all projects and terminal instances).</li>
+<li><strong>Project Config Path</strong>: <code>&lt;project_root&gt;/.agents/hooks.json</code> (Restricted to the active codebase workspace).</li>
+</ul>
+<p><em>Note: Project-local configuration files are evaluated at runtime by the agent loop, but they may not appear within the <code>/hooks</code> interactive CLI panel in early releases.</em></p>
+<hr>
+<h2 id="critical-constraints-lifecycle-integration-and-failure-modes">Critical Constraints, Lifecycle Integration, and Failure Modes</h2>
+<p>When designing hooks for the Antigravity engine, several critical constraints must be addressed to prevent security bypasses or runtime crashes:</p>
+<h3 id="1-scope-and-veto-policies">1. Scope and Veto Policies</h3>
+<p>If a hook is declared in both global and project-level scopes, <strong>both hooks will run</strong>. If any script returns <code>allow_tool: false</code>, the operation is blocked. This veto-power design ensures that global organization-wide security rules cannot be bypassed by project-level settings.</p>
+<h3 id="2-timeout-hazards">2. Timeout Hazards</h3>
+<p>While you can customize execution timeouts in the configuration (e.g., <code>&quot;timeout&quot;: 30</code>), <strong>setting a timeout to <code>0</code> will immediately kill the subprocess</strong>. This makes the hook fail and can halt agent execution. Always specify a reasonable duration (typically between 15 and 60 seconds).</p>
+<h3 id="3-absolute-path-constraints">3. Absolute Path Constraints</h3>
+<p>The <code>command</code> parameter in <code>hooks.json</code> must use an <strong>absolute path</strong> (e.g., <code>/home/user/project/.agents/hooks/script.sh</code>). Relative paths resolve against the active working directory of the terminal where <code>agy</code> was launched. If you start a session from a subfolder, relative paths will fail with an <code>exit status 127 (command not found)</code> error, bypassing the security guardrail.</p>
+<h3 id="4-json-payload-interception-in-go">4. JSON Payload Interception in Go</h3>
+<p>The Go-based <code>agy</code> runtime pipes arguments to standard input (<code>stdin</code>) using a nested structure. For shell command executions, arguments are located under <strong><code>.toolCall.args.CommandLine</code></strong>. Legacy paths like <code>.arguments.CommandLine</code> are incompatible. Additionally:</p>
+<ul>
+<li>If a target host lacks the <code>jq</code> utility, parsing will fail. Include a fallback parsing mechanism using shell tools like <code>grep</code> and <code>cut</code> to maintain robust guardrails.</li>
+<li>The return payload must be output at the <strong>top level</strong> of the JSON response (e.g., <code>{ &quot;allow_tool&quot;: false, &quot;deny_reason&quot;: &quot;...&quot; }</code>). Wrapping the output inside legacy structures like <code>hookSpecificOutput</code> will fail schema validation and cause a parser error.</li>
+<li>The script must always return an <strong>exit code of <code>0</code></strong> to indicate a successful validation run, even when rejecting a command. Non-zero exit codes are treated as hook execution failures and may trigger fallback actions or crash the active turn.</li>
+</ul>
+<p><img src="https://tanaikech.github.io/image-storage/20260626a/fig2e.jpg"
+     alt="Execution logic of a resilient shell interceptor hook, illustrating fallback parsing mechanisms and standard output formatting."
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<h2 id="production-ready-code-blueprint-samples">Production-Ready Code Blueprint Samples</h2>
+<p>This section provides concrete, system-tested code blueprints for implementing custom security guardrails using the Google Antigravity hooks engine. These scripts and configuration layouts establish programmatic boundaries around high-risk system calls and Model Context Protocol (MCP) tool integrations.</p>
+<hr>
+<h3 id="sample-1-restricting-shell-execution-with-a-static-pretooluse-barrier">Sample 1: Restricting Shell Execution with a Static PreToolUse Barrier</h3>
+<p>This implementation establishes an absolute barrier against executing any shell commands inside the local workspace directory.</p>
+<h4 id="1-hook-script-absolutepathtoprojectagentshooksdeny-run-commandsh">1. Hook Script (<code>/absolute/path/to/project/.agents/hooks/deny-run-command.sh</code>)</h4>
+<p>Create this file and save it within your workspace environment:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e">#!/bin/bash
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"># Read standard input to clear the pipeline buffer</span>
+</span></span><span style="display:flex;"><span>input_json<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>cat<span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Emit top-level JSON indicating execution rejection</span>
+</span></span><span style="display:flex;"><span>cat <span style="color:#e6db74">&lt;&lt;EOF
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">{
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  &#34;allow_tool&#34;: false,
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  &#34;deny_reason&#34;: &#34;Executing shell commands is strictly prohibited in this project for security reasons.&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">}
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">EOF</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Exit with success status to ensure the decision engine evaluates the JSON</span>
+</span></span><span style="display:flex;"><span>exit <span style="color:#ae81ff">0</span>
+</span></span></code></pre></div><p>Ensure the script is flagged as executable:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>chmod +x /absolute/path/to/project/.agents/hooks/deny-run-command.sh
+</span></span></code></pre></div><h4 id="2-configuration-hooksjson">2. Configuration (<code>hooks.json</code>)</h4>
+<p>Register the script inside your workspace-level hook configuration file (<code>&lt;project_root&gt;/.agents/hooks.json</code>):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;block-run-command&#34;</span>: {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;PreToolUse&#34;</span>: [
+</span></span><span style="display:flex;"><span>      {
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;matcher&#34;</span>: <span style="color:#e6db74">&#34;run_command&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;hooks&#34;</span>: [
+</span></span><span style="display:flex;"><span>          {
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;command&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;command&#34;</span>: <span style="color:#e6db74">&#34;/absolute/path/to/project/.agents/hooks/deny-run-command.sh&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;timeout&#34;</span>: <span style="color:#ae81ff">30</span>
+</span></span><span style="display:flex;"><span>          }
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    ]
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="3-operational-testing-and-execution-results">3. Operational Testing and Execution Results</h4>
+<p>To test the barrier, restart the <code>agy</code> session and verify that the hook is active using the <code>/hooks</code> command. Next, issue a prompt that triggers shell command execution.</p>
+<p><strong>User Input</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>Show me the git status of this project using a command.
+</span></span></code></pre></div><p><strong>Engine Action</strong></p>
+<p><img src="https://tanaikech.github.io/image-storage/20260626a/fig2a.jpg"
+     alt="fig2a"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<p>The agent attempts to call the <code>run_command</code> tool to run <code>git status</code>. The <code>PreToolUse</code> hook intercepts the execution request and passes the event payload to the script. The script returns <code>allow_tool: false</code>.</p>
+<p><strong>Terminal Interface (TUI) Output</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>Error invalid tool call: Tool call denied with reason: Executing shell commands is strictly prohibited in this project for security reasons.
+</span></span></code></pre></div><p><strong>Agent Behavior</strong>
+The agent registers the tool rejection and recognizes that shell command execution is blocked by system policy. It halts further execution attempts and informs the user of the security constraint.</p>
+<hr>
+<h3 id="sample-2-dynamically-inspecting-execution-lines-for-selective-command-filtering">Sample 2: Dynamically Inspecting Execution Lines for Selective Command Filtering</h3>
+<p>This implementation selectively filters command payloads, blocking dangerous utilities while allowing standard developer queries (like <code>ls</code> or <code>git status</code>).</p>
+<h4 id="1-hook-script-absolutepathtoprojectagentshooksfilter-run-commandsh">1. Hook Script (<code>/absolute/path/to/project/.agents/hooks/filter-run-command.sh</code>)</h4>
+<p>Create this script to inspect command line parameters before execution:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e">#!/bin/bash
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"># Read the stdin JSON payload piped from the agent loop</span>
+</span></span><span style="display:flex;"><span>input_json<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>cat<span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Extract execution arguments, falling back to basic parsing if jq is absent</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> -x /usr/bin/jq <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>  command_line<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>echo <span style="color:#e6db74">&#34;</span>$input_json<span style="color:#e6db74">&#34;</span> | /usr/bin/jq -r <span style="color:#e6db74">&#39;.toolCall.args.CommandLine&#39;</span><span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">elif</span> command -v jq &gt;/dev/null 2&gt;&amp;1; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>  command_line<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>echo <span style="color:#e6db74">&#34;</span>$input_json<span style="color:#e6db74">&#34;</span> | jq -r <span style="color:#e6db74">&#39;.toolCall.args.CommandLine&#39;</span><span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># RegEx string-matching fallback</span>
+</span></span><span style="display:flex;"><span>  command_line<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>echo <span style="color:#e6db74">&#34;</span>$input_json<span style="color:#e6db74">&#34;</span> | grep -oE <span style="color:#e6db74">&#39;&#34;CommandLine&#34;\s*:\s*&#34;[^&#34;]*&#34;&#39;</span> | head -n <span style="color:#ae81ff">1</span> | cut -d<span style="color:#e6db74">&#39;&#34;&#39;</span> -f4<span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Define policy parameters and verify execution strings</span>
+</span></span><span style="display:flex;"><span>is_blocked<span style="color:#f92672">=</span>false
+</span></span><span style="display:flex;"><span>blocked_reason<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> echo <span style="color:#e6db74">&#34;</span>$command_line<span style="color:#e6db74">&#34;</span> | grep -qE <span style="color:#e6db74">&#39;\b(rm|curl|wget|shutdown|reboot|poweroff)\b&#39;</span>; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>  is_blocked<span style="color:#f92672">=</span>true
+</span></span><span style="display:flex;"><span>  blocked_reason<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;The command contains a restricted utility (rm, curl, wget, shutdown, reboot, or poweroff) which is blocked by security policy.&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Format output based on validation state</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span>$is_blocked<span style="color:#e6db74">&#34;</span> <span style="color:#f92672">=</span> true <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>  cat <span style="color:#e6db74">&lt;&lt;EOF
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">{
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  &#34;allow_tool&#34;: false,
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  &#34;deny_reason&#34;: &#34;$blocked_reason&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">}
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">EOF</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>  cat <span style="color:#e6db74">&lt;&lt;EOF
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">{
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  &#34;allow_tool&#34;: true
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">}
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">EOF</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>exit <span style="color:#ae81ff">0</span>
+</span></span></code></pre></div><h4 id="2-configuration-hooksjson-1">2. Configuration (<code>hooks.json</code>)</h4>
+<p>Add the selective command filter to your <code>hooks.json</code> file:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;filter-run-command&#34;</span>: {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;PreToolUse&#34;</span>: [
+</span></span><span style="display:flex;"><span>      {
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;matcher&#34;</span>: <span style="color:#e6db74">&#34;run_command&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;hooks&#34;</span>: [
+</span></span><span style="display:flex;"><span>          {
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;command&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;command&#34;</span>: <span style="color:#e6db74">&#34;/absolute/path/to/project/.agents/hooks/filter-run-command.sh&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;timeout&#34;</span>: <span style="color:#ae81ff">30</span>
+</span></span><span style="display:flex;"><span>          }
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    ]
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="3-operational-testing-and-execution-results-1">3. Operational Testing and Execution Results</h4>
+<h5 id="case-a-permitted-commands">Case A: Permitted Commands</h5>
+<p><strong>User Input</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>Show me the git status of this project using a command.
+</span></span></code></pre></div><p><strong>Engine Action</strong></p>
+<p><img src="https://tanaikech.github.io/image-storage/20260626a/fig2b.jpg"
+     alt="fig2b"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<p>The agent attempts to execute <code>git status</code>. The hook script checks the input parameters, finds no prohibited patterns, and returns <code>{ &quot;allow_tool&quot;: true }</code>.</p>
+<p><strong>Terminal Interface (TUI) Output</strong>
+The command executes normally, and the repository status is rendered directly in the console.</p>
+<h5 id="case-b-restricted-commands-and-agent-pivoting">Case B: Restricted Commands and Agent Pivoting</h5>
+<p><strong>User Input</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>Download a test file from http://example.com using a command.
+</span></span></code></pre></div><p><strong>Engine Action</strong>
+The agent attempts to invoke <code>curl http://example.com</code>. The hook intercepts the command, detects the prohibited keyword <code>curl</code>, and rejects the operation.</p>
+<p><strong>Terminal Interface (TUI) Output</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>⚠ Tool call denied by jsonhook__filter-run-command_PreToolUse_0_0: The command contains a restricted utility (rm, curl, wget, shutdown, reboot, or poweroff) which is blocked by security policy.
+</span></span></code></pre></div><p><strong>Agent Pivoting Behavior</strong>
+Because the hook returns a specific rejection reason, the agent parses the warning and adapts its strategy. Knowing that <code>curl</code> is blocked, it writes a Python alternative using standard library calls to execute the download safely:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>● Bash (python3 -c &#34;import urllib.request; urllib.request.urlretrieve(&#39;http://example.com&#39;, &#39;example.html&#39;)&#34;)
+</span></span></code></pre></div><p>This alternative command bypasses the forbidden tool list and runs successfully.</p>
+<hr>
+<h3 id="sample-3-regulating-model-context-protocol-mcp-tool-execution">Sample 3: Regulating Model Context Protocol (MCP) Tool Execution</h3>
+<p>This implementation applies security policies to external tools integrated via the Model Context Protocol (MCP).</p>
+<h4 id="1-target-mcp-server-absolutepathtoprojectagentsmcp-servermcp-serverjs">1. Target MCP Server (<code>/absolute/path/to/project/.agents/mcp-server/mcp-server.js</code>)</h4>
+<p>Create a mock Node.js MCP server that handles basic input and output:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">readline</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;readline&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">rl</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">readline</span>.<span style="color:#a6e22e">createInterface</span>({
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">input</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">process</span>.<span style="color:#a6e22e">stdin</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">output</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">process</span>.<span style="color:#a6e22e">stdout</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">terminal</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">false</span>,
+</span></span><span style="display:flex;"><span>});
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">rl</span>.<span style="color:#a6e22e">on</span>(<span style="color:#e6db74">&#34;line&#34;</span>, (<span style="color:#a6e22e">line</span>) =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">request</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">line</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Process discovery requests from the agent client
+</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">request</span>.<span style="color:#a6e22e">method</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;tools/list&#34;</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">response</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">jsonrpc</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;2.0&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">id</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">request</span>.<span style="color:#a6e22e">id</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">result</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">tools</span><span style="color:#f92672">:</span> [
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>              <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;hello_world&#34;</span>,
+</span></span><span style="display:flex;"><span>              <span style="color:#a6e22e">description</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;A simple hello world tester.&#34;</span>,
+</span></span><span style="display:flex;"><span>              <span style="color:#a6e22e">inputSchema</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;object&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">properties</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>                  <span style="color:#a6e22e">greeting</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;string&#34;</span> },
+</span></span><span style="display:flex;"><span>                },
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">required</span><span style="color:#f92672">:</span> [<span style="color:#e6db74">&#34;greeting&#34;</span>],
+</span></span><span style="display:flex;"><span>              },
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>          ],
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>      };
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">response</span>));
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">request</span>.<span style="color:#a6e22e">method</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;tools/call&#34;</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e">// Execute the requested tool action
+</span></span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">response</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">jsonrpc</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;2.0&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">id</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">request</span>.<span style="color:#a6e22e">id</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">result</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">content</span><span style="color:#f92672">:</span> [
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>              <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;text&#34;</span>,
+</span></span><span style="display:flex;"><span>              <span style="color:#a6e22e">text</span><span style="color:#f92672">:</span> <span style="color:#e6db74">`Hello, </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">request</span>.<span style="color:#a6e22e">params</span>.<span style="color:#a6e22e">arguments</span>.<span style="color:#a6e22e">greeting</span><span style="color:#e6db74">}</span><span style="color:#e6db74">!`</span>,
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>          ],
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>      };
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">response</span>));
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">err</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Gracefully ignore malformed inputs
+</span></span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>});
+</span></span></code></pre></div><h4 id="2-server-registry-setup-mcp_configjson">2. Server Registry Setup (<code>mcp_config.json</code>)</h4>
+<p>Configure your server within the agent&rsquo;s MCP settings file (<code>&lt;project_root&gt;/.agents/mcp_config.json</code>):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;mcpServers&#34;</span>: {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;test-server&#34;</span>: {
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;command&#34;</span>: <span style="color:#e6db74">&#34;node&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;args&#34;</span>: [<span style="color:#e6db74">&#34;/absolute/path/to/project/.agents/mcp-server/mcp-server.js&#34;</span>]
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="3-mcp-interceptor-script-absolutepathtoprojectagentshooksdeny-mcp-toolsh">3. MCP Interceptor Script (<code>/absolute/path/to/project/.agents/hooks/deny-mcp-tool.sh</code>)</h4>
+<p>Create a script to inspect and authorize MCP tool calls:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e">#!/bin/bash
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"># Read the piped stdin JSON payload containing the MCP request context</span>
+</span></span><span style="display:flex;"><span>input_json<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>cat<span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Extract the tool name parameter safely</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> -x /usr/bin/jq <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>  tool_name<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>echo <span style="color:#e6db74">&#34;</span>$input_json<span style="color:#e6db74">&#34;</span> | /usr/bin/jq -r <span style="color:#e6db74">&#39;.toolCall.args.ToolName // .toolCall.args.toolName&#39;</span><span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">elif</span> command -v jq &gt;/dev/null 2&gt;&amp;1; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>  tool_name<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>echo <span style="color:#e6db74">&#34;</span>$input_json<span style="color:#e6db74">&#34;</span> | jq -r <span style="color:#e6db74">&#39;.toolCall.args.ToolName // .toolCall.args.toolName&#39;</span><span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>  // Fallback parameter extraction
+</span></span><span style="display:flex;"><span>  tool_name<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>echo <span style="color:#e6db74">&#34;</span>$input_json<span style="color:#e6db74">&#34;</span> | grep -oE <span style="color:#e6db74">&#39;&#34;[Tt]oolName&#34;\s*:\s*&#34;[^&#34;]*&#34;&#39;</span> | head -n <span style="color:#ae81ff">1</span> | cut -d<span style="color:#e6db74">&#39;&#34;&#39;</span> -f4<span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Apply security policies to specific MCP tools</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;</span>$tool_name<span style="color:#e6db74">&#34;</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;hello_world&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>  cat <span style="color:#e6db74">&lt;&lt;EOF
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">{
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  &#34;allow_tool&#34;: false,
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  &#34;deny_reason&#34;: &#34;Execution of the MCP tool &#39;hello_world&#39; is blocked by project policy.&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">}
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">EOF</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>  cat <span style="color:#e6db74">&lt;&lt;EOF
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">{
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  &#34;allow_tool&#34;: true
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">}
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">EOF</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>exit <span style="color:#ae81ff">0</span>
+</span></span></code></pre></div><h4 id="4-configuration-hooksjson">4. Configuration (<code>hooks.json</code>)</h4>
+<p>Register the MCP interceptor by targeting <code>call_mcp_tool</code> in your config file:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;deny-mcp-tool&#34;</span>: {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;PreToolUse&#34;</span>: [
+</span></span><span style="display:flex;"><span>      {
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;matcher&#34;</span>: <span style="color:#e6db74">&#34;call_mcp_tool&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;hooks&#34;</span>: [
+</span></span><span style="display:flex;"><span>          {
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;command&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;command&#34;</span>: <span style="color:#e6db74">&#34;/absolute/path/to/project/.agents/hooks/deny-mcp-tool.sh&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;timeout&#34;</span>: <span style="color:#ae81ff">30</span>
+</span></span><span style="display:flex;"><span>          }
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    ]
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="5-operational-testing-and-execution-results">5. Operational Testing and Execution Results</h4>
+<p><strong>User Input</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>Call the hello_world tool of the test-server MCP server with greeting &#39;Antigravity&#39;.
+</span></span></code></pre></div><p><strong>Engine Action</strong></p>
+<p><img src="https://tanaikech.github.io/image-storage/20260626a/fig2c.jpg"
+     alt="fig2c"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<p>The agent attempts to execute the <code>hello_world</code> tool via its registered <code>call_mcp_tool</code> dispatcher. The <code>PreToolUse</code> hook intercepts the execution request, identifies the targeted tool as <code>hello_world</code>, and rejects the operation.</p>
+<p><strong>Terminal Interface (TUI) Output</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>⚠ Tool call denied by jsonhook__deny-mcp-tool_PreToolUse_0_0: Execution of the MCP tool &#39;hello_world&#39; is blocked by project policy.
+</span></span></code></pre></div><p><strong>Agent Behavior</strong>
+The agent registers the denial, understands that running the <code>hello_world</code> tool violates local security settings, and notifies the developer that the operation was blocked.</p>
+<hr>
+<h2 id="deepening-control-advanced-integration-and-the-evolution-of-hooks">Deepening Control: Advanced Integration and the Evolution of Hooks</h2>
+<p>As agent environments become more complex, hooks are evolving from simple script execution checkers into distributed validation pipelines.</p>
+<h3 id="multi-device-approvals-and-asynchronous-telemetry">Multi-Device Approvals and Asynchronous Telemetry</h3>
+<p>A prominent example of this evolution is the integration of hooks with &ldquo;Agent Approve&rdquo; workflows <a href="https://antigravity.google/cli/install.sh">Ref</a>. Under this paradigm:</p>
+<ul>
+<li>A local <code>PreToolUse</code> hook intercepts tool requests within the terminal.</li>
+<li>Instead of relying entirely on local shell scripts, the hook serializes the validation state and forwards it to an external companion app (such as an iOS or Apple Watch client) via a local plugin loop (<code>~/.gemini/antigravity-cli/plugins/agentapprove/hooks.json</code>).</li>
+<li>The execution thread halts synchronously in the terminal until the developer reviews and approves the request on their mobile device.</li>
+</ul>
+<p><img src="https://tanaikech.github.io/image-storage/20260626a/fig1f.jpg"
+     alt="Topology of a multi-device, synchronous verification loop integrating local Antigravity CLI hooks with external mobile security interfaces."
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<h3 id="context-injection-and-safe-chaining">Context Injection and Safe Chaining</h3>
+<p>Beyond security checks, <code>PreInvocation</code> and <code>PreToolUse</code> hooks can be chained to inject dynamic context into the agent&rsquo;s prompt context:</p>
+<ul>
+<li>Upstream hooks can query system resources—such as active database schemas, API routes, or pending tickets—and pass this information to downstream hooks.</li>
+<li>This dynamic context is appended to the system instructions, giving the agent real-time situational awareness without cluttering system prompt templates.</li>
+<li>If the agent attempts a destructive action, downstream validation checks catch and block the operation before it runs.</li>
+</ul>
+<p>This layered architecture combines dynamic context injection with strict, out-of-band security rules, allowing developers to safely delegate complex tasks to autonomous agents.</p>
+<h2 id="implementing-lifecycle-hooks-in-sandboxed-environments-the-gasadk-adk-gas-framework">Implementing Lifecycle Hooks in Sandboxed Environments: The GASADK (adk-gas) Framework</h2>
+<p>Integrating a lifecycle hook architecture within restricted serverless runtime environments, such as Google Apps Script (GAS), requires adapting the standard design patterns of native command-line engines. In GASADK (adk-gas) <a href="https://github.com/tanaikech/adk-gas">Ref</a>—an autonomous agent development kit designed for the GAS ecosystem—the local subprocess spawning model used by native CLI environments has been successfully rewritten and implemented to work reliably within the security and execution limits of the Google cloud sandbox.</p>
+<h3 id="google-apps-script-platform-constraints-and-mitigations">Google Apps Script Platform Constraints and Mitigations</h3>
+<h4 id="1-inability-to-spawn-native-subprocesses">1. Inability to Spawn Native Subprocesses</h4>
+<p>Standard agent engines intercept commands by executing a localized <code>spawn</code> call to run external shell scripts on the host system. This mechanism is structurally impossible within the V8-based Google Apps Script runtime.</p>
+<ul>
+<li><strong>Mitigation:</strong> The system replaces shell process execution with a dual-execution model supporting <strong>&ldquo;GAS Function Hooks&rdquo;</strong> and <strong>&ldquo;Webhook Hooks&rdquo;</strong>. The engine executes either a sandboxed JavaScript function declared directly within the GAS global namespace or dispatches an out-of-band HTTP call to external validation endpoints.</li>
+</ul>
+<h4 id="2-the-absolute-six-minute-execution-constraint">2. The Absolute Six-Minute Execution Constraint</h4>
+<p>Standard consumer GAS executions are capped at six minutes. Integrating heavy, synchronous security checks or network requests risks exhausting the main thread&rsquo;s time quota and causing execution failures.</p>
+<ul>
+<li><strong>Mitigation:</strong> The runner enforces explicit timeout parameters. For external webhooks, request durations are managed using the timeout parameters of <code>UrlFetchApp</code>. For local function calls, the system uses memory buffers (managed via <code>CacheService</code>) to track and limit hook execution times, allowing the agent to safely skip lagging processes or use a fallback mechanism.</li>
+</ul>
+<hr>
+<h3 id="gasadk-hook-architecture-and-configuration">GASADK Hook Architecture and Configuration</h3>
+<p>The hook interface and setup configurations are represented in the TypeScript definitions below, showing how standard pattern matchers and handlers are adapted for GAS-compliant execution:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span><span style="color:#75715e">// TypeScript interface definition for GASADK lifecycle hooks
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">interface</span> <span style="color:#a6e22e">GasHookConfig</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">name</span>: <span style="color:#66d9ef">string</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;gas_function&#34;</span> <span style="color:#f92672">|</span> <span style="color:#e6db74">&#34;webhook&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Applicable when type is &#39;gas_function&#39;: the identifier of a function in the global GAS scope
+</span></span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">functionName?</span>: <span style="color:#66d9ef">string</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Applicable when type is &#39;webhook&#39;: the destination URL processed via UrlFetchApp
+</span></span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">url?</span>: <span style="color:#66d9ef">string</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">timeout?</span>: <span style="color:#66d9ef">number</span>; <span style="color:#75715e">// Execution time limit represented in milliseconds
+</span></span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">matcher?</span>: <span style="color:#66d9ef">string</span>; <span style="color:#75715e">// Regular expression parsed against targeted tool identifiers
+</span></span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Reference execution configuration for the autonomous agent sandbox
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">adkSettings</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">hooks</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">BeforeTool</span><span style="color:#f92672">:</span> [
+</span></span><span style="display:flex;"><span>      {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;SecurityGuard&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;gas_function&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">functionName</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;checkToolSafety&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">matcher</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;GoogleDriveApp.*|GmailApp.*&#34;</span>,
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>    ],
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Notification</span><span style="color:#f92672">:</span> [
+</span></span><span style="display:flex;"><span>      {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;SlackNotifier&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;webhook&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;https://hooks.slack.com/services/...&#34;</span>,
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>    ],
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><h2 id="practical-use-cases-for-hooks-in-gasadk">Practical Use Cases for Hooks in GASADK</h2>
+<p>With the core hooks engine fully integrated and functional inside GASADK <a href="https://github.com/tanaikech/adk-gas">Ref</a>, developers can deploy automated agent configurations tailored to cloud workspaces. The following operational use cases demonstrate the programmatic capabilities of this implementation.</p>
+<h3 id="use-case-1-safety-guardrails-for-google-workspace-operations-pretooluse">Use Case 1: Safety Guardrails for Google Workspace Operations (PreToolUse)</h3>
+<ul>
+<li><strong>Overview:</strong> This framework allows developers to verify file operations and email dispatches by intercepting the agent&rsquo;s intent before changes are committed in Google Workspace.</li>
+<li><strong>Mechanism:</strong> The <code>PreToolUse</code> hook monitors incoming parameters passed to workspace tools, such as target recipient addresses in Gmail or file IDs in Google Drive. If the agent attempts to delete critical system directories or send message payloads to unverified external domains, the hook issues an immediate block response (<code>decision: 'deny'</code>) with a descriptive rejection reason, preventing data loss.</li>
+</ul>
+<h3 id="use-case-2-auto-saving-state-to-prevent-the-six-minute-execution-boundary-precompress--sessionend--notification">Use Case 2: Auto-Saving State to Prevent the Six-Minute Execution Boundary (PreCompress / SessionEnd / Notification)</h3>
+<ul>
+<li><strong>Overview:</strong> This configuration monitors Google Apps Script runtime limitations, saving active conversation threads and execution plans before the workspace script is terminated.</li>
+<li><strong>Mechanism:</strong> The <code>PreCompress</code> hook or turn-level handlers evaluate the elapsed time since script execution began. If the execution duration exceeds five minutes, the hook halts the turn, saves the active contextual history directly into <code>PropertiesService</code>, <code>CacheService</code>, or Google Drive, and calls a <code>Notification</code> hook to broadcast a process-paused status update to developer channels like Slack.</li>
+</ul>
+<h3 id="use-case-3-automatic-compliance-audit-logging-beforetool--aftertool">Use Case 3: Automatic Compliance Audit Logging (BeforeTool / AfterTool)</h3>
+<ul>
+<li><strong>Overview:</strong> Organizations can capture complete, unalterable transaction logs of agent actions on-the-fly to satisfy auditing standards.</li>
+<li><strong>Mechanism:</strong> During the <code>BeforeTool</code> and <code>AfterTool</code> lifecycle checkpoints, the hooks system intercepts target parameters, execution timestamps, and output values. The hook synchronously appends these records to a dedicated master log within Google Sheets (<code>SpreadsheetApp.openById(...).appendRow(...)</code>), keeping a clean audit history without agent intervention.</li>
+</ul>
+<h3 id="use-case-4-real-time-dynamic-context-injection-sessionstart--beforeagent">Use Case 4: Real-Time Dynamic Context Injection (SessionStart / BeforeAgent)</h3>
+<ul>
+<li><strong>Overview:</strong> This injection routine appends active environmental details—such as user calendar events or unread inbox items—to prompts at the beginning of each transaction.</li>
+<li><strong>Mechanism:</strong> When a user initiates a prompt, the <code>BeforeAgent</code> hook executes calls to the GAS <code>CalendarApp</code> and <code>GmailApp</code> services to retrieve active calendar records or new message counts. It converts these system variables into a formatted context string and appends it to the user&rsquo;s prompt as <code>additionalContext</code>, allowing the agent to contextualize its decisions.</li>
+</ul>
+<h3 id="use-case-5-compliance-and-sensitive-data-censorship-afteragent">Use Case 5: Compliance and Sensitive Data Censorship (AfterAgent)</h3>
+<ul>
+<li><strong>Overview:</strong> This guardrail intercepts final agent answers, scanning and redacting exposed credentials, private customer data, or policy-violating text before it is presented to the user.</li>
+<li><strong>Mechanism:</strong> The <code>AfterAgent</code> hook evaluates the generated response string against pre-defined regular expressions or database lists. If sensitive credentials or unmasked personal data are flagged, the hook cancels the display action (<code>decision: 'deny'</code>), logs a compliance warning, and returns a system redirection prompt to guide the agent to safely rewrite the response.</li>
+</ul>
+<h2 id="summary">Summary</h2>
+<p>Through this study, we achieved three primary goals: we demystified the internal mechanics of agent hooks, made them fully functional in Google&rsquo;s Go-based Antigravity CLI <a href="https://antigravity.google/docs/hooks">Ref</a>, and successfully implemented this framework into GASADK <a href="https://github.com/tanaikech/adk-gas">Ref</a>. Analyzing the legacy Gemini CLI codebase allowed us to build a precise conceptual model of execution loops, input mapping, and decision aggregation. This knowledge enabled us to construct robust local CLI security boundaries and build serverless-ready hook configurations. Developing these guardrails transitions autonomous developer systems from loose, prompt-based guidelines to absolute, deterministic safety gates.</p>
+<ul>
+<li><strong>Conceptual Demystification of Hooks</strong>: Hooks are no longer a black box. Understanding their execution mechanics allows developers to replace fragile prompt directives with concrete programmatic rules.</li>
+<li><strong>Unified CLI Security Boundaries</strong>: Porting our understanding to Antigravity CLI made the five streamlined events (<code>PreToolUse</code>, <code>PostToolUse</code>, <code>PreInvocation</code>, <code>PostInvocation</code>, and <code>Stop</code>) a core part of our local development setups.</li>
+<li><strong>Successful Integration in GASADK</strong>: We successfully engineered a dual-driver hook model for GASADK, enabling both sandboxed local functions and external webhook dispatches in serverless environments.</li>
+<li><strong>Resolving Platform Limitations</strong>: Our GASADK implementation addresses Google Apps Script limitations, bypassing the lack of subprocess spawning and using CacheService to prevent timeout crashes at the 6-minute boundary.</li>
+<li><strong>Real-World Automation Guardrails</strong>: These hook designs enable critical production use cases, including data-leak censorship, automatic Google Sheets audit logs, Workspace operation safety gates, and dynamic calendar context injection.</li>
+</ul>
+
+  
+  <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2026%2f06%2f26%2fa-developers-guide-to-agent-hooks-in-antigravity-cli%2f" target="_blank" title="Share on Facebook"><i class="fab fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2026%2f06%2f26%2fa-developers-guide-to-agent-hooks-in-antigravity-cli%2f" target="_blank" title="Tweet"><i class="fab fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f06%2f26%2fa-developers-guide-to-agent-hooks-in-antigravity-cli%2f" target="_blank" title="Share on Google+"><i class="fab fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2026%2f06%2f26%2fa-developers-guide-to-agent-hooks-in-antigravity-cli%2f" target="_blank" title="Post to Tumblr"><i class="fab fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f06%2f26%2fa-developers-guide-to-agent-hooks-in-antigravity-cli%2f" target="_blank" title="Pin it"><i class="fab fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f06%2f26%2fa-developers-guide-to-agent-hooks-in-antigravity-cli%2f" target="_blank" title="Submit to Reddit"><i class="fab fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
+
+
+  
+<nav class="prev-next-posts">
+  <div class="prev-post">
+    
+      <span class="nav-label">Previous Article</span>
+      <a href="https://tanaikech.github.io/2026/06/24/updated-ggsrun-to-v537/">Updated ggsrun to v537</a>
+    
+  </div>
+  <div class="next-post">
+    
+  </div>
+</nav>
+
+<style>
+.prev-next-posts {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+  gap: 2rem;
+}
+.prev-post, .next-post {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.next-post {
+  text-align: right;
+}
+.nav-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+.prev-next-posts a {
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-decoration: none;
+}
+@media (max-width: 600px) {
+  .prev-next-posts { flex-direction: column; text-align: left; }
+  .next-post { text-align: left; }
+}
+</style>
+
+
+  
+  
+  
+  
+
+  
+
+</div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-social"><a href="https://twitter.com/tanaikech" target="_blank" rel="me" title="twitter">
+                  <i class="fab fa-x-twitter"></i>
+                </a><a href="https://github.com/tanaikech" target="_blank" rel="me" title="github">
+                  <i class="fab fa-github"></i>
+                </a><a href="https://linkedin.com/in/tanaike" target="_blank" rel="me" title="linkedin">
+                  <i class="fab fa-linkedin"></i>
+                </a><a href="https://www.youtube.com/@tanaike" target="_blank" rel="me" title="youtube">
+                  <i class="fab fa-youtube"></i>
+                </a><a href="https://medium.com/@tanaike" target="_blank" rel="me" title="medium">
+                  <i class="fab fa-medium"></i>
+                </a><a href="https://stackoverflow.com/users/7108653" target="_blank" rel="me" title="stackoverflow">
+                  <i class="fab fa-stack-overflow"></i>
+                </a><a href="https://zenn.dev/tanaike" target="_blank" rel="me" title="zenn">
+                  <i class="fas fa-edit"></i>
+                </a><a href="https://dev.to/tanaike" target="_blank" rel="me" title="devto">
+                  <i class="fab fa-dev"></i>
+                </a>
+      </div>
+      
+      <p class="copyright">
+        &copy; 2026 tanaike - Google Apps Script, Gemini API, and Developer Tips. Built with <a href="https://gohugo.io" target="_blank">Hugo</a>.
+      </p>
+    </div>
+  </footer>
+
+  <script src="https://tanaikech.github.io/js/eclipse.js"></script>
+
+  
+  
+
+  
+  
+
+  
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
+<script>
+  
+  if (window.location.hostname != "localhost") {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-J3Z6T50WL5');
+  }
+</script>
+
+
+
+  
+
+  
+<script src="https://tanaikech.github.io/js/math-code.js"></script>
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  
+
+</body>
+</html>
+
