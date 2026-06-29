@@ -202,6 +202,42 @@
   
     <article class="post-item">
       <div class="post-meta">
+        <i class="far fa-calendar-alt"></i> April 27, 2018
+      </div>
+      <h2><a href="https://tanaikech.github.io/2018/04/27/clean-method-for-google-apps-script/">CLEAN method for Google Apps Script</a></h2>
+      <div class="post-summary">
+        
+          <p><a href="https://gist.github.com/tanaikech/585597adda7954ba1cde3e724582bac5">Gists</a></p>
+<p>This is a sample script which works the same action with the <a href="https://msdn.microsoft.com/en-us/vba/excel-vba/articles/worksheetfunction-clean-method-excel">CLEAN method of VBA</a>. The CLEAN method of VBA removes the characters of <code>0-31, 127, 129, 141, 143, 144, 157</code>. Although I had looked for such method for Google Apps Script, I couldn&rsquo;t find it. So I created this. If this is useful for you, I&rsquo;m glad.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">cleanForGAS</span>(<span style="color:#a6e22e">str</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">typeof</span> <span style="color:#a6e22e">str</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;string&#34;</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">escaped</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">escape</span>(<span style="color:#a6e22e">str</span>.<span style="color:#a6e22e">trim</span>());
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">31</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">s</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">i</span>.<span style="color:#a6e22e">toString</span>(<span style="color:#ae81ff">16</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">re</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> RegExp(<span style="color:#e6db74">&#34;%&#34;</span> <span style="color:#f92672">+</span> (<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">?</span> <span style="color:#e6db74">&#34;0&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">s</span> <span style="color:#f92672">:</span> <span style="color:#a6e22e">s</span>).<span style="color:#a6e22e">toUpperCase</span>(), <span style="color:#e6db74">&#34;g&#34;</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">escaped</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">escaped</span>.<span style="color:#a6e22e">replace</span>(<span style="color:#a6e22e">re</span>, <span style="color:#e6db74">&#34;&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">remove</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;%7F&#34;</span>, <span style="color:#e6db74">&#34;%81&#34;</span>, <span style="color:#e6db74">&#34;%8D&#34;</span>, <span style="color:#e6db74">&#34;%8F&#34;</span>, <span style="color:#e6db74">&#34;%90&#34;</span>, <span style="color:#e6db74">&#34;%9D&#34;</span>];
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">remove</span>.<span style="color:#a6e22e">forEach</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">re</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> RegExp(<span style="color:#a6e22e">e</span>, <span style="color:#e6db74">&#34;g&#34;</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">escaped</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">escaped</span>.<span style="color:#a6e22e">replace</span>(<span style="color:#a6e22e">re</span>, <span style="color:#e6db74">&#34;&#34;</span>);
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">unescape</span>(<span style="color:#a6e22e">escaped</span>).<span style="color:#a6e22e">trim</span>();
+</span></span><span style="display:flex;"><span>  } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">str</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">cleanForGAS</span>(<span style="color:#a6e22e">str</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div>
+        
+      </div>
+    </article>
+  
+    <article class="post-item">
+      <div class="post-meta">
         <i class="far fa-calendar-alt"></i> April 26, 2018
       </div>
       <h2><a href="https://tanaikech.github.io/2018/04/26/taking-advantage-of-web-apps-with-google-apps-script/">Taking advantage of Web Apps with Google Apps Script</a></h2>
@@ -389,22 +425,6 @@ Result of reduce was added.</p>
 <li><a href="https://chrome.google.com/webstore/detail/rearrangescripts/ndaicidjkbcpajgejcclgfdcncpoekml">Add-on</a></li>
 <li><a href="https://github.com/tanaikech/RearrangeScripts">GitHub</a></li>
 </ul>
-        
-      </div>
-    </article>
-  
-    <article class="post-item">
-      <div class="post-meta">
-        <i class="far fa-calendar-alt"></i> March 1, 2018
-      </div>
-      <h2><a href="https://tanaikech.github.io/2018/03/01/cli-tool-gonetatmo/">CLI Tool - gonetatmo</a></h2>
-      <div class="post-summary">
-        
-          <p><a name="Overview"></a></p>
-<h1 id="overview">Overview</h1>
-<p>This is a CLI tool to retrieve data from a personal weather station of Netatmo.</p>
-<h1 id="description">Description</h1>
-<p>I have <a href="https://www.netatmo.com/en-US/product/weather/weatherstation">a personal weather station of Netatmo</a>. I check the data of my local environment using it. In most case, I have used my browser to retrieve the data so far. <a href="https://github.com/tanaikech/cui4netatmo">About retrieving data using curl, I have created it before.</a> Recently, I thought that I wanted to create this as a CLI too. So I created this. This tool can retrieve not only the data of own Netatmo, but also the data of specific area using Netatmo APIs. By this, I got to be able to retrieve easily the data of various places. This tool has the following features.</p>
         
       </div>
     </article>
