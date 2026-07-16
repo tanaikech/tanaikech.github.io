@@ -202,6 +202,84 @@
   
     <article class="post-item">
       <div class="post-meta">
+        <i class="far fa-calendar-alt"></i> April 3, 2020
+      </div>
+      <h2><a href="https://tanaikech.github.io/2020/04/03/retrieving-overwrapped-cells-between-2-ranges-on-google-spreadsheet-using-google-apps-script/">Retrieving Overwrapped Cells Between 2 Ranges on Google Spreadsheet using Google Apps Script</a></h2>
+      <div class="post-summary">
+        
+          <p><a href="https://gist.github.com/tanaikech/492cc2bb0b978fdb344aa821962baf53">Gists</a></p>
+<p>This is a sample script for retrieving the overwrapped cells between 2 ranges on Google Spreadsheet using Google Apps Script. Please use this with enabling V8.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">getOverwrappedRanges_</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">rangeList1</span>, <span style="color:#a6e22e">rangeList2</span>) =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">rangeList1</span>.<span style="color:#a6e22e">toString</span>() <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#34;RangeList&#34;</span> <span style="color:#f92672">||</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">rangeList2</span>.<span style="color:#a6e22e">toString</span>() <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#34;RangeList&#34;</span>
+</span></span><span style="display:flex;"><span>  ) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">&#34;Input RangeList object.&#34;</span>);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Ref: https://stackoverflow.com/a/21231012/7108653
+</span></span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">columnToLetter</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">column</span> =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">temp</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">letter</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">column</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">temp</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">column</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">%</span> <span style="color:#ae81ff">26</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">letter</span> <span style="color:#f92672">=</span> String.<span style="color:#a6e22e">fromCharCode</span>(<span style="color:#a6e22e">temp</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">65</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">letter</span>;
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">column</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">column</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">temp</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">/</span> <span style="color:#ae81ff">26</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">letter</span>;
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Expand range1.
+</span></span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ar</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">rangeList1</span>.<span style="color:#a6e22e">getRanges</span>().<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">ar</span>, <span style="color:#a6e22e">r</span>) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">startRow1</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">getRow</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">endRow1</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">startRow1</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">getNumRows</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">startColumn1</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">getColumn</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">endColumn1</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">startColumn1</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">getNumColumns</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">j</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">startRow1</span>; <span style="color:#a6e22e">j</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">endRow1</span>; <span style="color:#a6e22e">j</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">k</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">startColumn1</span>; <span style="color:#a6e22e">k</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">endColumn1</span>; <span style="color:#a6e22e">k</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">columnToLetter</span>(<span style="color:#a6e22e">k</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">j</span>);
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ar</span>;
+</span></span><span style="display:flex;"><span>  }, []);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Expand range2.
+</span></span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">map</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">rangeList2</span>.<span style="color:#a6e22e">getRanges</span>().<span style="color:#a6e22e">reduce</span>((<span style="color:#a6e22e">m</span>, <span style="color:#a6e22e">r</span>) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">startRow2</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">getRow</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">endRow2</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">startRow2</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">getNumRows</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">startColumn2</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">getColumn</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">endColumn2</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">startColumn2</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">getNumColumns</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">j</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">startRow2</span>; <span style="color:#a6e22e">j</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">endRow2</span>; <span style="color:#a6e22e">j</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">k</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">startColumn2</span>; <span style="color:#a6e22e">k</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">endColumn2</span>; <span style="color:#a6e22e">k</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">m</span>.<span style="color:#a6e22e">set</span>(<span style="color:#a6e22e">columnToLetter</span>(<span style="color:#a6e22e">k</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">j</span>, <span style="color:#66d9ef">null</span>);
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">m</span>;
+</span></span><span style="display:flex;"><span>  }, <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Map</span>());
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ar</span>.<span style="color:#a6e22e">filter</span>(<span style="color:#a6e22e">e</span> =&gt; <span style="color:#a6e22e">map</span>.<span style="color:#a6e22e">has</span>(<span style="color:#a6e22e">e</span>));
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">main</span> <span style="color:#f92672">=</span> () =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">range1</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;B3:C7&#34;</span>, <span style="color:#e6db74">&#34;D6:E9&#34;</span>]; <span style="color:#75715e">// Please input range1 as a1Notation.
+</span></span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">range2</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;A2:B3&#34;</span>, <span style="color:#e6db74">&#34;C7:D10&#34;</span>]; <span style="color:#75715e">// Please input range2 as a1Notation.
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSheet</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">getOverwrappedRanges_</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRangeList</span>(<span style="color:#a6e22e">range1</span>),
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRangeList</span>(<span style="color:#a6e22e">range2</span>)
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>); <span style="color:#75715e">// &lt;--- [&#34;B3&#34;,&#34;C7&#34;,&#34;D7&#34;,&#34;D8&#34;,&#34;D9&#34;]
+</span></span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><ul>
+<li>
+<p>In this sample script, from the ranges of <code>&quot;B3:C7&quot;, &quot;D6:E9&quot;</code> and <code>&quot;A2:B3&quot;, &quot;C7:D10&quot;</code>, the overwrapped cells are returned. In this case, <code>[&quot;B3&quot;,&quot;C7&quot;,&quot;D7&quot;,&quot;D8&quot;,&quot;D9&quot;]</code> is returned.</p>
+        
+      </div>
+    </article>
+  
+    <article class="post-item">
+      <div class="post-meta">
         <i class="far fa-calendar-alt"></i> March 22, 2020
       </div>
       <h2><a href="https://tanaikech.github.io/2020/03/22/benchmark-process-costs-under-v8-using-google-apps-script/">Benchmark: Process Costs under V8 using Google Apps Script</a></h2>
@@ -380,30 +458,6 @@
 <p><strong>This is a GAS library for retrieving and creating the albums and media items using Google Photo API using Google Apps Script (GAS).</strong></p>
 <h3 id="description">Description</h3>
 <p>In the current stage, Google Photo API is not included in Advanced Google services. But in order to use Google Photo API with Google Apps Script, I created this as a GAS library. So in the current stage, in order to use this library, the following flow is required.</p>
-        
-      </div>
-    </article>
-  
-    <article class="post-item">
-      <div class="post-meta">
-        <i class="far fa-calendar-alt"></i> February 23, 2020
-      </div>
-      <h2><a href="https://tanaikech.github.io/2020/02/23/updated-goodls-to-v126/">Updated goodls to v126</a></h2>
-      <div class="post-summary">
-        
-          <ul>
-<li>
-<p>v1.2.6 (February 23, 2020)</p>
-<ol>
-<li>When the files are downloaded from the shared folder, if an error occurs, the download was stopped. In <a href="https://github.com/tanaikech/goodls/issues/9">this thread</a>, a request for skipping this error was proposed. This request was implemented at v1.2.6. Please try the option of <code>--skiperror</code> like below.
-<ul>
-<li><code>$ goodls -u https://drive.google.com/drive/folders/###?usp=sharing --skiperror</code></li>
-</ul>
-</li>
-</ol>
-</li>
-</ul>
-<p><font color="#3366CC"><strong>The detail information and how to get this are <a href="https://github.com/tanaikech/goodls">https://github.com/tanaikech/goodls</a>.</strong></font></p>
         
       </div>
     </article>
