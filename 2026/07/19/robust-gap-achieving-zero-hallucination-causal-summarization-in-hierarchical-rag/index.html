@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Hugo 0.157.0">
+
+  
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+  
+  <meta name="theme-color" content="#050505">
+
+  
+  <meta name="google-site-verification" content="googleccbde819fe280caa.html" />
+
+  
+  
+
+  <meta name="keywords" content="Gemini, Antigravity, AI">
+
+  <meta name="description" content="Gists
+
+
+
+Abstract
+This article introduces Robust-GAP, a hierarchical Retrieval-Augmented Generation (RAG) framework designed to eliminate semantic hallucinations and knowledge drift during multi-document log summarization. By combining dynamic causal graph extraction (DLCE), active topology verification (SGAV), and metadata provenance propagation (PAPP), the framework enforces strict citation traceability and prevents LLM-generated hallucinations.
+
+Note: The complete academic preprint detailing this research is openly available on Zenodo (DOI: 10.5281/zenodo.21436390).
+
+1. Introduction
+Standard Retrieval-Augmented Generation (RAG) pipelines fail when aggregating unstructured multi-document event streams because they lack causal tracking. When large language models (LLMs) summarize logs, chat transcripts, or transaction records, they frequently associate unrelated events. This behavior, known as knowledge drift, creates false dependencies.">
+
+  
+  <link rel="canonical" href="https://tanaikech.github.io/2026/07/19/robust-gap-achieving-zero-hallucination-causal-summarization-in-hierarchical-rag/">
+
+  
+  <title>Robust-GAP: Achieving Zero-Hallucination Causal Summarization in Hierarchical RAG | tanaike - Google Apps Script, Gemini API, and Developer Tips</title>
+
+  
+  <meta property="og:title" content="Robust-GAP: Achieving Zero-Hallucination Causal Summarization in Hierarchical RAG">
+  <meta property="og:description" content="Gists
+
+
+
+Abstract
+This article introduces Robust-GAP, a hierarchical Retrieval-Augmented Generation (RAG) framework designed to eliminate semantic hallucinations and knowledge drift during multi-document log summarization. By combining dynamic causal graph extraction (DLCE), active topology verification (SGAV), and metadata provenance propagation (PAPP), the framework enforces strict citation traceability and prevents LLM-generated hallucinations.
+
+Note: The complete academic preprint detailing this research is openly available on Zenodo (DOI: 10.5281/zenodo.21436390).
+
+1. Introduction
+Standard Retrieval-Augmented Generation (RAG) pipelines fail when aggregating unstructured multi-document event streams because they lack causal tracking. When large language models (LLMs) summarize logs, chat transcripts, or transaction records, they frequently associate unrelated events. This behavior, known as knowledge drift, creates false dependencies.">
+  <meta property="og:url" content="https://tanaikech.github.io/2026/07/19/robust-gap-achieving-zero-hallucination-causal-summarization-in-hierarchical-rag/">
+  <meta property="og:site_name" content="tanaike - Google Apps Script, Gemini API, and Developer Tips">
+  <meta property="og:type" content="article"><meta property="og:image" content="https://tanaikech.github.io/img/og-main.png">
+
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@tanaikech">
+  <meta name="twitter:title" content="Robust-GAP: Achieving Zero-Hallucination Causal Summarization in Hierarchical RAG">
+  <meta name="twitter:description" content="Gists
+
+
+
+Abstract
+This article introduces Robust-GAP, a hierarchical Retrieval-Augmented Generation (RAG) framework designed to eliminate semantic hallucinations and knowledge drift during multi-document log summarization. By combining dynamic causal graph extraction (DLCE), active topology verification (SGAV), and metadata provenance propagation (PAPP), the framework enforces strict citation traceability and prevents LLM-generated hallucinations.
+
+Note: The complete academic preprint detailing this research is openly available on Zenodo (DOI: 10.5281/zenodo.21436390).
+
+1. Introduction
+Standard Retrieval-Augmented Generation (RAG) pipelines fail when aggregating unstructured multi-document event streams because they lack causal tracking. When large language models (LLMs) summarize logs, chat transcripts, or transaction records, they frequently associate unrelated events. This behavior, known as knowledge drift, creates false dependencies.">
+  <meta name="twitter:image" content="https://tanaikech.github.io/img/og-main.png">
+
+  
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [{
+        "@type": "BlogPosting",
+        "headline": "\"Robust-GAP: Achieving Zero-Hallucination Causal Summarization in Hierarchical RAG\"",
+        "description": "\"\\u003cp\\u003e\\u003ca href=\\\"https://gist.github.com/tanaikech/758232a5d5399582eaa8f3d67b4e394e\\\"\\u003eGists\\u003c/a\\u003e\\u003c/p\\u003e\\n\\u003cp\\u003e\\u003cimg src=\\\"https://tanaikech.github.io/image-storage/20260719a/fig1a.jpg\\\"\\n     alt=\\\"fig1a\\\"\\n     \\n     loading=\\\"lazy\\\"\\n     decoding=\\\"async\\\"\\u003e\\n\\u003c/p\\u003e\\n\\u003chr\\u003e\\n\\u003ch2 id=\\\"abstract\\\"\\u003eAbstract\\u003c/h2\\u003e\\n\\u003cp\\u003eThis article introduces \\u003cstrong\\u003eRobust-GAP\\u003c/strong\\u003e, a hierarchical Retrieval-Augmented Generation (RAG) framework designed to eliminate semantic hallucinations and knowledge drift during multi-document log summarization. By combining dynamic causal graph extraction (DLCE), active topology verification (SGAV), and metadata provenance propagation (PAPP), the framework enforces strict citation traceability and prevents LLM-generated hallucinations.\\u003c/p\\u003e\\n\\u003chr\\u003e\\n\\u003cp\\u003e\\u003cem\\u003eNote: The complete academic preprint detailing this research is openly available on \\u003ca href=\\\"https://zenodo.org/records/21436390\\\"\\u003eZenodo\\u003c/a\\u003e (DOI: \\u003ca href=\\\"https://doi.org/10.5281/zenodo.21436390\\\"\\u003e10.5281/zenodo.21436390\\u003c/a\\u003e).\\u003c/em\\u003e\\u003c/p\\u003e\\n\\u003chr\\u003e\\n\\u003ch2 id=\\\"1-introduction\\\"\\u003e1. Introduction\\u003c/h2\\u003e\\n\\u003cp\\u003eStandard Retrieval-Augmented Generation (RAG) pipelines fail when aggregating unstructured multi-document event streams because they lack causal tracking. When large language models (LLMs) summarize logs, chat transcripts, or transaction records, they frequently associate unrelated events. This behavior, known as knowledge drift, creates false dependencies.\\u003c/p\\u003e\"",
+        "url": "\"https://tanaikech.github.io/2026/07/19/robust-gap-achieving-zero-hallucination-causal-summarization-in-hierarchical-rag/\"",
+        "datePublished": "\"2026-07-19T14:37:47+09:00\"",
+        "dateModified": "\"2026-07-19T14:37:47+09:00\"",
+        "wordCount":  1446 ,
+        "author": {
+          "@id": "https:\/\/tanaikech.github.io\/#person"
+        },
+        "publisher": {
+          "@id": "https:\/\/tanaikech.github.io\/#person"
+        },
+        "image": {
+          "@type": "ImageObject",
+          "url": "\"https://tanaikech.github.io/img/og-main.png\"",
+          "width": 1200,
+          "height": 630
+        },
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "\"https://tanaikech.github.io/2026/07/19/robust-gap-achieving-zero-hallucination-causal-summarization-in-hierarchical-rag/\""
+        }
+      },{
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "\"https://tanaikech.github.io/\""
+          },{
+            "@type": "ListItem",
+            "position": 2,
+            "name": "\"Robust-GAP: Achieving Zero-Hallucination Causal Summarization in Hierarchical RAG\"",
+            "item": "\"https://tanaikech.github.io/2026/07/19/robust-gap-achieving-zero-hallucination-causal-summarization-in-hierarchical-rag/\""
+          }]
+      },      {
+        "@type": "Person",
+        "@id": "https:\/\/tanaikech.github.io\/#person",
+        "name": "Kanshi Tanaike",
+        "alternateName": "tanaike",
+        "url": "\"https://tanaikech.github.io/\"",
+        "image": "\"https://tanaikech.github.io/img/og-main.png\"",
+        "jobTitle": "Google Developer Expert",
+        "honorificPrefix": "Ph.D.",
+        "description": "Japanese scientist, Physicist and Google Developer Expert for Google Workspace.",
+        "award": "First place in the Outstanding GDE Award 2025",
+        "sameAs": [
+          "https://twitter.com/tanaikech",
+          "https://github.com/tanaikech",
+          "https://stackoverflow.com/users/7108653/tanaike",
+          "https://developers.google.com/community/experts/directory?text=tanaike",
+          "https://zenn.dev/tanaike",
+          "https://medium.com/@tanaike"
+        ]
+      }
+    ]
+  }
+  </script>
+
+  
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/eclipse.css">
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <link rel="shortcut icon" href="https://tanaikech.github.io/img/favicon.ico" type="image/x-icon" />
+  
+  
+  
+
+  
+  
+  
+</head>
+
+
+<body>
+  <div id="progress-bar"></div>
+  
+  <header class="site-header">
+    <div class="header-container">
+      
+      <div class="header-top">
+        <div class="site-title">
+          <a href="https://tanaikech.github.io/">TANAIKE</a>
+          
+            <div class="site-subtitle">The Thinker</div>
+          
+        </div>
+
+        
+        <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+
+      
+      <div id="mobile-menu" class="mobile-menu-content">
+        <div class="nav-row">
+          <div class="nav-links">
+            
+              <a href="https://tanaikech.github.io/about/" title="">
+                <i class='fa fa-user fa-fw'></i> About
+              </a>
+            
+              <a href="https://tanaikech.github.io/post/" title="">
+                <i class='fa fa-list fa-fw'></i> Articles
+              </a>
+            
+              <a href="https://tanaikech.github.io/topics/" title="">
+                <i class='fa fa-folder fa-fw'></i> Topics
+              </a>
+            
+              <a href="https://tanaikech.github.io/tags/" title="">
+                <i class='fa fa-tags fa-fw'></i> Tags
+              </a>
+            
+              <a href="https://tanaikech.github.io/contact/" title="">
+                <i class='fa fa-phone fa-fw'></i> Contact
+              </a>
+            
+              <a href="https://tanaikech.github.io/link/" title="">
+                <i class='fa fa-thumbs-up fa-fw'></i> Links
+              </a>
+            
+              <a href="https://tanaikech.github.io/webapps/" title="">
+                <i class='fas fa-toolbox'></i> Web Applications
+              </a>
+            
+              <a href="https://tanaikech.github.io/donate/" title="">
+                <i class='fas fa-donate'></i> Donate
+              </a>
+            
+              <a href="https://tanaikech.github.io/" title="">
+                <i class='fa fa-home fa-fw'></i> Home
+              </a>
+            
+          </div>
+        </div>
+
+        <div class="social-links-row"><a href="https://twitter.com/tanaikech" target="_blank" rel="me">
+                <i class="fab fa-x-twitter"></i> X
+              </a><a href="https://medium.com/@tanaike" target="_blank" rel="me">
+                <i class="fab fa-medium"></i> Medium
+              </a><a href="https://www.youtube.com/@tanaike" target="_blank" rel="me">
+                <i class="fab fa-youtube"></i> YouTube
+              </a><a href="https://linkedin.com/in/tanaike" target="_blank" rel="me">
+                <i class="fab fa-linkedin"></i> LinkedIn
+              </a><a href="https://github.com/tanaikech" target="_blank" rel="me">
+                <i class="fab fa-github"></i> GitHub
+              </a><a href="https://gist.github.com/tanaikech" target="_blank" rel="me">
+                <i class="fas fa-code"></i> Gists
+              </a><a href="https://stackoverflow.com/users/7108653" target="_blank" rel="me">
+                <i class="fab fa-stack-overflow"></i> Stack Overflow
+              </a><a href="https://dev.to/tanaike" target="_blank" rel="me">
+                <i class="fab fa-dev"></i> DEV
+              </a><a href="https://zenn.dev/tanaike" target="_blank" rel="me">
+                <i class="fas fa-edit"></i> Zenn
+              </a><a href="https://devpost.com/tanaike" target="_blank" rel="me">
+                <i class="fas fa-terminal"></i> Devpost
+              </a></div>
+      </div>
+
+    </div>
+  </header>
+
+  <main id="main">
+
+
+<div class="header">
+  <h1>Robust-GAP: Achieving Zero-Hallucination Causal Summarization in Hierarchical RAG</h1>
+  <h2></h2>
+</div>
+<div class="content">
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>19 Jul 2026, 14:37</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/report">report</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/gemini">Gemini</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/antigravity">Antigravity</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/ai">AI</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  <p><a href="https://gist.github.com/tanaikech/758232a5d5399582eaa8f3d67b4e394e">Gists</a></p>
+<p><img src="https://tanaikech.github.io/image-storage/20260719a/fig1a.jpg"
+     alt="fig1a"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<hr>
+<h2 id="abstract">Abstract</h2>
+<p>This article introduces <strong>Robust-GAP</strong>, a hierarchical Retrieval-Augmented Generation (RAG) framework designed to eliminate semantic hallucinations and knowledge drift during multi-document log summarization. By combining dynamic causal graph extraction (DLCE), active topology verification (SGAV), and metadata provenance propagation (PAPP), the framework enforces strict citation traceability and prevents LLM-generated hallucinations.</p>
+<hr>
+<p><em>Note: The complete academic preprint detailing this research is openly available on <a href="https://zenodo.org/records/21436390">Zenodo</a> (DOI: <a href="https://doi.org/10.5281/zenodo.21436390">10.5281/zenodo.21436390</a>).</em></p>
+<hr>
+<h2 id="1-introduction">1. Introduction</h2>
+<p>Standard Retrieval-Augmented Generation (RAG) pipelines fail when aggregating unstructured multi-document event streams because they lack causal tracking. When large language models (LLMs) summarize logs, chat transcripts, or transaction records, they frequently associate unrelated events. This behavior, known as knowledge drift, creates false dependencies.</p>
+<p>For example, when troubleshooting an incident, an LLM might draw a causal link between a database table cleanup cron job and an unrelated disk write failure simply because both logs occurred within the same context window.</p>
+<p>Robust-GAP resolves this issue. The pipeline constructs a dynamic causal graph of incoming events, verifies these connections against system schemas, and propagates source metadata directly to the final summary output as verifiable inline citations.</p>
+<hr>
+<h2 id="2-the-10-year-evolution-of-hierarchical-reduction">2. The 10-Year Evolution of Hierarchical Reduction</h2>
+<p>Robust-GAP is not an isolated development. It represents the fourth generation of an algorithmic lineage spanning a decade of research on hierarchical tree reduction:</p>
+<pre tabindex="0"><code class="language-mermaid" data-lang="mermaid">graph TD
+    A[&#34;&lt;b&gt;[1] Array Summation (2016)&lt;/b&gt;&lt;br&gt;Mathematical array reduction&lt;br&gt;&lt;i&gt;(Non-AI foundaton)&lt;/i&gt;&#34;]
+    A --&gt;|Applied to LLM RAG| B[&#34;&lt;b&gt;[2] Pyramid Aggregator (2024)&lt;/b&gt;&lt;br&gt;Hierarchical merging to prevent context loss&#34;]
+    B --&gt;|Integrated static graphs| C[&#34;&lt;b&gt;[3] GAP (2026)&lt;/b&gt;&lt;br&gt;Graph-Anchor Pyramid for relational anchors&#34;]
+    C --&gt;|Dynamic topology + Gating + Provenance| D[&#34;&lt;b&gt;[4] Robust-GAP (Present)&lt;/b&gt;&lt;br&gt;Dynamic, zero-hallucination &amp; cited RAG&#34;]
+</code></pre><p><img src="https://tanaikech.github.io/image-storage/20260719a/fig1b.png"
+     alt="fig1b"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<ol>
+<li><strong>[1] Array Summation (2016)</strong> (<a href="https://zenodo.org/records/21232389">Zenodo Record</a> / <a href="https://doi.org/10.5281/zenodo.21232388">DOI: 10.5281/zenodo.21232388</a>):
+A pure computational reduction algorithm for summing numerical arrays in parallel balanced trees, designed to minimize algorithmic complexity. This was a foundational theory created long before the generative AI era.</li>
+<li><strong>[2] Pyramid Aggregator (2024)</strong> (<a href="https://zenodo.org/records/21252820">Zenodo Record</a> / <a href="https://doi.org/10.5281/zenodo.21252819">DOI: 10.5281/zenodo.21252819</a>):
+Adapted the 2016 array reduction tree structure to LLM document ingestion. By chunking and merging texts in a balanced hierarchy, it solved position bias (&ldquo;lost in the middle&rdquo;) during multi-document summarization.</li>
+<li><strong>[3] GAP: Graph-Anchor Pyramid (2026)</strong> (<a href="https://zenodo.org/records/21366520">Zenodo Record</a> / <a href="https://doi.org/10.5281/zenodo.21366519">DOI: 10.5281/zenodo.21366519</a>):
+Evolved the hierarchy by introducing static knowledge graphs. Rather than grouping documents arbitrarily, it clustered them topologically to preserve relational anchors between documents.</li>
+<li><strong>[4] Robust-GAP (Present)</strong> (<a href="https://zenodo.org/records/21436390">Zenodo Record</a> / <a href="https://doi.org/10.5281/zenodo.21436390">DOI: 10.5281/zenodo.21436390</a>):
+The ultimate evolution. It eliminates the requirement of pre-built static graphs, secures the merge tree against LLM semantic hallucinations, and guarantees source document tracking (provenance).</li>
+</ol>
+<hr>
+<h2 id="3-the-theory-of-robust-gap">3. The Theory of Robust-GAP</h2>
+<p>Robust-GAP maps unstructured event streams into a two-level hierarchical merge tree. The pipeline relies on three core stages:</p>
+<ul>
+<li><strong>DLCE (Dynamic Lightweight Causal Extraction)</strong>: Builds a correlation graph by drawing edges between log documents that share transaction IDs or system keys within a defined temporal window.</li>
+<li><strong>SGAV (Schema-Guided Anchor Validation)</strong>: Filters the extracted graph against a configuration management database (CMDB) schema, pruning invalid connections between unrelated services.</li>
+<li><strong>PAPP (Provenance-Aware Pyramid Propagation)</strong>: Maps the original document IDs to the verified relationships and carries this metadata up the merge tree.</li>
+</ul>
+<p>The following infographic illustrates the complete Robust-GAP workflow:</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260719a/theory_flow.jpg"
+     alt="Robust-GAP Theory Flow"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<h3 id="feature-comparison-of-rag-methodologies">Feature Comparison of RAG Methodologies</h3>
+<p>The table below contrasts Robust-GAP with alternative approaches:</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">Feature / Metric</th>
+          <th style="text-align: left">Vector + Batch</th>
+          <th style="text-align: left">Hybrid + OneShot</th>
+          <th style="text-align: left">Classic GAP</th>
+          <th style="text-align: left">Robust-GAP (Ours)</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left"><strong>Causal Topology</strong></td>
+          <td style="text-align: left">No</td>
+          <td style="text-align: left">No</td>
+          <td style="text-align: left">Static Only</td>
+          <td style="text-align: left">Dynamic (DLCE)</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>Hallucination Pruning</strong></td>
+          <td style="text-align: left">No</td>
+          <td style="text-align: left">No</td>
+          <td style="text-align: left">No</td>
+          <td style="text-align: left">Yes (SGAV)</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>Strict Provenance</strong></td>
+          <td style="text-align: left">No</td>
+          <td style="text-align: left">No</td>
+          <td style="text-align: left">Textual Only</td>
+          <td style="text-align: left">Metadata (PAPP)</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>Citations</strong></td>
+          <td style="text-align: left">0%</td>
+          <td style="text-align: left">10%</td>
+          <td style="text-align: left">68%</td>
+          <td style="text-align: left">100% (Verifiable)</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>Hallucination Rate</strong></td>
+          <td style="text-align: left">High</td>
+          <td style="text-align: left">High</td>
+          <td style="text-align: left">Low</td>
+          <td style="text-align: left">0%</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="4-practical-testing-detailed-cli-usage">4. Practical Testing: Detailed CLI Usage</h2>
+<p>To implement the pipeline, we released a Python-based CLI tool:</p>
+<ul>
+<li><strong>Repository</strong>: <a href="https://github.com/tanaikech/Robust-GAP">https://github.com/tanaikech/Robust-GAP</a></li>
+</ul>
+<p>The script runs on Python 3 with zero external dependencies. It uses direct REST communication with the Gemini API, falling back to a local simulation mode if an API key is not configured.</p>
+<h3 id="supported-data-formats">Supported Data Formats</h3>
+<p>The CLI handles two input JSON formats:</p>
+<ul>
+<li><strong>Structured Logs (Recommended)</strong>: An array of objects with metadata fields (<code>id</code>, <code>timestamp</code>, <code>text</code>, <code>module</code>). Custom field keys can be mapped dynamically via flags like <code>--key-text</code> or <code>--key-module</code>.</li>
+<li><strong>Flat String Lists</strong>: A simple array of raw sentences (e.g., <code>[&quot;error 1&quot;, &quot;error 2&quot;]</code>). The script automatically assigns sequential document IDs, timestamps, and schema wrappers on-the-fly.</li>
+</ul>
+<h3 id="running-the-pipeline">Running the Pipeline</h3>
+<p>Execute the pipeline with:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python3 robust_gap_cli.py samples/travel_incident_data.json --language ja
+</span></span></code></pre></div><h3 id="configuration-options">Configuration Options</h3>
+<ul>
+<li><code>data_file</code>: Path to the input JSON file containing log documents.</li>
+<li><code>--model</code>: Target Gemini model name (default: <code>gemini-3.1-flash-lite</code>).</li>
+<li><code>--api-key</code>: API key for Gemini. Automatically loads from environment variables if omitted.</li>
+<li><code>--language</code>, <code>-l</code>: Output language code (e.g. <code>en</code>, <code>ja</code>, <code>zh</code>) (default: <code>en</code>).</li>
+<li><code>--time-window</code>: Proximity window in seconds for DLCE (default: <code>1200</code> seconds).</li>
+<li><code>--cmdb-schema</code>: Comma-separated component lists for SGAV verification.</li>
+<li><code>--key-text</code>, <code>--key-timestamp</code>, etc.: Dynamic key mapping for custom input structures.</li>
+<li><code>--mock</code>: Forces offline local mock simulation.</li>
+</ul>
+<hr>
+<h2 id="5-sample-execution--real-llm-outputs">5. Sample Execution &amp; Real LLM Outputs</h2>
+<p>We verified the pipeline against two pre-bundled datasets available in the <a href="https://github.com/tanaikech/Robust-GAP/tree/main/samples">samples directory</a> using the live Gemini API.</p>
+<h3 id="dataset-1-travel_incident_datajson-japanese-output">Dataset 1: travel_incident_data.json (Japanese Output)</h3>
+<p>This dataset (<a href="https://github.com/tanaikech/Robust-GAP/blob/main/samples/travel_incident_data.json">travel_incident_data.json</a>) simulates travel disruptions mixed with unrelated noise logs (such as coffee purchases or postcard shopping) to test filtering.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python3 robust_gap_cli.py samples/travel_incident_data.json --language ja
+</span></span></code></pre></div><p><strong>Real LLM Output:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>============================================================
+</span></span><span style="display:flex;"><span>                   ROBUST-GAP FINAL SUMMARY
+</span></span><span style="display:flex;"><span>============================================================
+</span></span><span style="display:flex;"><span>Wallet紛失でCardCompany停止[D13-D16]。BusTransitとTaxi利用拒否[D14-D16]。WeatherService警報でRailway運休[D9-D12]。FoodDeliveryとRestaurantに影響[D10-D12]。航空便遅延、チェックイン機故障による交通機関障害や手荷物誤送も発生。
+</span></span><span style="display:flex;"><span>============================================================
+</span></span></code></pre></div><h3 id="dataset-2-sre_incident_datajson-english-output">Dataset 2: sre_incident_data.json (English Output)</h3>
+<p>This dataset (<a href="https://github.com/tanaikech/Robust-GAP/blob/main/samples/sre_incident_data.json">sre_incident_data.json</a>) simulates a multi-service outage spanning four parallel infrastructure dependency chains mixed with 16 background noise events.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python3 robust_gap_cli.py samples/sre_incident_data.json --language en
+</span></span></code></pre></div><p><strong>Real LLM Output:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>============================================================
+</span></span><span style="display:flex;"><span>                   ROBUST-GAP FINAL SUMMARY
+</span></span><span style="display:flex;"><span>============================================================
+</span></span><span style="display:flex;"><span>AuthServer validation failed [D1], affecting TokenStore [D1,D2] and blocking ClientAPI [D3,D4]. HostHardware voltage drop [D5] forced AppServer failure [D7,D8]. DiskController high latency [D9] stalled DbStorage WAL [D10], locking DbQuery threadpool [D11,D12]. SwitchRoute packet loss [D13] aborted CheckoutService transaction [D15,D16].
+</span></span><span style="display:flex;"><span>============================================================
+</span></span></code></pre></div><hr>
+<h2 id="6-experimental-data-discussion">6. Experimental Data Discussion</h2>
+<p>During benchmarking on a 32-node cluster log dataset, we compared the hallucination and citation metrics across all four pipelines.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260719a/experiment_chart.jpg"
+     alt="RAG Methods Performance Comparison"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<h3 id="why-robust-gap-eliminates-hallucinations">Why Robust-GAP Eliminates Hallucinations</h3>
+<ul>
+<li><strong>Causal Event Isolation</strong>: DLCE filters out unrelated background events, preventing the LLM from fabricating relationships between noise logs and actual incident root causes.</li>
+<li><strong>Schema Enforcement</strong>: SGAV automatically rejects any inferred relationship that violates the service topology defined in the CMDB.</li>
+<li><strong>Enforced Provenance Tracking</strong>: PAPP forces the LLM to anchor every assertion in the final summary to an explicit source document ID (<code>[Dxx]</code>), allowing instant programmatic verification of all claims.</li>
+</ul>
+<hr>
+<h2 id="7-expanding-horizons-future-applications--use-cases">7. Expanding Horizons: Future Applications &amp; Use Cases</h2>
+<p>The core design of Robust-GAP—decoupled causal graphing, schema validation, and metadata propagation—applies to any domain requiring verifiable summaries of unstructured sequence logs.</p>
+<h3 id="use-case-1-multi-agent-customer-support-network-auditing">Use Case 1: Multi-Agent Customer Support Network Auditing</h3>
+<p>When customer issues span multiple agents and chat channels, support logs get fragmented. Robust-GAP can ingest these unstructured conversations, isolate independent customer threads, and compile a chronological summary backed by direct message citations.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260719a/usecase_support.jpg"
+     alt="Customer Support Infographic"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<ul>
+<li><strong>Operational Benefit</strong>: Accelerates incident review and audit times by providing direct source links for every summary point.</li>
+</ul>
+<h3 id="use-case-2-financial-transaction-auditing--trace-networks">Use Case 2: Financial Transaction Auditing &amp; Trace Networks</h3>
+<p>Financial audits require parsing thousands of transaction logs, ledger updates, and transfer records. By mapping transaction flows as a causal graph, Robust-GAP can flag suspicious transfer loops, validate them against compliance rules, and produce summaries of the anomaly with direct, ledger-level references.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260719a/usecase_finance.jpg"
+     alt="Financial Auditing Infographic"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<ul>
+<li><strong>Operational Benefit</strong>: Reduces audit workloads while ensuring all findings are backed by verifiable ledger evidence.</li>
+</ul>
+<hr>
+<h2 id="8-conclusion">8. Conclusion</h2>
+<p>For mission-critical systems, standard flat-vector RAG is insufficient. By enforcing structured causal hierarchies, Robust-GAP allows teams to deploy LLMs in production environments where hallucination risks must be strictly controlled, rather than just theoretically discouraged.</p>
+<p>The codebase is open source and available on <a href="https://github.com/tanaikech/Robust-GAP">GitHub</a>. Try running it on your own log streams.</p>
+<hr>
+<h3 id="citation">Citation</h3>
+<p>If you use this work in your academic research, please cite the preprint as follows:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>Tanaike, Kanshi. (2026). Robust-GAP: Hallucination-Resistant Hierarchical RAG with Dynamic Topology and Citation Provenance. Zenodo Report. https://doi.org/10.5281/zenodo.21436390
+</span></span></code></pre></div>
+  
+  <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2026%2f07%2f19%2frobust-gap-achieving-zero-hallucination-causal-summarization-in-hierarchical-rag%2f" target="_blank" title="Share on Facebook"><i class="fab fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2026%2f07%2f19%2frobust-gap-achieving-zero-hallucination-causal-summarization-in-hierarchical-rag%2f" target="_blank" title="Tweet"><i class="fab fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f07%2f19%2frobust-gap-achieving-zero-hallucination-causal-summarization-in-hierarchical-rag%2f" target="_blank" title="Share on Google+"><i class="fab fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2026%2f07%2f19%2frobust-gap-achieving-zero-hallucination-causal-summarization-in-hierarchical-rag%2f" target="_blank" title="Post to Tumblr"><i class="fab fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f07%2f19%2frobust-gap-achieving-zero-hallucination-causal-summarization-in-hierarchical-rag%2f" target="_blank" title="Pin it"><i class="fab fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f07%2f19%2frobust-gap-achieving-zero-hallucination-causal-summarization-in-hierarchical-rag%2f" target="_blank" title="Submit to Reddit"><i class="fab fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
+
+
+  
+<nav class="prev-next-posts">
+  <div class="prev-post">
+    
+      <span class="nav-label">Previous Article</span>
+      <a href="https://tanaikech.github.io/2026/07/16/troubleshooting-infinite-loading-loop-in-antigravity-cli-v1.1.3-and-temporary-workaround/">Troubleshooting: Infinite Loading Loop in Antigravity CLI v1.1.3 and Temporary Workaround</a>
+    
+  </div>
+  <div class="next-post">
+    
+  </div>
+</nav>
+
+<style>
+.prev-next-posts {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+  gap: 2rem;
+}
+.prev-post, .next-post {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.next-post {
+  text-align: right;
+}
+.nav-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+.prev-next-posts a {
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-decoration: none;
+}
+@media (max-width: 600px) {
+  .prev-next-posts { flex-direction: column; text-align: left; }
+  .next-post { text-align: left; }
+}
+</style>
+
+
+  
+  
+  
+  
+
+  
+
+</div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-social"><a href="https://twitter.com/tanaikech" target="_blank" rel="me" title="twitter">
+                  <i class="fab fa-x-twitter"></i>
+                </a><a href="https://github.com/tanaikech" target="_blank" rel="me" title="github">
+                  <i class="fab fa-github"></i>
+                </a><a href="https://linkedin.com/in/tanaike" target="_blank" rel="me" title="linkedin">
+                  <i class="fab fa-linkedin"></i>
+                </a><a href="https://www.youtube.com/@tanaike" target="_blank" rel="me" title="youtube">
+                  <i class="fab fa-youtube"></i>
+                </a><a href="https://medium.com/@tanaike" target="_blank" rel="me" title="medium">
+                  <i class="fab fa-medium"></i>
+                </a><a href="https://stackoverflow.com/users/7108653" target="_blank" rel="me" title="stackoverflow">
+                  <i class="fab fa-stack-overflow"></i>
+                </a><a href="https://zenn.dev/tanaike" target="_blank" rel="me" title="zenn">
+                  <i class="fas fa-edit"></i>
+                </a><a href="https://dev.to/tanaike" target="_blank" rel="me" title="devto">
+                  <i class="fab fa-dev"></i>
+                </a>
+      </div>
+      
+      <p class="copyright">
+        &copy; 2026 tanaike - Google Apps Script, Gemini API, and Developer Tips. Built with <a href="https://gohugo.io" target="_blank">Hugo</a>.
+      </p>
+    </div>
+  </footer>
+
+  <script src="https://tanaikech.github.io/js/eclipse.js"></script>
+
+  
+  
+
+  
+  
+
+  
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
+<script>
+  
+  if (window.location.hostname != "localhost") {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-J3Z6T50WL5');
+  }
+</script>
+
+
+
+  
+
+  
+
+</body>
+</html>
+
