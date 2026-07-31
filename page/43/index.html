@@ -202,6 +202,67 @@
   
     <article class="post-item">
       <div class="post-meta">
+        <i class="far fa-calendar-alt"></i> May 28, 2022
+      </div>
+      <h2><a href="https://tanaikech.github.io/2022/05/28/uploading-files-to-google-drive-with-asynchronous-process-using-python/">Uploading Files to Google Drive with Asynchronous Process using Python</a></h2>
+      <div class="post-summary">
+        
+          <p><a href="https://gist.github.com/tanaikech/a4cfbea4935b8c281d1f6abb91016705">Gists</a></p>
+<p>This is a sample script for uploading files to Google Drive with asynchronous process using Python.</p>
+<h2 id="sample-script">Sample script</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> aiohttp
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> asyncio
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> json
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>folder_id <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span> <span style="color:#75715e"># Please set the folder ID you want to put.</span>
+</span></span><span style="display:flex;"><span>token <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;###&#34;</span> <span style="color:#75715e"># Please set your access token.</span>
+</span></span><span style="display:flex;"><span>url <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://www.googleapis.com/upload/drive/v3/files&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">async</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">workers</span>(file):
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">async</span> <span style="color:#66d9ef">with</span> aiohttp<span style="color:#f92672">.</span>ClientSession() <span style="color:#66d9ef">as</span> session:
+</span></span><span style="display:flex;"><span>        metadata <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;name&#34;</span>: file[<span style="color:#e6db74">&#34;filename&#34;</span>], <span style="color:#e6db74">&#34;parents&#34;</span>: [folder_id]}
+</span></span><span style="display:flex;"><span>        data <span style="color:#f92672">=</span> aiohttp<span style="color:#f92672">.</span>FormData()
+</span></span><span style="display:flex;"><span>        data<span style="color:#f92672">.</span>add_field(<span style="color:#e6db74">&#34;metadata&#34;</span>, json<span style="color:#f92672">.</span>dumps(metadata), content_type<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;application/json; charset=UTF-8&#34;</span>)
+</span></span><span style="display:flex;"><span>        data<span style="color:#f92672">.</span>add_field(<span style="color:#e6db74">&#34;file&#34;</span>, open(file[<span style="color:#e6db74">&#34;path&#34;</span>], <span style="color:#e6db74">&#34;rb&#34;</span>))
+</span></span><span style="display:flex;"><span>        headers <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;Authorization&#34;</span>: <span style="color:#e6db74">&#34;Bearer &#34;</span> <span style="color:#f92672">+</span> token}
+</span></span><span style="display:flex;"><span>        params <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;uploadType&#34;</span>: <span style="color:#e6db74">&#34;multipart&#34;</span>}
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">async</span> <span style="color:#66d9ef">with</span> session<span style="color:#f92672">.</span>post(url, data<span style="color:#f92672">=</span>data, params<span style="color:#f92672">=</span>params, headers<span style="color:#f92672">=</span>headers) <span style="color:#66d9ef">as</span> resp:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">await</span> resp<span style="color:#f92672">.</span>json()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">async</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Please set the filenames and the file paths as follows.</span>
+</span></span><span style="display:flex;"><span>    fileList <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>        {<span style="color:#e6db74">&#34;filename&#34;</span>: <span style="color:#e6db74">&#34;sample1&#34;</span>, <span style="color:#e6db74">&#34;path&#34;</span>: <span style="color:#e6db74">&#34;./sample1.png&#34;</span>},
+</span></span><span style="display:flex;"><span>        ,
+</span></span><span style="display:flex;"><span>        ,
+</span></span><span style="display:flex;"><span>        ,
+</span></span><span style="display:flex;"><span>    ]
+</span></span><span style="display:flex;"><span>    works <span style="color:#f92672">=</span> [asyncio<span style="color:#f92672">.</span>create_task(workers(e)) <span style="color:#66d9ef">for</span> e <span style="color:#f92672">in</span> fileList]
+</span></span><span style="display:flex;"><span>    res <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> asyncio<span style="color:#f92672">.</span>gather(<span style="color:#f92672">*</span>works)
+</span></span><span style="display:flex;"><span>    print(res)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>asyncio<span style="color:#f92672">.</span>run(main())
+</span></span></code></pre></div><ul>
+<li>When this script is run, the files of <code>fileList</code> are uploaded to Google Drive with the asynchronous process.</li>
+</ul>
+<h2 id="note">Note</h2>
+<ul>
+<li>This sample supposes that your access token can be used for uploading files to Google Drive using Drive API. Please be careful about this.</li>
+</ul>
+<h2 id="reference">Reference</h2>
+<ul>
+<li>I answered this sample script for <a href="https://stackoverflow.com/q/72399888/7108653">this thread of Stackoverflow</a></li>
+</ul>
+        
+      </div>
+    </article>
+  
+    <article class="post-item">
+      <div class="post-meta">
         <i class="far fa-calendar-alt"></i> May 25, 2022
       </div>
       <h2><a href="https://tanaikech.github.io/2022/05/25/parsing-json-data-array-by-expanding-header-row-using-google-apps-script/">Parsing JSON Data Array by Expanding Header Row using Google Apps Script</a></h2>
@@ -432,21 +493,6 @@ sample1, sample2, sample3, sample4, sample5
           <p><a href="https://gist.github.com/tanaikech/7bebb7c6d8ed6ddfdd825153ef71c47e">Gists</a></p>
 <p>This is a report for obtaining the values from GOOGLEFINANCE using Google Apps Script. When I tested to retrieve the values from <code>GOOGLEFINANCE</code> function on Google Spreadsheet using Google Apps Script, I noticed that the values can be retrieved.</p>
 <p>When I had tested this before, I had got the value of <code>#N/A</code>. About retrieving the values from <code>GOOGLEFINANCE</code> function on Google Spreadsheet, I had known &ldquo;<a href="https://gsuiteupdates.googleblog.com/2016/09/historical-googlefinance-data-no-longer.html">Historical GOOGLEFINANCE data no longer accessible outside of Google Sheets</a>&rdquo;. By this situation, <code>#N/A</code> had been returned when the value had been retrieved using a script.</p>
-        
-      </div>
-    </article>
-  
-    <article class="post-item">
-      <div class="post-meta">
-        <i class="far fa-calendar-alt"></i> May 14, 2022
-      </div>
-      <h2><a href="https://tanaikech.github.io/2022/05/14/reducing-image-data-size-using-google-apps-script/">Reducing Image Data Size using Google Apps Script</a></h2>
-      <div class="post-summary">
-        
-          <p><a href="https://gist.github.com/tanaikech/14c863e225162ec86894d604709d8b35">Gists</a></p>
-<p>This is a sample script for reducing the image data size using Google Apps Script. You might have a situation where you might want to reduce the data size of image data using Google Apps Script. Here, using Google Apps Script, I would like to introduce a sample script for reducing the data size of the image data by reducing the image quality.</p>
-<h2 id="limitations">Limitations</h2>
-<p>In the current stage, by the specification of Google side, there are the following limitations.</p>
         
       </div>
     </article>

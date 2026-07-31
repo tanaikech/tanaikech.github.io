@@ -202,6 +202,43 @@
   
     <article class="post-item">
       <div class="post-meta">
+        <i class="far fa-calendar-alt"></i> June 17, 2026
+      </div>
+      <h2><a href="https://tanaikech.github.io/2026/06/17/updated-ggsrun-to-v530/">Updated ggsrun to v530</a></h2>
+      <div class="post-summary">
+        
+          <h2 id="ggsrun-was-updated-to-v530">ggsrun was updated to v5.3.0.</h2>
+<ul>
+<li><strong>v5.3.0 (June 2026) - Responsive TUI Filer (FD Mode) Enhancements, Focus Persistence, and Platform Compatibility Fixes</strong>
+Refactored TUI Filer (FD Mode) popup layouts using <code>tview.Flex</code> to center dialogs (errors, sorting, details, help) and prevent text clipping. Implemented focus locking to preserve active panel focus post-action. Added wrap-around to lists and mapped the <code>y</code> key to yank (copy) selected file paths or File IDs to the clipboard. Resolved compilation errors on 32-bit Linux platforms (e.g. <code>linux/arm</code>) by explicitly casting <code>syscall.Stat_t</code> <code>Ctim</code> fields to <code>int64</code> inside build-tagged files, and adapted the mock simulation test suite (<code>fd_test.go</code>) to match the new responsive structures.</li>
+<li><strong>v5.2.4 (June 2026) - Latest MIME Type Formats, CLI Option Help Details, Concurrent Conversion Overhaul, and Destination Directory Support</strong>
+Updated internal MIME type mapping definitions (<code>googlemimetypes.go</code>) to synchronize with the latest Google Drive API <code>importFormats</code>/<code>exportFormats</code>. Revamped the CLI options help display for <code>--extension</code> (download/revision) and <code>--convertto</code> (upload) to explicitly list all supported formats. Overhauled the concurrent upload/download engines to handle <code>--convertto</code> / <code>--noconvert</code> directly in parallel streams without falling back to the legacy single-threaded uploader, adding validation capability checks and graceful error warning feedback. Added <code>--destination</code> (<code>-d</code>) option to the <code>download</code> and <code>revision</code> commands to allow specifying the target local directory for saving downloaded files.</li>
+<li><strong>v5.2.3 (June 2026) - Directory Reuse Conflict Resolution, Output Control, and CLI/MCP Alignment</strong>
+Upgraded the directory upload conflict resolution mechanism to silently and recursively reuse existing remote folders without prompting. Aligned the <code>--conflict-mode</code> behavior for <code>-j</code> / <code>--jsonparser</code> CLI runs to match the automated MCP mode (defaulting to <code>OverwriteIfNewer</code>, overridable via <code>--cm</code>). Muted TUI output and progress bars (<code>mpb</code>) when running with the <code>-j</code> option to return clean JSON. Supported <code>--cm</code> as a shorthand alias for <code>--conflict-mode</code> in file transfers.</li>
+<li><strong>v5.2.2 (June 2026) - MCP Help Display Expansion, Safety Review Prompt, Dual-Mode Conflict Engine, and File-Level Error Feedback</strong>
+Expanded <code>ggsrun mcp -h</code> (and <code>--help</code>) to display all exposed MCP tool names and their detailed description outputs directly. Implemented strict programmatic safety review prompts inside the <code>exe1</code> MCP tool description, instructing LLMs to statically analyze Apps Script payloads for API mutations (write/update/delete) and obtain user Y/N confirmations before running, while allowing read-only scripts to run automatically. Re-designed the conflict resolution engine into a dual-mode system: automated and non-interactive for MCP server sessions (defaulting to <code>OverwriteIfNewer</code>, with options for <code>Ignore</code> and <code>Rename</code>), and preserving legacy interactive CLI prompts for raw executions. Refactored parallel transfer loops to capture and return detailed file-level error feedback instead of crashing.</li>
+<li><strong>v5.2.1 (June 2026) - Dynamic CLI Help Customization, Beacon Script Integration, and Namespace Binding</strong>
+Updated the CLI help systems for <code>e1</code>, <code>e2</code>, and <code>w</code> to integrate comprehensive execution command examples (including stateless beacon checks) dynamically within both the <code>--help</code> flag screens and optionless execution error overlays. Fixed a namespace bug where evaluated scripts executing <code>ggsrunif.Beacon()</code> inside the library threw a <code>ggsrunif is not defined</code> ReferenceError, by binding <code>ggsrunif</code> to the library&rsquo;s global execution context.</li>
+<li><strong>v5.2.0 (June 2026) - Go standard layout, WSL2 browser integration, Web Apps URL registration, CLI UX hardening, and MCP Server Schema Improvements</strong>
+Reorganized the codebase to follow the standard Go project structure (<code>main.go</code>, <code>/internal/app/</code>, <code>/internal/utl/</code>). Expanded <code>ggsrun auth</code> to request Web Apps URL registration and dynamically persist it in <code>ggsrun.cfg</code>, allowing <code>ggsrun w</code> to run without the <code>-u</code> option. Integrated WSL 2 environment detection to prompt the user to choose between the Windows host browser, WSL/Ubuntu native browser, or manual URL copy-pasting. Upgraded <code>ggsrun e1</code>, <code>ggsrun e2</code>, and <code>ggsrun w</code> commands to dynamically print full CLI flag helps alongside custom usage examples. <strong>Improved the MCP server (<code>ggsrun mcp</code>) tools schema, adding rich parameter descriptions, Drive API query examples, new <code>scriptfile</code>/<code>stringscript</code> parameters to the <code>exe1</code> schema, <code>searchbyid</code> parameter to the <code>filelist</code> schema, and making <code>scriptid</code> optional by resolving automatically from <code>ggsrun.cfg</code> (via <code>GGSRUN_CFG_PATH</code> or the local directory). Refined <code>tools/call</code> backend handling to safely strip null/empty values.</strong></li>
+<li><strong>v5.1.1 (May 2026) - Modular Handlers &amp; Enhanced MCP Server Core</strong>
+Refactored the codebase to modularize legacy single-file command handlers into dedicated, organized handler files (<code>handler_download.go</code>, <code>handler_upload.go</code>, <code>handler_transfer.go</code>, <code>handler_mcp.go</code>, <code>handler_execute.go</code>). Strengthened the MCP server core (<code>ggsrun mcp</code>) by capturing stdout and stderr execution logs for comprehensive error recovery. Embedded full support for <code>--conflict-mode</code> inside the MCP JSON-RPC schemas and standardized file transfer outputs into <code>TransferResult</code> to support interactive multi-turn collision resolution in LLM conversations. Fully updated pre-built binaries for all major architectures.</li>
+<li><strong>v5.1.0 (May 2026) - Advanced Conflict Resolution Engine</strong>
+Introduced a robust pre-computation conflict resolution matrix for both <code>download</code> and <code>upload</code> commands via the new <code>--conflict-mode</code> (<code>-cm</code>) flag. Users can now choose from <code>skip</code>, <code>overwrite</code>, <code>rename</code> (appends timestamp <code>_YYYYMMDD_HHMMSS</code> to avoid collisions), or <code>update</code> (syncs only if the source file is newer than the target). Includes interactive fallback CLI prompts if no mode is specified. Deprecated the legacy <code>--overwrite</code> (<code>-o</code>) and <code>--skip</code> (<code>-s</code>) options in favor of <code>--conflict-mode</code>. To avoid Drive API rate limits during massive concurrent uploads, metadata query is pre-fetched in bulk.</li>
+<li><strong>v5.0.3 (May 2026) - CLI UX Overhaul &amp; Dynamic TUI Integration</strong>
+Introduced a highly visual, modern Terminal UI (TUI) powered by <code>pterm</code> for <code>exe1</code>, <code>exe2</code>, and <code>webapps</code> commands. Added interactive loading spinners with anti-ghosting fixed-width padding (<code>%-70s</code>) and beautifully structured execution reports. Maintained strict backward compatibility by preserving pure JSON output streams via the <code>-j</code> flag for CI/CD pipeline automation.</li>
+<li><strong>v5.0.2 (May 2026) - Secure Web Apps Protocol Upgrade</strong>
+Upgraded the <code>webapps</code> command to natively support &ldquo;Only myself&rdquo; execution deployments by bridging OAuth tokens (<code>drive</code> scope) across Google&rsquo;s HTTP 302 Auth Redirects. Ported the IIFE/JSON-literal double-eval protections from <code>exe2</code> to <code>webapps</code>.</li>
+<li><strong>v5.0.1 (May 2026) - Execution Engine Hardening &amp; Double-Eval Eradication</strong>
+Eliminated the V8 engine double-eval 500 server crash during dynamic script execution by enforcing IIFE and JSON-literal payload encoding. Redefined <code>-f</code> flag mapping for proper API gateway resolution in <code>exe2</code>. Added precision deployment documentation for stateful and stateless execution modes.</li>
+</ul>
+<p><strong>You can check ggsrun at <a href="https://github.com/tanaikech/ggsrun">https://github.com/tanaikech/ggsrun</a>.</strong></p>
+        
+      </div>
+    </article>
+  
+    <article class="post-item">
+      <div class="post-meta">
         <i class="far fa-calendar-alt"></i> June 15, 2026
       </div>
       <h2><a href="https://tanaikech.github.io/2026/06/15/orchestrating-google-workspace-with-antigravity-cli-a-high-performance-agentic-framework/">Orchestrating Google Workspace with Antigravity CLI: A High-Performance Agentic Framework</a></h2>
@@ -367,27 +404,6 @@ Engine fundamentally rewritten for Go 1.26.3+. Implemented channel-based concurr
 </p>
 <h2 id="abstract">Abstract</h2>
 <p>Google&rsquo;s Agent Development Kit (ADK) revolutionizes autonomous AI agents, yet its standard Node.js-based asynchronous ReAct architecture is fundamentally incompatible with the restrictive, synchronous, and time-bound execution environment of Google Apps Script (GAS). To unlock enterprise-grade AI natively within Google Workspace, this paper introduces GASADK. By abandoning the cyclical ReAct loop in favor of a deterministic Planner-Executor-Synthesizer (PES) architecture, GASADK proactively manages execution constraints, synchronous network blocking, and payload limits. This framework successfully implements multi-agent orchestration, the Model Context Protocol (MCP), and Agent-to-Agent (A2A) communication directly within GAS, empowering developers to build highly resilient, serverless AI workflows that seamlessly manipulate Workspace applications.</p>
-        
-      </div>
-    </article>
-  
-    <article class="post-item">
-      <div class="post-meta">
-        <i class="far fa-calendar-alt"></i> May 7, 2026
-      </div>
-      <h2><a href="https://tanaikech.github.io/2026/05/07/updated-gas-library-geminiwithfiles/">Updated: GAS Library - GeminiWithFiles</a></h2>
-      <div class="post-summary">
-        
-          <h2 id="geminiwithfiles-was-updated-to-v2016">GeminiWithFiles was updated to v2.0.16</h2>
-<ul>
-<li>v2.0.16 (May 7, 2026)
-<ol>
-<li>Introduced <code>invoke_agent</code> functionality to Agent Skills.</li>
-<li>Enabled subagent orchestration, allowing parent agents to spawn independent executing contexts (Subagents) for specialized tasks without polluting the main conversation history.</li>
-</ol>
-</li>
-</ul>
-<p><strong>You can see the detail information here <a href="https://github.com/tanaikech/GeminiWithFiles">https://github.com/tanaikech/GeminiWithFiles</a></strong></p>
         
       </div>
     </article>
