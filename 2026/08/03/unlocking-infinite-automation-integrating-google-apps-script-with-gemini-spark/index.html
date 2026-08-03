@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Hugo 0.157.0">
+
+  
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+  
+  <meta name="theme-color" content="#050505">
+
+  
+  <meta name="google-site-verification" content="googleccbde819fe280caa.html" />
+
+  
+  
+
+  <meta name="keywords" content="Google Apps Script, Google Workspace, Gemini, AI, googleapi">
+
+  <meta name="description" content="Gists
+Abstract
+Gemini Spark, Google&rsquo;s 24/7 autonomous AI agent, seamlessly connects with Google Workspace. However, connecting to arbitrary external APIs requires extended integration. This article demonstrates how integrating Google Apps Script (GAS) as a Model Context Protocol (MCP) server or Webhook endpoint expands Gemini Spark&rsquo;s capabilities, enabling enterprise-grade workflow automation.
+Introduction
+Gemini Spark was officially announced at Google I/O 2026 on May 19, 2026, and its service in Japan began on July 16, 2026. Ref Gemini Spark is Google&rsquo;s first always-on AI agent that runs continuously in the cloud 24/7, even when your PC is closed, to complete tasks on your behalf. Unlike traditional Q&amp;A-style chat AIs, it can autonomously execute complex workflows across multiple Google applications. Its core functionalities are built around three main pillars: Tasks, Skills, and Schedules.">
+
+  
+  <link rel="canonical" href="https://tanaikech.github.io/2026/08/03/unlocking-infinite-automation-integrating-google-apps-script-with-gemini-spark/">
+
+  
+  <title>Unlocking Infinite Automation: Integrating Google Apps Script with Gemini Spark | tanaike - Google Apps Script, Gemini API, and Developer Tips</title>
+
+  
+  <meta property="og:title" content="Unlocking Infinite Automation: Integrating Google Apps Script with Gemini Spark">
+  <meta property="og:description" content="Gists
+Abstract
+Gemini Spark, Google&rsquo;s 24/7 autonomous AI agent, seamlessly connects with Google Workspace. However, connecting to arbitrary external APIs requires extended integration. This article demonstrates how integrating Google Apps Script (GAS) as a Model Context Protocol (MCP) server or Webhook endpoint expands Gemini Spark&rsquo;s capabilities, enabling enterprise-grade workflow automation.
+Introduction
+Gemini Spark was officially announced at Google I/O 2026 on May 19, 2026, and its service in Japan began on July 16, 2026. Ref Gemini Spark is Google&rsquo;s first always-on AI agent that runs continuously in the cloud 24/7, even when your PC is closed, to complete tasks on your behalf. Unlike traditional Q&amp;A-style chat AIs, it can autonomously execute complex workflows across multiple Google applications. Its core functionalities are built around three main pillars: Tasks, Skills, and Schedules.">
+  <meta property="og:url" content="https://tanaikech.github.io/2026/08/03/unlocking-infinite-automation-integrating-google-apps-script-with-gemini-spark/">
+  <meta property="og:site_name" content="tanaike - Google Apps Script, Gemini API, and Developer Tips">
+  <meta property="og:type" content="article"><meta property="og:image" content="https://tanaikech.github.io/img/og-main.png">
+
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@tanaikech">
+  <meta name="twitter:title" content="Unlocking Infinite Automation: Integrating Google Apps Script with Gemini Spark">
+  <meta name="twitter:description" content="Gists
+Abstract
+Gemini Spark, Google&rsquo;s 24/7 autonomous AI agent, seamlessly connects with Google Workspace. However, connecting to arbitrary external APIs requires extended integration. This article demonstrates how integrating Google Apps Script (GAS) as a Model Context Protocol (MCP) server or Webhook endpoint expands Gemini Spark&rsquo;s capabilities, enabling enterprise-grade workflow automation.
+Introduction
+Gemini Spark was officially announced at Google I/O 2026 on May 19, 2026, and its service in Japan began on July 16, 2026. Ref Gemini Spark is Google&rsquo;s first always-on AI agent that runs continuously in the cloud 24/7, even when your PC is closed, to complete tasks on your behalf. Unlike traditional Q&amp;A-style chat AIs, it can autonomously execute complex workflows across multiple Google applications. Its core functionalities are built around three main pillars: Tasks, Skills, and Schedules.">
+  <meta name="twitter:image" content="https://tanaikech.github.io/img/og-main.png">
+
+  
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [{
+        "@type": "BlogPosting",
+        "headline": "\"Unlocking Infinite Automation: Integrating Google Apps Script with Gemini Spark\"",
+        "description": "\"\\u003cp\\u003e\\u003ca href=\\\"https://gist.github.com/tanaikech/dff79b14e5cc2bda94bd625f3e05d12a\\\"\\u003eGists\\u003c/a\\u003e\\u003c/p\\u003e\\n\\u003ch2 id=\\\"abstract\\\"\\u003eAbstract\\u003c/h2\\u003e\\n\\u003cp\\u003eGemini Spark, Google\\u0026rsquo;s 24/7 autonomous AI agent, seamlessly connects with Google Workspace. However, connecting to arbitrary external APIs requires extended integration. This article demonstrates how integrating Google Apps Script (GAS) as a Model Context Protocol (MCP) server or Webhook endpoint expands Gemini Spark\\u0026rsquo;s capabilities, enabling enterprise-grade workflow automation.\\u003c/p\\u003e\\n\\u003ch2 id=\\\"introduction\\\"\\u003eIntroduction\\u003c/h2\\u003e\\n\\u003cp\\u003eGemini Spark was officially announced at Google I/O 2026 on May 19, 2026, and its service in Japan began on July 16, 2026. \\u003ca href=\\\"https://blog.google/innovation-and-ai/products/gemini-app/gemini-spark-updates-july-2026/\\\"\\u003eRef\\u003c/a\\u003e Gemini Spark is Google\\u0026rsquo;s first always-on AI agent that runs continuously in the cloud 24/7, even when your PC is closed, to complete tasks on your behalf. Unlike traditional Q\\u0026amp;A-style chat AIs, it can autonomously execute complex workflows across multiple Google applications. Its core functionalities are built around three main pillars: Tasks, Skills, and Schedules.\\u003c/p\\u003e\"",
+        "url": "\"https://tanaikech.github.io/2026/08/03/unlocking-infinite-automation-integrating-google-apps-script-with-gemini-spark/\"",
+        "datePublished": "\"2026-08-03T15:56:37+09:00\"",
+        "dateModified": "\"2026-08-03T15:56:37+09:00\"",
+        "wordCount":  3242 ,
+        "author": {
+          "@id": "https:\/\/tanaikech.github.io\/#person"
+        },
+        "publisher": {
+          "@id": "https:\/\/tanaikech.github.io\/#person"
+        },
+        "image": {
+          "@type": "ImageObject",
+          "url": "\"https://tanaikech.github.io/img/og-main.png\"",
+          "width": 1200,
+          "height": 630
+        },
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "\"https://tanaikech.github.io/2026/08/03/unlocking-infinite-automation-integrating-google-apps-script-with-gemini-spark/\""
+        }
+      },{
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "\"https://tanaikech.github.io/\""
+          },{
+            "@type": "ListItem",
+            "position": 2,
+            "name": "\"Unlocking Infinite Automation: Integrating Google Apps Script with Gemini Spark\"",
+            "item": "\"https://tanaikech.github.io/2026/08/03/unlocking-infinite-automation-integrating-google-apps-script-with-gemini-spark/\""
+          }]
+      },      {
+        "@type": "Person",
+        "@id": "https:\/\/tanaikech.github.io\/#person",
+        "name": "Kanshi Tanaike",
+        "alternateName": "tanaike",
+        "url": "\"https://tanaikech.github.io/\"",
+        "image": "\"https://tanaikech.github.io/img/og-main.png\"",
+        "jobTitle": "Google Developer Expert",
+        "honorificPrefix": "Ph.D.",
+        "description": "Japanese scientist, Physicist and Google Developer Expert for Google Workspace.",
+        "award": "First place in the Outstanding GDE Award 2025",
+        "sameAs": [
+          "https://twitter.com/tanaikech",
+          "https://github.com/tanaikech",
+          "https://stackoverflow.com/users/7108653/tanaike",
+          "https://developers.google.com/community/experts/directory?text=tanaike",
+          "https://zenn.dev/tanaike",
+          "https://medium.com/@tanaike"
+        ]
+      }
+    ]
+  }
+  </script>
+
+  
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/eclipse.css">
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <link rel="shortcut icon" href="https://tanaikech.github.io/img/favicon.ico" type="image/x-icon" />
+  
+  
+  
+
+  
+  
+  
+</head>
+
+
+<body>
+  <div id="progress-bar"></div>
+  
+  <header class="site-header">
+    <div class="header-container">
+      
+      <div class="header-top">
+        <div class="site-title">
+          <a href="https://tanaikech.github.io/">TANAIKE</a>
+          
+            <div class="site-subtitle">The Thinker</div>
+          
+        </div>
+
+        
+        <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+
+      
+      <div id="mobile-menu" class="mobile-menu-content">
+        <div class="nav-row">
+          <div class="nav-links">
+            
+              <a href="https://tanaikech.github.io/about/" title="">
+                <i class='fa fa-user fa-fw'></i> About
+              </a>
+            
+              <a href="https://tanaikech.github.io/post/" title="">
+                <i class='fa fa-list fa-fw'></i> Articles
+              </a>
+            
+              <a href="https://tanaikech.github.io/topics/" title="">
+                <i class='fa fa-folder fa-fw'></i> Topics
+              </a>
+            
+              <a href="https://tanaikech.github.io/tags/" title="">
+                <i class='fa fa-tags fa-fw'></i> Tags
+              </a>
+            
+              <a href="https://tanaikech.github.io/contact/" title="">
+                <i class='fa fa-phone fa-fw'></i> Contact
+              </a>
+            
+              <a href="https://tanaikech.github.io/link/" title="">
+                <i class='fa fa-thumbs-up fa-fw'></i> Links
+              </a>
+            
+              <a href="https://tanaikech.github.io/webapps/" title="">
+                <i class='fas fa-toolbox'></i> Web Applications
+              </a>
+            
+              <a href="https://tanaikech.github.io/donate/" title="">
+                <i class='fas fa-donate'></i> Donate
+              </a>
+            
+              <a href="https://tanaikech.github.io/" title="">
+                <i class='fa fa-home fa-fw'></i> Home
+              </a>
+            
+          </div>
+        </div>
+
+        <div class="social-links-row"><a href="https://twitter.com/tanaikech" target="_blank" rel="me">
+                <i class="fab fa-x-twitter"></i> X
+              </a><a href="https://medium.com/@tanaike" target="_blank" rel="me">
+                <i class="fab fa-medium"></i> Medium
+              </a><a href="https://www.youtube.com/@tanaike" target="_blank" rel="me">
+                <i class="fab fa-youtube"></i> YouTube
+              </a><a href="https://linkedin.com/in/tanaike" target="_blank" rel="me">
+                <i class="fab fa-linkedin"></i> LinkedIn
+              </a><a href="https://github.com/tanaikech" target="_blank" rel="me">
+                <i class="fab fa-github"></i> GitHub
+              </a><a href="https://gist.github.com/tanaikech" target="_blank" rel="me">
+                <i class="fas fa-code"></i> Gists
+              </a><a href="https://stackoverflow.com/users/7108653" target="_blank" rel="me">
+                <i class="fab fa-stack-overflow"></i> Stack Overflow
+              </a><a href="https://dev.to/tanaike" target="_blank" rel="me">
+                <i class="fab fa-dev"></i> DEV
+              </a><a href="https://zenn.dev/tanaike" target="_blank" rel="me">
+                <i class="fas fa-edit"></i> Zenn
+              </a><a href="https://devpost.com/tanaike" target="_blank" rel="me">
+                <i class="fas fa-terminal"></i> Devpost
+              </a></div>
+      </div>
+
+    </div>
+  </header>
+
+  <main id="main">
+
+
+<div class="header">
+  <h1>Unlocking Infinite Automation: Integrating Google Apps Script with Gemini Spark</h1>
+  <h2></h2>
+</div>
+<div class="content">
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>03 Aug 2026, 15:56</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-workspace">Google Workspace</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/gemini">Gemini</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/ai">AI</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/googleapi">googleapi</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  <p><a href="https://gist.github.com/tanaikech/dff79b14e5cc2bda94bd625f3e05d12a">Gists</a></p>
+<h2 id="abstract">Abstract</h2>
+<p>Gemini Spark, Google&rsquo;s 24/7 autonomous AI agent, seamlessly connects with Google Workspace. However, connecting to arbitrary external APIs requires extended integration. This article demonstrates how integrating Google Apps Script (GAS) as a Model Context Protocol (MCP) server or Webhook endpoint expands Gemini Spark&rsquo;s capabilities, enabling enterprise-grade workflow automation.</p>
+<h2 id="introduction">Introduction</h2>
+<p>Gemini Spark was officially announced at Google I/O 2026 on May 19, 2026, and its service in Japan began on July 16, 2026. <a href="https://blog.google/innovation-and-ai/products/gemini-app/gemini-spark-updates-july-2026/">Ref</a> Gemini Spark is Google&rsquo;s first always-on AI agent that runs continuously in the cloud 24/7, even when your PC is closed, to complete tasks on your behalf. Unlike traditional Q&amp;A-style chat AIs, it can autonomously execute complex workflows across multiple Google applications. Its core functionalities are built around three main pillars: Tasks, Skills, and Schedules.</p>
+<p>Gemini Spark features built-in integrations for managing Google Workspace applications. By combining these built-in applications, Gemini Spark can process various user tasks. Furthermore, Google Apps Script (GAS) extends control beyond Google Workspace to manage a vast array of Google APIs and external services. Recently, Google Apps Script achieved General Availability (GA) as a core service in Google Workspace, providing enterprise-grade data protection, robust administrative controls, and standard technical support. <a href="https://developers.google.com/apps-script/release-notes#June_22_2026">Ref</a></p>
+<p>When Google Apps Script is integrated with Gemini Spark, application capabilities expand infinitely. This report introduces Gemini Spark&rsquo;s features and provides a comprehensive guide to integrating Gemini Spark with Google Apps Script via custom Model Context Protocol (MCP) servers and direct Webhook triggers.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260803a/fig1.jpg"
+     alt="fig1"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<p>The architecture diagram above illustrates the central role of Gemini Spark and its integration ecosystem:</p>
+<ul>
+<li>Gemini Spark Core Engine (Center): Built around three fundamental pillars—Tasks (multi-step workflow execution), Skills (tool integrations), and Schedules (background triggers).</li>
+<li>Native Google Workspace Integration (Left): Directly interfaces with native Workspace applications (Gmail, Google Drive, Google Docs, Google Sheets) for native document handling, searching, and formula evaluation.</li>
+<li>Extended Automation via Google Apps Script (Right): Bridges native tool boundaries through two serverless pathways:</li>
+<li>MCP Protocol Pathway: Connects Gemini Spark via JSON-RPC to GAS Web Apps acting as MCP servers, enabling structured data queries against specialized APIs like Google Analytics 4 (GA4).</li>
+<li>Event Webhook Pathway: Acts as a zero-infrastructure event dispatcher, sending HTTP GET webhooks to GAS Web Apps upon background triggers such as incoming Gmail events.</li>
+</ul>
+<h2 id="using-gemini-spark">Using Gemini Spark</h2>
+<p>To test native Gemini Spark features, follow these steps.</p>
+<h3 id="1-access-gemini-spark">1. Access Gemini Spark</h3>
+<p>Navigate to <code>https://gemini.google.com/spark</code> using your web browser.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260803a/fig2.jpg"
+     alt="fig2"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<h3 id="2-enable-connected-apps">2. Enable Connected Apps</h3>
+<p>Click &ldquo;Connected Apps&rdquo; in the sidebar. Currently, Google Workspace can be linked directly to Gemini Spark. Enable Google Workspace.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260803a/fig3.jpg"
+     alt="fig3"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<p>Native integrations support Google Workspace services such as Gmail, Google Drive, and Google Docs:</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260803a/fig4.jpg"
+     alt="fig4"
+     
+     loading="lazy"
+     decoding="async">
+
+<img src="https://tanaikech.github.io/image-storage/20260803a/fig5.jpg"
+     alt="fig5"
+     
+     loading="lazy"
+     decoding="async">
+
+<img src="https://tanaikech.github.io/image-storage/20260803a/fig6.jpg"
+     alt="fig6"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<p>In its current stage, Gemini Spark&rsquo;s built-in Google Workspace integration primarily reads Google Docs and Sheets, and searches files or folders. While direct folder listing commands are slightly constrained natively, Gemini Spark handles complex user prompts effectively.</p>
+<p>Below, we analyze five representative prompts, their execution results, and the technical mechanics governing Gemini Spark&rsquo;s behavior.</p>
+<h4 id="prompt-1-spreadsheet-creation-and-formula-evaluation">Prompt 1: Spreadsheet Creation and Formula Evaluation</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>Create a new Google Spreadsheet by putting a formula `=GOOGLEFINANCE(&#34;CURRENCY:USDJPY&#34;)` in cell &#34;A1&#34; of the first sheet. Then, get and show the value of cell &#34;A1&#34;.
+</span></span></code></pre></div><p><img src="https://tanaikech.github.io/image-storage/20260803a/fig7.jpg"
+     alt="fig7"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<h5 id="technical-discussion--analysis-prompt-1">Technical Discussion &amp; Analysis (Prompt 1)</h5>
+<p>In Prompt 1, Gemini Spark demonstrates autonomous tool-chaining across file creation and data retrieval APIs. Rather than merely injecting a static string into a cell, Gemini Spark creates the spreadsheet, inserts the dynamic <code>=GOOGLEFINANCE</code> formula, waits for the underlying Google Sheets calculation engine to resolve the live currency rate, and subsequently fetches the evaluated cell value to display in the chat interface. This confirms that Gemini Spark operates via a closed-loop multi-step execution cycle (Create -&gt; Write -&gt; Evaluate -&gt; Read -&gt; Synthesize) rather than single-turn UI macro execution.</p>
+<p>Remarkably, executing such complex natural language prompts previously required dedicated, custom-built MCP servers or specialized external agentic frameworks. <a href="https://medium.com/google-cloud/orchestrating-google-workspace-with-antigravity-cli-a-high-performance-agentic-framework-499cae446161">Ref</a> The fact that Gemini Spark natively performs this multi-step tool-chaining out of the box—without requiring any external infrastructure or pre-configured MCP tools—represents a major architectural leap forward for native Workspace automation.</p>
+<h4 id="prompt-2-file-discovery-in-folder">Prompt 2: File Discovery in Folder</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>Show the file list from a folder named &#34;sample folder&#34; in my Google Drive.
+</span></span></code></pre></div><p><img src="https://tanaikech.github.io/image-storage/20260803a/fig8.jpg"
+     alt="fig8"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<h5 id="technical-discussion--analysis-prompt-2">Technical Discussion &amp; Analysis (Prompt 2)</h5>
+<p>Standard Google Drive search queries often require exact folder IDs or specific parent syntax (<code>'folder_id' in parents</code>). In Prompt 2, Gemini Spark demonstrates multi-stage query resolution. It first translates the natural language folder name (&ldquo;sample folder&rdquo;) into a Drive search query to resolve the internal target folder ID, and subsequently issues a scoped file enumeration request. This two-phase search resolution enables users to interact with hierarchical Drive structures using high-level human concepts.</p>
+<h4 id="prompt-3-web-scraping-and-document-generation">Prompt 3: Web Scraping and Document Generation</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>Fetch information from the URL `https://tanaikech.github.io/about/`, organize and summarize the details clearly into a new Google Doc, and finally display the URL of the generated Google Doc.
+</span></span></code></pre></div><p><img src="https://tanaikech.github.io/image-storage/20260803a/fig9.jpg"
+     alt="fig9"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<h5 id="technical-discussion--analysis-prompt-3">Technical Discussion &amp; Analysis (Prompt 3)</h5>
+<p>Prompt 3 showcases cross-domain workflow orchestration combining external web retrieval with Google Docs publishing. Gemini Spark fetches raw HTML content from an arbitrary public URL, performs semantic content extraction and summarization, formats the resulting text, creates a new Google Doc via the Docs API, and returns the accessible URL. This verifies Gemini Spark&rsquo;s ability to seamlessly bridge external web data retrieval with internal Workspace document creation in a single autonomous prompt.</p>
+<p>Furthermore, while Prompt 3 handles public web fetching natively, real-world data retrieval often requires complex authentication mechanisms (such as OAuth 2.0, API keys, session headers, or multi-step token handshakes) or custom response parsing. In scenarios where direct native fetching falls short due to security or procedural constraints, offloading the retrieval workflow to a custom MCP server built with Google Apps Script (GAS) Web Apps provides an effective solution. Utilizing GAS Web Apps as an MCP server enables developers to encapsulate complex authentication and data extraction logic securely while exposing clean, structured tools to Gemini Spark.</p>
+<h4 id="prompt-4-autonomous-gmail-event-triggering">Prompt 4: Autonomous Gmail Event Triggering</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>When a new email is received from `tanaike@hotmail.com`, send the data to &#34;Sheet1&#34; in the Google Spreadsheet named `Sample for Gemini Spark`.
+</span></span></code></pre></div><p>Running this prompt yields the task response and automatically configures a background schedule:</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260803a/fig10.jpg"
+     alt="fig10"
+     
+     loading="lazy"
+     decoding="async">
+
+<img src="https://tanaikech.github.io/image-storage/20260803a/fig11.jpg"
+     alt="fig11"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<p>When a test email is sent from <code>tanaike@hotmail.com</code>, Gemini Spark autonomously triggers:</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260803a/fig12.jpg"
+     alt="fig12"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<h5 id="technical-discussion--analysis-prompt-4">Technical Discussion &amp; Analysis (Prompt 4)</h5>
+<p>Prompt 4 marks a fundamental transition from interactive Q&amp;A to cloud-native, event-driven persistence. Upon prompt execution, Gemini Spark parses the natural language conditional trigger (<code>When a new email is received...</code>) and automatically provisions an active listener rule within its cloud background scheduler (<code>fig11</code>). When an email matching the filter criteria arrives, Gemini Spark wakes up in the cloud 24/7 without user intervention, extracts the timestamp, subject, and body (<code>2026-08-03 14:13:16 JST	test email	This is a test email.</code>), and appends the payload to the target Google Sheet (<code>fig12</code>). This proves Gemini Spark functions as a serverless, zero-infrastructure event dispatcher.</p>
+<h4 id="prompt-5-native-limitation-with-external-apis-google-analytics-4">Prompt 5: Native Limitation with External APIs (Google Analytics 4)</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>You are an AI agent specialized in the Google Analytics Data API and data analysis. Do NOT write or export data to Google Sheets or any external files. Fetch data directly from GA4 based on the following requirements and output a summary of the results directly in this chat.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[Requirements]
+</span></span><span style="display:flex;"><span>1. Target GA4 Property ID: &#34;properties/###&#34;
+</span></span><span style="display:flex;"><span>2. Date Range: From &#34;2026-08-01&#34; to &#34;today&#34;
+</span></span><span style="display:flex;"><span>3. Data to Retrieve:
+</span></span><span style="display:flex;"><span>   - Dimension: City (`city`)
+</span></span><span style="display:flex;"><span>   - Metric: Active Users (`activeUsers`)
+</span></span><span style="display:flex;"><span>4. Output Format (Do not create files; output directly in response):
+</span></span><span style="display:flex;"><span>   - Executive Summary: Total active users and key takeaways across cities.
+</span></span><span style="display:flex;"><span>   - Top Ranking: Top 10 cities by active user count (formatted as a table).
+</span></span><span style="display:flex;"><span>   - Brief Insights: A concise 2-3 sentence analysis of the geographical distribution of users.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Fetch the data via the API call and provide only the summarized insights in the requested format.
+</span></span></code></pre></div><p>Running Prompt 5 reveals Gemini Spark&rsquo;s current native limitation:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>I currently do not have access to an integration or tool connected to the Google Analytics Data API to retrieve live data from GA4 properties (such as Property ID `properties/###`). As a result, I am unable to fetch the active user metrics by city for the requested date range.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>If you are able to export the report data or provide the numbers directly, I would be happy to analyze the data and generate the requested Executive Summary, Top 10 Ranking table, and geographical insights for you.
+</span></span></code></pre></div><h5 id="technical-discussion--analysis-prompt-5">Technical Discussion &amp; Analysis (Prompt 5)</h5>
+<p>Prompt 5 highlights the boundaries of Gemini Spark&rsquo;s native built-in connectors. While Gemini Spark natively manages standard Workspace apps (Drive, Gmail, Docs, Sheets), it lacks native tools to authenticate against specialized Google APIs (such as Google Analytics Data API, BigQuery, or Google Cloud Logging) or third-party REST endpoints. When prompted for direct GA4 API access, Gemini Spark correctly identifies its tool boundary and declines execution rather than hallucinating data. This empirical boundary establishes the explicit technical requirement for external tool extension frameworks like the Model Context Protocol (MCP).</p>
+<h2 id="integrating-gemini-spark-with-google-apps-script">Integrating Gemini Spark with Google Apps Script</h2>
+<p>To overcome native limits, Gemini Spark supports Model Context Protocol (MCP) servers. By implementing an MCP server using Google Apps Script (GAS) Web Apps <a href="https://medium.com/google-cloud/building-model-context-protocol-mcp-server-with-google-apps-script-9ff1fe58653c">Ref</a>, we can grant Gemini Spark direct access to GA4, custom databases, and complex business logic.</p>
+<h3 id="step-1-deploy-gas-web-app-as-an-mcp-server">Step 1: Deploy GAS Web App as an MCP Server</h3>
+<p>To implement an MCP server on Google Apps Script (GAS), we utilize the open-source sample repository <a href="https://github.com/tanaikech/adk-gas/tree/master/samples/googleapiapp-mcp-server">Google API MCP / A2A Server for GASADK</a>. <a href="https://medium.com/google-cloud/orchestrating-google-workspace-with-antigravity-cli-a-high-performance-agentic-framework-499cae446161">Ref</a> This sample leverages the <code>GASADK</code> and <code>GoogleApiApp</code> libraries to handle JSON-RPC 2.0 transport over HTTP.</p>
+<p>Follow these step-by-step instructions to set up and deploy the sample script:</p>
+<ol>
+<li>Create a new Google Apps Script project via Google Drive or from within a Google Spreadsheet.</li>
+<li>Open the project manifest file <code>appsscript.json</code> (In the GAS Editor, navigate to Project Settings and check &ldquo;Show &lsquo;appsscript.json&rsquo; manifest file in editor&rdquo;).</li>
+<li>Copy and paste the following <code>appsscript.json</code> configuration. Adjust the <code>timeZone</code> field to match your local timezone if necessary:</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;timeZone&#34;</span>: <span style="color:#e6db74">&#34;Asia/Tokyo&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;dependencies&#34;</span>: {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;libraries&#34;</span>: [
+</span></span><span style="display:flex;"><span>      {
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;userSymbol&#34;</span>: <span style="color:#e6db74">&#34;GASADK&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;version&#34;</span>: <span style="color:#e6db74">&#34;12&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;libraryId&#34;</span>: <span style="color:#e6db74">&#34;1w2mwhWQd4_6rom-UBRPD8gayBoqGH_87awSBVqGI8DdaQI_pOeSuGYDu&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;developmentMode&#34;</span>: <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      {
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;userSymbol&#34;</span>: <span style="color:#e6db74">&#34;GoogleApiApp&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;version&#34;</span>: <span style="color:#e6db74">&#34;4&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;libraryId&#34;</span>: <span style="color:#e6db74">&#34;1YVWd5qzz0quKljrJkliE143UwwJq1BopoZQSwNEqwNgHOPQ9VeaQeNS7&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;developmentMode&#34;</span>: <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    ],
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;enabledAdvancedServices&#34;</span>: [
+</span></span><span style="display:flex;"><span>      {
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;userSymbol&#34;</span>: <span style="color:#e6db74">&#34;AnalyticsData&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;version&#34;</span>: <span style="color:#e6db74">&#34;v1beta&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;serviceId&#34;</span>: <span style="color:#e6db74">&#34;analyticsdata&#34;</span>
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    ]
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;exceptionLogging&#34;</span>: <span style="color:#e6db74">&#34;STACKDRIVER&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;runtimeVersion&#34;</span>: <span style="color:#e6db74">&#34;V8&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;webapp&#34;</span>: {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;executeAs&#34;</span>: <span style="color:#e6db74">&#34;USER_DEPLOYING&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;access&#34;</span>: <span style="color:#e6db74">&#34;ANYONE_ANONYMOUS&#34;</span>
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;oauthScopes&#34;</span>: [
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;https://www.googleapis.com/auth/analytics.readonly&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;https://www.googleapis.com/auth/script.external_request&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;https://www.googleapis.com/auth/spreadsheets&#34;</span>
+</span></span><span style="display:flex;"><span>  ]
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><ol start="4">
+<li>Copy the main server script <code>DeployMcpServer.js</code> from the GitHub repository <a href="https://github.com/tanaikech/adk-gas/blob/master/samples/googleapiapp-mcp-server/DeployMcpServer.js">Ref</a> and paste its content into your script file (e.g., <code>Code.gs</code>).</li>
+<li>Understand the Access Key Setting: If you do not configure custom parameters in <code>PropertiesService</code>, the sample script uses <code>sample</code> as the default access key (i.e., <code>accessKey=sample</code>).</li>
+<li>Deploy as Web App: Click &ldquo;Deploy&rdquo; &gt; &ldquo;New deployment&rdquo; in the script editor. Select &ldquo;Web app&rdquo; as the type, set &ldquo;Execute as&rdquo; to &ldquo;Me&rdquo;, and set &ldquo;Who has access&rdquo; to &ldquo;Anyone&rdquo;. Click &ldquo;Deploy&rdquo; and authorize the required Google OAuth permissions.</li>
+<li>Copy the Web App Deployment URL for registration in Gemini Spark (e.g., <code>https://script.google.com/macros/s/{DEPLOYMENT_ID}/exec</code>).</li>
+</ol>
+<h3 id="step-2-register-the-gas-mcp-server-in-gemini-spark">Step 2: Register the GAS MCP Server in Gemini Spark</h3>
+<ol>
+<li>In Gemini Spark, navigate to &ldquo;Connected Apps&rdquo; &gt; &ldquo;Custom apps for Spark&rdquo;.</li>
+<li>Enter your GAS Web App URL with the access key parameter (e.g., <code>https://script.google.com/macros/s/{DEPLOYMENT_ID}/exec?accessKey=sample</code>) and click &ldquo;Next&rdquo;.</li>
+</ol>
+<p><img src="https://tanaikech.github.io/image-storage/20260803a/fig13.jpg"
+     alt="fig13"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<ol start="3">
+<li>Accept the security statement and click &ldquo;Connect&rdquo;.</li>
+</ol>
+<p><img src="https://tanaikech.github.io/image-storage/20260803a/fig14.jpg"
+     alt="fig14"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<ol start="4">
+<li>Specify the MCP app name (e.g., <code>GAS-MCP</code>) and confirm tool connection.</li>
+</ol>
+<p><img src="https://tanaikech.github.io/image-storage/20260803a/fig15.jpg"
+     alt="fig15"
+     
+     loading="lazy"
+     decoding="async">
+
+<img src="https://tanaikech.github.io/image-storage/20260803a/fig16.jpg"
+     alt="fig16"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<h3 id="empirical-testing-and-results">Empirical Testing and Results</h3>
+<h4 id="test-1-querying-ga4-via-gas-mcp-server">Test 1: Querying GA4 via GAS MCP Server</h4>
+<p>We run the updated prompt instructing Gemini Spark to utilize <code>@gas-mcp</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>You are an AI agent specialized in the Google Analytics Data API and data analysis. In order to use the Google Analytics Data API, you can use the MCP server @gas-mcp.
+</span></span><span style="display:flex;"><span>Do NOT write or export data to Google Sheets or any external files. Fetch data directly from GA4 based on the following requirements and output a summary of the results directly in this chat.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[Requirements]
+</span></span><span style="display:flex;"><span>1. Target GA4 Property ID: &#34;properties/###&#34;
+</span></span><span style="display:flex;"><span>2. Date Range: From &#34;2026-08-01&#34; to &#34;today&#34;
+</span></span><span style="display:flex;"><span>3. Data to Retrieve:
+</span></span><span style="display:flex;"><span>   - Dimension: City (`city`)
+</span></span><span style="display:flex;"><span>   - Metric: Active Users (`activeUsers`)
+</span></span><span style="display:flex;"><span>4. Output Format (Do not create files; output directly in response):
+</span></span><span style="display:flex;"><span>   - Executive Summary: Total active users and key takeaways across cities.
+</span></span><span style="display:flex;"><span>   - Top Ranking: Top 10 cities by active user count (formatted as a table).
+</span></span><span style="display:flex;"><span>   - Brief Insights: A concise 2-3 sentence analysis of the geographical distribution of users.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Fetch the data via the API call and provide only the summarized insights in the requested format.
+</span></span></code></pre></div><p>Upon execution, Gemini Spark prompts for approval to invoke <code>GAS-MCP</code>:</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260803a/fig17.jpg"
+     alt="fig17"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<p>Gemini Spark successfully executes the MCP tool call and returns structured GA4 analytical insights directly in the chat:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-markdown" data-lang="markdown"><span style="display:flex;"><span><span style="color:#75715e">### Executive Summary
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">-</span> **Total Active Users:** 135
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">-</span> **Key Takeaway:** Traffic is heavily concentrated in <span style="font-weight:bold">**Singapore**</span>, which accounts for 59 active users (~43.7% of total active users). The remaining user base is globally distributed across various cities in Asia, North America, and Europe, alongside a small portion of unclassified/unspecified location data.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">### Top Ranking (Top 10 Cities)
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>| Rank | City                         | Active Users |
+</span></span><span style="display:flex;"><span>| ---- | ---------------------------- | ------------ |
+</span></span><span style="display:flex;"><span>| 1    | Singapore                    | 59           |
+</span></span><span style="display:flex;"><span>| 2    | <span style="font-style:italic">_Unspecified / Blank_</span> (<span style="color:#e6db74">`&#34;&#34;`</span>) | 9            |
+</span></span><span style="display:flex;"><span>| 3    | <span style="color:#e6db74">`(not set)`</span>                  | 8            |
+</span></span><span style="display:flex;"><span>| 4    | Qinhuangdao                  | 4            |
+</span></span><span style="display:flex;"><span>| 5    | Osaka                        | 4            |
+</span></span><span style="display:flex;"><span>| 6    | Chengdu                      | 3            |
+</span></span><span style="display:flex;"><span>| 7    | Council Bluffs               | 3            |
+</span></span><span style="display:flex;"><span>| 8    | Bengaluru                    | 2            |
+</span></span><span style="display:flex;"><span>| 9    | Seattle                      | 2            |
+</span></span><span style="display:flex;"><span>| 10   | Ahmedabad                    | 1            |
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">### Brief Insights
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>User engagement shows a primary concentration in Singapore, which generates the vast majority of active sessions for this period. Beyond Singapore, the platform exhibits a diverse international footprint with minor clusters across East Asia (Qinhuangdao, Osaka, Chengdu), North America (Council Bluffs, Seattle), and South Asia (Bengaluru, Ahmedabad). Overall, 58 distinct city locations were recorded, indicating broad long-tail reach across global regions.
+</span></span></code></pre></div><h5 id="technical-discussion--analysis-test-1">Technical Discussion &amp; Analysis (Test 1)</h5>
+<p>Test 1 provides empirical proof of overcoming Gemini Spark&rsquo;s native API limitations through custom GAS MCP servers. When <code>@gas-mcp</code> is invoked, Gemini Spark serializes the prompt requirements into a structured JSON-RPC tool payload sent to the GAS Web App endpoint (<code>fig17</code>). GAS handles the OAuth 2.0 token management and Advanced Analytics Service execution server-side, returning raw JSON metrics back to Gemini Spark. Gemini Spark then performs analytical synthesis, converting raw dimensional metrics into an Executive Summary, formatted Markdown ranking table, and geographical distribution analysis. This architecture cleanly encapsulates complex authentication and API interactions within GAS while leaving higher-level analytical reasoning to Gemini Spark.</p>
+<h4 id="test-2-autonomous-event-driven-execution-of-gas-via-gmail-triggers">Test 2: Autonomous Event-Driven Execution of GAS via Gmail Triggers</h4>
+<p>Traditionally, executing Google Apps Script upon Gmail arrival required continuous Time-driven triggers or complex GCP Pub/Sub webhook setups. Integrating Gemini Spark with GAS replaces this complexity with simple natural language prompting:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>When a new email is received from `tanaike@hotmail.com`, send the data to &#34;Sheet1&#34; in the Google Spreadsheet named `Sample for Gemini Spark`. In order to put the data to Google Spreadsheet, use @gas-mcp.
+</span></span></code></pre></div><p>Gemini Spark automatically establishes an active monitoring schedule:</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260803a/fig18.jpg"
+     alt="fig18"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<p>When an incoming email arrives from <code>tanaike@hotmail.com</code>, Gemini Spark invokes <code>GAS-MCP</code> to append the record (<code>2026-08-03 14:51:46 JST	test email	This is a test email.</code>) to Google Sheets seamlessly:</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260803a/fig19.jpg"
+     alt="fig19"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<h5 id="technical-discussion--analysis-test-2">Technical Discussion &amp; Analysis (Test 2)</h5>
+<p>Test 2 demonstrates the convergence of event-driven cloud triggers and custom MCP action execution. In traditional GAS development, reacting to incoming emails requires either polling scripts executed via Time-driven triggers (which consume execution quotas and suffer from latency) or configuring Cloud Pub/Sub with push webhooks (which demands complex GCP IAM infrastructure). By delegating event detection to Gemini Spark&rsquo;s 24/7 background agent (<code>fig18</code>), email events trigger instant, zero-maintenance execution of GAS MCP tools (<code>fig19</code>). GAS acts as the secure, enterprise-grade execution engine while Gemini Spark provides zero-code event orchestration.</p>
+<h2 id="appendix-direct-http-webhook-integration-get-requests">Appendix: Direct HTTP Webhook Integration (GET Requests)</h2>
+<p><em>(Note: Delete active tasks and remove GAS-MCP from Connected Apps before testing this pattern.)</em></p>
+<p>In addition to MCP, Gemini Spark can invoke GAS Web Apps directly via HTTP GET requests.</p>
+<p>Below is a robust standalone GAS Web App implementation with concurrent execution locking:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">doGet</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">e</span>) =&gt; <span style="color:#a6e22e">main</span>(<span style="color:#e6db74">&#34;GET&#34;</span>, <span style="color:#a6e22e">e</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">doPost</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">e</span>) =&gt; <span style="color:#a6e22e">main</span>(<span style="color:#e6db74">&#34;POST&#34;</span>, <span style="color:#a6e22e">e</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">main</span>(<span style="color:#a6e22e">method</span>, <span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">timestamp</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Date();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">payload</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">e</span> <span style="color:#f92672">||</span> {});
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">rowData</span> <span style="color:#f92672">=</span> [<span style="color:#a6e22e">timestamp</span>, <span style="color:#a6e22e">method</span>, <span style="color:#a6e22e">payload</span>];
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>().<span style="color:#a6e22e">getSheets</span>()[<span style="color:#ae81ff">0</span>];
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">lock</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">LockService</span>.<span style="color:#a6e22e">getScriptLock</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">hasLock</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">lock</span>.<span style="color:#a6e22e">tryLock</span>(<span style="color:#ae81ff">30000</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">hasLock</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ContentService</span>.<span style="color:#a6e22e">createTextOutput</span>(<span style="color:#e6db74">&#34;Error: Lock timeout&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">appendRow</span>(<span style="color:#a6e22e">rowData</span>);
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">finally</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">lock</span>.<span style="color:#a6e22e">releaseLock</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ContentService</span>.<span style="color:#a6e22e">createTextOutput</span>(<span style="color:#e6db74">&#34;ok&#34;</span>);
+</span></span><span style="display:flex;"><span>  } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">err</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">error</span>(<span style="color:#e6db74">`[Execution Error] </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">err</span>.<span style="color:#a6e22e">stack</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ContentService</span>.<span style="color:#a6e22e">createTextOutput</span>(<span style="color:#e6db74">`Error: </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">err</span>.<span style="color:#a6e22e">message</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Deploy the Web App with access set to &ldquo;Anyone&rdquo;. Then create a task using the following prompt:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>When a new email is received from `tanaike@hotmail.com`, send the data to `https://script.google.com/macros/s/{DEPLOYMENT_ID}/exec` with the GET method by including the email data as the query parameters as follows:
+</span></span><span style="display:flex;"><span>```
+</span></span><span style="display:flex;"><span>sender={Email address of the sender.}&amp;subject={Subject line or title of the email.}&amp;content={Full message content of the email.}&amp;summary={A concise summary of the email body.}
+</span></span><span style="display:flex;"><span>```
+</span></span></code></pre></div><p>Gemini Spark creates the schedule and requests user confirmation for outgoing HTTP requests:</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260803a/fig20.jpg"
+     alt="fig20"
+     
+     loading="lazy"
+     decoding="async">
+
+<img src="https://tanaikech.github.io/image-storage/20260803a/fig21.jpg"
+     alt="fig21"
+     
+     loading="lazy"
+     decoding="async">
+
+<img src="https://tanaikech.github.io/image-storage/20260803a/fig22.jpg"
+     alt="fig22"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<p>The GAS execution receives structured query parameters:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;parameter&#34;</span>: {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;sender&#34;</span>: <span style="color:#e6db74">&#34;tanaike@hotmail.com&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;content&#34;</span>: <span style="color:#e6db74">&#34;This is a test email.&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;summary&#34;</span>: <span style="color:#e6db74">&#34;This is a test email.&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;subject&#34;</span>: <span style="color:#e6db74">&#34;test email&#34;</span>
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;parameters&#34;</span>: {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;sender&#34;</span>: [<span style="color:#e6db74">&#34;tanaike@hotmail.com&#34;</span>],
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;content&#34;</span>: [<span style="color:#e6db74">&#34;This is a test email.&#34;</span>],
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;summary&#34;</span>: [<span style="color:#e6db74">&#34;This is a test email.&#34;</span>],
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;subject&#34;</span>: [<span style="color:#e6db74">&#34;test email&#34;</span>]
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;queryString&#34;</span>: <span style="color:#e6db74">&#34;sender=tanaike%40hotmail.com&amp;subject=test%20email&amp;content=This%20is%20a%20test%20email.&amp;summary=This%20is%20a%20test%20email.&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;contextPath&#34;</span>: <span style="color:#e6db74">&#34;&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;contentLength&#34;</span>: <span style="color:#ae81ff">-1</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="technical-discussion--comparative-analysis-direct-webhook-vs-mcp">Technical Discussion &amp; Comparative Analysis (Direct Webhook vs. MCP)</h3>
+<p>The direct HTTP GET integration method provides a lightweight alternative to MCP, requiring no external library dependencies in GAS. However, technical trade-offs exist between the two approaches:</p>
+<ul>
+<li>Payload Protocol and Constraints: Direct GET requests embed parameters in URL query strings. Long email bodies or complex JSON structures risk exceeding HTTP GET URL length limits (typically ~2,000 characters) or triggering URI encoding issues. In contrast, MCP uses structured JSON-RPC payloads over standard request bodies, supporting arbitrary data size and nested schemas.</li>
+<li>Method Restrictions (POST Restriction): Currently, Gemini Spark restricts outbound POST requests, outputting explicit runtime errors such as <code>Outbound HTTP requests are unavailable in this environment, so the POST request could not be completed automatically.</code>. While GET requests function cleanly (<code>fig20</code>–<code>fig22</code>), POST constraints restrict direct REST webhook patterns. MCP bypasses this limitation by managing protocol transport internally via Web App endpoints.</li>
+<li>Prompt Overhead: Direct Webhooks require explicit URL query parameter mapping in the natural language prompt itself. MCP abstracts endpoint parameters into typed tool definitions, allowing simple prompts like <code>use @gas-mcp</code> without exposing endpoint URLs or parameter schemas in chat.</li>
+</ul>
+<h2 id="summary">Summary</h2>
+<p>This article presented a comprehensive investigation into the mechanics, architectural boundaries, and enterprise integration patterns of Google Gemini Spark—Google&rsquo;s 24/7 cloud-native autonomous AI agent—with Google Apps Script (GAS).</p>
+<ul>
+<li>Gemini Spark demonstrates remarkable native capabilities, executing closed-loop multi-step workflows (such as dynamic formula evaluation, multi-stage Drive query resolution, and web-to-document publishing) out of the box without requiring external agentic frameworks.</li>
+<li>Empirical testing revealed native tool boundaries: Gemini Spark cannot directly access specialized Google APIs (such as Google Analytics 4) or handle complex authenticated external web requests natively.</li>
+<li>Deploying GAS Web Apps as Model Context Protocol (MCP) servers seamlessly overcomes native API limits, encapsulating OAuth 2.0 authentication and custom API logic server-side while exposing structured tools to Gemini Spark.</li>
+<li>Integrating GAS with Gemini Spark&rsquo;s 24/7 background agent transforms natural language prompts into autonomous event dispatchers, eliminating the need for quota-heavy polling scripts or complex Cloud Pub/Sub infrastructure.</li>
+<li>Direct HTTP GET requests from Gemini Spark to GAS Web Apps provide a lightweight webhook fallback, though payload constraints, URL encoding limits, and current outbound POST restrictions make the MCP pattern the superior enterprise architecture.</li>
+<li>Combining enterprise-grade, GA-certified Google Apps Script with continuous cloud-native Gemini Spark agents opens infinite automation possibilities across Google Cloud and third-party ecosystems.</li>
+</ul>
+
+  
+  <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2026%2f08%2f03%2funlocking-infinite-automation-integrating-google-apps-script-with-gemini-spark%2f" target="_blank" title="Share on Facebook"><i class="fab fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2026%2f08%2f03%2funlocking-infinite-automation-integrating-google-apps-script-with-gemini-spark%2f" target="_blank" title="Tweet"><i class="fab fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f08%2f03%2funlocking-infinite-automation-integrating-google-apps-script-with-gemini-spark%2f" target="_blank" title="Share on Google+"><i class="fab fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2026%2f08%2f03%2funlocking-infinite-automation-integrating-google-apps-script-with-gemini-spark%2f" target="_blank" title="Post to Tumblr"><i class="fab fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f08%2f03%2funlocking-infinite-automation-integrating-google-apps-script-with-gemini-spark%2f" target="_blank" title="Pin it"><i class="fab fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f08%2f03%2funlocking-infinite-automation-integrating-google-apps-script-with-gemini-spark%2f" target="_blank" title="Submit to Reddit"><i class="fab fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
+
+
+  
+<nav class="prev-next-posts">
+  <div class="prev-post">
+    
+      <span class="nav-label">Previous Article</span>
+      <a href="https://tanaikech.github.io/2026/07/31/inside-the-virtual-rd-lab-how-human-imagination-and-ai-multi-agents-shape-the-future-of-science/">Inside the Virtual R&amp;D Lab: How Human Imagination and AI Multi-Agents Shape the Future of Science</a>
+    
+  </div>
+  <div class="next-post">
+    
+  </div>
+</nav>
+
+<style>
+.prev-next-posts {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+  gap: 2rem;
+}
+.prev-post, .next-post {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.next-post {
+  text-align: right;
+}
+.nav-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+.prev-next-posts a {
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-decoration: none;
+}
+@media (max-width: 600px) {
+  .prev-next-posts { flex-direction: column; text-align: left; }
+  .next-post { text-align: left; }
+}
+</style>
+
+
+  
+  
+  
+  
+
+  
+
+</div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-social"><a href="https://twitter.com/tanaikech" target="_blank" rel="me" title="twitter">
+                  <i class="fab fa-x-twitter"></i>
+                </a><a href="https://github.com/tanaikech" target="_blank" rel="me" title="github">
+                  <i class="fab fa-github"></i>
+                </a><a href="https://linkedin.com/in/tanaike" target="_blank" rel="me" title="linkedin">
+                  <i class="fab fa-linkedin"></i>
+                </a><a href="https://www.youtube.com/@tanaike" target="_blank" rel="me" title="youtube">
+                  <i class="fab fa-youtube"></i>
+                </a><a href="https://medium.com/@tanaike" target="_blank" rel="me" title="medium">
+                  <i class="fab fa-medium"></i>
+                </a><a href="https://stackoverflow.com/users/7108653" target="_blank" rel="me" title="stackoverflow">
+                  <i class="fab fa-stack-overflow"></i>
+                </a><a href="https://zenn.dev/tanaike" target="_blank" rel="me" title="zenn">
+                  <i class="fas fa-edit"></i>
+                </a><a href="https://dev.to/tanaike" target="_blank" rel="me" title="devto">
+                  <i class="fab fa-dev"></i>
+                </a>
+      </div>
+      
+      <p class="copyright">
+        &copy; 2026 tanaike - Google Apps Script, Gemini API, and Developer Tips. Built with <a href="https://gohugo.io" target="_blank">Hugo</a>.
+      </p>
+    </div>
+  </footer>
+
+  <script src="https://tanaikech.github.io/js/eclipse.js"></script>
+
+  
+  
+
+  
+  
+
+  
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
+<script>
+  
+  if (window.location.hostname != "localhost") {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-J3Z6T50WL5');
+  }
+</script>
+
+
+
+  
+
+  
+<script src="https://tanaikech.github.io/js/math-code.js"></script>
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  
+
+</body>
+</html>
+
