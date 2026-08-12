@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Hugo 0.157.0">
+
+  
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+  
+  <meta name="theme-color" content="#050505">
+
+  
+  <meta name="google-site-verification" content="googleccbde819fe280caa.html" />
+
+  
+  
+
+  <meta name="keywords" content="Gemini, Antigravity, AI">
+
+  <meta name="description" content="Gists
+Solving the LLM quota monitoring paradox with zero-overhead local Connect RPC agent hooks.
+
+Abstract
+Google Antigravity CLI users using Google OAuth face abrupt task failures when API quota hits 0%, while account switching triggers unrecoverable signature errors. Querying quota via LLM tool calls creates a paradox by consuming the very tokens being monitored. We resolve this with antigravity-cli-check-usage-plugin, a CLI Agent Hook running outside the LLM execution turn. Directly querying local Connect RPC endpoints, it monitors quota with zero token overhead and injects proactive warning banners when threshold limits are reached.">
+
+  
+  <link rel="canonical" href="https://tanaikech.github.io/2026/08/12/preventing-quota-crashes-via-antigravity-cli-agent-hooks/">
+
+  
+  <title>Preventing Quota Crashes via Antigravity CLI Agent Hooks | tanaike - Google Apps Script, Gemini API, and Developer Tips</title>
+
+  
+  <meta property="og:title" content="Preventing Quota Crashes via Antigravity CLI Agent Hooks">
+  <meta property="og:description" content="Gists
+Solving the LLM quota monitoring paradox with zero-overhead local Connect RPC agent hooks.
+
+Abstract
+Google Antigravity CLI users using Google OAuth face abrupt task failures when API quota hits 0%, while account switching triggers unrecoverable signature errors. Querying quota via LLM tool calls creates a paradox by consuming the very tokens being monitored. We resolve this with antigravity-cli-check-usage-plugin, a CLI Agent Hook running outside the LLM execution turn. Directly querying local Connect RPC endpoints, it monitors quota with zero token overhead and injects proactive warning banners when threshold limits are reached.">
+  <meta property="og:url" content="https://tanaikech.github.io/2026/08/12/preventing-quota-crashes-via-antigravity-cli-agent-hooks/">
+  <meta property="og:site_name" content="tanaike - Google Apps Script, Gemini API, and Developer Tips">
+  <meta property="og:type" content="article"><meta property="og:image" content="https://tanaikech.github.io/img/og-main.png">
+
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@tanaikech">
+  <meta name="twitter:title" content="Preventing Quota Crashes via Antigravity CLI Agent Hooks">
+  <meta name="twitter:description" content="Gists
+Solving the LLM quota monitoring paradox with zero-overhead local Connect RPC agent hooks.
+
+Abstract
+Google Antigravity CLI users using Google OAuth face abrupt task failures when API quota hits 0%, while account switching triggers unrecoverable signature errors. Querying quota via LLM tool calls creates a paradox by consuming the very tokens being monitored. We resolve this with antigravity-cli-check-usage-plugin, a CLI Agent Hook running outside the LLM execution turn. Directly querying local Connect RPC endpoints, it monitors quota with zero token overhead and injects proactive warning banners when threshold limits are reached.">
+  <meta name="twitter:image" content="https://tanaikech.github.io/img/og-main.png">
+
+  
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [{
+        "@type": "BlogPosting",
+        "headline": "\"Preventing Quota Crashes via Antigravity CLI Agent Hooks\"",
+        "description": "\"\\u003cp\\u003e\\u003ca href=\\\"https://gist.github.com/tanaikech/999bcefd34a17a0906ed2f2a46be853d\\\"\\u003eGists\\u003c/a\\u003e\\u003c/p\\u003e\\n\\u003ch2 id=\\\"solving-the-llm-quota-monitoring-paradox-with-zero-overhead-local-connect-rpc-agent-hooks\\\"\\u003eSolving the LLM quota monitoring paradox with zero-overhead local Connect RPC agent hooks.\\u003c/h2\\u003e\\n\\u003chr\\u003e\\n\\u003ch2 id=\\\"abstract\\\"\\u003eAbstract\\u003c/h2\\u003e\\n\\u003cp\\u003eGoogle Antigravity CLI users using Google OAuth face abrupt task failures when API quota hits 0%, while account switching triggers unrecoverable signature errors. Querying quota via LLM tool calls creates a paradox by consuming the very tokens being monitored. We resolve this with \\u003ccode\\u003eantigravity-cli-check-usage-plugin\\u003c/code\\u003e, a CLI Agent Hook running outside the LLM execution turn. Directly querying local Connect RPC endpoints, it monitors quota with zero token overhead and injects proactive warning banners when threshold limits are reached.\\u003c/p\\u003e\"",
+        "url": "\"https://tanaikech.github.io/2026/08/12/preventing-quota-crashes-via-antigravity-cli-agent-hooks/\"",
+        "datePublished": "\"2026-08-12T15:43:02+09:00\"",
+        "dateModified": "\"2026-08-12T15:43:02+09:00\"",
+        "wordCount":  1626 ,
+        "author": {
+          "@id": "https:\/\/tanaikech.github.io\/#person"
+        },
+        "publisher": {
+          "@id": "https:\/\/tanaikech.github.io\/#person"
+        },
+        "image": {
+          "@type": "ImageObject",
+          "url": "\"https://tanaikech.github.io/img/og-main.png\"",
+          "width": 1200,
+          "height": 630
+        },
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "\"https://tanaikech.github.io/2026/08/12/preventing-quota-crashes-via-antigravity-cli-agent-hooks/\""
+        }
+      },{
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "\"https://tanaikech.github.io/\""
+          },{
+            "@type": "ListItem",
+            "position": 2,
+            "name": "\"Preventing Quota Crashes via Antigravity CLI Agent Hooks\"",
+            "item": "\"https://tanaikech.github.io/2026/08/12/preventing-quota-crashes-via-antigravity-cli-agent-hooks/\""
+          }]
+      },      {
+        "@type": "Person",
+        "@id": "https:\/\/tanaikech.github.io\/#person",
+        "name": "Kanshi Tanaike",
+        "alternateName": "tanaike",
+        "url": "\"https://tanaikech.github.io/\"",
+        "image": "\"https://tanaikech.github.io/img/og-main.png\"",
+        "jobTitle": "Google Developer Expert",
+        "honorificPrefix": "Ph.D.",
+        "description": "Japanese scientist, Physicist and Google Developer Expert for Google Workspace.",
+        "award": "First place in the Outstanding GDE Award 2025",
+        "sameAs": [
+          "https://twitter.com/tanaikech",
+          "https://github.com/tanaikech",
+          "https://stackoverflow.com/users/7108653/tanaike",
+          "https://developers.google.com/community/experts/directory?text=tanaike",
+          "https://zenn.dev/tanaike",
+          "https://medium.com/@tanaike",
+          "https://orcid.org/0009-0004-2510-1163"
+        ]
+      }
+    ]
+  }
+  </script>
+
+  
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/eclipse.css">
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <link rel="shortcut icon" href="https://tanaikech.github.io/img/favicon.ico" type="image/x-icon" />
+  
+  
+  
+
+  
+  
+  
+</head>
+
+
+<body>
+  <div id="progress-bar"></div>
+  
+  <header class="site-header">
+    <div class="header-container">
+      
+      <div class="header-top">
+        <div class="site-title">
+          <a href="https://tanaikech.github.io/">TANAIKE</a>
+          
+            <div class="site-subtitle">The Thinker</div>
+          
+        </div>
+
+        
+        <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+
+      
+      <div id="mobile-menu" class="mobile-menu-content">
+        <div class="nav-row">
+          <div class="nav-links">
+            
+              <a href="https://tanaikech.github.io/about/" title="">
+                <i class='fa fa-user fa-fw'></i> About
+              </a>
+            
+              <a href="https://tanaikech.github.io/post/" title="">
+                <i class='fa fa-list fa-fw'></i> Articles
+              </a>
+            
+              <a href="https://tanaikech.github.io/topics/" title="">
+                <i class='fa fa-folder fa-fw'></i> Topics
+              </a>
+            
+              <a href="https://tanaikech.github.io/tags/" title="">
+                <i class='fa fa-tags fa-fw'></i> Tags
+              </a>
+            
+              <a href="https://tanaikech.github.io/contact/" title="">
+                <i class='fa fa-phone fa-fw'></i> Contact
+              </a>
+            
+              <a href="https://tanaikech.github.io/link/" title="">
+                <i class='fa fa-thumbs-up fa-fw'></i> Links
+              </a>
+            
+              <a href="https://tanaikech.github.io/webapps/" title="">
+                <i class='fas fa-toolbox'></i> Web Applications
+              </a>
+            
+              <a href="https://tanaikech.github.io/donate/" title="">
+                <i class='fas fa-donate'></i> Donate
+              </a>
+            
+              <a href="https://tanaikech.github.io/" title="">
+                <i class='fa fa-home fa-fw'></i> Home
+              </a>
+            
+          </div>
+        </div>
+
+        <div class="social-links-row"><a href="https://twitter.com/tanaikech" target="_blank" rel="me">
+                <i class="fab fa-x-twitter"></i> X
+              </a><a href="https://medium.com/@tanaike" target="_blank" rel="me">
+                <i class="fab fa-medium"></i> Medium
+              </a><a href="https://www.youtube.com/@tanaike" target="_blank" rel="me">
+                <i class="fab fa-youtube"></i> YouTube
+              </a><a href="https://linkedin.com/in/tanaike" target="_blank" rel="me">
+                <i class="fab fa-linkedin"></i> LinkedIn
+              </a><a href="https://github.com/tanaikech" target="_blank" rel="me">
+                <i class="fab fa-github"></i> GitHub
+              </a><a href="https://gist.github.com/tanaikech" target="_blank" rel="me">
+                <i class="fas fa-code"></i> Gists
+              </a><a href="https://stackoverflow.com/users/7108653" target="_blank" rel="me">
+                <i class="fab fa-stack-overflow"></i> Stack Overflow
+              </a><a href="https://dev.to/tanaike" target="_blank" rel="me">
+                <i class="fab fa-dev"></i> DEV
+              </a><a href="https://zenn.dev/tanaike" target="_blank" rel="me">
+                <i class="fas fa-edit"></i> Zenn
+              </a><a href="https://devpost.com/tanaike" target="_blank" rel="me">
+                <i class="fas fa-terminal"></i> Devpost
+              </a><a href="https://orcid.org/0009-0004-2510-1163" target="_blank" rel="me">
+                <i class="fab fa-orcid"></i> ORCID
+              </a></div>
+      </div>
+
+    </div>
+  </header>
+
+  <main id="main">
+
+
+<div class="header">
+  <h1>Preventing Quota Crashes via Antigravity CLI Agent Hooks</h1>
+  <h2></h2>
+</div>
+<div class="content">
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>12 Aug 2026, 15:43</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/report">report</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/gemini">Gemini</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/antigravity">Antigravity</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/ai">AI</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  <p><a href="https://gist.github.com/tanaikech/999bcefd34a17a0906ed2f2a46be853d">Gists</a></p>
+<h2 id="solving-the-llm-quota-monitoring-paradox-with-zero-overhead-local-connect-rpc-agent-hooks">Solving the LLM quota monitoring paradox with zero-overhead local Connect RPC agent hooks.</h2>
+<hr>
+<h2 id="abstract">Abstract</h2>
+<p>Google Antigravity CLI users using Google OAuth face abrupt task failures when API quota hits 0%, while account switching triggers unrecoverable signature errors. Querying quota via LLM tool calls creates a paradox by consuming the very tokens being monitored. We resolve this with <code>antigravity-cli-check-usage-plugin</code>, a CLI Agent Hook running outside the LLM execution turn. Directly querying local Connect RPC endpoints, it monitors quota with zero token overhead and injects proactive warning banners when threshold limits are reached.</p>
+<hr>
+<h2 id="1-introduction">1. Introduction</h2>
+<p>Developers relying on <strong>Google Antigravity CLI</strong> for autonomous pair programming frequently encounter a frustrating barrier: running out of API quota mid-session. When using Google OAuth authentication, your quota can silently hit 0%, causing task execution to halt abruptly with an unrecoverable quota error:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>⚠ Individual quota reached. Please upgrade your subscription to increase your limits. Resets in 1h00m00s.
+</span></span><span style="display:flex;"><span>Error ID: 49a81c0f
+</span></span></code></pre></div><p>To bypass this roadblock, developers often attempt to log out and switch to a paid Google Cloud project billing account. However, in <strong>Antigravity CLI v1.1.12</strong>, attempting to resume an active agent session after switching accounts triggers a critical signature mismatch failure:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>⚠ Invalid thought signature.
+</span></span><span style="display:flex;"><span>Error ID: e2901f4c
+</span></span></code></pre></div><p>This error prevents the session from continuing, forcing you to wait until the quota resets. While future CLI updates may resolve this session state issue, waiting for a patch is not a viable strategy when shipping code today.</p>
+<p>The architectural divergence between standard tool-based monitoring and our agent hook model is illustrated in Figure 1. While developers can manually run the <code>/usage</code> slash command to view quota, <strong>AI agents executing multi-step autonomous tasks cannot trigger <code>/usage</code> programmatically</strong>. In traditional CLI workflows, invoking quota checks via LLM tool calls requires passing context back and forth through the inference API, depleting active model tokens. Conversely, the zero-overhead agent hook interceptor executes locally prior to prompt dispatch, querying the process socket silently and injecting status alerts only when remaining quota breaches configured safety bounds.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260812a/quota_architecture_comparison.jpg"
+     alt="Figure 1: Architectural comparison between traditional CLI agent quota limitations and the zero-overhead agent hook workflow."
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<p>In this article, to overcome the limitation of agents being unable to trigger <code>/usage</code>, we walk through the engineering journey of building <strong><code>antigravity-cli-check-usage-plugin</code></strong>. By combining local Connect RPC inspection with proactive lifecycle hooks, this plugin automatically performs external quota checks with <strong>Zero Quota Consumption (0 LLM tokens)</strong>, completely preventing mid-session crashes.</p>
+<hr>
+<h2 id="2-repository">2. Repository</h2>
+<p>The plugin developed and discussed in this article is open-sourced and available on GitHub:</p>
+<ul>
+<li><strong>GitHub Repository</strong>: <a href="https://github.com/tanaikech/antigravity-cli-check-usage-plugin">tanaikech/antigravity-cli-check-usage-plugin</a></li>
+</ul>
+<p>This repository contains the dual-runner entrypoint (<code>entrypoint.sh</code>), Python script (<code>check_quota.py</code>), pure Bash fallback script (<code>check_quota.sh</code>), lifecycle hook manifest (<code>hooks.json</code>), and default threshold configuration (<code>config.json</code>), allowing instant one-command installation as an Antigravity CLI plugin across any developer environment.</p>
+<hr>
+<h2 id="3-core-motivation">3. Core Motivation</h2>
+<p>While Antigravity CLI provides the <code>/usage</code> slash command for developers to manually inspect quota limits, AI agents executing autonomous task loops cannot invoke <code>/usage</code> programmatically.</p>
+<p>If we attempted to solve this by equipping the AI agent with a custom tool to query the internal RPC endpoint (<code>/exa.language_server_pb.LanguageServerService/GetUserStatus</code>), the tool invocation and context turns would consume LLM API tokens. This creates a fundamental paradox: <strong>using LLM context tokens to check remaining quota consumes the very quota you are trying to preserve.</strong></p>
+<p>In addressing this challenge, the solution built upon our previously published article, <a href="https://medium.com/google-cloud/a-developers-guide-to-agent-hooks-in-antigravity-cli-4c1440febd11">A Developer’s Guide to Agent Hooks in Antigravity CLI</a>. Recalling the out-of-band execution mechanics of CLI Agent Hooks explored in that guide, we leveraged lifecycle events (<code>PreInvocation</code> and <code>PostInvocation</code>) to run local process checks completely outside the LLM inference turn—guaranteeing zero API token quota overhead.</p>
+<ul>
+<li><strong>Zero Token Overhead</strong>: During normal operation, quota checking runs entirely outside the LLM context (via local Python/Bash scripts) without invoking LLM tool calls.</li>
+<li><strong>Local RPC Interception</strong>: It automatically queries the CLI&rsquo;s internal status endpoint on <code>127.0.0.1</code> without external network calls.</li>
+<li><strong>Proactive Threshold Alerting</strong>: It notifies both the developer and the AI agent <em>before</em> quota hits 0%, preventing session corruption and hard crashes.</li>
+</ul>
+<hr>
+<h2 id="4-connect-rpc">4. Connect RPC</h2>
+<p>Through reverse-engineering the Antigravity CLI local process architecture (originally explored in the <a href="https://github.com/skainguyen1412/antigravity-usage">antigravity-usage repository by skainguyen1412</a>), we discovered that the running <code>agy</code> process hosts a local HTTPS server using the gRPC / Connect Protocol on <code>127.0.0.1</code>.</p>
+<p>By querying the internal endpoint <code>/exa.language_server_pb.LanguageServerService/GetUserStatus</code>, we can retrieve real-time model quota fractions and reset timestamps directly from the local process.</p>
+<p>Because the <code>agy</code> process may open multiple listening sockets on <code>127.0.0.1</code> for IPC and WebSockets, a shell loop that probes each detected port until it receives a valid <code>userStatus</code> response is required:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Scan listening sockets for the active &#39;agy&#39; process on loopback (127.0.0.1)</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> PORT in <span style="color:#66d9ef">$(</span>ss -tulpn 2&gt;/dev/null | grep agy | awk -F<span style="color:#e6db74">&#39;127.0.0.1:&#39;</span> <span style="color:#e6db74">&#39;{print $2}&#39;</span> | awk <span style="color:#e6db74">&#39;{print $1}&#39;</span> | sort -u<span style="color:#66d9ef">)</span>; <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># Post a Connect Protocol request to the internal GetUserStatus RPC endpoint</span>
+</span></span><span style="display:flex;"><span>  RES<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>curl -k -s -X POST https://127.0.0.1:<span style="color:#e6db74">${</span>PORT<span style="color:#e6db74">}</span>/exa.language_server_pb.LanguageServerService/GetUserStatus <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -H <span style="color:#e6db74">&#34;Content-Type: application/json&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -H <span style="color:#e6db74">&#34;Connect-Protocol-Version: 1&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>    -d <span style="color:#e6db74">&#39;{&#34;metadata&#34;:{&#34;ideName&#34;:&#34;antigravity&#34;,&#34;extensionName&#34;:&#34;antigravity&#34;,&#34;locale&#34;:&#34;en&#34;}}&#39;</span><span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># Verify if the response contains the userStatus JSON key</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> echo <span style="color:#e6db74">&#34;</span>$RES<span style="color:#e6db74">&#34;</span> | grep -q <span style="color:#e6db74">&#34;userStatus&#34;</span>; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>    echo <span style="color:#e6db74">&#34;</span>$RES<span style="color:#e6db74">&#34;</span> | jq .
+</span></span><span style="display:flex;"><span>    break
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">done</span>
+</span></span></code></pre></div><p>To execute this logic seamlessly and rapidly inside an agent hook outside the LLM invocation turn, we implemented a Python script using standard library components, alongside a pure Bash fallback script (<code>check_quota.sh</code>) and an entrypoint runner (<code>entrypoint.sh</code>) that automatically selects Python when available or Bash on systems without Python installed.</p>
+<blockquote>
+<p>[!IMPORTANT]<br>
+<strong>Note on Scope</strong>: The <code>GetUserStatus</code> endpoint returns the <strong>Five Hour Limit Remaining</strong> fraction (<code>remainingFraction</code>) and ISO reset timestamp (<code>resetTime</code>) for active model pools. The long-term <strong>Weekly Limit Remaining</strong> is not exposed through this RPC endpoint.</p>
+</blockquote>
+<hr>
+<h2 id="5-complete-agent-hook-workflow">5. Complete Agent Hook Workflow</h2>
+<p>Building upon the lifecycle concepts detailed in <a href="https://medium.com/google-cloud/a-developers-guide-to-agent-hooks-in-antigravity-cli-4c1440febd11">A Developer’s Guide to Agent Hooks in Antigravity CLI</a>, the plugin integrates into the Antigravity CLI by registering <code>PreInvocation</code> and <code>PostInvocation</code> agent hooks in <code>hooks.json</code>. Because <code>PreInvocation</code> fires after the user submits input but <em>before</em> the prompt payload is dispatched to the LLM backend, it inspects local process state and dynamically injects steps prior to model inference.</p>
+<p>As detailed in Figure 2, the final agent hook operates under two distinct execution patterns based on the configured warning threshold (default: 20%):</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260812a/quota_hook_workflow.jpg"
+     alt="Figure 2: Complete agent hook execution workflow diagram detailing Pattern A (silent) and Pattern B (warning state)."
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<h3 id="pattern-a-normal-operation-quota--threshold">Pattern A: Normal Operation (Quota &gt; Threshold)</h3>
+<p>When remaining quota is above the warning threshold, the hook outputs an empty step injection payload:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;injectSteps&#34;</span>: []
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><ul>
+<li><strong>Impact</strong>: <strong>Zero Quota Consumption (0 Token Overhead)</strong>. The hook executes silently in less than 50 milliseconds. No messages or extra context are injected into the LLM session, consuming absolutely zero model quota.</li>
+</ul>
+<h3 id="pattern-b-warning-state-quota--threshold">Pattern B: Warning State (Quota &lt;= Threshold)</h3>
+<p>When remaining quota drops to or below the threshold, the hook injects a transient system message with mandatory agent directives:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;injectSteps&#34;</span>: [
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;ephemeralMessage&#34;</span>: <span style="color:#e6db74">&#34;⚠️ [SYSTEM QUOTA WARNING] Model quota is below threshold (20%) (Active: gemini-3.6-flash-medium):\n - GEMINI Models [ACTIVE MODEL]: 20.0% remaining (Refreshes in 3h 00m)\n\n[MANDATORY INSTRUCTION FOR AGENT]: The model quota has dropped below the threshold. You MUST display a prominent Quota Warning banner at the very top of your response for THIS TURN ONLY! Do NOT display a warning banner on subsequent turns unless another quota warning is explicitly injected. In the warning banner, you MUST also inform the user that they can run the &#39;/usage&#39; command at any time to inspect detailed quota status.&#34;</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  ]
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><ul>
+<li><strong>Impact</strong>: The AI agent immediately prepends a prominent Quota Warning banner to its response, advising the developer to run <code>/usage</code> or pause heavy multi-step automation before encountering a hard crash.</li>
+</ul>
+<hr>
+<h2 id="6-installation--dual-runtime">6. Installation &amp; Dual Runtime</h2>
+<p>The complete implementation is published as an open-source Antigravity CLI plugin: <code>antigravity-cli-check-usage-plugin</code>.</p>
+<h3 id="installation">Installation</h3>
+<p>Install the plugin directly via the Antigravity CLI:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>agy plugin install https://github.com/tanaikech/antigravity-cli-check-usage-plugin
+</span></span></code></pre></div><h3 id="dual-runtime-architecture-python-primary--pure-bash-fallback">Dual Runtime Architecture: Python Primary + Pure Bash Fallback</h3>
+<p>The plugin features a multi-environment entrypoint (<code>entrypoint.sh</code>) producing 100% identical JSON outputs across both runtimes. The engineering rationale behind this dual design includes:</p>
+<ul>
+<li><strong>Python (Primary Runner)</strong>: Requires zero external dependencies like <code>jq</code>, absorbs OS-specific syntax differences across Linux, macOS, and Windows, and guarantees type-safe date math.</li>
+<li><strong>Pure Bash (Fallback Safety Net)</strong>: Ensures instant execution in minimal or containerized environments where Python is not pre-installed.</li>
+</ul>
+<h3 id="configuration-and-disabling">Configuration and Disabling</h3>
+<p>You can customize or completely disable the warning threshold (default: <strong>20.0%</strong>) using environment variables, configuration files, or hook arguments.</p>
+<p><strong>Set Custom Threshold (e.g., 25%):</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>export QUOTA_THRESHOLD<span style="color:#f92672">=</span>25.0
+</span></span></code></pre></div><p><strong>Disable Quota Check Completely:</strong>
+Setting <code>QUOTA_THRESHOLD</code> to <code>-1</code> instructs the hook to skip all RPC queries immediately:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>export QUOTA_THRESHOLD<span style="color:#f92672">=</span>-1
+</span></span></code></pre></div><hr>
+<h2 id="7-real-world-testing--verification">7. Real-World Testing &amp; Verification</h2>
+<p>After installing the plugin, setting <code>export QUOTA_THRESHOLD=80.0</code> and executing a live session test in Antigravity CLI v1.1.12 demonstrates the hook in action, as captured in Figure 3:</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260812a/cli_quota_warning_demo.jpg"
+     alt="Figure 3: Live terminal demonstration of real-time Quota Warning banner injection in Antigravity CLI 1.1.12."
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<p>When the user enters a simple greeting (<code>hello</code>), the agent hook instantly detects that the active model&rsquo;s remaining quota (71.0%) has dropped below the configured threshold (80.0%). A prominent yellow <strong>Warning banner</strong> (<code>Quota Warning: GEMINI Models quota is at 71.0% remaining...</code>) is dynamically prepended at the top of the AI&rsquo;s response, alerting the developer and providing a reminder to inspect detailed limits via <code>/usage</code>.</p>
+<hr>
+<h2 id="8-updating--uninstalling">8. Updating &amp; Uninstalling</h2>
+<p>To update the plugin to the latest version or remove it from your environment:</p>
+<ul>
+<li><strong>Check installed plugins</strong>:
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>agy plugin list
+</span></span></code></pre></div></li>
+<li><strong>Uninstall the plugin</strong>:
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>agy plugin uninstall antigravity-cli-check-usage-plugin
+</span></span></code></pre></div></li>
+<li><strong>Reinstall the updated version</strong>:
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>agy plugin install https://github.com/tanaikech/antigravity-cli-check-usage-plugin
+</span></span></code></pre></div></li>
+</ul>
+<hr>
+<h2 id="summary">Summary</h2>
+<p>In this article, we presented a zero-overhead solution to eliminate mid-session quota crashes and account-switching signature errors in Google Antigravity CLI. Drawing upon foundational concepts from <a href="https://medium.com/google-cloud/a-developers-guide-to-agent-hooks-in-antigravity-cli-4c1440febd11">A Developer’s Guide to Agent Hooks in Antigravity CLI</a> and resolving the paradox where using LLM tool calls to query internal RPC endpoints consumes quota, we built native CLI Agent Hooks (<code>PreInvocation</code> / <code>PostInvocation</code>) running completely outside the LLM execution turn. Featuring a dual Python primary and pure Bash fallback architecture, the hook probes internal local Connect RPC endpoints with absolute zero token consumption during normal operation. By proactively injecting warning banners and <code>/usage</code> reminders when quota drops below threshold, it guarantees universal environment compatibility and eliminates task interruptions cleanly at the root.</p>
+
+  
+  <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2026%2f08%2f12%2fpreventing-quota-crashes-via-antigravity-cli-agent-hooks%2f" target="_blank" title="Share on Facebook"><i class="fab fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2026%2f08%2f12%2fpreventing-quota-crashes-via-antigravity-cli-agent-hooks%2f" target="_blank" title="Tweet"><i class="fab fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f08%2f12%2fpreventing-quota-crashes-via-antigravity-cli-agent-hooks%2f" target="_blank" title="Share on Google+"><i class="fab fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2026%2f08%2f12%2fpreventing-quota-crashes-via-antigravity-cli-agent-hooks%2f" target="_blank" title="Post to Tumblr"><i class="fab fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f08%2f12%2fpreventing-quota-crashes-via-antigravity-cli-agent-hooks%2f" target="_blank" title="Pin it"><i class="fab fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f08%2f12%2fpreventing-quota-crashes-via-antigravity-cli-agent-hooks%2f" target="_blank" title="Submit to Reddit"><i class="fab fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
+
+
+  
+<nav class="prev-next-posts">
+  <div class="prev-post">
+    
+      <span class="nav-label">Previous Article</span>
+      <a href="https://tanaikech.github.io/2026/08/07/before-the-quake-how-antigravity-clis-ai-agents-iot-data-predict-earthquakes/">Before the Quake: How Antigravity CLI&#39;s AI Agents &amp; IoT Data Predict Earthquakes</a>
+    
+  </div>
+  <div class="next-post">
+    
+  </div>
+</nav>
+
+<style>
+.prev-next-posts {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+  gap: 2rem;
+}
+.prev-post, .next-post {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.next-post {
+  text-align: right;
+}
+.nav-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+.prev-next-posts a {
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-decoration: none;
+}
+@media (max-width: 600px) {
+  .prev-next-posts { flex-direction: column; text-align: left; }
+  .next-post { text-align: left; }
+}
+</style>
+
+
+  
+  
+  
+  
+
+  
+
+</div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-social"><a href="https://twitter.com/tanaikech" target="_blank" rel="me" title="twitter">
+                  <i class="fab fa-x-twitter"></i>
+                </a><a href="https://github.com/tanaikech" target="_blank" rel="me" title="github">
+                  <i class="fab fa-github"></i>
+                </a><a href="https://linkedin.com/in/tanaike" target="_blank" rel="me" title="linkedin">
+                  <i class="fab fa-linkedin"></i>
+                </a><a href="https://www.youtube.com/@tanaike" target="_blank" rel="me" title="youtube">
+                  <i class="fab fa-youtube"></i>
+                </a><a href="https://medium.com/@tanaike" target="_blank" rel="me" title="medium">
+                  <i class="fab fa-medium"></i>
+                </a><a href="https://stackoverflow.com/users/7108653" target="_blank" rel="me" title="stackoverflow">
+                  <i class="fab fa-stack-overflow"></i>
+                </a><a href="https://zenn.dev/tanaike" target="_blank" rel="me" title="zenn">
+                  <i class="fas fa-edit"></i>
+                </a><a href="https://dev.to/tanaike" target="_blank" rel="me" title="devto">
+                  <i class="fab fa-dev"></i>
+                </a><a href="https://devpost.com/tanaike" target="_blank" rel="me" title="devpost">
+                  <i class="fas fa-terminal"></i>
+                </a><a href="https://orcid.org/0009-0004-2510-1163" target="_blank" rel="me" title="orcid">
+                  <i class="fab fa-orcid"></i>
+                </a>
+      </div>
+      
+      <p class="copyright">
+        &copy; 2026 tanaike - Google Apps Script, Gemini API, and Developer Tips. Built with <a href="https://gohugo.io" target="_blank">Hugo</a>.
+      </p>
+    </div>
+  </footer>
+
+  <script src="https://tanaikech.github.io/js/eclipse.js"></script>
+
+  
+  
+
+  
+  
+
+  
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
+<script>
+  
+  if (window.location.hostname != "localhost") {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-J3Z6T50WL5');
+  }
+</script>
+
+
+
+  
+
+  
+<script src="https://tanaikech.github.io/js/math-code.js"></script>
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  
+
+</body>
+</html>
+
