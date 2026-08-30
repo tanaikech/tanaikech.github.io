@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Hugo 0.157.0">
+
+  
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+  
+  <meta name="theme-color" content="#050505">
+
+  
+  <meta name="google-site-verification" content="googleccbde819fe280caa.html" />
+
+  
+  
+
+  <meta name="keywords" content="Google Apps Script, Google Workspace, Gemini, AI">
+
+  <meta name="description" content="Gists
+Breaking the Limits of GAS with Direct Cloud-to-Cloud Streaming in Persistent Linux Sandboxes
+
+Abstract
+While Google Apps Script (GAS) is a powerful tool for Google Workspace automation, platform and computational constraints often limit its ability to handle advanced workloads. Gemini Managed Agents provide remote Linux sandboxes equipped with bash execution. This article introduces an architecture integrating GAS with a Linux sandbox to execute tasks beyond the capabilities of Apps Script alone. By streaming generated artifacts directly from within the Linux sandbox to Google Drive, this approach bypasses API payload limits, eliminates token overhead, and achieves high-throughput cloud automation.">
+
+  
+  <link rel="canonical" href="https://tanaikech.github.io/2026/08/30/taking-advantage-of-gemini-managed-agents-with-google-apps-script/">
+
+  
+  <title>Taking Advantage of Gemini Managed Agents with Google Apps Script | tanaike - Google Apps Script, Gemini API, and Developer Tips</title>
+
+  
+  <meta property="og:title" content="Taking Advantage of Gemini Managed Agents with Google Apps Script">
+  <meta property="og:description" content="Gists
+Breaking the Limits of GAS with Direct Cloud-to-Cloud Streaming in Persistent Linux Sandboxes
+
+Abstract
+While Google Apps Script (GAS) is a powerful tool for Google Workspace automation, platform and computational constraints often limit its ability to handle advanced workloads. Gemini Managed Agents provide remote Linux sandboxes equipped with bash execution. This article introduces an architecture integrating GAS with a Linux sandbox to execute tasks beyond the capabilities of Apps Script alone. By streaming generated artifacts directly from within the Linux sandbox to Google Drive, this approach bypasses API payload limits, eliminates token overhead, and achieves high-throughput cloud automation.">
+  <meta property="og:url" content="https://tanaikech.github.io/2026/08/30/taking-advantage-of-gemini-managed-agents-with-google-apps-script/">
+  <meta property="og:site_name" content="tanaike - Google Apps Script, Gemini API, and Developer Tips">
+  <meta property="og:type" content="article"><meta property="og:image" content="https://tanaikech.github.io/img/og-main.png">
+
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@tanaikech">
+  <meta name="twitter:title" content="Taking Advantage of Gemini Managed Agents with Google Apps Script">
+  <meta name="twitter:description" content="Gists
+Breaking the Limits of GAS with Direct Cloud-to-Cloud Streaming in Persistent Linux Sandboxes
+
+Abstract
+While Google Apps Script (GAS) is a powerful tool for Google Workspace automation, platform and computational constraints often limit its ability to handle advanced workloads. Gemini Managed Agents provide remote Linux sandboxes equipped with bash execution. This article introduces an architecture integrating GAS with a Linux sandbox to execute tasks beyond the capabilities of Apps Script alone. By streaming generated artifacts directly from within the Linux sandbox to Google Drive, this approach bypasses API payload limits, eliminates token overhead, and achieves high-throughput cloud automation.">
+  <meta name="twitter:image" content="https://tanaikech.github.io/img/og-main.png">
+
+  
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [{
+        "@type": "BlogPosting",
+        "headline": "\"Taking Advantage of Gemini Managed Agents with Google Apps Script\"",
+        "description": "\"\\u003cp\\u003e\\u003ca href=\\\"https://gist.github.com/tanaikech/0f71ec60332df260a04a60f425ef4829\\\"\\u003eGists\\u003c/a\\u003e\\u003c/p\\u003e\\n\\u003ch3 id=\\\"breaking-the-limits-of-gas-with-direct-cloud-to-cloud-streaming-in-persistent-linux-sandboxes\\\"\\u003eBreaking the Limits of GAS with Direct Cloud-to-Cloud Streaming in Persistent Linux Sandboxes\\u003c/h3\\u003e\\n\\u003chr\\u003e\\n\\u003ch2 id=\\\"abstract\\\"\\u003eAbstract\\u003c/h2\\u003e\\n\\u003cp\\u003eWhile Google Apps Script (GAS) is a powerful tool for Google Workspace automation, platform and computational constraints often limit its ability to handle advanced workloads. Gemini Managed Agents provide remote Linux sandboxes equipped with bash execution. This article introduces an architecture integrating GAS with a Linux sandbox to execute tasks beyond the capabilities of Apps Script alone. By streaming generated artifacts directly from within the Linux sandbox to Google Drive, this approach bypasses API payload limits, eliminates token overhead, and achieves high-throughput cloud automation.\\u003c/p\\u003e\"",
+        "url": "\"https://tanaikech.github.io/2026/08/30/taking-advantage-of-gemini-managed-agents-with-google-apps-script/\"",
+        "datePublished": "\"2026-08-30T16:36:36+09:00\"",
+        "dateModified": "\"2026-08-30T16:36:36+09:00\"",
+        "wordCount":  3483 ,
+        "author": {
+          "@id": "https:\/\/tanaikech.github.io\/#person"
+        },
+        "publisher": {
+          "@id": "https:\/\/tanaikech.github.io\/#person"
+        },
+        "image": {
+          "@type": "ImageObject",
+          "url": "\"https://tanaikech.github.io/img/og-main.png\"",
+          "width": 1200,
+          "height": 630
+        },
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "\"https://tanaikech.github.io/2026/08/30/taking-advantage-of-gemini-managed-agents-with-google-apps-script/\""
+        }
+      },{
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "\"https://tanaikech.github.io/\""
+          },{
+            "@type": "ListItem",
+            "position": 2,
+            "name": "\"Taking Advantage of Gemini Managed Agents with Google Apps Script\"",
+            "item": "\"https://tanaikech.github.io/2026/08/30/taking-advantage-of-gemini-managed-agents-with-google-apps-script/\""
+          }]
+      },      {
+        "@type": "Person",
+        "@id": "https:\/\/tanaikech.github.io\/#person",
+        "name": "Kanshi Tanaike",
+        "alternateName": "tanaike",
+        "url": "\"https://tanaikech.github.io/\"",
+        "image": "\"https://tanaikech.github.io/img/og-main.png\"",
+        "jobTitle": "Google Developer Expert",
+        "honorificPrefix": "Ph.D.",
+        "description": "Japanese scientist, Physicist and Google Developer Expert for Google Workspace.",
+        "award": "First place in the Outstanding GDE Award 2025",
+        "sameAs": [
+          "https://twitter.com/tanaikech",
+          "https://github.com/tanaikech",
+          "https://stackoverflow.com/users/7108653/tanaike",
+          "https://developers.google.com/community/experts/directory?text=tanaike",
+          "https://zenn.dev/tanaike",
+          "https://medium.com/@tanaike",
+          "https://orcid.org/0009-0004-2510-1163"
+        ]
+      }
+    ]
+  }
+  </script>
+
+  
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/eclipse.css">
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <link rel="shortcut icon" href="https://tanaikech.github.io/img/favicon.ico" type="image/x-icon" />
+  
+  
+  
+
+  
+  
+  
+</head>
+
+
+<body>
+  <div id="progress-bar"></div>
+  
+  <header class="site-header">
+    <div class="header-container">
+      
+      <div class="header-top">
+        <div class="site-title">
+          <a href="https://tanaikech.github.io/">TANAIKE</a>
+          
+            <div class="site-subtitle">The Thinker</div>
+          
+        </div>
+
+        
+        <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+
+      
+      <div id="mobile-menu" class="mobile-menu-content">
+        <div class="nav-row">
+          <div class="nav-links">
+            
+              <a href="https://tanaikech.github.io/about/" title="">
+                <i class='fa fa-user fa-fw'></i> About
+              </a>
+            
+              <a href="https://tanaikech.github.io/post/" title="">
+                <i class='fa fa-list fa-fw'></i> Articles
+              </a>
+            
+              <a href="https://tanaikech.github.io/topics/" title="">
+                <i class='fa fa-folder fa-fw'></i> Topics
+              </a>
+            
+              <a href="https://tanaikech.github.io/tags/" title="">
+                <i class='fa fa-tags fa-fw'></i> Tags
+              </a>
+            
+              <a href="https://tanaikech.github.io/contact/" title="">
+                <i class='fa fa-phone fa-fw'></i> Contact
+              </a>
+            
+              <a href="https://tanaikech.github.io/link/" title="">
+                <i class='fa fa-thumbs-up fa-fw'></i> Links
+              </a>
+            
+              <a href="https://tanaikech.github.io/webapps/" title="">
+                <i class='fas fa-toolbox'></i> Web Applications
+              </a>
+            
+              <a href="https://tanaikech.github.io/donate/" title="">
+                <i class='fas fa-donate'></i> Donate
+              </a>
+            
+              <a href="https://tanaikech.github.io/" title="">
+                <i class='fa fa-home fa-fw'></i> Home
+              </a>
+            
+          </div>
+        </div>
+
+        <div class="social-links-row"><a href="https://twitter.com/tanaikech" target="_blank" rel="me">
+                <i class="fab fa-x-twitter"></i> X
+              </a><a href="https://medium.com/@tanaike" target="_blank" rel="me">
+                <i class="fab fa-medium"></i> Medium
+              </a><a href="https://www.youtube.com/@tanaike" target="_blank" rel="me">
+                <i class="fab fa-youtube"></i> YouTube
+              </a><a href="https://linkedin.com/in/tanaike" target="_blank" rel="me">
+                <i class="fab fa-linkedin"></i> LinkedIn
+              </a><a href="https://github.com/tanaikech" target="_blank" rel="me">
+                <i class="fab fa-github"></i> GitHub
+              </a><a href="https://gist.github.com/tanaikech" target="_blank" rel="me">
+                <i class="fas fa-code"></i> Gists
+              </a><a href="https://stackoverflow.com/users/7108653" target="_blank" rel="me">
+                <i class="fab fa-stack-overflow"></i> Stack Overflow
+              </a><a href="https://dev.to/tanaike" target="_blank" rel="me">
+                <i class="fab fa-dev"></i> DEV
+              </a><a href="https://zenn.dev/tanaike" target="_blank" rel="me">
+                <i class="fas fa-edit"></i> Zenn
+              </a><a href="https://devpost.com/tanaike" target="_blank" rel="me">
+                <i class="fas fa-terminal"></i> Devpost
+              </a><a href="https://orcid.org/0009-0004-2510-1163" target="_blank" rel="me">
+                <i class="fab fa-orcid"></i> ORCID
+              </a></div>
+      </div>
+
+    </div>
+  </header>
+
+  <main id="main">
+
+
+<div class="header">
+  <h1>Taking Advantage of Gemini Managed Agents with Google Apps Script</h1>
+  <h2></h2>
+</div>
+<div class="content">
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>30 Aug 2026, 16:36</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/report">report</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-workspace">Google Workspace</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/gemini">Gemini</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/ai">AI</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  <p><a href="https://gist.github.com/tanaikech/0f71ec60332df260a04a60f425ef4829">Gists</a></p>
+<h3 id="breaking-the-limits-of-gas-with-direct-cloud-to-cloud-streaming-in-persistent-linux-sandboxes">Breaking the Limits of GAS with Direct Cloud-to-Cloud Streaming in Persistent Linux Sandboxes</h3>
+<hr>
+<h2 id="abstract">Abstract</h2>
+<p>While Google Apps Script (GAS) is a powerful tool for Google Workspace automation, platform and computational constraints often limit its ability to handle advanced workloads. Gemini Managed Agents provide remote Linux sandboxes equipped with bash execution. This article introduces an architecture integrating GAS with a Linux sandbox to execute tasks beyond the capabilities of Apps Script alone. By streaming generated artifacts directly from within the Linux sandbox to Google Drive, this approach bypasses API payload limits, eliminates token overhead, and achieves high-throughput cloud automation.</p>
+<h2 id="introduction">Introduction</h2>
+<p>Recently, Martin Hawksey published an inspiring article on AppsScriptPulse exploring the potential of Gemini Managed Agents and the Google Workspace CLI within Google Workspace automation. <a href="https://pulse.appsscript.info/p/2026/08/adding-a-spark-of-intelligence-to-google-workspace-exploring-gemini-managed-agents-and-the-google-workspace-cli/">Ref</a> Gemini Managed Agents (part of the Gemini v1beta Interactions and Environments API) allow developers to provision and interact with remote Linux sandbox environments capable of autonomous code execution, shell commands, and package management. <a href="https://ai.google.dev/gemini-api/docs/agents">Ref</a></p>
+<p>While Google Apps Script (GAS) is widely used for automating Google Workspace workflows, it operates as a lightweight, restricted serverless runtime without OS-level access, inherently preventing developers from executing various advanced computational workloads. Common platform bottlenecks include restricted low-level network and protocol controls, the absence of headless browser environments for dynamic web rendering, the inability to run native binaries for media transcoding or signal processing, the lack of modern compilers and build toolchains, and strict platform quotas on execution duration and payload sizes. The objective of this article is to introduce a generalized architecture that bridges GAS with a full-featured Linux sandbox provisioned by Gemini Managed Agents, demonstrating how developers can seamlessly offload otherwise impossible workloads to a dedicated cloud compute environment with high throughput and complete autonomy.</p>
+<p>By integrating Google Apps Script with Gemini Managed Agents, GAS gains access to a dedicated Linux container (4 vCPU, 16 GB RAM) featuring Python 3.12, Node.js 22, and standard Linux package managers (<code>apt</code>, <code>npm</code>, <code>pip</code>). In this article, I present an end-to-end architecture and client library that enables GAS to orchestrate complex tasks inside a persistent Linux sandbox, eliminating local processing overhead by streaming generated artifacts directly to Google Drive via the <a href="https://github.com/tanaikech/ggsrun">ggsrun</a> CLI tool.</p>
+<h2 id="architectural-paradigm-why-direct-cloud-to-cloud-streaming">Architectural Paradigm: Why Direct Cloud-to-Cloud Streaming?</h2>
+<p>When generating large files (such as high-resolution screenshots, audio waveforms, or bundled JavaScript) inside a Managed Agent sandbox and transferring them to Google Drive, returning raw binary data as Base64 strings through the Gemini API response to GAS introduces severe platform bottlenecks:</p>
+<ul>
+<li><strong>GAS URL Fetch Response Limit</strong>: Google Apps Script enforces a strict 50 MB response payload limit on <code>UrlFetchApp</code>. <a href="https://developers.google.com/apps-script/guides/services/quotas">Ref</a></li>
+<li><strong>Code Execution Output Buffer Truncation</strong>: The Gemini Interactions API code execution environment imposes standard output (stdout) buffer limits, truncating multi-megabyte Base64 payloads mid-stream. <a href="https://ai.google.dev/gemini-api/docs/code-execution">Ref</a></li>
+<li><strong>Rate Limits and Conversational Token Inflation</strong>: Gemini Managed Agents enforce a 200,000 Tokens Per Minute (TPM) quota. <a href="https://ai.google.dev/gemini-api/docs/rate-limits">Ref</a> Base64 encoding inflates binary size by ~33%. In multi-turn sessions, accumulating previous Base64 output strings in conversation history rapidly exhausts input token quotas, triggering immediate <code>429 Quota Exceeded</code> errors.</li>
+<li><strong>CPU and Memory Overhead on GAS</strong>: Decoding multi-megabyte Base64 strings and creating Drive blobs inside Apps Script consumes valuable execution time and script memory.</li>
+</ul>
+<p><img src="https://tanaikech.github.io/image-storage/20260830a/fig1_architectural_comparison.jpg"
+     alt="Figure 1: Architectural comparison between Base64 API transfer and direct cloud-to-cloud streaming via ggsrun"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<p>To eliminate these bottlenecks, the optimal approach is to execute the Go CLI tool <a href="https://github.com/tanaikech/ggsrun">ggsrun</a> directly inside the Linux sandbox using a dynamically injected OAuth access token (<code>ScriptApp.getOAuthToken()</code>). This allows the sandbox to stream binary artifacts directly to Google Drive over Google Cloud&rsquo;s internal backbone network at speeds exceeding 2 MB/s, completely bypassing Apps Script memory, API response size limits, and token quota exhaustion.</p>
+<h3 id="drastic-input-token-savings-via-bi-directional-streaming">Drastic Input Token Savings via Bi-directional Streaming</h3>
+<p>The advantages of direct cloud-to-cloud streaming extend far beyond outbound artifact uploads. When bringing large external datasets (high-resolution images, audio, video files, multi-gigabyte CSV/JSON datasets, or machine learning models) into the sandbox for processing, direct inbound downloads provide an equally critical advantage.</p>
+<p>Embedding large binary or structured datasets directly into API prompts as Base64 strings or serialized text rapidly consumes input token quotas, instantly hitting the 200,000 Tokens Per Minute (TPM) limit and triggering immediate <code>429 Quota Exceeded</code> errors. In contrast, by streaming files directly from Google Drive into the sandbox via <a href="https://github.com/tanaikech/ggsrun">ggsrun</a>, the prompt requires only a concise instruction (e.g., &ldquo;Download target dataset from Drive and analyze it&rdquo;). This architecture <strong>reduces input token consumption to virtually zero, completely preventing rate-limit exhaustion</strong>.</p>
+<h3 id="process-cost-reduction-via-shared-persistent-sandboxes">Process Cost Reduction via Shared Persistent Sandboxes</h3>
+<p>Furthermore, sharing a single persistent Linux sandbox (<code>environmentId</code>) across multiple clients—including Google Apps Script, local Node.js workstations, Python scripts, and CI/CD pipelines—dramatically lowers operational process costs.</p>
+<p>By staging common master datasets, corpora, libraries, or pre-trained models inside the persistent sandbox filesystem (<code>/workspace/</code>), any client can immediately leverage those shared assets to generate content and execute complex processing. This eliminates the redundant overhead of uploading or re-initializing datasets on every execution turn, <strong>significantly reducing execution latency, network bandwidth, and cumulative API overhead</strong>.</p>
+<p>Furthermore, provisioning a single persistent Linux sandbox and sharing its unique <code>environmentId</code> across multiple script executions, Google Apps Script projects, and local developer workstations eliminates redundant initialization overhead and allows multiple tasks to reuse shared working files and pre-installed packages seamlessly.</p>
+<h2 id="workflow">Workflow</h2>
+<p>The following diagram illustrates the complete end-to-end architecture where Google Apps Script and local Node.js workstations orchestrate a single persistent Linux sandbox using a shared <code>environmentId</code>, leveraging bi-directional streaming (Inbound download / Outbound upload) and shared master datasets for instant content generation.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260830a/fig2_workflow_architecture.jpg"
+     alt="Figure 2: End-to-end bi-directional workflow and shared persistent sandbox architecture"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<p><strong>Figure 2 Narrative</strong>: The diagram outlines the data integration and execution pipelines across cloud and local environments:</p>
+<ul>
+<li><strong>Multi-Client Orchestration</strong>: Cloud-based Google Apps Script (synchronous trigger, dynamic OAuth token) and local Node.js workstations (real-time SSE streaming, <code>gcloud</code> CLI auth) orchestrate the exact same remote container via a shared <code>environmentId</code>.</li>
+<li><strong>Shared Data Repository &amp; Pre-installed Toolchains</strong>: The persistent sandbox (4 vCPU / 16 GB RAM) retains shared master datasets and build tools (Playwright, FFmpeg, esbuild), enabling instant content generation without redundant data re-upload overhead.</li>
+<li><strong>Inbound Direct Download (<code>ggsrun download</code>)</strong>: Streams large external datasets directly from Google Drive into the sandbox, eliminating prompt data embedding and preserving input token quotas (200k TPM safe).</li>
+<li><strong>Outbound Direct Upload (<code>ggsrun upload</code>)</strong>: Streams generated binary deliverables directly to Google Drive at 2+ MB/s, completely bypassing GAS 50 MB payload limits and stdout buffer truncation.</li>
+</ul>
+<h2 id="repository">Repository</h2>
+<p>All source code, GAS classes, Node.js stream clients, test suites, and raw execution logs are available in the GitHub repository:</p>
+<ul>
+<li><a href="https://github.com/tanaikech/managed-agents-gas">GitHub Repository: tanaikech/managed-agents-gas</a></li>
+</ul>
+<h2 id="usage">Usage</h2>
+<h3 id="1-obtain-gemini-api-key">1. Obtain Gemini API Key</h3>
+<p>Generate an API key from Google AI Studio. <a href="https://ai.google.dev/gemini-api/docs/api-key">Ref</a> This API key authenticates requests to the Gemini v1beta Interactions and Environments APIs.</p>
+<h3 id="2-create-google-apps-script-project">2. Create Google Apps Script Project</h3>
+<p>Create a Google Apps Script project using either of the following methods: <a href="https://developers.google.com/apps-script/guides/projects">Ref</a></p>
+<ul>
+<li><strong>Standalone Project</strong>: Visit <a href="https://script.google.com">script.google.com</a> and click <strong>New project</strong>.</li>
+<li><strong>Container-bound Project</strong>: Open a Google Sheet, Doc, or Form, click <strong>Extensions</strong>, and select <strong>Apps Script</strong>.</li>
+</ul>
+<h3 id="3-deploy-client-scripts--set-script-properties">3. Deploy Client Scripts &amp; Set Script Properties</h3>
+<p>Copy the following files from the repository into your Apps Script editor:</p>
+<ul>
+<li><a href="https://github.com/tanaikech/managed-agents-gas/blob/main/gas-src/ManagedAgentSandboxClient.js"><code>ManagedAgentSandboxClient.js</code></a>: Core client class managing sandbox lifecycle, dynamic environment variables, session persistence in <code>PropertiesService</code>, and intelligent 429 rate-limit backoff.</li>
+<li><a href="https://github.com/tanaikech/managed-agents-gas/blob/main/gas-src/tests.js"><code>tests.js</code></a>: Master test suite covering sandbox provisioning, tooling verification, media processing, web scraping, and performance benchmarks.</li>
+</ul>
+<p>Navigate to <strong>Project Settings</strong> &gt; <strong>Script Properties</strong> and add your API key: <a href="https://developers.google.com/apps-script/guides/properties#manage_script_properties_manually">Ref</a></p>
+<ul>
+<li>Property: <code>GEMINI_API_KEY</code></li>
+<li>Value: <em>Your Gemini API Key</em></li>
+</ul>
+<h3 id="4-required-authorization-scopes">4. Required Authorization Scopes</h3>
+<p>Ensure your project manifest (<code>appsscript.json</code>) includes the necessary OAuth scopes:</p>
+<ul>
+<li><code>https://www.googleapis.com/auth/script.external_request</code>: Required for <code>UrlFetchApp</code> API communication.</li>
+<li><code>https://www.googleapis.com/auth/drive</code>: Required for creating destination folders and uploading artifacts. (If using existing folders without <code>DriveApp.createFolder()</code>, <code>https://www.googleapis.com/auth/drive.file</code> can be used).</li>
+</ul>
+<h2 id="testing-on-cloud-google-apps-script">Testing on Cloud (Google Apps Script)</h2>
+<p>Execution logs for all tests can be verified in <a href="https://github.com/tanaikech/managed-agents-gas/blob/main/gas-src/execution-logs.md">gas-src/execution-logs.md</a>.</p>
+<h3 id="1-provisioning-a-unified-linux-sandbox">1. Provisioning a Unified Linux Sandbox</h3>
+<p>Executing <code>provisionSharedSandbox()</code> initializes a new remote Linux container, installs all required CLI utilities and dependencies, configures destination Google Drive paths, and saves the resulting <code>environmentId</code> in <code>PropertiesService</code>.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260830a/fig3_provisioning_sandbox.jpg"
+     alt="Figure 3: Technical infographic of provisioning a unified persistent Linux sandbox via Google Apps Script"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<p><strong>Figure 3 Narrative</strong>: The infographic details the 4-step provisioning pipeline. In Step 1, Google Drive creates destination directory <code>ManagedAgent_Artifacts_YYYYMMDD</code>. In Step 2, a 4 vCPU / 16 GB RAM Linux container bootstraps <code>ggsrun</code>, <code>ffmpeg</code>, <code>sox</code>, <code>jq</code>, <code>typescript</code>, <code>esbuild</code>, and Playwright (Chromium). In Step 3, the sandbox validates installed binaries and emits a <code>READY</code> status. In Step 4, the unique <code>environmentId</code> is persisted under <code>SHARED_SANDBOX_SESSION</code> in <code>PropertiesService</code> for multi-test and cross-client reuse.</p>
+<ul>
+<li>Step 1: Destination folder <code>ManagedAgent_Artifacts_YYYYMMDD</code> is created in Google Drive.</li>
+<li>Step 2: An initialization prompt dispatches commands to download <code>ggsrun</code>, install <code>ffmpeg</code>, <code>sox</code>, <code>jq</code>, <code>typescript</code>, <code>esbuild</code>, and configure headless Chromium via Playwright.</li>
+<li>Step 3: The sandbox validates tool installations and returns a <code>READY</code> status.</li>
+<li>Step 4: The persistent <code>environmentId</code> is stored under <code>SHARED_SANDBOX_SESSION</code> in <code>PropertiesService</code> for subsequent test reuse.</li>
+</ul>
+<p>Running <code>testListSandboxes()</code> queries the Environments API to confirm active sandbox status and metadata.</p>
+<h3 id="2-test-1-user-agent-customization--posix-socket-verification-runtest1_useragentcomparison">2. Test 1: User-Agent Customization &amp; POSIX Socket Verification (<code>runTest1_UserAgentComparison</code>)</h3>
+<p>This test demonstrates that while GAS <code>UrlFetchApp</code> automatically overwrites custom HTTP <code>User-Agent</code> headers with Google&rsquo;s proxy identity string, the Managed Agent sandbox preserves arbitrary header configurations via raw POSIX sockets and native <code>curl</code>.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260830a/fig4_test1_user_agent.jpg"
+     alt="Figure 4: Technical infographic of HTTP User-Agent header behavior comparison between Google Apps Script and Linux Sandbox"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<p><strong>Figure 4 Narrative</strong>: The diagram illustrates the request and response paths when sending a custom <code>User-Agent: sample user agent</code> header to <code>httpbin.org/anything</code>. In Google Apps Script (left), platform proxy policies enforce header substitution (❌). In contrast, the Linux sandbox using <code>curl</code> (right) retains the exact custom header string via raw POSIX socket transmission (✅). An autonomous inline Python script compares the reflected JSON payloads and outputs the verification matrix.</p>
+<ul>
+<li>Step 1: GAS sends an HTTP GET request to <code>https://httpbin.org/anything</code> specifying <code>User-Agent: sample user agent</code>.</li>
+<li>Step 2: The sandbox executes an identical <code>curl</code> request to the same endpoint and compares the reflected JSON payloads using an inline Python script.</li>
+<li>Summary of Execution: The comparison confirms that GAS replaced the header with <code>Mozilla/5.0 (compatible; Google-Apps-Script; beanserver; ...)</code>, whereas the Linux sandbox preserved the exact <code>sample user agent</code> header string.</li>
+</ul>
+<h3 id="3-test-2-ggsrun-deployment--drive-direct-access-verification-runtest2_ggsrundirectdeployment">3. Test 2: <code>ggsrun</code> Deployment &amp; Drive Direct Access Verification (<code>runTest2_GgsrunDirectDeployment</code>)</h3>
+<p>This test validates Google Drive authentication and direct access via <a href="https://github.com/tanaikech/ggsrun">ggsrun</a> inside the sandbox by dynamically injecting a fresh OAuth access token (<code>ScriptApp.getOAuthToken()</code>) into the execution turn.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260830a/fig5_test2_ggsrun_drive.jpg"
+     alt="Figure 5: Technical infographic of dynamic OAuth token injection and ggsrun direct Google Drive deployment"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<p><strong>Figure 5 Narrative</strong>: The infographic outlines the three execution steps of dynamic authentication and CLI offloading. In Step 1, GAS extracts <code>ScriptApp.getOAuthToken()</code> and dynamically injects it into the execution turn&rsquo;s <code>GGSRUN_AT</code> environment variable (eliminating 1-hour token expiration risks). In Step 2, the sandbox generates a verification file and uploads it via <code>ggsrun upload</code>. In Step 3, <code>ggsrun searchfiles</code> executes a folder query, confirming all 9 artifacts in 12.1 seconds.</p>
+<ul>
+<li>Step 1: A verification file <code>00_ggsrun_verification.txt</code> is created inside <code>/workspace/test2/</code>.</li>
+<li>Step 2: <code>ggsrun upload</code> uploads the file directly to the designated Google Drive folder using non-blocking overwrite mode (<code>--nc --cm OverwriteIfNewer -j</code>).</li>
+<li>Step 3: <code>ggsrun searchfiles</code> queries the destination folder to confirm file existence and returns structured metadata.</li>
+<li>Summary of Execution: The file was created, uploaded, and verified in Google Drive in 12.1 seconds, confirming full workspace interoperability without persisting sensitive access tokens across sessions.</li>
+</ul>
+<h3 id="4-test-3-playwright-headless-scraping-to-direct-drive-upload-runtest3_playwrightdirectupload">4. Test 3: Playwright Headless Scraping to Direct Drive Upload (<code>runTest3_PlaywrightDirectUpload</code>)</h3>
+<p>This test executes an automated headless Chromium browser session to scrape dynamic JavaScript content and capture multi-viewport screenshots.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260830a/fig6_test3_playwright_scraping.jpg"
+     alt="Figure 6: Technical infographic of headless browser scraping with Playwright and bulk direct upload to Google Drive"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<p><strong>Figure 6 Narrative</strong>: The diagram depicts headless Chromium (Playwright) rendering dynamic JavaScript pages within the sandbox to capture multi-viewport screenshots (Desktop 1280x800: 92.5 KB, Mobile 375x812: 51.6 KB, Paginated Page 2: 171.9 KB) alongside structured quote JSON (4.1 KB), totaling ~320 KB across 4 artifacts. Bypassing Base64 API conversion, all files are streamed directly to Google Drive via <code>ggsrun upload</code> in a single command, completing in 20.4 seconds.</p>
+<ul>
+<li>Step 1: A Node.js Playwright script navigates to a JavaScript-rendered quote website (<code>quotes.toscrape.com/js/</code>).</li>
+<li>Step 2: Playwright captures full-page Desktop (1280x800) and Mobile iPhone emulation (375x812) screenshots of Page 1.</li>
+<li>Step 3: Playwright clicks pagination controls, captures a Desktop screenshot of Page 2, and extracts structured quote data into <code>02_Page2_Quotes.json</code>.</li>
+<li>Step 4: <code>ggsrun upload</code> transfers all 3 PNG images and the JSON dataset directly to Google Drive in a single command.</li>
+<li>Summary of Execution: All 4 artifacts (totaling ~320 KB) were generated and uploaded in 20.4 seconds, successfully rendering client-side JavaScript that GAS cannot parse natively.</li>
+</ul>
+<h3 id="5-test-4-ffmpeg-audio-synthesis--transcoding-to-direct-drive-upload-runtest4_ffmpegaudiodirectupload">5. Test 4: FFmpeg Audio Synthesis &amp; Transcoding to Direct Drive Upload (<code>runTest4_FFmpegAudioDirectUpload</code>)</h3>
+<p>This test executes native digital signal processing inside the sandbox using FFmpeg and SoX to synthesize multi-tone audio chords.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260830a/fig7_test4_ffmpeg_audio.jpg"
+     alt="Figure 7: Technical infographic of multi-tone audio synthesis with FFmpeg and direct Google Drive upload"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<p><strong>Figure 7 Narrative</strong>: The infographic illustrates the digital signal processing (DSP) pipeline inside the Linux sandbox. Three sine wave generators (440 Hz / A4, 554.37 Hz / C#5, 659.25 Hz / E5) are combined through the <code>ffmpeg</code> <code>amix</code> filter complex into a 3-second harmonic major chord MP3 (73.4 KB), while <code>ffprobe</code> extracts stream metadata into JSON (1.8 KB). Both binary audio and JSON analysis are streamed directly to Google Drive via <code>ggsrun</code> in 9.1 seconds.</p>
+<ul>
+<li>Step 1: <code>ffmpeg</code> synthesizes a 3-second harmonic major chord MP3 by combining three sine waves (440 Hz, 554.37 Hz, and 659.25 Hz) through an <code>amix</code> audio filter complex.</li>
+<li>Step 2: <code>ffprobe</code> analyzes the output stream and extracts waveform metadata into <code>03_Audio_Analysis.json</code>.</li>
+<li>Step 3: <code>ggsrun upload</code> uploads <code>03_Chord_Major.mp3</code> (73.4 KB) and <code>03_Audio_Analysis.json</code> (1.8 KB) directly to Google Drive.</li>
+<li>Summary of Execution: High-fidelity audio synthesis, metadata extraction, and Drive upload completed in 9.1 seconds.</li>
+</ul>
+<h3 id="6-test-5-typescript-ast-extraction--esbuild-bundling-to-direct-drive-upload-runtest5_typescriptastdirectupload">6. Test 5: TypeScript AST Extraction &amp; <code>esbuild</code> Bundling to Direct Drive Upload (<code>runTest5_TypeScriptASTDirectUpload</code>)</h3>
+<p>This test demonstrates modern JavaScript/TypeScript build tooling inside the sandbox environment.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260830a/fig8_test5_typescript_build.jpg"
+     alt="Figure 8: Technical infographic of TypeScript AST extraction and high-speed esbuild compilation with direct Drive upload"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<p><strong>Figure 8 Narrative</strong>: The diagram outlines the dual build toolchains operating on TypeScript source code (<code>matrix.ts</code>). The first branch employs the official TypeScript Compiler API to parse the Abstract Syntax Tree (AST) and export interface schemas (<code>04_TypeScript_AST.json</code>: 152 B). The second branch leverages <code>esbuild</code> to compile a standalone IIFE bundle (<code>04_Matrix_Bundle.iife.js</code>: 1.2 KB) in just 13 milliseconds. Both deliverables are offloaded to Google Drive via <code>ggsrun</code> in 10.0 seconds.</p>
+<ul>
+<li>Step 1: A TypeScript module (<code>matrix.ts</code>) defining generic classes and interfaces is written to <code>/workspace/test5/</code>.</li>
+<li>Step 2: A Node.js script utilizes the official TypeScript Compiler API to parse the AST and export interface and method schemas into <code>04_TypeScript_AST.json</code>.</li>
+<li>Step 3: <code>esbuild</code> bundles and minifies <code>matrix.ts</code> into a standalone IIFE JavaScript bundle (<code>04_Matrix_Bundle.iife.js</code>).</li>
+<li>Step 4: <code>ggsrun upload</code> transfers both the AST schema and the bundled JavaScript to Google Drive.</li>
+<li>Summary of Execution: AST parsing, bundle compilation (13 ms build time), and Drive upload completed in 10.0 seconds.</li>
+</ul>
+<h3 id="7-test-6-performance-benchmark-direct-ggsrun-upload-vs-base64-via-gas-runtest6_driveuploadperformancecomparison">7. Test 6: Performance Benchmark: Direct <code>ggsrun</code> Upload vs. Base64 via GAS (<code>runTest6_DriveUploadPerformanceComparison</code>)</h3>
+<p>This benchmark evaluates transferring a binary payload (10,000 bytes) from the sandbox to Google Drive across two distinct methods:</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260830a/fig9_test6_performance_benchmark.jpg"
+     alt="Figure 9: Performance benchmark comparison infographic: Direct ggsrun streaming vs. Base64 transfer via Gemini API"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<p><strong>Figure 9 Narrative</strong>: The benchmark infographic compares Approach A (direct <code>ggsrun</code> streaming) against Approach B (Base64 transfer via API -&gt; GAS decode). Approach A finished in 16.20 seconds (0.60 KB/s, zero GAS CPU usage), proving to be <strong>1.98x faster</strong> than Approach B (32.13 seconds, 0.30 KB/s, 1.23 s GAS CPU). Approach A completely eliminates Base64 payload inflation (~33%) and prevents multi-turn conversational token exhaustion.</p>
+<ul>
+<li><strong>Approach A (Direct <code>ggsrun</code> Upload)</strong>: The sandbox generates a 10 KB binary file from <code>/dev/urandom</code> and streams it directly to Google Drive via <code>ggsrun</code> in a single interaction turn (<code>freshInteraction: true</code>).</li>
+<li><strong>Approach B (Base64 Transfer via API -&gt; GAS Blob Save)</strong>: The sandbox encodes the 10 KB binary into Base64, returns it through the Gemini API response text, and GAS decodes the string and saves the file to Drive.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>================================================================================
+</span></span><span style="display:flex;"><span>PERFORMANCE BENCHMARK REPORT: 10,000 BYTES FILE TRANSFER TO GOOGLE DRIVE
+</span></span><span style="display:flex;"><span>================================================================================
+</span></span><span style="display:flex;"><span>| Metric                       | Approach A: Direct ggsrun Upload | Approach B: Base64 via Gemini API -&gt; GAS |
+</span></span><span style="display:flex;"><span>| :--------------------------- | :------------------------------- | :--------------------------------------- |
+</span></span><span style="display:flex;"><span>| Transfer Method              | Direct Sandbox-to-Drive (Go CLI) | Base64 Stream -&gt; GAS -&gt; Drive            |
+</span></span><span style="display:flex;"><span>| Drive File Name              | benchmark_10kb_ggsrun.bin        | benchmark_10kb_gas.bin                   |
+</span></span><span style="display:flex;"><span>| Verified File Size           | 10,000 bytes (9.77 KB)           | 10,000 bytes (9.77 KB)                   |
+</span></span><span style="display:flex;"><span>| API Turns Required           | 1 Turn (Direct Offload)          | 1 Turn (Base64 Retrieval)                |
+</span></span><span style="display:flex;"><span>| Local GAS Processing Time    | 0.00 s (Zero CPU overhead)       | 1.23 s (Base64 Decode &amp; Blob Creation)   |
+</span></span><span style="display:flex;"><span>| Total End-to-End Duration    | 16.20 s                          | 32.13 s                                  |
+</span></span><span style="display:flex;"><span>| Effective Throughput         | 0.60 KB/s                        | 0.30 KB/s                                |
+</span></span><span style="display:flex;"><span>| Performance Multiplier       | 1.98x FASTER                     | Baseline (Higher Latency &amp; Token Usage)  |
+</span></span><span style="display:flex;"><span>================================================================================
+</span></span></code></pre></div><p>Summary of Benchmark Findings: Direct streaming via <code>ggsrun</code> was <strong>1.98x faster</strong>, eliminated 100% of Apps Script CPU/memory decoding overhead, and prevented conversational token quota consumption. For multi-megabyte payloads, this direct streaming architecture is essential to prevent <code>429 Quota Exceeded</code> errors.</p>
+<h2 id="testing-on-local-workstations-nodejs-stream-runner">Testing on Local Workstations (Node.js Stream Runner)</h2>
+<p>To demonstrate cross-platform interoperability enabling developers to control the exact same persistent Linux sandbox from both Google Apps Script and local workstations, a high-performance Node.js client powered by Server-Sent Events (SSE) streaming was implemented. <a href="https://github.com/tanaikech/managed-agents-gas/tree/main/local-node.js-src">Ref</a></p>
+<h3 id="1-purpose-and-advantages-of-the-local-stream-runner">1. Purpose and Advantages of the Local Stream Runner</h3>
+<p>While Google Apps Script operates under a synchronous blocking execution model where agent events are aggregated at the end of the HTTP request, the local Node.js runner (built with the <code>@google/genai</code> SDK) provides significant developer benefits:</p>
+<ul>
+<li><strong>Real-Time Lifecycle Visibility (SSE Streaming)</strong>: Streams internal reasoning steps (<code>thought</code>), executed shell commands (<code>code_execution_call</code>), sandbox standard output/error (<code>code_execution_result</code>), and model text (<code>model_output</code>) live to the terminal with ANSI color coding.</li>
+<li><strong>Interactive Hybrid Development Workflow</strong>: Enables developers to prototype, debug, and calibrate agent prompts and toolchains locally with real-time feedback before deploying them into automated, hands-off Google Apps Script triggers.</li>
+<li><strong>Zero-Friction Sandbox Sharing (GAS ↔ Local)</strong>: By simply setting <code>ENVIRONMENT_ID</code> in a local <code>.env</code> file to the identifier generated during Apps Script provisioning, the local client immediately attaches to the existing container, sharing all pre-installed packages, compiled binaries, and workspace files without re-installation overhead.</li>
+<li><strong>Automated OAuth Token Integration</strong>: Dynamically extracts fresh Google OAuth access tokens via the Google Cloud SDK (<code>gcloud auth print-access-token</code>) and injects them into <code>GGSRUN_AT</code>, executing direct-to-Drive file uploads identically to Apps Script without manual credential copying.</li>
+</ul>
+<h3 id="2-local-setup-and-test-execution">2. Local Setup and Test Execution</h3>
+<p>Local test suites can be executed through the following straightforward steps:</p>
+<ul>
+<li>Step 1: Clone the repository and install dependencies by running <code>npm install</code> inside the <code>local-node.js-src</code> directory.</li>
+<li>Step 2: Copy <code>.env.example</code> to <code>.env</code> and specify <code>GEMINI_API_KEY</code>, the persistent <code>ENVIRONMENT_ID</code>, and the destination <code>TARGET_FOLDER_ID</code>.</li>
+<li>Step 3: Run <code>npm test</code> (or individual tests <code>npm run test:1</code> through <code>test:6</code>) to monitor agent execution in real-time.</li>
+<li>Step 4: When testing is complete, run <code>npm run test:teardown</code> to safely purge the remote sandbox environment and release cloud resources.</li>
+</ul>
+<p>Full raw execution transcripts with live streaming outputs can be reviewed in <a href="https://github.com/tanaikech/managed-agents-gas/blob/main/local-node.js-src/execution-logs.md">local-node.js-src/execution-logs.md</a>, confirming 100% functional parity with Google Apps Script executions.</p>
+<h2 id="appendix-gemini-managed-agents-api-usage-patterns">Appendix: Gemini Managed Agents API Usage Patterns</h2>
+<p>The following patterns summarize common interaction models when working with the Gemini v1beta Interactions and Environments API:</p>
+<h3 id="base-endpoint">Base Endpoint</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-http" data-lang="http"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">POST https://generativelanguage.googleapis.com/v1beta/interactions?key=${API_KEY}
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">Content-Type: application/json
+</span></span></span></code></pre></div><h3 id="scenario-1-sharing-a-single-persistent-sandbox-across-multiple-clients">Scenario 1: Sharing a Single Persistent Sandbox Across Multiple Clients</h3>
+<p>Provision a remote environment once by setting <code>environment.type</code> to <code>&quot;remote&quot;</code>. Save the returned <code>environment_id</code> and pass it as a string in subsequent requests across any client (GAS, Node.js, Python, or CI/CD).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;agent&#34;</span>: <span style="color:#e6db74">&#34;antigravity-preview-05-2026&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;input&#34;</span>: <span style="color:#e6db74">&#34;Run task in shared container...&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;environment&#34;</span>: <span style="color:#e6db74">&#34;environments/env-12345&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="scenario-2-using-isolated-sandboxes-per-execution">Scenario 2: Using Isolated Sandboxes per Execution</h3>
+<p>Set <code>environment.type</code> to <code>&quot;remote&quot;</code> on every call when tasks require a completely fresh, isolated Linux environment.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;agent&#34;</span>: <span style="color:#e6db74">&#34;antigravity-preview-05-2026&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;input&#34;</span>: <span style="color:#e6db74">&#34;Execute client-specific isolated task...&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;environment&#34;</span>: {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;remote&#34;</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="scenario-3-preserving-multi-turn-conversational-context">Scenario 3: Preserving Multi-turn Conversational Context</h3>
+<p>Include <code>previous_interaction_id</code> when the agent must retain knowledge of prior reasoning, variables, or command outputs.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;agent&#34;</span>: <span style="color:#e6db74">&#34;antigravity-preview-05-2026&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;input&#34;</span>: <span style="color:#e6db74">&#34;Based on the previous output, proceed to step 2...&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;environment&#34;</span>: <span style="color:#e6db74">&#34;environments/env-12345&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;previous_interaction_id&#34;</span>: <span style="color:#e6db74">&#34;interaction-prev-67890&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="scenario-4-reusing-sandbox-with-fresh-context-freshinteraction">Scenario 4: Reusing Sandbox with Fresh Context (<code>freshInteraction</code>)</h3>
+<p>Specify the existing <code>environment_id</code> and <strong>omit <code>previous_interaction_id</code></strong>. This preserves all files and installed tools on the Linux container while resetting conversation history to zero tokens, preventing TPM rate-limit exhaustion.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;agent&#34;</span>: <span style="color:#e6db74">&#34;antigravity-preview-05-2026&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;input&#34;</span>: <span style="color:#e6db74">&#34;Execute a completely new task in the existing sandbox...&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;environment&#34;</span>: <span style="color:#e6db74">&#34;environments/env-12345&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="summary-matrix">Summary Matrix</h3>
+<p><img src="https://tanaikech.github.io/image-storage/20260830a/fig10_appendix_api_matrix.jpg"
+     alt="Figure 10: Summary matrix of Gemini Managed Agents API interaction scenarios and context management models"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<h2 id="summary">Summary</h2>
+<p>This article introduced an enterprise-grade architecture integrating Google Apps Script with Gemini Managed Agents (Linux sandboxes) to fundamentally transcend traditional serverless runtime constraints. By combining persistent remote sandboxes with bi-directional direct cloud-to-cloud streaming via <a href="https://github.com/tanaikech/ggsrun">ggsrun</a>, developers can achieve advanced processing capabilities previously impossible in Apps Script while avoiding API payload limitations and conversational token rate quotas.</p>
+<ul>
+<li><strong>Overcame Apps Script Limits</strong>: Enabled advanced workloads requiring native Linux environments—such as headless browser scraping (Playwright), audio synthesis (FFmpeg), and TypeScript compilation (<code>esbuild</code>)—directly from Google Apps Script.</li>
+<li><strong>Autonomous Fusion of AI Reasoning &amp; Linux Execution</strong>: Transcended static external command execution by uniting Gemini&rsquo;s cognitive reasoning with native Linux shell autonomy, enabling dynamic command synthesis, runtime code execution, and autonomous self-correction across complex workflows.</li>
+<li><strong>Bi-directional Streaming Token &amp; Payload Optimization</strong>: In addition to direct artifact uploads, streaming large input datasets directly from Drive into the sandbox eliminates prompt data embedding and Base64 conversion, minimizing input/output token usage to bypass GAS 50 MB limits and the 200,000 TPM rate quota.</li>
+<li><strong>Process Cost Reduction via Shared Sandboxes</strong>: Staging and sharing the container filesystem and common master datasets across clients eliminates redundant data re-upload and tooling setup overhead per task, substantially reducing execution latency and bandwidth costs.</li>
+<li><strong>Empirically Proven 2x Performance Acceleration &amp; Zero Memory Footprint</strong>: Validated through benchmarks that direct cloud-to-cloud CLI streaming is 1.98x faster than traditional API Base64 retrieval while imposing zero CPU decoding load or local memory consumption on Google Apps Script.</li>
+</ul>
+
+  
+  <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2026%2f08%2f30%2ftaking-advantage-of-gemini-managed-agents-with-google-apps-script%2f" target="_blank" title="Share on Facebook"><i class="fab fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2026%2f08%2f30%2ftaking-advantage-of-gemini-managed-agents-with-google-apps-script%2f" target="_blank" title="Tweet"><i class="fab fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f08%2f30%2ftaking-advantage-of-gemini-managed-agents-with-google-apps-script%2f" target="_blank" title="Share on Google+"><i class="fab fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2026%2f08%2f30%2ftaking-advantage-of-gemini-managed-agents-with-google-apps-script%2f" target="_blank" title="Post to Tumblr"><i class="fab fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f08%2f30%2ftaking-advantage-of-gemini-managed-agents-with-google-apps-script%2f" target="_blank" title="Pin it"><i class="fab fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f08%2f30%2ftaking-advantage-of-gemini-managed-agents-with-google-apps-script%2f" target="_blank" title="Submit to Reddit"><i class="fab fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
+
+
+  
+<nav class="prev-next-posts">
+  <div class="prev-post">
+    
+      <span class="nav-label">Previous Article</span>
+      <a href="https://tanaikech.github.io/2026/08/21/redefining-the-role-of-google-apps-script-in-the-era-of-generative-ai/">Redefining the Role of Google Apps Script in the Era of Generative AI</a>
+    
+  </div>
+  <div class="next-post">
+    
+  </div>
+</nav>
+
+<style>
+.prev-next-posts {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+  gap: 2rem;
+}
+.prev-post, .next-post {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.next-post {
+  text-align: right;
+}
+.nav-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+.prev-next-posts a {
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-decoration: none;
+}
+@media (max-width: 600px) {
+  .prev-next-posts { flex-direction: column; text-align: left; }
+  .next-post { text-align: left; }
+}
+</style>
+
+
+  
+  
+  
+  
+
+  
+
+</div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-social"><a href="https://twitter.com/tanaikech" target="_blank" rel="me" title="twitter">
+                  <i class="fab fa-x-twitter"></i>
+                </a><a href="https://github.com/tanaikech" target="_blank" rel="me" title="github">
+                  <i class="fab fa-github"></i>
+                </a><a href="https://linkedin.com/in/tanaike" target="_blank" rel="me" title="linkedin">
+                  <i class="fab fa-linkedin"></i>
+                </a><a href="https://www.youtube.com/@tanaike" target="_blank" rel="me" title="youtube">
+                  <i class="fab fa-youtube"></i>
+                </a><a href="https://medium.com/@tanaike" target="_blank" rel="me" title="medium">
+                  <i class="fab fa-medium"></i>
+                </a><a href="https://stackoverflow.com/users/7108653" target="_blank" rel="me" title="stackoverflow">
+                  <i class="fab fa-stack-overflow"></i>
+                </a><a href="https://zenn.dev/tanaike" target="_blank" rel="me" title="zenn">
+                  <i class="fas fa-edit"></i>
+                </a><a href="https://dev.to/tanaike" target="_blank" rel="me" title="devto">
+                  <i class="fab fa-dev"></i>
+                </a><a href="https://devpost.com/tanaike" target="_blank" rel="me" title="devpost">
+                  <i class="fas fa-terminal"></i>
+                </a><a href="https://orcid.org/0009-0004-2510-1163" target="_blank" rel="me" title="orcid">
+                  <i class="fab fa-orcid"></i>
+                </a>
+      </div>
+      
+      <p class="copyright">
+        &copy; 2026 tanaike - Google Apps Script, Gemini API, and Developer Tips. Built with <a href="https://gohugo.io" target="_blank">Hugo</a>.
+      </p>
+    </div>
+  </footer>
+
+  <script src="https://tanaikech.github.io/js/eclipse.js"></script>
+
+  
+  
+
+  
+  
+
+  
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
+<script>
+  
+  if (window.location.hostname != "localhost") {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-J3Z6T50WL5');
+  }
+</script>
+
+
+
+  
+
+  
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"
+      onload="renderMathInElement(document.body, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '\\[', right: '\\]', display: true},
+          {left: '\\begin{equation}', right: '\\end{equation}', display: true},
+          {left: '\\begin{align}', right: '\\end{align}', display: true},
+          {left: '\\begin{alignat}', right: '\\end{alignat}', display: true},
+          {left: '\\begin{gather}', right: '\\end{gather}', display: true},
+          {left: '\\begin{CD}', right: '\\end{CD}', display: true},
+          {left: '$', right: '$', display: false},
+          {left: '\\(', right: '\\)', display: false}
+        ],
+        throwOnError: false,
+        ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      });"></script>
+
+</body>
+</html>
+
