@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Hugo 0.157.0">
+
+  
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+  
+  <meta name="theme-color" content="#050505">
+
+  
+  <meta name="google-site-verification" content="googleccbde819fe280caa.html" />
+
+  
+  
+
+  <meta name="keywords" content="Google Apps Script, Google Workspace, Cloud Run">
+
+  <meta name="description" content="Gists
+Deterministic Sub-Second Python and Bash Execution, Zero-Trust gVisor Isolation, and Zero Idle Cost
+
+
+Abstract
+While secure sandboxes are pivotal for running Generative AI-generated code safely, connecting Google Cloud Run Sandboxes (gVisor) directly to Google Apps Script unlocks a vastly broader horizon. Beyond executing AI-drafted scripts on the fly, this complementary architecture empowers Google Workspace with deterministic Python data science (Pandas, Seaborn) and Bash execution in 200–450 ms. With zero-trust micro-isolation, zero-token data ingestion, and zero idle cost, it elevates Workspace automations far beyond standard V8 runtime constraints.">
+
+  
+  <link rel="canonical" href="https://tanaikech.github.io/2026/09/10/taking-advantage-of-cloud-run-sandboxes-with-google-apps-script-for-google-workspace/">
+
+  
+  <title>Taking Advantage of Cloud Run Sandboxes with Google Apps Script for Google Workspace | tanaike - Google Apps Script, Gemini API, and Developer Tips</title>
+
+  
+  <meta property="og:title" content="Taking Advantage of Cloud Run Sandboxes with Google Apps Script for Google Workspace">
+  <meta property="og:description" content="Gists
+Deterministic Sub-Second Python and Bash Execution, Zero-Trust gVisor Isolation, and Zero Idle Cost
+
+
+Abstract
+While secure sandboxes are pivotal for running Generative AI-generated code safely, connecting Google Cloud Run Sandboxes (gVisor) directly to Google Apps Script unlocks a vastly broader horizon. Beyond executing AI-drafted scripts on the fly, this complementary architecture empowers Google Workspace with deterministic Python data science (Pandas, Seaborn) and Bash execution in 200–450 ms. With zero-trust micro-isolation, zero-token data ingestion, and zero idle cost, it elevates Workspace automations far beyond standard V8 runtime constraints.">
+  <meta property="og:url" content="https://tanaikech.github.io/2026/09/10/taking-advantage-of-cloud-run-sandboxes-with-google-apps-script-for-google-workspace/">
+  <meta property="og:site_name" content="tanaike - Google Apps Script, Gemini API, and Developer Tips">
+  <meta property="og:type" content="article"><meta property="og:image" content="https://tanaikech.github.io/img/og-main.png">
+
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@tanaikech">
+  <meta name="twitter:title" content="Taking Advantage of Cloud Run Sandboxes with Google Apps Script for Google Workspace">
+  <meta name="twitter:description" content="Gists
+Deterministic Sub-Second Python and Bash Execution, Zero-Trust gVisor Isolation, and Zero Idle Cost
+
+
+Abstract
+While secure sandboxes are pivotal for running Generative AI-generated code safely, connecting Google Cloud Run Sandboxes (gVisor) directly to Google Apps Script unlocks a vastly broader horizon. Beyond executing AI-drafted scripts on the fly, this complementary architecture empowers Google Workspace with deterministic Python data science (Pandas, Seaborn) and Bash execution in 200–450 ms. With zero-trust micro-isolation, zero-token data ingestion, and zero idle cost, it elevates Workspace automations far beyond standard V8 runtime constraints.">
+  <meta name="twitter:image" content="https://tanaikech.github.io/img/og-main.png">
+
+  
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [{
+        "@type": "BlogPosting",
+        "headline": "\"Taking Advantage of Cloud Run Sandboxes with Google Apps Script for Google Workspace\"",
+        "description": "\"\\u003cp\\u003e\\u003ca href=\\\"https://gist.github.com/tanaikech/769d00f589a672e36a9317a323daad07\\\"\\u003eGists\\u003c/a\\u003e\\u003c/p\\u003e\\n\\u003ch3 id=\\\"deterministic-sub-second-python-and-bash-execution-zero-trust-gvisor-isolation-and-zero-idle-cost\\\"\\u003eDeterministic Sub-Second Python and Bash Execution, Zero-Trust gVisor Isolation, and Zero Idle Cost\\u003c/h3\\u003e\\n\\u003cp\\u003e\\u003cimg src=\\\"https://tanaikech.github.io/image-storage/20260910a/fig1.jpg\\\"\\n     alt=\\\"top image\\\"\\n     \\n     loading=\\\"lazy\\\"\\n     decoding=\\\"async\\\"\\u003e\\n\\u003c/p\\u003e\\n\\u003ch2 id=\\\"abstract\\\"\\u003eAbstract\\u003c/h2\\u003e\\n\\u003cp\\u003eWhile secure sandboxes are pivotal for running Generative AI-generated code safely, connecting Google Cloud Run Sandboxes (gVisor) directly to Google Apps Script unlocks a vastly broader horizon. Beyond executing AI-drafted scripts on the fly, this complementary architecture empowers Google Workspace with deterministic Python data science (Pandas, Seaborn) and Bash execution in 200–450 ms. With zero-trust micro-isolation, zero-token data ingestion, and zero idle cost, it elevates Workspace automations far beyond standard V8 runtime constraints.\\u003c/p\\u003e\"",
+        "url": "\"https://tanaikech.github.io/2026/09/10/taking-advantage-of-cloud-run-sandboxes-with-google-apps-script-for-google-workspace/\"",
+        "datePublished": "\"2026-09-10T11:08:12+09:00\"",
+        "dateModified": "\"2026-09-10T11:08:12+09:00\"",
+        "wordCount":  4848 ,
+        "author": {
+          "@id": "https:\/\/tanaikech.github.io\/#person"
+        },
+        "publisher": {
+          "@id": "https:\/\/tanaikech.github.io\/#person"
+        },
+        "image": {
+          "@type": "ImageObject",
+          "url": "\"https://tanaikech.github.io/img/og-main.png\"",
+          "width": 1200,
+          "height": 630
+        },
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "\"https://tanaikech.github.io/2026/09/10/taking-advantage-of-cloud-run-sandboxes-with-google-apps-script-for-google-workspace/\""
+        }
+      },{
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "\"https://tanaikech.github.io/\""
+          },{
+            "@type": "ListItem",
+            "position": 2,
+            "name": "\"Taking Advantage of Cloud Run Sandboxes with Google Apps Script for Google Workspace\"",
+            "item": "\"https://tanaikech.github.io/2026/09/10/taking-advantage-of-cloud-run-sandboxes-with-google-apps-script-for-google-workspace/\""
+          }]
+      },      {
+        "@type": "Person",
+        "@id": "https:\/\/tanaikech.github.io\/#person",
+        "name": "Kanshi Tanaike",
+        "alternateName": "tanaike",
+        "url": "\"https://tanaikech.github.io/\"",
+        "image": "\"https://tanaikech.github.io/img/og-main.png\"",
+        "jobTitle": "Google Developer Expert",
+        "honorificPrefix": "Ph.D.",
+        "description": "Japanese scientist, Physicist and Google Developer Expert for Google Workspace.",
+        "award": "First place in the Outstanding GDE Award 2025",
+        "sameAs": [
+          "https://twitter.com/tanaikech",
+          "https://github.com/tanaikech",
+          "https://stackoverflow.com/users/7108653/tanaike",
+          "https://developers.google.com/community/experts/directory?text=tanaike",
+          "https://zenn.dev/tanaike",
+          "https://medium.com/@tanaike",
+          "https://orcid.org/0009-0004-2510-1163"
+        ]
+      }
+    ]
+  }
+  </script>
+
+  
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/eclipse.css">
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <link rel="shortcut icon" href="https://tanaikech.github.io/img/favicon.ico" type="image/x-icon" />
+  
+  
+  
+
+  
+  
+  
+</head>
+
+
+<body>
+  <div id="progress-bar"></div>
+  
+  <header class="site-header">
+    <div class="header-container">
+      
+      <div class="header-top">
+        <div class="site-title">
+          <a href="https://tanaikech.github.io/">TANAIKE</a>
+          
+            <div class="site-subtitle">The Thinker</div>
+          
+        </div>
+
+        
+        <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+
+      
+      <div id="mobile-menu" class="mobile-menu-content">
+        <div class="nav-row">
+          <div class="nav-links">
+            
+              <a href="https://tanaikech.github.io/about/" title="">
+                <i class='fa fa-user fa-fw'></i> About
+              </a>
+            
+              <a href="https://tanaikech.github.io/post/" title="">
+                <i class='fa fa-list fa-fw'></i> Articles
+              </a>
+            
+              <a href="https://tanaikech.github.io/topics/" title="">
+                <i class='fa fa-folder fa-fw'></i> Topics
+              </a>
+            
+              <a href="https://tanaikech.github.io/tags/" title="">
+                <i class='fa fa-tags fa-fw'></i> Tags
+              </a>
+            
+              <a href="https://tanaikech.github.io/contact/" title="">
+                <i class='fa fa-phone fa-fw'></i> Contact
+              </a>
+            
+              <a href="https://tanaikech.github.io/link/" title="">
+                <i class='fa fa-thumbs-up fa-fw'></i> Links
+              </a>
+            
+              <a href="https://tanaikech.github.io/webapps/" title="">
+                <i class='fas fa-toolbox'></i> Web Applications
+              </a>
+            
+              <a href="https://tanaikech.github.io/donate/" title="">
+                <i class='fas fa-donate'></i> Donate
+              </a>
+            
+              <a href="https://tanaikech.github.io/" title="">
+                <i class='fa fa-home fa-fw'></i> Home
+              </a>
+            
+          </div>
+        </div>
+
+        <div class="social-links-row"><a href="https://twitter.com/tanaikech" target="_blank" rel="me">
+                <i class="fab fa-x-twitter"></i> X
+              </a><a href="https://medium.com/@tanaike" target="_blank" rel="me">
+                <i class="fab fa-medium"></i> Medium
+              </a><a href="https://www.youtube.com/@tanaike" target="_blank" rel="me">
+                <i class="fab fa-youtube"></i> YouTube
+              </a><a href="https://linkedin.com/in/tanaike" target="_blank" rel="me">
+                <i class="fab fa-linkedin"></i> LinkedIn
+              </a><a href="https://github.com/tanaikech" target="_blank" rel="me">
+                <i class="fab fa-github"></i> GitHub
+              </a><a href="https://gist.github.com/tanaikech" target="_blank" rel="me">
+                <i class="fas fa-code"></i> Gists
+              </a><a href="https://stackoverflow.com/users/7108653" target="_blank" rel="me">
+                <i class="fab fa-stack-overflow"></i> Stack Overflow
+              </a><a href="https://dev.to/tanaike" target="_blank" rel="me">
+                <i class="fab fa-dev"></i> DEV
+              </a><a href="https://zenn.dev/tanaike" target="_blank" rel="me">
+                <i class="fas fa-edit"></i> Zenn
+              </a><a href="https://devpost.com/tanaike" target="_blank" rel="me">
+                <i class="fas fa-terminal"></i> Devpost
+              </a><a href="https://orcid.org/0009-0004-2510-1163" target="_blank" rel="me">
+                <i class="fab fa-orcid"></i> ORCID
+              </a></div>
+      </div>
+
+    </div>
+  </header>
+
+  <main id="main">
+
+
+<div class="header">
+  <h1>Taking Advantage of Cloud Run Sandboxes with Google Apps Script for Google Workspace</h1>
+  <h2></h2>
+</div>
+<div class="content">
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>10 Sep 2026, 11:08</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-workspace">Google Workspace</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/cloud-run">Cloud Run</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  <p><a href="https://gist.github.com/tanaikech/769d00f589a672e36a9317a323daad07">Gists</a></p>
+<h3 id="deterministic-sub-second-python-and-bash-execution-zero-trust-gvisor-isolation-and-zero-idle-cost">Deterministic Sub-Second Python and Bash Execution, Zero-Trust gVisor Isolation, and Zero Idle Cost</h3>
+<p><img src="https://tanaikech.github.io/image-storage/20260910a/fig1.jpg"
+     alt="top image"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<h2 id="abstract">Abstract</h2>
+<p>While secure sandboxes are pivotal for running Generative AI-generated code safely, connecting Google Cloud Run Sandboxes (gVisor) directly to Google Apps Script unlocks a vastly broader horizon. Beyond executing AI-drafted scripts on the fly, this complementary architecture empowers Google Workspace with deterministic Python data science (Pandas, Seaborn) and Bash execution in 200–450 ms. With zero-trust micro-isolation, zero-token data ingestion, and zero idle cost, it elevates Workspace automations far beyond standard V8 runtime constraints.</p>
+<h2 id="introduction">Introduction</h2>
+<p>Google Apps Script (GAS) <a href="https://developers.google.com/apps-script">Ref</a> is a cornerstone of Google Workspace automation across Sheets, Docs, Forms, and Drive. Yet, developers often hit hard limits. Standard accounts enforce a strict 6-minute timeout. The environment runs only JavaScript on V8, precluding native Linux binaries or external compilers. When an unhandled exception occurs, the entire script halts abruptly.</p>
+<p>Recently, in my article &ldquo;Taking Advantage of Gemini Managed Agents with Google Apps Script&rdquo; <a href="https://medium.com/google-cloud/taking-advantage-of-gemini-managed-agents-with-google-apps-script-19215ab8c61f">Ref</a>, I showed how to break past these limits by connecting Apps Script to a persistent Linux sandbox provisioned by Gemini Managed Agents <a href="https://ai.google.dev/gemini-api/docs/agents">Ref</a>. Using my Go CLI tool <code>ggsrun</code> <a href="https://github.com/tanaikech/ggsrun">Ref</a> for direct streaming between the sandbox and Google Drive, that architecture handles heavy, multi-turn agentic workflows. Examples include Playwright scraping across multiple viewports and audio transcoding with FFmpeg.</p>
+<p>Gemini Managed Agents excel at autonomous, multi-step reasoning. However, they rely on LLM prompts via the Interactions API. This adds conversational inference overhead, pushing response latencies to several seconds or tens of seconds while burning token quotas (such as 200k TPM) <a href="https://ai.google.dev/gemini-api/docs/rate-limits">Ref</a>. Many everyday Workspace automations do not need an LLM. Tasks like mathematical evaluations, string parsing, regular expression matching, and shell commands require deterministic, instant execution without prompt ambiguity or token limits.</p>
+<p>The breakthrough moment came when I encountered Romin Irani&rsquo;s masterfully crafted and inspiring article, &ldquo;Safely Running Untrusted Code: A Hands-On Guide to Google Cloud Run Sandboxes&rdquo; <a href="https://medium.com/google-cloud/safely-running-untrusted-code-a-hands-on-guide-to-google-cloud-run-sandboxes-8bbc95d391c7">Ref</a>. In his exceptional guide, Irani brilliantly illuminated how Google Cloud Run Sandboxes leverage gVisor application kernel technology to deliver lightweight, ephemeral micro-isolation for arbitrary code execution with remarkable simplicity and elegance. Reading his hands-on exploration sparked an immediate insight: <em>What if we connect this powerful sandbox directly to Google Apps Script? Could this be the key to supercharging Google Workspace automations with instant, secure dynamic execution?</em> That spark inspired me to plan, design, and thoroughly refine the project presented here.</p>
+<p>Fundamentally, secure sandboxes have become an indispensable cornerstone in the era of Generative AI. When large language models like Gemini generate code on the fly, they produce untrusted scripts that demand strict execution isolation to shield host environments from unintended side effects, resource exhaustion, or security compromises. I myself have continuously explored and proposed sandboxing approaches for Google Apps Script to safely execute AI-generated code <a href="https://medium.com/google-cloud/a-fake-sandbox-for-google-apps-script-a-feasibility-study-on-securely-executing-code-generated-by-cc985ce5dae3">Ref</a>, <a href="https://medium.com/google-cloud/exploring-sandboxing-for-ai-generated-google-apps-script-0652a68eb4b7">Ref</a>. Yet, liberating this sandboxed execution capability so that it can be directly orchestrated from Google Apps Script unlocks a vastly broader horizon. It transforms Apps Script from a bounded JavaScript runtime into an agile command center. Beyond safely running AI-generated scripts in real time, it empowers Google Workspace to seamlessly offload high-performance Python and Bash workloads—spanning advanced statistics, scientific plotting with Pandas and Seaborn, and complex data transformations—that were previously unattainable within Apps Script alone.</p>
+<p>In this article, I introduce this complementary architecture powered by <strong>Google Cloud Run Sandboxes</strong> (<code>--sandbox-launcher</code>) <a href="https://cloud.google.com/run/docs/configuring/sandboxes">Ref</a>. By pairing gVisor <a href="https://gvisor.dev/">Ref</a> micro-virtualization with second-generation Cloud Run instances <a href="https://cloud.google.com/run">Ref</a>, Apps Script can dispatch dynamic Python and Bash scripts over standard REST HTTP calls. The benefits are clear: sub-second execution (200 to 450 ms), zero-trust process isolation, and zero idle maintenance costs. Together, Cloud Run Sandboxes and Gemini Managed Agents give developers a comprehensive automation toolkit for Google Workspace.</p>
+<hr>
+<h2 id="architecture-cloud-run-sandboxes-for-google-apps-script">Architecture: Cloud Run Sandboxes for Google Apps Script</h2>
+<p>Cloud Run Sandboxes compartmentalize untrusted code execution using gVisor application kernel technology. Integrating this infrastructure with Google Apps Script offers four major benefits:</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260910a/architecture_workflow.png"
+     alt="Google Apps Script × Cloud Run Sandboxes Architecture"
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 1: Architectural workflow linking Google Apps Script, Cloud Run FastAPI Runner, and gVisor Micro-Sandbox.</em></p>
+<ul>
+<li><strong>Dynamic code execution without image rebuilding</strong>: You never need to rebuild or redeploy container images when script logic changes. Apps Script dynamically generates Python or Bash code strings and posts them to the Cloud Run runner for immediate execution.</li>
+<li><strong>Crash resilience against runaway scripts</strong>: If an offloaded script triggers a segmentation fault or an infinite loop (<code>while True: pass</code>), gVisor isolates and terminates only the child process via SIGKILL. The parent FastAPI runner remains healthy and returns a clean JSON error response.</li>
+<li><strong>Deterministic sub-second latency</strong>: Because the sandbox forks directly inside a running container, it avoids cold VM boots and prompt delays, running guest code in 200 to 450 milliseconds.</li>
+<li><strong>Zero-idle cost management</strong>: Setting <code>--min-instances=0</code> allows Cloud Run to scale to zero when idle. Combined with Google Cloud&rsquo;s Always Free tier <a href="https://cloud.google.com/run/pricing">Ref</a>, everyday automation incurs zero idle maintenance cost.</li>
+</ul>
+<hr>
+<h2 id="system-architecture-and-processing-workflow">System Architecture and Processing Workflow</h2>
+<p>The architecture connects three layers: the Google Apps Script orchestrator, the Cloud Run FastAPI proxy runner, and the gVisor micro-sandbox isolation layer. For complete, step-by-step setup and deployment instructions, please refer to the detailed guide in the <a href="https://github.com/tanaikech/cloud-run-sandbox-gas">GitHub Repository</a>.</p>
+<p>Execution flows through three sequential stages:</p>
+<ul>
+<li><strong>Stage 1: Dispatch from Google Apps Script</strong>: Apps Script sends an HTTPS POST request with a JSON payload containing the code snippet, language (Python or Bash), timeout, and security override flags. Core logic is implemented in <a href="https://github.com/tanaikech/cloud-run-sandbox-gas/blob/master/gas/Code.js">gas/Code.js</a> and <a href="https://github.com/tanaikech/cloud-run-sandbox-gas/blob/master/gas/Auth.js">gas/Auth.js</a>.</li>
+<li><strong>Stage 2: Execution by FastAPI Proxy Runner</strong>: A lightweight Python service on Cloud Run Gen2 (<a href="https://github.com/tanaikech/cloud-run-sandbox-gas/blob/master/cloud_run/main.py">cloud_run/main.py</a>) receives the payload. It invokes <code>/usr/local/gcp/bin/sandbox do -- &lt;command&gt;</code>, capturing wall-clock runtime, exit codes, stdout, and stderr.</li>
+<li><strong>Stage 3: Ephemeral isolation in gVisor</strong>: The gVisor sandbox intercepts every guest system call. It blocks access to the Google Cloud Metadata Server (169.254.169.254) to eliminate SSRF risks, strips host environment variables, enforces a read-only root filesystem, and shuts down external network egress by default.</li>
+</ul>
+<hr>
+<h2 id="8-axis-verification-suite-from-google-apps-script">8-Axis Verification Suite from Google Apps Script</h2>
+<p>To verify both functional accuracy and security boundaries, I designed and executed an 8-axis test suite directly from Google Apps Script.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260910a/verification_matrix.png"
+     alt="Cloud Run Sandboxes Test Suite Matrix"
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 2: Comprehensive 8-axis test suite matrix evaluating deterministic execution and security isolation.</em></p>
+<p>The complete suite is implemented in <a href="https://github.com/tanaikech/cloud-run-sandbox-gas/blob/master/gas/TestCases.js">gas/TestCases.js</a>. The core verification logic includes:</p>
+<ul>
+<li><strong>TC-01: Basic Computation</strong>: Evaluates deterministic Python arithmetic (<code>print(2**32)</code>). Expected result: <code>4294967296</code> with exit code 0. Full test definition: <a href="https://github.com/tanaikech/cloud-run-sandbox-gas/blob/master/gas/TestCases.js">gas/TestCases.js:TC-01</a>.</li>
+<li><strong>TC-02: Syntax Error Handling</strong>: Injects an invalid syntax payload (<code>print('unclosed string literal</code>) to verify crash resistance. Expected result: Structured error JSON containing <code>SyntaxError</code> without container failure. Full test definition: <a href="https://github.com/tanaikech/cloud-run-sandbox-gas/blob/master/gas/TestCases.js">gas/TestCases.js:TC-02</a>.</li>
+<li><strong>TC-03: Infinite Loop DoS Defense</strong>: Runs an infinite loop (<code>while True: pass</code>) with a 2.0-second timeout. Expected result: gVisor terminates the guest process cleanly after 2.0 seconds via SIGKILL. Full test definition: <a href="https://github.com/tanaikech/cloud-run-sandbox-gas/blob/master/gas/TestCases.js">gas/TestCases.js:TC-03</a>.</li>
+<li><strong>TC-04: Metadata Server SSRF Isolation</strong>: Probes <code>169.254.169.254</code> to attempt service account token extraction. Expected result: Request blocked with <code>Network is unreachable</code>. Full test definition: <a href="https://github.com/tanaikech/cloud-run-sandbox-gas/blob/master/gas/TestCases.js">gas/TestCases.js:TC-04</a>.</li>
+<li><strong>TC-05: Host Environment Variable Shielding</strong>: Dumps guest environment variables to check host credential leakage. Expected result: GCP credentials and host variables are completely absent. Full test definition: <a href="https://github.com/tanaikech/cloud-run-sandbox-gas/blob/master/gas/TestCases.js">gas/TestCases.js:TC-05</a>.</li>
+<li><strong>TC-06: Filesystem Write Protection</strong>: Attempts to write to the container root filesystem. Expected result: Blocked with <code>Read-only file system</code> by default; allowed only in isolated tmpfs with <code>--write</code>. Full test definition: <a href="https://github.com/tanaikech/cloud-run-sandbox-gas/blob/master/gas/TestCases.js">gas/TestCases.js:TC-06</a>.</li>
+<li><strong>TC-07: Outbound Network Egress Isolation</strong>: Attempts an outbound TCP connection to public DNS (<code>1.1.1.1:53</code>). Expected result: Connection rejected by default; allowed only with <code>--allow-egress</code>. Full test definition: <a href="https://github.com/tanaikech/cloud-run-sandbox-gas/blob/master/gas/TestCases.js">gas/TestCases.js:TC-07</a>.</li>
+<li><strong>TC-08: Isolated Bash Subshell Execution</strong>: Runs <code>uname -a &amp;&amp; id</code> in a Bash subshell. Expected result: Returns the kernel signature <code>4.19.0-gvisor</code>, confirming gVisor containment. Full test definition: <a href="https://github.com/tanaikech/cloud-run-sandbox-gas/blob/master/gas/TestCases.js">gas/TestCases.js:TC-08</a>.</li>
+</ul>
+<hr>
+<h2 id="execution-log-and-verification-results">Execution Log and Verification Results</h2>
+<p>The following execution log was captured directly from the Google Apps Script logger during my verification run. Project hashes are sanitized as <code>[PROJECT-HASH]</code>, container UUIDs are sanitized as <code>[INSTANCE-UUID]</code>, and timestamps are normalized to start at <code>00:00:00</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>00:00:00	Notice	Execution started
+</span></span><span style="display:flex;"><span>00:00:00	Info	================================================================================
+</span></span><span style="display:flex;"><span>00:00:00	Info	STARTING CLOUD RUN SANDBOX TEST SUITE (GAS EXECUTION)
+</span></span><span style="display:flex;"><span>00:00:00	Info	Target Base URL: https://cr-gas-sandbox-[PROJECT-HASH]-uc.a.run.app
+</span></span><span style="display:flex;"><span>00:00:00	Info	Started At     : 2026-09-09T00:00:00.000Z
+</span></span><span style="display:flex;"><span>00:00:00	Info	================================================================================
+</span></span><span style="display:flex;"><span>00:00:00	Info	Executing [TC-01] Basic Python Computation (2**32)...
+</span></span><span style="display:flex;"><span>00:00:04	Info	Executing [TC-02] Syntax Error Handling &amp; Crash Resistance...
+</span></span><span style="display:flex;"><span>00:00:05	Info	Executing [TC-03] Infinite Loop DoS Defense (Timeout Enforcement)...
+</span></span><span style="display:flex;"><span>00:00:07	Info	Executing [TC-04] Metadata Server SSRF Isolation (169.254.169.254)...
+</span></span><span style="display:flex;"><span>00:00:08	Info	Executing [TC-05] Host Environment Variable Shielding...
+</span></span><span style="display:flex;"><span>00:00:09	Info	Executing [TC-06] Filesystem Write Protection (Ephemeral tmpfs)...
+</span></span><span style="display:flex;"><span>00:00:10	Info	Executing [TC-07] Outbound Network Egress Isolation...
+</span></span><span style="display:flex;"><span>00:00:12	Info	Executing [TC-08] Isolated Bash Subshell Command Execution...
+</span></span><span style="display:flex;"><span>00:00:13	Info
+</span></span><span style="display:flex;"><span>### 📊 CLOUD RUN SANDBOX × GAS VERIFICATION RUN REPORT
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>- Total Tests Executed: 8
+</span></span><span style="display:flex;"><span>- Passed: 8 / 8
+</span></span><span style="display:flex;"><span>- Failed: 0 / 8
+</span></span><span style="display:flex;"><span>- Total Execution Wall Time: 12.44 seconds
+</span></span><span style="display:flex;"><span>- Overall Verdict: ✅ ALL TESTS PASSED
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>| Test ID | Test Name | HTTP | Server Time | Network RTT | Sandbox Active | Status |
+</span></span><span style="display:flex;"><span>| :--- | :--- | :---: | :---: | :---: | :---: | :---: |
+</span></span><span style="display:flex;"><span>| **TC-01** | Basic Python Computation (2**32) | 200 | 449.34 ms | 3609 ms | gVisor (True) | ✅ PASS |
+</span></span><span style="display:flex;"><span>| **TC-02** | Syntax Error Handling &amp; Crash Resistance | 200 | 201.43 ms | 322 ms | gVisor (True) | ✅ PASS |
+</span></span><span style="display:flex;"><span>| **TC-03** | Infinite Loop DoS Defense (Timeout Enforcement) | 200 | 2003.96 ms | 2118 ms | gVisor (True) | ✅ PASS |
+</span></span><span style="display:flex;"><span>| **TC-04** | Metadata Server SSRF Isolation (169.254.169.254) | 200 | 716.68 ms | 874 ms | gVisor (True) | ✅ PASS |
+</span></span><span style="display:flex;"><span>| **TC-05** | Host Environment Variable Shielding | 200 | 411.31 ms | 539 ms | gVisor (True) | ✅ PASS |
+</span></span><span style="display:flex;"><span>| **TC-06** | Filesystem Write Protection (Ephemeral tmpfs) | 200 | 641.73 ms | 757 ms | gVisor (True) | ✅ PASS |
+</span></span><span style="display:flex;"><span>| **TC-07** | Outbound Network Egress Isolation | 200 | 992.04 ms | 1106 ms | gVisor (True) | ✅ PASS |
+</span></span><span style="display:flex;"><span>| **TC-08** | Isolated Bash Subshell Command Execution | 200 | 338.78 ms | 460 ms | gVisor (True) | ✅ PASS |
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>#### 📝 Detailed Execution Breakdown &amp; Raw Outputs
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>--------------------------------------------------------------------------------
+</span></span><span style="display:flex;"><span>[TC-01] Basic Python Computation (2**32)
+</span></span><span style="display:flex;"><span>Endpoint       : /run
+</span></span><span style="display:flex;"><span>Verdict        : PASS - Correct computation result returned (4294967296)
+</span></span><span style="display:flex;"><span>Timing         : Server=449.34ms, RoundTrip=3609ms
+</span></span><span style="display:flex;"><span>Sandbox Active : true
+</span></span><span style="display:flex;"><span>stdout         : 4294967296
+</span></span><span style="display:flex;"><span>--------------------------------------------------------------------------------
+</span></span><span style="display:flex;"><span>[TC-02] Syntax Error Handling &amp; Crash Resistance
+</span></span><span style="display:flex;"><span>Endpoint       : /run
+</span></span><span style="display:flex;"><span>Verdict        : PASS - Container remained healthy, structured error JSON safely returned
+</span></span><span style="display:flex;"><span>Timing         : Server=201.43ms, RoundTrip=322ms
+</span></span><span style="display:flex;"><span>Sandbox Active : true
+</span></span><span style="display:flex;"><span>stderr         : SyntaxError: unterminated string literal (detected at line 1)
+</span></span><span style="display:flex;"><span>--------------------------------------------------------------------------------
+</span></span><span style="display:flex;"><span>[TC-03] Infinite Loop DoS Defense (Timeout Enforcement)
+</span></span><span style="display:flex;"><span>Endpoint       : /run
+</span></span><span style="display:flex;"><span>Verdict        : PASS - Process terminated cleanly after 2.0s without hanging server
+</span></span><span style="display:flex;"><span>Timing         : Server=2003.96ms, RoundTrip=2118ms
+</span></span><span style="display:flex;"><span>Sandbox Active : true
+</span></span><span style="display:flex;"><span>stderr         : Execution timed out after 2.0 seconds
+</span></span><span style="display:flex;"><span>--------------------------------------------------------------------------------
+</span></span><span style="display:flex;"><span>[TC-04] Metadata Server SSRF Isolation (169.254.169.254)
+</span></span><span style="display:flex;"><span>Endpoint       : /test/metadata-isolation
+</span></span><span style="display:flex;"><span>Verdict        : PASS - Metadata server unreachable from sandbox (SSRF Blocked)
+</span></span><span style="display:flex;"><span>Timing         : Server=716.68ms, RoundTrip=874ms
+</span></span><span style="display:flex;"><span>Sandbox Active : true
+</span></span><span style="display:flex;"><span>details        : ACCESS_BLOCKED: URLError: &lt;urlopen error [Errno 101] Network is unreachable&gt;
+</span></span><span style="display:flex;"><span>--------------------------------------------------------------------------------
+</span></span><span style="display:flex;"><span>[TC-05] Host Environment Variable Shielding
+</span></span><span style="display:flex;"><span>Endpoint       : /test/env-isolation
+</span></span><span style="display:flex;"><span>Verdict        : PASS - Host GCP credentials and environment variables fully masked
+</span></span><span style="display:flex;"><span>Timing         : Server=411.31ms, RoundTrip=539ms
+</span></span><span style="display:flex;"><span>Sandbox Active : true
+</span></span><span style="display:flex;"><span>details        : Sensitive host environment variables are properly masked from sandbox guest.
+</span></span><span style="display:flex;"><span>--------------------------------------------------------------------------------
+</span></span><span style="display:flex;"><span>[TC-06] Filesystem Write Protection (Ephemeral tmpfs)
+</span></span><span style="display:flex;"><span>Endpoint       : /test/fs-isolation
+</span></span><span style="display:flex;"><span>Verdict        : PASS - Read-only filesystem enforced by default; write permitted only with flag
+</span></span><span style="display:flex;"><span>Timing         : Server=641.73ms, RoundTrip=757ms
+</span></span><span style="display:flex;"><span>Sandbox Active : true
+</span></span><span style="display:flex;"><span>details        : Write blocked without flag: PASS. Write permitted with flag: PASS.
+</span></span><span style="display:flex;"><span>--------------------------------------------------------------------------------
+</span></span><span style="display:flex;"><span>[TC-07] Outbound Network Egress Isolation
+</span></span><span style="display:flex;"><span>Endpoint       : /test/egress-isolation
+</span></span><span style="display:flex;"><span>Verdict        : PASS - Outbound network traffic blocked by default; enabled only with flag
+</span></span><span style="display:flex;"><span>Timing         : Server=992.04ms, RoundTrip=1106ms
+</span></span><span style="display:flex;"><span>Sandbox Active : true
+</span></span><span style="display:flex;"><span>details        : Egress blocked without flag: PASS. Egress allowed with flag: PASS.
+</span></span><span style="display:flex;"><span>--------------------------------------------------------------------------------
+</span></span><span style="display:flex;"><span>[TC-08] Isolated Bash Subshell Command Execution
+</span></span><span style="display:flex;"><span>Endpoint       : /run
+</span></span><span style="display:flex;"><span>Verdict        : PASS - Bash subshell executed securely inside sandbox
+</span></span><span style="display:flex;"><span>Timing         : Server=338.78ms, RoundTrip=460ms
+</span></span><span style="display:flex;"><span>Sandbox Active : true
+</span></span><span style="display:flex;"><span>stdout         : Linux sandbox-[INSTANCE-UUID] 4.19.0-gvisor #1 SMP Sun Jan 10 15:06:54 PST 2016 x86_64 GNU/Linux
+</span></span><span style="display:flex;"><span>--------------------------------------------------------------------------------
+</span></span><span style="display:flex;"><span>00:00:13	Notice	Execution completed
+</span></span></code></pre></div><p>All eight test vectors achieved a 100% PASS rate. In particular, TC-08 explicitly returned the kernel signature <code>4.19.0-gvisor</code>, confirming gVisor process containment.</p>
+<hr>
+<h2 id="latency-and-performance-analysis">Latency and Performance Analysis</h2>
+<p>Measuring execution telemetry reveals distinct performance profiles between cold starts and warm executions:</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260910a/benchmark_latency.png"
+     alt="Latency Breakdown: Cold Start vs Warm Execution"
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 3: Latency breakdown between cold-start container provisioning and warm micro-sandbox execution.</em></p>
+<ul>
+<li><strong>Cold Start Phase (TC-01)</strong>: Scaling from zero instances, the initial request takes 3,609 ms round-trip time. Cloud Run container provisioning accounts for 3.16 seconds of this time, while the gVisor fork and Python execution take only 449 ms.</li>
+<li><strong>Warm Execution Phase (TC-02 to TC-08)</strong>: Subsequent calls bypass container startup, reducing round-trip latency to 322–539 ms. Server-side sandbox processing remains steady at 201–411 ms.</li>
+<li><strong>Minimal Compute Overhead</strong>: Because gVisor forks an existing process tree rather than booting an external virtual machine, virtualization overhead stays below 50 ms.</li>
+</ul>
+<hr>
+<h2 id="cost-analysis-and-safety-guardrails">Cost Analysis and Safety Guardrails</h2>
+<p>Running external cloud services for automation often raises concerns about unexpected billing. In this architecture, costs are bounded by Google Cloud policies <a href="https://cloud.google.com/run/pricing">Ref</a> and explicit service guardrails:</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260910a/free_tier_limits.png"
+     alt="Google Cloud Always Free Tier Allocations &amp; Cost Architecture"
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 4: Google Cloud Always Free tier allocations and zero-idle cost architecture.</em></p>
+<ul>
+<li><strong>Always Free Tier Allocation</strong>: Cloud Run provides 2 million requests, 360,000 GiB-seconds of memory, and 180,000 vCPU-seconds free per month <a href="https://cloud.google.com/run/pricing">Ref</a>. A 0.5-second execution on a 512MiB/1CPU profile allows hundreds of thousands of monthly requests without cost.</li>
+<li><strong>Zero-Idle Scaling (<code>--min-instances=0</code>)</strong>: Cloud Run shuts down all active instances when idle, generating zero compute charges between executions.</li>
+<li><strong>Concurrency Guardrails (<code>--max-instances=1</code>)</strong>: Capping instances at 1 ensures runaway recursive triggers in Apps Script cannot spawn concurrent container fleets.</li>
+<li><strong>Hard Timeout Enforcement (<code>--timeout=15s</code>)</strong>: Cloud Run forcibly terminates any request exceeding 15 seconds, preventing long-running resource drain.</li>
+<li><strong>One-Step Cleanup Script</strong>: The repository includes <a href="https://github.com/tanaikech/cloud-run-sandbox-gas/blob/master/scripts/cleanup.sh">scripts/cleanup.sh</a> to delete the Cloud Run service, Artifact Registry images, and temporary Cloud Storage buckets with a single command.</li>
+</ul>
+<hr>
+<h2 id="practical-application-generating-multivariate-correlation-heatmaps-on-google-sheets">Practical Application: Generating Multivariate Correlation Heatmaps on Google Sheets</h2>
+<p>While unit tests validate security and latency, the real value of Cloud Run Sandboxes emerges in solving everyday Google Workspace challenges that Apps Script cannot address natively.</p>
+<p>A prime example is advanced scientific visualization. While Google Sheets provides standard bar and line charts, it completely lacks native support for bivariate or multivariate statistical visualizations—such as Pearson correlation matrix heatmaps, kernel density estimates, or regression confidence bands. Traditionally, developers were forced to either export datasets to external desktop environments or configure cumbersome third-party visualization services.</p>
+<p>By combining Google Apps Script with Cloud Run Sandboxes, developers can bridge this gap seamlessly:</p>
+<ul>
+<li><strong>Automated Sheet Population</strong>: Apps Script creates a new Google Spreadsheet and populates it with a multivariate table (for example, academic evaluation scores across Math, Physics, Chemistry, English, and History).</li>
+<li><strong>Dynamic Script Formulation</strong>: Apps Script extracts the numeric matrix and pairs it with a Python script utilizing <code>pandas</code>, <code>matplotlib</code>, and <code>seaborn</code>.</li>
+<li><strong>Sub-Second gVisor Execution</strong>: The payload is dispatched to Cloud Run Sandboxes (<code>POST /run</code>). Inside the isolated micro-sandbox, Python computes the correlation matrix (<code>df.corr()</code>) and renders a publication-grade heatmap PNG directly into a Base64 string in ~350 ms.</li>
+<li><strong>Direct Blob Insertion</strong>: Apps Script decodes the Base64 output into a native image Blob (<code>Utilities.newBlob()</code>) and embeds it directly beside the dataset on the Google Sheet (<code>sheet.insertImage()</code>).</li>
+</ul>
+<h3 id="the-dynamic-python-visualization-script">The Dynamic Python Visualization Script</h3>
+<p>In <a href="https://github.com/tanaikech/cloud-run-sandbox-gas/blob/master/gas/PracticalDemo.js"><code>gas/PracticalDemo.js</code></a>, Apps Script dynamically constructs and dispatches the following Python script to the Cloud Run runner:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span>os<span style="color:#f92672">.</span>environ[<span style="color:#e6db74">&#39;MPLCONFIGDIR&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;/tmp/mpl&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> io<span style="color:#f92672">,</span> json<span style="color:#f92672">,</span> base64
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> matplotlib
+</span></span><span style="display:flex;"><span>matplotlib<span style="color:#f92672">.</span>use(<span style="color:#e6db74">&#39;Agg&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> matplotlib.pyplot <span style="color:#66d9ef">as</span> plt
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> pandas <span style="color:#66d9ef">as</span> pd
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> seaborn <span style="color:#66d9ef">as</span> sns
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Injected empirical dataset from Google Sheets</span>
+</span></span><span style="display:flex;"><span>records <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>  {<span style="color:#e6db74">&#34;Math&#34;</span>: <span style="color:#ae81ff">95</span>, <span style="color:#e6db74">&#34;Physics&#34;</span>: <span style="color:#ae81ff">92</span>, <span style="color:#e6db74">&#34;Chemistry&#34;</span>: <span style="color:#ae81ff">88</span>, <span style="color:#e6db74">&#34;English&#34;</span>: <span style="color:#ae81ff">72</span>, <span style="color:#e6db74">&#34;History&#34;</span>: <span style="color:#ae81ff">68</span>},
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># ... (15 rows injected dynamically from spreadsheet)</span>
+</span></span><span style="display:flex;"><span>]
+</span></span><span style="display:flex;"><span>df <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>DataFrame(records)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Calculate Pearson correlation matrix</span>
+</span></span><span style="display:flex;"><span>corr <span style="color:#f92672">=</span> df<span style="color:#f92672">.</span>corr()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Configure publication-grade styling</span>
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>figure(figsize<span style="color:#f92672">=</span>(<span style="color:#ae81ff">6.8</span>, <span style="color:#ae81ff">5.2</span>), dpi<span style="color:#f92672">=</span><span style="color:#ae81ff">150</span>)
+</span></span><span style="display:flex;"><span>sns<span style="color:#f92672">.</span>set_theme(style<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;white&#39;</span>)
+</span></span><span style="display:flex;"><span>cmap <span style="color:#f92672">=</span> sns<span style="color:#f92672">.</span>diverging_palette(<span style="color:#ae81ff">230</span>, <span style="color:#ae81ff">20</span>, as_cmap<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>ax <span style="color:#f92672">=</span> sns<span style="color:#f92672">.</span>heatmap(corr, annot<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, fmt<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;.2f&#39;</span>, cmap<span style="color:#f92672">=</span>cmap, vmin<span style="color:#f92672">=-</span><span style="color:#ae81ff">1.0</span>, vmax<span style="color:#f92672">=</span><span style="color:#ae81ff">1.0</span>,
+</span></span><span style="display:flex;"><span>                 square<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, linewidths<span style="color:#f92672">=</span><span style="color:#ae81ff">0.6</span>, cbar_kws<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#39;shrink&#39;</span>: <span style="color:#ae81ff">0.8</span>})
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>title(<span style="color:#e6db74">&#39;Student Performance: Multivariate Correlation Heatmap&#39;</span>, fontsize<span style="color:#f92672">=</span><span style="color:#ae81ff">11</span>, fontweight<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;bold&#39;</span>, pad<span style="color:#f92672">=</span><span style="color:#ae81ff">12</span>)
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>tight_layout()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Encode plot to Base64 PNG buffer</span>
+</span></span><span style="display:flex;"><span>buf <span style="color:#f92672">=</span> io<span style="color:#f92672">.</span>BytesIO()
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>savefig(buf, format<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;png&#39;</span>, dpi<span style="color:#f92672">=</span><span style="color:#ae81ff">150</span>)
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>close()
+</span></span><span style="display:flex;"><span>buf<span style="color:#f92672">.</span>seek(<span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>b64_png <span style="color:#f92672">=</span> base64<span style="color:#f92672">.</span>b64encode(buf<span style="color:#f92672">.</span>getvalue())<span style="color:#f92672">.</span>decode(<span style="color:#e6db74">&#39;utf-8&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Output structured JSON to stdout</span>
+</span></span><span style="display:flex;"><span>print(json<span style="color:#f92672">.</span>dumps({
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;status&#39;</span>: <span style="color:#e6db74">&#39;success&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;image_base64&#39;</span>: b64_png,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;variables&#39;</span>: list(df<span style="color:#f92672">.</span>columns),
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;records_processed&#39;</span>: len(df)
+</span></span><span style="display:flex;"><span>}))
+</span></span></code></pre></div><p>This Python script is engineered with four deliberate architectural techniques:</p>
+<ul>
+<li><strong>gVisor Read-Only Filesystem Adaptation (<code>MPLCONFIGDIR</code>)</strong>: In Cloud Run Sandboxes, gVisor enforces a strict read-only root filesystem (<code>/</code>) to defend against tampering. Under normal circumstances, Matplotlib attempts to create a font cache in <code>~/.config/matplotlib</code>, throwing write permission warnings or errors. Setting <code>os.environ['MPLCONFIGDIR'] = '/tmp/mpl'</code> redirects cache writes to the ephemeral, writable <code>/tmp</code> (tmpfs) directory, ensuring clean, warning-free execution with empty <code>stderr</code>.</li>
+<li><strong>Headless In-Memory Image Rendering</strong>: Setting <code>matplotlib.use('Agg')</code> and utilizing an in-memory <code>io.BytesIO()</code> buffer completely eliminates disk I/O. The chart is rendered in memory, encoded into Base64, and recycled immediately, delivering sub-second execution speeds without leaving stale files on disk.</li>
+<li><strong>Structured Stdout Communication Protocol</strong>: The script outputs a single, structured JSON payload to <code>stdout</code> containing the Base64 image and processing metadata. Apps Script parses this response effortlessly, requiring no complex multi-part MIME decoding or secondary storage buckets.</li>
+<li><strong>Direct Empirical Data Injection</strong>: Tabular data extracted from Google Sheets is serialized as JSON and directly embedded into the guest script template. This allows arbitrary row counts and columns to be processed without requiring database drivers or network connections inside the sandbox.</li>
+</ul>
+<h3 id="dynamic-script-generation-via-gemini-api">Dynamic Script Generation via Gemini API</h3>
+<p>An essential architectural advantage of this setup is that the Python script does not need to be hard-coded. Developers can call the Gemini API directly from Apps Script with a natural language prompt—such as <em>&ldquo;Generate a Python Seaborn script to compute a correlation heatmap from this JSON table and output Base64 PNG&rdquo;</em>—to dynamically synthesize the visualization code on demand.</p>
+<p>This workflow unlocks a powerful synergy:</p>
+<ul>
+<li><strong>Gemini (Single-Turn Code Generation)</strong>: Formulates tailored data transformation and plotting logic from high-level natural language instructions.</li>
+<li><strong>Cloud Run Sandboxes (Instant Deterministic Execution)</strong>: Runs the generated Python code inside an ephemeral gVisor micro-sandbox at sub-second speeds (200–450 ms), completely shielding Google Workspace from untrusted code execution while incurring zero idle hosting cost.</li>
+</ul>
+<h3 id="operational-advantages-over-gemini-managed-agents">Operational Advantages over Gemini Managed Agents</h3>
+<p>In my previous article, <a href="https://medium.com/google-cloud/taking-advantage-of-gemini-managed-agents-with-google-apps-script-19215ab8c61f"><em>Taking Advantage of Gemini Managed Agents with Google Apps Script</em></a>, Gemini Managed Agents provisioned a heavy-duty container (4 vCPU / 16 GB RAM) with a multi-hour persistent session. That architecture excels at exploratory, conversational agentic workflows where the agent navigates ambiguous tasks and self-heals over multiple turns.</p>
+<p>However, for automated spreadsheet recalculation, scheduled batch reporting, or user-facing UI triggers, Cloud Run Sandboxes provides a distinctly superior operational profile:</p>
+<ul>
+<li><strong>Sub-Second Execution Speed</strong>: Cloud Run Sandboxes renders and returns the chart in ~350 ms, compared to 15–30+ seconds for conversational LLM agent reasoning.</li>
+<li><strong>Compatibility with Google Sheets Custom Functions (30-Second Limit)</strong>: Google Sheets custom functions (formula functions called directly from cells) enforce a rigid, non-negotiable 30-second execution timeout. In the Gemini Managed Agents architecture, having a generative AI model in the loop creates conversational inference overhead that frequently pushes turnaround times to 15–40+ seconds, making it ill-suited for in-cell custom formulas. In contrast, Cloud Run Sandboxes deliver deterministic sub-second responses (200–450 ms), operating well below the 30-second ceiling. This low latency makes it effortless to create dynamic, cell-level custom functions powered by Python (such as statistical modeling, complex regex transformations, or matrix operations) that update smoothly as spreadsheet data changes.</li>
+<li><strong>Zero-Token High-Volume Data Ingestion</strong>: Sends thousands of spreadsheet rows, raw arrays, or megabytes of JSON directly over standard HTTP payloads without consuming LLM input tokens, completely removing TPM rate-limit anxiety and payload token costs.</li>
+<li><strong>Zero Cost and Generous Quotas</strong>: Cloud Run Sandboxes consumes no LLM tokens and operates entirely within Cloud Run&rsquo;s generous Always Free tier.</li>
+<li><strong>Deterministic Mathematical Precision</strong>: The statistical calculations and graphical outputs are 100% deterministic and reproducible, eliminating prompt hallucinations.</li>
+</ul>
+<p>The implementation is available in the repository as <a href="https://github.com/tanaikech/cloud-run-sandbox-gas/blob/master/gas/PracticalDemo.js"><code>gas/PracticalDemo.js</code></a>. To support Google Sheets creation and image embedding, ensure your <code>appsscript.json</code> includes the <code>&quot;https://www.googleapis.com/auth/spreadsheets&quot;</code> and <code>&quot;https://www.googleapis.com/auth/drive&quot;</code> OAuth scopes as documented in <a href="https://github.com/tanaikech/cloud-run-sandbox-gas/blob/master/gas/setup_instructions.md"><code>gas/setup_instructions.md</code></a>.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260910a/PracticalHeatmapDemoResult.jpg"
+     alt="Google Sheets Correlation Heatmap Result"
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 5: Google Sheets generated with multivariate student data and an embedded correlation heatmap rendered by Cloud Run Sandboxes (Matplotlib &amp; Seaborn).</em></p>
+<h3 id="real-world-execution-telemetry-and-perceptual-performance">Real-World Execution Telemetry and Perceptual Performance</h3>
+<p>When executing <code>runPracticalHeatmapDemo()</code> directly from Google Apps Script, the perceptual speed is electrifying. The actual execution log demonstrates this seamless end-to-end flow:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>00:00:01	Notice	Execution started
+</span></span><span style="display:flex;"><span>00:00:02	Info	================================================================================
+</span></span><span style="display:flex;"><span>00:00:02	Info	STARTING PRACTICAL DEMO: SPREADSHEET HEATMAP VIA CLOUD RUN SANDBOX
+</span></span><span style="display:flex;"><span>00:00:02	Info	Target Base URL: https://cr-gas-sandbox-[PROJECT-HASH]-uc.a.run.app
+</span></span><span style="display:flex;"><span>00:00:02	Info	Started At     : 2026-09-09T00:00:02.275Z
+</span></span><span style="display:flex;"><span>00:00:02	Info	================================================================================
+</span></span><span style="display:flex;"><span>00:00:02	Info	[Step 1/4] Creating new Google Spreadsheet with multivariate student metrics...
+</span></span><span style="display:flex;"><span>00:00:04	Info	Spreadsheet created: https://docs.google.com/spreadsheets/d/[SPREADSHEET-ID]/edit
+</span></span><span style="display:flex;"><span>00:00:04	Info	[Step 2/4] Reading data from Sheet and constructing JSON matrix payload...
+</span></span><span style="display:flex;"><span>00:00:04	Info	Extracted 15 rows across 5 variables.
+</span></span><span style="display:flex;"><span>00:00:04	Info	[Step 3/4] Dispatching payload to Cloud Run Sandboxes (POST /run)...
+</span></span><span style="display:flex;"><span>00:00:08	Info	Sandbox Server Time : 4161.7 ms
+</span></span><span style="display:flex;"><span>00:00:08	Info	Network Round-Trip  : 4343 ms
+</span></span><span style="display:flex;"><span>00:00:08	Info	Is Sandboxed (gVisor): true
+</span></span><span style="display:flex;"><span>00:00:08	Info	[Step 4/4] Converting Base64 output to Blob and embedding onto Google Sheet...
+</span></span><span style="display:flex;"><span>00:00:09	Info	================================================================================
+</span></span><span style="display:flex;"><span>00:00:09	Info	DEMO COMPLETED SUCCESSFULLY!
+</span></span><span style="display:flex;"><span>00:00:09	Info	Spreadsheet URL : https://docs.google.com/spreadsheets/d/[SPREADSHEET-ID]/edit
+</span></span><span style="display:flex;"><span>00:00:09	Info	Execution Time  : Server 4161.7 ms | Total 4343 ms
+</span></span><span style="display:flex;"><span>00:00:09	Info	================================================================================
+</span></span><span style="display:flex;"><span>00:00:10	Notice	Execution completed
+</span></span></code></pre></div><p>The entire pipeline—creating a new Google Spreadsheet, styling header rows, reading data back, dispatching across HTTPS to Cloud Run, cold-loading heavy scientific libraries (<code>pandas</code>, <code>numpy</code>, <code>matplotlib</code>, <code>seaborn</code>) inside a gVisor micro-sandbox, calculating Pearson correlation coefficients, rendering the plot, streaming the Base64 PNG back, decoding into a Blob, and embedding it into the Sheet—finished in <strong>just 9 seconds of total wall-clock time</strong> (with only 4.16 seconds of Cloud Run server compute).</p>
+<h3 id="visual-layout-and-analytical-fidelity">Visual Layout and Analytical Fidelity</h3>
+<p>Examining the resulting Google Sheet (Figure 5) reveals exceptional publication quality:</p>
+<ul>
+<li><strong>Tabular Matrix (Columns A–F)</strong>: 15 student records populated across 5 academic disciplines (Math, Physics, Chemistry, English, and History) with styled blue headers and clean grid alignment.</li>
+<li><strong>Embedded Chart (Columns H–L)</strong>: The 5x5 Pearson correlation matrix rendered by Seaborn using a diverging palette (<code>coolwarm</code>) with explicit correlation coefficients and colorbar (-1.00 to +1.00).</li>
+<li><strong>Domain Insights</strong>: STEM subjects (Math, Physics, Chemistry) display strong positive clustering (&gt; 0.94), while humanities (English, History) correlate at 0.99. Cross-domain pairs exhibit sharp negative divergence (-0.95 to -0.99), delivering instant statistical clarity.</li>
+<li><strong>Perceptual Speed Leap</strong>: Compared to Gemini Managed Agents, which typically requires 30 to 60+ seconds for conversational reasoning and container bootstrapping, Cloud Run Sandboxes feels instantaneous. For spreadsheet users, waiting 8–9 seconds for a full end-to-end spreadsheet creation and visual chart generation is a revolutionary leap in developer experience.</li>
+</ul>
+<hr>
+<h2 id="comparing-cloud-run-sandboxes-and-gemini-managed-agents">Comparing Cloud Run Sandboxes and Gemini Managed Agents</h2>
+<p>Choosing between these two technologies from Google Apps Script requires evaluating the fundamental trade-offs between autonomous artificial intelligence and deterministic high-speed computation:</p>
+<p><img src="https://tanaikech.github.io/image-storage/20260910a/comparison_agents.png"
+     alt="Cloud Run Sandboxes vs Gemini Managed Agents"
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 6: Strategic workload comparison: Cloud Run Sandboxes vs. Gemini Managed Agents.</em></p>
+<p><img src="https://tanaikech.github.io/image-storage/20260910a/comparison_specs.png"
+     alt="Compute Specifications &amp; Session Lifecycle Architecture"
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 7: Detailed compute specifications, hardware profiles, and session lifecycle comparison.</em></p>
+<ul>
+<li><strong>Workload Intent and Reasoning</strong>: Cloud Run Sandboxes <a href="https://cloud.google.com/run/docs/configuring/sandboxes">Ref</a> target deterministic, high-speed code execution under strict isolation. In contrast, Gemini Managed Agents <a href="https://ai.google.dev/gemini-api/docs/agents">Ref</a> handle autonomous workflows requiring natural language reasoning, multi-step problem solving, and dynamic package installation.</li>
+<li><strong>Execution Trigger</strong>: Cloud Run Sandboxes take raw code strings over standard REST HTTP POST requests from Apps Script. Gemini Managed Agents require natural language prompts via the Interactions API.</li>
+<li><strong>Latency Profiles</strong>: Cloud Run Sandboxes deliver sub-second responses (200 to 450 ms server execution). Gemini Managed Agents incur conversational LLM inference delays of several to tens of seconds.</li>
+<li><strong>Hardware Specifications and Compute Resources</strong>: Cloud Run Sandboxes are deployed on an agile, minimal compute profile (1 vCPU / 512 MiB RAM in this architecture, scalable up to 8 vCPU / 32 GB), minimizing virtualization overhead and maximizing Always Free tier mileage. In contrast, Gemini Managed Agents provision a heavy-duty container profile (4 vCPU / 16 GB RAM) capable of supporting large browser engines (Playwright/Chromium) and media encoding toolchains (FFmpeg).</li>
+<li><strong>Session Lifetime and Execution Duration (TTL)</strong>: Cloud Run Sandboxes operate under an ephemeral, request-scoped lifecycle (sub-second execution with a strict 15-second Cloud Run hard cap), instantly destroying all in-memory tmpfs state upon request completion and scaling to zero instances when idle. In contrast, Gemini Managed Agents provide a persistent multi-turn session lifecycle (<code>environmentId</code>) with a TTL lasting several hours, allowing installed tools and shared disk state to survive across multiple interactions.</li>
+<li><strong>Data Payload Ingestion and Token Freedom</strong>: Cloud Run Sandboxes ingests multi-megabyte raw JSON or binary Base64 streams directly over standard HTTP (up to 32 MB) with zero token consumption and zero rate-limit constraints. In contrast, feeding high-volume tabular datasets or multi-megabyte dumps into Gemini Managed Agents consumes thousands of input tokens per interaction, rapidly exhausting 200k TPM quotas and risking context window saturation.</li>
+<li><strong>Pricing and Quotas</strong>: Cloud Run Sandboxes use standard compute billing, remaining comfortably within free tiers for typical automation tasks. Gemini Managed Agents consume LLM tokens subject to TPM limits (such as 200k TPM) <a href="https://ai.google.dev/gemini-api/docs/rate-limits">Ref</a>.</li>
+<li><strong>State Persistence</strong>: Cloud Run Sandboxes remain strictly ephemeral, recycling the environment after each run. Gemini Managed Agents offer persistent workspaces (<code>environmentId</code>) to retain files and installed packages.</li>
+</ul>
+<h3 id="architectural-trade-offs-advantages-and-limitations">Architectural Trade-offs: Advantages and Limitations</h3>
+<p>Understanding the practical strengths and weaknesses of each runtime ensures optimal architectural decisions:</p>
+<ul>
+<li><strong>Cloud Run Sandboxes Advantages</strong>: Delivers deterministic sub-second execution (200 to 450 ms) with 100% mathematical precision and zero prompt ambiguity. Ingests high-volume tabular arrays directly over HTTP with zero token consumption, completely bypassing TPM rate limits. Generates zero idle hosting expenses through automatic scale-to-zero, staying well within the Always Free tier of 2 million monthly requests.</li>
+<li><strong>Cloud Run Sandboxes Limitations</strong>: Purely ephemeral with no cross-request file or package persistence. Resource-constrained by default (512 MiB RAM / 1 vCPU) and strictly capped by a 15-second timeout, making it unsuitable for multi-hour sessions or heavyweight browser instances.</li>
+<li><strong>Gemini Managed Agents Advantages</strong>: Provides unmatched adaptability when the code or solution is not known in advance. Natural language instructions enable the agent to write its own scripts, inspect errors, self-heal, and dynamically install Linux packages inside a heavy-duty 16 GB container that persists across multiple turns.</li>
+<li><strong>Gemini Managed Agents Limitations</strong>: Suffers from conversational inference latency (often 10 to 30+ seconds), potential output non-determinism, and token quota exhaustion (200k TPM) during high-frequency invocation. It is ill-suited for real-time user-facing spreadsheet UI interactions.</li>
+</ul>
+<h3 id="practical-scenarios-when-to-use-which-architecture">Practical Scenarios: When to Use Which Architecture</h3>
+<p>To maximize automation efficiency in Google Workspace, consider these proven deployment scenarios:</p>
+<ul>
+<li><strong>Scenario 1: High-Frequency Spreadsheet Recalculation and Custom Functions (Use Cloud Run Sandboxes)</strong>: When building in-cell Google Sheets custom functions (such as <code>=PY_EVAL(...)</code>) or triggering <code>onEdit</code> events to perform numerical optimization, Monte Carlo simulations, or matrix operations across thousands of rows. Because Google Sheets enforces a rigid 30-second timeout on custom functions, Gemini Managed Agents&rsquo; generative AI inference latency (15–40+ seconds) is ill-suited for this use case. Cloud Run Sandboxes return accurate results in ~300 ms, fitting comfortably within the 30-second limit and updating spreadsheet cells instantaneously without token costs.</li>
+<li><strong>Scenario 2: Dynamic Multi-Page Headless Browser Scraping (Use Gemini Managed Agents)</strong>: When automating the extraction of dynamically rendered JavaScript tables across authenticated web portals using Playwright and Chromium. The 4 vCPU / 16 GB RAM environment and persistent filesystem allow the agent to manage browser cookies, navigate pages, and stream screenshots or PDF deliverables directly to Google Drive via <code>ggsrun</code>.</li>
+<li><strong>Scenario 3: Secure Data Transformation and Format Parsing (Use Cloud Run Sandboxes)</strong>: When processing automated Google Forms submissions containing raw text, structured CSVs, or proprietary logs that require regular expression extraction, cryptographic hashing, or data validation. Cloud Run Sandboxes execute thousands of deterministic invocations daily within the Always Free tier without risking prompt hallucinations.</li>
+<li><strong>Scenario 4: Exploratory Research and Open-Ended Data Synthesis (Use Gemini Managed Agents)</strong>: When an analyst uploads an unstructured data dump to Google Drive and asks the system to identify anomalies, formulate ad-hoc Python visualizations, and draft an executive narrative summary. The agent&rsquo;s autonomous reasoning and multi-turn persistence excel at iterating until high-level analytical goals are met.</li>
+</ul>
+<hr>
+<h2 id="summary">Summary</h2>
+<p>In this article, I demonstrated how to integrate Google Apps Script with Google Cloud Run Sandboxes to run dynamic Python and Bash workloads securely, deterministically, and with blistering speed. By offloading compute tasks to gVisor micro-sandboxes, Google Workspace automations gain the power to safely execute AI-generated scripts on demand and perform advanced data science without server maintenance overhead.</p>
+<p>Key takeaways from this implementation:</p>
+<ul>
+<li><strong>Eliminated runtime limits and enabled safe AI code execution</strong>: Executed arbitrary Python and Bash scripts on demand without container rebuilding, allowing Apps Script to safely run Gemini-generated logic and native data science libraries (Pandas, Seaborn).</li>
+<li><strong>Achieved blistering perceptual speed and sub-second latency</strong>: Recorded 200–450 ms server execution speeds and completed an end-to-end spreadsheet visualization demo in just 9.0 seconds, delivering responsiveness orders of magnitude faster than multi-turn LLM agents.</li>
+<li><strong>Enabled zero-token high-volume data exchange</strong>: Streamed tabular data and images directly over standard HTTP payloads, completely bypassing LLM context windows, token billing, and 200k TPM rate limit bottlenecks.</li>
+<li><strong>Validated 4-axis zero-trust micro-isolation</strong>: Confirmed empirical protection via gVisor against SSRF metadata extraction, host environment variable leaks, root filesystem modifications, and unauthorized network egress.</li>
+<li><strong>Established zero-idle operations and strategic synergy</strong>: Maintained $0.00 standby costs through automatic scale-to-zero and the Always Free tier, establishing a comprehensive automation toolkit alongside autonomous Gemini Managed Agents.</li>
+</ul>
+<hr>
+<h2 id="getting-started-and-repository">Getting Started and Repository</h2>
+<p>For comprehensive step-by-step setup guides, prerequisite configurations, one-click deployment procedures, and troubleshooting instructions, please refer to the complete documentation in the GitHub repository:</p>
+<ul>
+<li><strong>Detailed Usage Guide &amp; Repository</strong>: <a href="https://github.com/tanaikech/cloud-run-sandbox-gas">https://github.com/tanaikech/cloud-run-sandbox-gas</a></li>
+<li><strong>One-Click Deployment Script</strong>: <a href="https://github.com/tanaikech/cloud-run-sandbox-gas/blob/master/cloud_run/deploy.sh">cloud_run/deploy.sh</a></li>
+<li><strong>FastAPI Proxy Runner</strong>: <a href="https://github.com/tanaikech/cloud-run-sandbox-gas/blob/master/cloud_run/main.py">cloud_run/main.py</a></li>
+<li><strong>Google Apps Script Orchestrator</strong>: <a href="https://github.com/tanaikech/cloud-run-sandbox-gas/blob/master/gas/Code.js">gas/Code.js</a></li>
+<li><strong>GAS Test Suite Definitions</strong>: <a href="https://github.com/tanaikech/cloud-run-sandbox-gas/blob/master/gas/TestCases.js">gas/TestCases.js</a></li>
+<li><strong>Complete Resource Cleanup Script</strong>: <a href="https://github.com/tanaikech/cloud-run-sandbox-gas/blob/master/scripts/cleanup.sh">scripts/cleanup.sh</a></li>
+</ul>
+
+  
+  <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2026%2f09%2f10%2ftaking-advantage-of-cloud-run-sandboxes-with-google-apps-script-for-google-workspace%2f" target="_blank" title="Share on Facebook"><i class="fab fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2026%2f09%2f10%2ftaking-advantage-of-cloud-run-sandboxes-with-google-apps-script-for-google-workspace%2f" target="_blank" title="Tweet"><i class="fab fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f09%2f10%2ftaking-advantage-of-cloud-run-sandboxes-with-google-apps-script-for-google-workspace%2f" target="_blank" title="Share on Google+"><i class="fab fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2026%2f09%2f10%2ftaking-advantage-of-cloud-run-sandboxes-with-google-apps-script-for-google-workspace%2f" target="_blank" title="Post to Tumblr"><i class="fab fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f09%2f10%2ftaking-advantage-of-cloud-run-sandboxes-with-google-apps-script-for-google-workspace%2f" target="_blank" title="Pin it"><i class="fab fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f09%2f10%2ftaking-advantage-of-cloud-run-sandboxes-with-google-apps-script-for-google-workspace%2f" target="_blank" title="Submit to Reddit"><i class="fab fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
+
+
+  
+<nav class="prev-next-posts">
+  <div class="prev-post">
+    
+      <span class="nav-label">Previous Article</span>
+      <a href="https://tanaikech.github.io/2026/09/08/bidirectional-writeback-for-apache-iceberg-via-google-sheets-serverless-lakehouse-console/">Bidirectional Writeback for Apache Iceberg via Google Sheets: Serverless Lakehouse Console</a>
+    
+  </div>
+  <div class="next-post">
+    
+  </div>
+</nav>
+
+<style>
+.prev-next-posts {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+  gap: 2rem;
+}
+.prev-post, .next-post {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.next-post {
+  text-align: right;
+}
+.nav-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+.prev-next-posts a {
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-decoration: none;
+}
+@media (max-width: 600px) {
+  .prev-next-posts { flex-direction: column; text-align: left; }
+  .next-post { text-align: left; }
+}
+</style>
+
+
+  
+  
+  
+  
+
+  
+
+</div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-social"><a href="https://twitter.com/tanaikech" target="_blank" rel="me" title="twitter">
+                  <i class="fab fa-x-twitter"></i>
+                </a><a href="https://github.com/tanaikech" target="_blank" rel="me" title="github">
+                  <i class="fab fa-github"></i>
+                </a><a href="https://linkedin.com/in/tanaike" target="_blank" rel="me" title="linkedin">
+                  <i class="fab fa-linkedin"></i>
+                </a><a href="https://www.youtube.com/@tanaike" target="_blank" rel="me" title="youtube">
+                  <i class="fab fa-youtube"></i>
+                </a><a href="https://medium.com/@tanaike" target="_blank" rel="me" title="medium">
+                  <i class="fab fa-medium"></i>
+                </a><a href="https://stackoverflow.com/users/7108653" target="_blank" rel="me" title="stackoverflow">
+                  <i class="fab fa-stack-overflow"></i>
+                </a><a href="https://zenn.dev/tanaike" target="_blank" rel="me" title="zenn">
+                  <i class="fas fa-edit"></i>
+                </a><a href="https://dev.to/tanaike" target="_blank" rel="me" title="devto">
+                  <i class="fab fa-dev"></i>
+                </a><a href="https://devpost.com/tanaike" target="_blank" rel="me" title="devpost">
+                  <i class="fas fa-terminal"></i>
+                </a><a href="https://orcid.org/0009-0004-2510-1163" target="_blank" rel="me" title="orcid">
+                  <i class="fab fa-orcid"></i>
+                </a>
+      </div>
+      
+      <p class="copyright">
+        &copy; 2026 tanaike - Google Apps Script, Gemini API, and Developer Tips. Built with <a href="https://gohugo.io" target="_blank">Hugo</a>.
+      </p>
+    </div>
+  </footer>
+
+  <script src="https://tanaikech.github.io/js/eclipse.js"></script>
+
+  
+  
+
+  
+  
+
+  
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
+<script>
+  
+  if (window.location.hostname != "localhost") {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-J3Z6T50WL5');
+  }
+</script>
+
+
+
+  
+
+  
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"
+      onload="renderMathInElement(document.body, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '\\[', right: '\\]', display: true},
+          {left: '\\begin{equation}', right: '\\end{equation}', display: true},
+          {left: '\\begin{align}', right: '\\end{align}', display: true},
+          {left: '\\begin{alignat}', right: '\\end{alignat}', display: true},
+          {left: '\\begin{gather}', right: '\\end{gather}', display: true},
+          {left: '\\begin{CD}', right: '\\end{CD}', display: true},
+          {left: '$', right: '$', display: false},
+          {left: '\\(', right: '\\)', display: false}
+        ],
+        throwOnError: false,
+        ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      });"></script>
+
+</body>
+</html>
+
