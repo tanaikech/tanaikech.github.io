@@ -67,7 +67,7 @@ Recently, Google introduced powerful new capabilities to programmatically manage
         "url": "\"https://tanaikech.github.io/2026/10/23/building-a-multimodal-suggestion-based-ai-writing-coach-with-gemini-and-google-docs/\"",
         "datePublished": "\"2026-10-23T14:42:33+09:00\"",
         "dateModified": "\"2026-10-23T14:42:33+09:00\"",
-        "wordCount":  5792 ,
+        "wordCount":  6462 ,
         "author": {
           "@id": "https:\/\/tanaikech.github.io\/#person"
         },
@@ -583,6 +583,73 @@ Recently, Google introduced powerful new capabilities to programmatically manage
 <li><strong>Business Proposals &amp; Executive Reports:</strong> Polishing tone and verifying that summary tables match embedded charts.</li>
 <li><strong>Language Learning &amp; Non-Native English/Japanese Writing:</strong> Identifying personal recurring grammar or phrasing habits (such as redundant modifiers or uncountable noun mistakes) and copying the <strong>Writing Coach &amp; Learning Summary</strong> into a personal study log.</li>
 <li><strong>Drafting from Scratch:</strong> Entering a topic into the Custom Prompt box on an empty tab and clicking <strong>📝 Generate Initial Text from Prompt</strong> to create a structured starting draft, followed by iterative coaching passes.</li>
+</ul>
+<hr>
+<h2 id="update-to-v101-streamlining-large-manuscript--selection-scoped-proofreading-via-the-gemini-file-api">Update to v1.0.1: Streamlining Large-Manuscript &amp; Selection-Scoped Proofreading via the Gemini File API</h2>
+<p>Following the initial <code>v1.0.0</code> release, <strong>DocuMentor AI</strong> has been updated to <strong><code>v1.0.1</code></strong> to significantly reduce prompt payload sizes, API token consumption, and execution latency—especially when working with long manuscripts or proofreading specific highlighted sections.</p>
+<h3 id="why-v101-was-introduced">Why <code>v1.0.1</code> Was Introduced</h3>
+<p>In <strong><code>v1.0.0</code></strong>, while embedded figures and charts (<code>VISUAL_1</code>, etc.) were uploaded as binary files to the <strong>Gemini File API</strong> and referenced via <code>fileData.fileUri</code>, the manuscript&rsquo;s body text, Markdown tables (<code>TABLE_1</code>, etc.), and target editable text blocks were embedded directly inside the <code>generateContent</code> JSON prompt string. Moreover, when <strong>&quot;🎯 Proofread Selection Only&rdquo;</strong> was turned <strong>ON</strong>, <code>v1.0.0</code> still included the entire active tab&rsquo;s text inside the prompt alongside the selected blocks. When proofreading a very large Google Document (such as a multi-page technical specification or academic paper), embedding all manuscript text directly into the prompt increased JSON serialization overhead, request payload size, and token costs.</p>
+<h3 id="what-changed-in-v101">What Changed in <code>v1.0.1</code></h3>
+<ol>
+<li><strong>Uploading the Manuscript Text &amp; Tables as a Markdown File via the Gemini File API (<code>fileData.fileUri</code>)</strong>
+<ul>
+<li>Instead of embedding manuscript text and tables directly inside the <code>generateContent</code> prompt string, Step 2 (<code>step2_generateProofreading</code> and <code>step2_generateLearningSummaryFromExisting</code>) now packages the target manuscript data—including the <strong>Target Editable Settled Text Blocks</strong>, <strong>Target Tables</strong>, <strong>Target Figure Metadata</strong>, and <strong>Existing Suggestions</strong>—into a structured UTF-8 Markdown file (<code>manuscript_context.md</code>, <code>mimeType: &quot;text/markdown&quot;</code>).</li>
+<li>This Markdown file is uploaded to the <strong>Gemini File API</strong> (<code>upload/v1beta/files</code> using the resumable upload protocol) <strong>in the exact same parallel <code>UrlFetchApp.fetchAll()</code> batch</strong> as any embedded figure images, referenced in <code>contents[].parts</code> via <code>fileData.fileUri</code>, and automatically deleted alongside all image files in the <code>finally</code> block (<code>deleteGeminiFiles_</code>).</li>
+</ul>
+</li>
+<li><strong>True Selection-Scoped Extraction &amp; Upload (<code>selected_excerpt.md</code>)</strong>
+<ul>
+<li>When <strong>&quot;🎯 Proofread Selection Only&quot;</strong> (<code>selectionOnly</code>) is turned <strong>ON</strong>, Step 1 (<code>parseDocumentStructure_</code>) and Step 2 (<code>buildProofreadingPromptAndSchema_</code>) now extract, package, and upload <strong>strictly the selected portion</strong> (<code>selected_excerpt.md</code>—containing only the highlighted text blocks, selected tables, and selected figures) rather than sending the unselected parts of the document.</li>
+</ul>
+</li>
+<li><strong>Eliminating Redundant Text Duplication &amp; Minimizing Client–Server IPC Payloads</strong>
+<ul>
+<li>Redundant duplication between full-tab text and target editable text blocks has been removed from the uploaded context, and Step 3 (<code>step3_buildRequestBody</code>) now transfers only the compact target block coordinates between the sidebar UI and the Apps Script server instead of resending the full document object.</li>
+</ul>
+</li>
+</ol>
+<h3 id="comparison-v100-vs-v101">Comparison: <code>v1.0.0</code> vs. <code>v1.0.1</code></h3>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">Feature / Aspect</th>
+          <th style="text-align: left"><code>v1.0.0</code> (Initial Release)</th>
+          <th style="text-align: left"><code>v1.0.1</code> (Latest Update)</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left"><strong>Manuscript Text &amp; Tables Delivery</strong></td>
+          <td style="text-align: left">Embedded directly as raw text strings inside the <code>generateContent</code> JSON prompt payload.</td>
+          <td style="text-align: left">Uploaded as a temporary Markdown file (<code>text/markdown</code>) to the <strong>Gemini File API</strong> and referenced via <code>fileData.fileUri</code>.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>Embedded Figures (<code>VISUAL_N</code>) Delivery</strong></td>
+          <td style="text-align: left">Uploaded to the <strong>Gemini File API</strong> (<code>image/png</code>) and referenced via <code>fileData.fileUri</code>.</td>
+          <td style="text-align: left">Uploaded <strong>in parallel with the manuscript Markdown file</strong> in a single <code>UrlFetchApp.fetchAll()</code> batch.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>Proofread Selection Only (<code>ON</code>)</strong></td>
+          <td style="text-align: left">Restricted editable target blocks to the selection, but still sent the full active tab&rsquo;s text in the prompt.</td>
+          <td style="text-align: left">Extracts and uploads <strong>only the selected portion (<code>selected_excerpt.md</code>)</strong>—zero unselected text is shipped.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>Temporary File Cleanup</strong></td>
+          <td style="text-align: left">Automatically deletes uploaded figure files in the <code>finally</code> block.</td>
+          <td style="text-align: left">Automatically deletes <strong>both the manuscript Markdown file and all figure files</strong> in parallel in the <code>finally</code> block.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>Step 3 Index Accuracy (<code>WriteMode.SUGGEST</code>)</strong></td>
+          <td style="text-align: left">100% exact UTF-16 character index matching against <code>editableBlocks</code>.</td>
+          <td style="text-align: left"><strong>100% identical accuracy preserved</strong> (<code>originalText</code> is extracted from the <code>Target Editable Settled Text Blocks</code> inside the uploaded Markdown file).</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="how-v101-makes-documentor-ai-more-convenient">How <code>v1.0.1</code> Makes DocuMentor AI More Convenient</h3>
+<ul>
+<li><strong>Compact Prompts &amp; Lower Costs on Long Documents:</strong> Whether your Google Doc is 2 pages or 50 pages long, the inline text prompt sent to <code>generateContent</code> remains tiny (just a compact instruction referencing <code>fileData.fileUri</code>), avoiding bloated JSON payloads and reducing input token waste.</li>
+<li><strong>Fast, Lightweight Single-Paragraph Polishing:</strong> When you highlight a single paragraph or table in a long document and turn <strong>ON</strong> <strong>&quot;🎯 Proofread Selection Only&quot;</strong>, only that exact selection is extracted and uploaded as a file—making focused revisions significantly faster and more cost-efficient.</li>
+<li><strong>Zero Extra Sequential HTTP Latency:</strong> Because the manuscript Markdown file and figure images share the same parallel <code>UrlFetchApp.fetchAll()</code> upload and deletion pipeline, moving manuscript text to the Gemini File API adds zero extra sequential HTTP round-trips when figures are present.</li>
 </ul>
 <hr>
 <h2 id="summary">Summary</h2>
