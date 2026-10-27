@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Hugo 0.157.0">
+
+  
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+  
+  <meta name="theme-color" content="#050505">
+
+  
+  <meta name="google-site-verification" content="googleccbde819fe280caa.html" />
+
+  
+  
+
+  <meta name="keywords" content="Google Apps Script, Google Workspace, Gemini, document">
+
+  <meta name="description" content="Gists
+Scaling a Multimodal AI Writing and Code Review Coach Across Classrooms and Research Labs with Gemini and Google Apps Script
+
+
+In my previous article—Building a Multimodal, Suggestion-Based AI Writing Coach with Gemini and Google Docs—I introduced DocuMentor AI, an open-source Google Docs add-on built with Google Apps Script, the Google Docs API (v1), and the Gemini API (gemini-3.8-flash / gemini-4-argon). Instead of overwriting a writer&rsquo;s draft directly, DocuMentor AI uses the newest Google Docs API Suggestion &amp; Comment Management features (WriteControl.writeMode = &quot;SUGGEST&quot;, addCommentReply, insertComment, acceptSuggestion, rejectSuggestion, and deleteComment) to turn Google Docs into an interactive, multimodal writing coach.">
+
+  
+  <link rel="canonical" href="https://tanaikech.github.io/2026/10/27/beyond-passive-ai-rewrites-and-vibe-coding-in-google-docs/">
+
+  
+  <title>Beyond Passive AI Rewrites and Vibe Coding in Google Docs | tanaike - Google Apps Script, Gemini API, and Developer Tips</title>
+
+  
+  <meta property="og:title" content="Beyond Passive AI Rewrites and Vibe Coding in Google Docs">
+  <meta property="og:description" content="Gists
+Scaling a Multimodal AI Writing and Code Review Coach Across Classrooms and Research Labs with Gemini and Google Apps Script
+
+
+In my previous article—Building a Multimodal, Suggestion-Based AI Writing Coach with Gemini and Google Docs—I introduced DocuMentor AI, an open-source Google Docs add-on built with Google Apps Script, the Google Docs API (v1), and the Gemini API (gemini-3.8-flash / gemini-4-argon). Instead of overwriting a writer&rsquo;s draft directly, DocuMentor AI uses the newest Google Docs API Suggestion &amp; Comment Management features (WriteControl.writeMode = &quot;SUGGEST&quot;, addCommentReply, insertComment, acceptSuggestion, rejectSuggestion, and deleteComment) to turn Google Docs into an interactive, multimodal writing coach.">
+  <meta property="og:url" content="https://tanaikech.github.io/2026/10/27/beyond-passive-ai-rewrites-and-vibe-coding-in-google-docs/">
+  <meta property="og:site_name" content="tanaike - Google Apps Script, Gemini API, and Developer Tips">
+  <meta property="og:type" content="article"><meta property="og:image" content="https://tanaikech.github.io/img/og-main.png">
+
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@tanaikech">
+  <meta name="twitter:title" content="Beyond Passive AI Rewrites and Vibe Coding in Google Docs">
+  <meta name="twitter:description" content="Gists
+Scaling a Multimodal AI Writing and Code Review Coach Across Classrooms and Research Labs with Gemini and Google Apps Script
+
+
+In my previous article—Building a Multimodal, Suggestion-Based AI Writing Coach with Gemini and Google Docs—I introduced DocuMentor AI, an open-source Google Docs add-on built with Google Apps Script, the Google Docs API (v1), and the Gemini API (gemini-3.8-flash / gemini-4-argon). Instead of overwriting a writer&rsquo;s draft directly, DocuMentor AI uses the newest Google Docs API Suggestion &amp; Comment Management features (WriteControl.writeMode = &quot;SUGGEST&quot;, addCommentReply, insertComment, acceptSuggestion, rejectSuggestion, and deleteComment) to turn Google Docs into an interactive, multimodal writing coach.">
+  <meta name="twitter:image" content="https://tanaikech.github.io/img/og-main.png">
+
+  
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [{
+        "@type": "BlogPosting",
+        "headline": "\"Beyond Passive AI Rewrites and Vibe Coding in Google Docs\"",
+        "description": "\"\\u003cp\\u003e\\u003ca href=\\\"https://gist.github.com/tanaikech/9fa116d593c4f63be93a6ba6f790fd1b\\\"\\u003eGists\\u003c/a\\u003e\\u003c/p\\u003e\\n\\u003ch3 id=\\\"scaling-a-multimodal-ai-writing-and-code-review-coach-across-classrooms-and-research-labs-with-gemini-and-google-apps-script\\\"\\u003eScaling a Multimodal AI Writing and Code Review Coach Across Classrooms and Research Labs with Gemini and Google Apps Script\\u003c/h3\\u003e\\n\\u003cp\\u003e\\u003cimg src=\\\"https://tanaikech.github.io/image-storage/20261027a/documentor_ai_overview_infographic.png\\\"\\n     alt=\\\"DocuMentor AI Overview Infographic\\\"\\n     \\n     loading=\\\"lazy\\\"\\n     decoding=\\\"async\\\"\\u003e\\n\\u003c/p\\u003e\\n\\u003cp\\u003eIn my previous article—\\u003cstrong\\u003e\\u003ca href=\\\"https://medium.com/google-cloud/building-a-multimodal-suggestion-based-ai-writing-coach-with-gemini-and-google-docs-ea07244fed99\\\"\\u003eBuilding a Multimodal, Suggestion-Based AI Writing Coach with Gemini and Google Docs\\u003c/a\\u003e\\u003c/strong\\u003e—I introduced \\u003cstrong\\u003eDocuMentor AI\\u003c/strong\\u003e, an open-source Google Docs add-on built with \\u003cstrong\\u003eGoogle Apps Script\\u003c/strong\\u003e, the \\u003cstrong\\u003eGoogle Docs API (\\u003ccode\\u003ev1\\u003c/code\\u003e)\\u003c/strong\\u003e, and the \\u003cstrong\\u003eGemini API\\u003c/strong\\u003e (\\u003ccode\\u003egemini-3.8-flash\\u003c/code\\u003e / \\u003ccode\\u003egemini-4-argon\\u003c/code\\u003e). Instead of overwriting a writer\\u0026rsquo;s draft directly, DocuMentor AI uses the newest \\u003ca href=\\\"https://developers.google.com/workspace/docs/api/how-tos/suggestions\\\"\\u003eGoogle Docs API Suggestion \\u0026amp; Comment Management features\\u003c/a\\u003e (\\u003ccode\\u003eWriteControl.writeMode = \\u0026quot;SUGGEST\\u0026quot;\\u003c/code\\u003e, \\u003ccode\\u003eaddCommentReply\\u003c/code\\u003e, \\u003ccode\\u003einsertComment\\u003c/code\\u003e, \\u003ccode\\u003eacceptSuggestion\\u003c/code\\u003e, \\u003ccode\\u003erejectSuggestion\\u003c/code\\u003e, and \\u003ccode\\u003edeleteComment\\u003c/code\\u003e) to turn Google Docs into an interactive, multimodal writing coach.\\u003c/p\\u003e\"",
+        "url": "\"https://tanaikech.github.io/2026/10/27/beyond-passive-ai-rewrites-and-vibe-coding-in-google-docs/\"",
+        "datePublished": "\"2026-10-27T14:28:41+09:00\"",
+        "dateModified": "\"2026-10-27T14:28:41+09:00\"",
+        "wordCount":  6747 ,
+        "author": {
+          "@id": "https:\/\/tanaikech.github.io\/#person"
+        },
+        "publisher": {
+          "@id": "https:\/\/tanaikech.github.io\/#person"
+        },
+        "image": {
+          "@type": "ImageObject",
+          "url": "\"https://tanaikech.github.io/img/og-main.png\"",
+          "width": 1200,
+          "height": 630
+        },
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "\"https://tanaikech.github.io/2026/10/27/beyond-passive-ai-rewrites-and-vibe-coding-in-google-docs/\""
+        }
+      },{
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "\"https://tanaikech.github.io/\""
+          },{
+            "@type": "ListItem",
+            "position": 2,
+            "name": "\"Beyond Passive AI Rewrites and Vibe Coding in Google Docs\"",
+            "item": "\"https://tanaikech.github.io/2026/10/27/beyond-passive-ai-rewrites-and-vibe-coding-in-google-docs/\""
+          }]
+      },      {
+        "@type": "Person",
+        "@id": "https:\/\/tanaikech.github.io\/#person",
+        "name": "Kanshi Tanaike",
+        "alternateName": "tanaike",
+        "url": "\"https://tanaikech.github.io/\"",
+        "image": "\"https://tanaikech.github.io/img/og-main.png\"",
+        "jobTitle": "Google Developer Expert",
+        "honorificPrefix": "Ph.D.",
+        "description": "Japanese scientist, Physicist and Google Developer Expert for Google Workspace.",
+        "award": "First place in the Outstanding GDE Award 2025",
+        "sameAs": [
+          "https://twitter.com/tanaikech",
+          "https://github.com/tanaikech",
+          "https://stackoverflow.com/users/7108653/tanaike",
+          "https://developers.google.com/community/experts/directory?text=tanaike",
+          "https://zenn.dev/tanaike",
+          "https://medium.com/@tanaike",
+          "https://orcid.org/0009-0004-2510-1163"
+        ]
+      }
+    ]
+  }
+  </script>
+
+  
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/eclipse.css">
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <link rel="shortcut icon" href="https://tanaikech.github.io/img/favicon.ico" type="image/x-icon" />
+  
+  
+  
+
+  
+  
+  
+</head>
+
+
+<body>
+  <div id="progress-bar"></div>
+  
+  <header class="site-header">
+    <div class="header-container">
+      
+      <div class="header-top">
+        <div class="site-title">
+          <a href="https://tanaikech.github.io/">TANAIKE</a>
+          
+            <div class="site-subtitle">The Thinker</div>
+          
+        </div>
+
+        
+        <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+
+      
+      <div id="mobile-menu" class="mobile-menu-content">
+        <div class="nav-row">
+          <div class="nav-links">
+            
+              <a href="https://tanaikech.github.io/about/" title="">
+                <i class='fa fa-user fa-fw'></i> About
+              </a>
+            
+              <a href="https://tanaikech.github.io/post/" title="">
+                <i class='fa fa-list fa-fw'></i> Articles
+              </a>
+            
+              <a href="https://tanaikech.github.io/topics/" title="">
+                <i class='fa fa-folder fa-fw'></i> Topics
+              </a>
+            
+              <a href="https://tanaikech.github.io/tags/" title="">
+                <i class='fa fa-tags fa-fw'></i> Tags
+              </a>
+            
+              <a href="https://tanaikech.github.io/contact/" title="">
+                <i class='fa fa-phone fa-fw'></i> Contact
+              </a>
+            
+              <a href="https://tanaikech.github.io/link/" title="">
+                <i class='fa fa-thumbs-up fa-fw'></i> Links
+              </a>
+            
+              <a href="https://tanaikech.github.io/webapps/" title="">
+                <i class='fas fa-toolbox'></i> Web Applications
+              </a>
+            
+              <a href="https://tanaikech.github.io/donate/" title="">
+                <i class='fas fa-donate'></i> Donate
+              </a>
+            
+              <a href="https://tanaikech.github.io/" title="">
+                <i class='fa fa-home fa-fw'></i> Home
+              </a>
+            
+          </div>
+        </div>
+
+        <div class="social-links-row"><a href="https://twitter.com/tanaikech" target="_blank" rel="me">
+                <i class="fab fa-x-twitter"></i> X
+              </a><a href="https://medium.com/@tanaike" target="_blank" rel="me">
+                <i class="fab fa-medium"></i> Medium
+              </a><a href="https://www.youtube.com/@tanaike" target="_blank" rel="me">
+                <i class="fab fa-youtube"></i> YouTube
+              </a><a href="https://linkedin.com/in/tanaike" target="_blank" rel="me">
+                <i class="fab fa-linkedin"></i> LinkedIn
+              </a><a href="https://github.com/tanaikech" target="_blank" rel="me">
+                <i class="fab fa-github"></i> GitHub
+              </a><a href="https://gist.github.com/tanaikech" target="_blank" rel="me">
+                <i class="fas fa-code"></i> Gists
+              </a><a href="https://stackoverflow.com/users/7108653" target="_blank" rel="me">
+                <i class="fab fa-stack-overflow"></i> Stack Overflow
+              </a><a href="https://dev.to/tanaike" target="_blank" rel="me">
+                <i class="fab fa-dev"></i> DEV
+              </a><a href="https://zenn.dev/tanaike" target="_blank" rel="me">
+                <i class="fas fa-edit"></i> Zenn
+              </a><a href="https://devpost.com/tanaike" target="_blank" rel="me">
+                <i class="fas fa-terminal"></i> Devpost
+              </a><a href="https://orcid.org/0009-0004-2510-1163" target="_blank" rel="me">
+                <i class="fab fa-orcid"></i> ORCID
+              </a></div>
+      </div>
+
+    </div>
+  </header>
+
+  <main id="main">
+
+
+<div class="header">
+  <h1>Beyond Passive AI Rewrites and Vibe Coding in Google Docs</h1>
+  <h2></h2>
+</div>
+<div class="content">
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>27 Oct 2026, 14:28</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/document">document</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-workspace">Google Workspace</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/gemini">Gemini</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/document">document</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  <p><a href="https://gist.github.com/tanaikech/9fa116d593c4f63be93a6ba6f790fd1b">Gists</a></p>
+<h3 id="scaling-a-multimodal-ai-writing-and-code-review-coach-across-classrooms-and-research-labs-with-gemini-and-google-apps-script">Scaling a Multimodal AI Writing and Code Review Coach Across Classrooms and Research Labs with Gemini and Google Apps Script</h3>
+<p><img src="https://tanaikech.github.io/image-storage/20261027a/documentor_ai_overview_infographic.png"
+     alt="DocuMentor AI Overview Infographic"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<p>In my previous article—<strong><a href="https://medium.com/google-cloud/building-a-multimodal-suggestion-based-ai-writing-coach-with-gemini-and-google-docs-ea07244fed99">Building a Multimodal, Suggestion-Based AI Writing Coach with Gemini and Google Docs</a></strong>—I introduced <strong>DocuMentor AI</strong>, an open-source Google Docs add-on built with <strong>Google Apps Script</strong>, the <strong>Google Docs API (<code>v1</code>)</strong>, and the <strong>Gemini API</strong> (<code>gemini-3.8-flash</code> / <code>gemini-4-argon</code>). Instead of overwriting a writer&rsquo;s draft directly, DocuMentor AI uses the newest <a href="https://developers.google.com/workspace/docs/api/how-tos/suggestions">Google Docs API Suggestion &amp; Comment Management features</a> (<code>WriteControl.writeMode = &quot;SUGGEST&quot;</code>, <code>addCommentReply</code>, <code>insertComment</code>, <code>acceptSuggestion</code>, <code>rejectSuggestion</code>, and <code>deleteComment</code>) to turn Google Docs into an interactive, multimodal writing coach.</p>
+<p>Shortly after publishing that first article, I received enthusiastic feedback from educators, Google Developer Experts (GDEs), academic researchers, and enterprise practitioners. While they loved how the tool preserves author agency—especially through <strong>💡 Hint-Only Mode</strong> and the <strong>🎓 Writing Coach &amp; Learning Summary</strong> dialog—they raised a crucial practical question for schools, universities, and organizations:</p>
+<blockquote>
+<p><em>&ldquo;How can we deploy DocuMentor AI across a school, university lab, or company domain where students and end users are not allowed to access Google AI Studio to create their own Gemini API keys—without risking an API key leak in a shared Google Doc, and without asking non-coder IT administrators to rewrite JavaScript code?&rdquo;</em></p>
+</blockquote>
+<p>At the same time, while reflecting on how DocuMentor AI&rsquo;s underlying engine works, <strong>I came up with another new idea of my own</strong>: because DocuMentor AI extracts every line in a Google Doc as an independent block and applies non-destructive inline diffs (<code>WriteMode.SUGGEST</code>), Socratic hints (<code>insertComment</code>), and educational replies (<code>addCommentReply</code>), <strong>what if we use it not only for natural-language manuscripts, but also as an interactive Code Review &amp; Programming Coach for software engineers and computer science students?</strong> Rather than blindly copy-pasting AI-generated scripts (&ldquo;vibe coding&rdquo;), learners could paste source code written in <strong>any programming language</strong> (Python, JavaScript, TypeScript, Go, Java, C++, Rust, SQL, Google Apps Script, etc.) into Google Docs and learn <em>what</em> is wrong in their code, <em>why</em> it fails, and <em>how</em> to fix it line by line.</p>
+<p>In this follow-up article (Part 2), I present <strong>DocuMentor AI <code>v1.0.3</code></strong> alongside this new multi-language code coaching workflow:</p>
+<ul>
+<li><strong>1. Unified Dual-Mode Deployment (<code>Individual Mode</code> + <code>School, Research Lab &amp; Organization Mode</code>):</strong> With a <strong>single unified codebase</strong>, DocuMentor AI now seamlessly supports both <strong>👤 Individual Personal Setup (<code>UserProperties</code>)</strong> and <strong>🏫 Zero-Code School, Organization &amp; Academic Lab Deployment (<code>ScriptProperties</code> + Private Google Workspace Marketplace Add-on)</strong>.</li>
+<li><strong>2. Multi-Language Interactive Code Review &amp; Script Coaching (My New Use Case for Engineer Training):</strong> Without changing a single line of the add-on&rsquo;s code, DocuMentor AI serves as a <strong>language-agnostic, GitHub-style inline code reviewer and programming tutor inside Google Docs</strong>—capable of coaching learners across Python, JavaScript, TypeScript, C++, Go, SQL, Google Apps Script, and more.</li>
+</ul>
+<p>Below, I explain the dual-deployment architecture, why this paradigm is transformative for <strong>academia, classrooms, and multi-language software engineer training</strong>, and walk through three live execution demonstrations: <strong>💡 Hint-Only Mode</strong>, <strong>🚀 Suggest &amp; Coach Mode</strong> with resolved review history, and <strong>💻 Interactive Code Review &amp; Script Learning</strong> (demonstrated with a beginner Google Apps Script example).</p>
+<ul>
+<li><strong>GitHub Repository:</strong> <a href="https://github.com/tanaikech/DocuMentorAI">https://github.com/tanaikech/DocuMentorAI</a></li>
+<li><strong>Previous Article (Part 1):</strong> <a href="https://medium.com/google-cloud/building-a-multimodal-suggestion-based-ai-writing-coach-with-gemini-and-google-docs-ea07244fed99">Building a Multimodal, Suggestion-Based AI Writing Coach with Gemini and Google Docs</a></li>
+<li><strong>👤 Individual Installation Guide:</strong> <a href="https://github.com/tanaikech/DocuMentorAI/blob/main/INSTALL_INDIVIDUAL.md">INSTALL_INDIVIDUAL.md</a></li>
+<li><strong>🏫 School, University &amp; Organization Deployment Guide:</strong> <a href="https://github.com/tanaikech/DocuMentorAI/blob/main/INSTALL_ORGANIZATION.md">INSTALL_ORGANIZATION.md</a></li>
+</ul>
+<hr>
+<h2 id="1-the-deployment-challenge-in-education-research-labs--organizations">1. The Deployment Challenge in Education, Research Labs &amp; Organizations</h2>
+<p>When an individual developer or writer uses <strong>DocuMentor AI</strong> on their personal Google account, pasting a personal Gemini API key into the sidebar (stored in <code>PropertiesService.getUserProperties()</code>) is quick and straightforward.</p>
+<p>However, in <strong>Google Workspace for Education</strong>, <strong>university research laboratories</strong>, and <strong>corporate environments</strong>, three structural barriers arise:</p>
+<ol>
+<li><strong>Google AI Studio Is Restricted for Students &amp; Non-Technical Users:</strong> In most K–12 schools and universities using Google Workspace for Education, access to Google AI Studio is disabled for student Organizational Units (OUs)—especially for under-18 students—and requiring every student, researcher, or staff member to generate and manage their own API key is a major adoption bottleneck.</li>
+<li><strong>Sharing a Container-Bound Google Doc Risks API Key Exposure &amp; Wipes <code>ScriptProperties</code> on Copy:</strong> If a teacher or administrator simply pastes the script into a shared Google Docs template, any student with <strong>Editor</strong> access to that document can open <strong>Extensions &gt; Apps Script</strong> and inspect the project settings. Furthermore, when Google Classroom creates individual student copies of an assignment document (<em>&ldquo;Make a copy for each student&rdquo;</em>), Google Apps Script intentionally strips all <code>ScriptProperties</code> from the copied files for security reasons.</li>
+<li><strong>Most School &amp; Department IT Administrators Are Non-Coders:</strong> If deploying an internal tool requires editing source code to hardcode credentials or rewrite authentication flows, many school and departmental IT staff will be unable to maintain it.</li>
+</ol>
+<hr>
+<h2 id="2-how-v103-solves-this-with-a-single-unified-script">2. How <code>v1.0.3</code> Solves This with a Single Unified Script</h2>
+<p>To address all three barriers without splitting the project into separate &ldquo;Personal&rdquo; and &ldquo;Enterprise/Edu&rdquo; editions, <strong>DocuMentor AI <code>v1.0.3</code></strong> introduces two core architectural upgrades in <a href="https://github.com/tanaikech/DocuMentorAI/blob/main/src/code.js"><code>src/code.js</code></a> and <a href="https://github.com/tanaikech/DocuMentorAI/blob/main/src/index.html"><code>src/index.html</code></a>.</p>
+<h3 id="a-priority-locked-dual-api-key-resolution-scriptproperties--userproperties">A. Priority-Locked Dual API Key Resolution (<code>ScriptProperties</code> ➔ <code>UserProperties</code>)</h3>
+<p>In <code>v1.0.3</code>, the backend helper <code>getEffectiveApiKeyInfo_()</code> checks two storage scopes in strict priority order:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getEffectiveApiKeyInfo_</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">scriptProps</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">PropertiesService</span>.<span style="color:#a6e22e">getScriptProperties</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">scriptKey</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">scriptProps</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">?</span> <span style="color:#a6e22e">scriptProps</span>.<span style="color:#a6e22e">getProperty</span>(<span style="color:#e6db74">&#34;GEMINI_API_KEY&#34;</span>)
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">:</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">scriptKey</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">scriptKey</span>.<span style="color:#a6e22e">trim</span>().<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">apiKey</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">scriptKey</span>.<span style="color:#a6e22e">trim</span>(),
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">hasApiKey</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">apiKeySource</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;script&#34;</span>,
+</span></span><span style="display:flex;"><span>      };
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">e</span>) {}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">userProps</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">PropertiesService</span>.<span style="color:#a6e22e">getUserProperties</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">userKey</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">userProps</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">userProps</span>.<span style="color:#a6e22e">getProperty</span>(<span style="color:#e6db74">&#34;GEMINI_API_KEY&#34;</span>) <span style="color:#f92672">:</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">userKey</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">userKey</span>.<span style="color:#a6e22e">trim</span>().<span style="color:#a6e22e">length</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">apiKey</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">userKey</span>.<span style="color:#a6e22e">trim</span>(),
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">hasApiKey</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">apiKeySource</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;user&#34;</span>,
+</span></span><span style="display:flex;"><span>      };
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">e</span>) {}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">apiKey</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">hasApiKey</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">false</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">apiKeySource</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;none&#34;</span>,
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Here is how this single function behaves across both environments without a single line of code modification:</p>
+<ul>
+<li><strong>🏫 Admin-Managed Mode (<code>apiKeySource === 'script'</code>):</strong> The IT administrator opens the Apps Script visual interface (<strong>Project Settings ⚙️ &gt; Script Properties</strong>), clicks <strong>Add script property</strong>, and registers <code>GEMINI_API_KEY</code> once. Because <code>ScriptProperties</code> takes top priority, DocuMentor AI automatically locks into Admin-Managed Mode.</li>
+<li><strong>🔒 Locked Student / Organization Sidebar UI:</strong> When any student, faculty member, or employee opens the sidebar under Admin-Managed Mode, the API key input field and the <strong>Reset</strong> button are completely hidden and replaced with a locked status badge (<code>🔒 API Key Configured (School / Organization Admin)</code>). Furthermore, both <code>saveApiKey()</code> and <code>deleteApiKey()</code> ignore client-side overrides when <code>apiKeySource === 'script'</code>—meaning students cannot clear, overwrite, or inspect the organization&rsquo;s API key even from browser developer tools.</li>
+<li><strong>👤 Individual User Mode (<code>apiKeySource === 'user'</code> or <code>'none'</code>):</strong> Individual users do not touch <strong>Project Settings ⚙️ &gt; Script Properties</strong>, so <code>ScriptProperties</code> remains empty. The sidebar behaves 100% identically to previous versions: displaying the API key input box on first launch, saving the user&rsquo;s personal key into <code>UserProperties</code>, and showing <strong><code>🔒 API Key Configured (Saved)</code></strong> with a <strong>Reset</strong> button (as shown at the top of the <code>v1.0.3</code> sidebar in Section 4 below).</li>
+</ul>
+<h3 id="b-dual-menu-registration-for-both-private-marketplace-add-ons-and-container-bound-scripts-onopen--oninstall">B. Dual Menu Registration for Both Private Marketplace Add-ons and Container-Bound Scripts (<code>onOpen</code> &amp; <code>onInstall</code>)</h3>
+<p>When a script is published as a <strong>Google Workspace Marketplace Editor Add-on</strong>, Google Docs executes <code>onOpen(e)</code> in <code>ScriptApp.AuthMode.NONE</code> until the user interacts with the add-on, and requires menus to be registered via <code>DocumentApp.getUi().createAddonMenu()</code> (which places the menu under <strong>Extensions &gt; DocuMentor AI</strong>). Conversely, personal container-bound scripts typically use <code>createMenu('✦ DocuMentor AI')</code> to display a top-level menu in the Google Docs toolbar.</p>
+<p>In <code>v1.0.3</code>, <code>onOpen(e)</code> and <code>onInstall(e)</code> seamlessly support both execution environments in one place:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">onInstall</span>(<span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">onOpen</span>(<span style="color:#a6e22e">e</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">onOpen</span>(<span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">ui</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">DocumentApp</span>.<span style="color:#a6e22e">getUi</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">ui</span>.<span style="color:#a6e22e">createAddonMenu</span>().<span style="color:#a6e22e">addItem</span>(<span style="color:#e6db74">&#34;Open Dashboard&#34;</span>, <span style="color:#e6db74">&#34;showSidebar&#34;</span>).<span style="color:#a6e22e">addToUi</span>();
+</span></span><span style="display:flex;"><span>  } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">err</span>) {}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">e</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">authMode</span> <span style="color:#f92672">!==</span> <span style="color:#a6e22e">ScriptApp</span>.<span style="color:#a6e22e">AuthMode</span>.<span style="color:#a6e22e">NONE</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">ui</span>.<span style="color:#a6e22e">createMenu</span>(<span style="color:#e6db74">&#34;✦ DocuMentor AI&#34;</span>)
+</span></span><span style="display:flex;"><span>        .<span style="color:#a6e22e">addItem</span>(<span style="color:#e6db74">&#34;Open Dashboard&#34;</span>, <span style="color:#e6db74">&#34;showSidebar&#34;</span>)
+</span></span><span style="display:flex;"><span>        .<span style="color:#a6e22e">addToUi</span>();
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">err</span>) {}
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><hr>
+<h2 id="3-why-documentor-ai-is-transformative-for-academia-scientific-research-higher-education--engineering-training">3. Why DocuMentor AI Is Transformative for Academia, Scientific Research, Higher Education &amp; Engineering Training</h2>
+<p>While DocuMentor AI is a versatile writing coach for everyday business documents and K–12 classrooms, its architecture—combining <strong>Google Docs API <code>v1</code> Suggestion/Comment management</strong> with <strong>Gemini&rsquo;s multimodal reasoning</strong>—makes it uniquely powerful for <strong>academic researchers, university laboratories, graduate students, scientific authors, and software engineering learners</strong>.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20261027a/academic_and_classroom_workflow_infographic.png"
+     alt="Multimodal Academic and Classroom Coaching Workflow"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<p>As illustrated in the workflow infographic above, <strong>DocuMentor AI</strong> operates through a three-stage multimodal pipeline designed specifically for active learning, scholarly rigor, and engineering code review:</p>
+<ol>
+<li><strong>Stage 1 — Manuscript, Code &amp; Review History Extraction:</strong> When a researcher, student, or developer runs the tool on a Google Doc (or a highlighted section via <code>🎯 Proofread Selection Only</code>), the backend inspects the active document tab via <code>documents.get</code> with <code>suggestionsViewMode=PREVIEW_SUGGESTIONS_ACCEPTED</code> and <code>commentsViewMode=COMMENTS_VIEW_MODE_INCLUDED</code>. It simultaneously extracts <strong>body text and research claims</strong>, <strong>source code and scripts in any programming language</strong> (Python, JavaScript, TypeScript, Go, Java, C++, SQL, Google Apps Script, etc., line by line), <strong>structured data tables</strong> (<code>TABLE_1</code>, <code>TABLE_2</code>, &hellip;), <strong>embedded charts and figures</strong> as binary images (<code>VISUAL_1</code>, <code>VISUAL_2</code>, &hellip;), and <strong>both active and resolved review threads</strong> (including previously accepted or rejected inline edits and resolved comments from advisors, co-authors, or code reviewers).</li>
+<li><strong>Stage 2 — Gemini File API &amp; Docs API v1 Engine:</strong> The extracted Markdown context and binary figure images are uploaded in parallel to the <strong>Gemini File API</strong> (<code>fileData.fileUri</code>) and analyzed by <code>gemini-4-argon</code> or <code>gemini-3.8-flash</code>. During this phase, the engine performs <strong>cross-modal and spec-to-code verification</strong> (checking whether claims, baselines, or implementation scripts match the numbers, units, and architecture diagrams in tables and figures), conducts <strong>rejection-aware history analysis</strong> (adapting its edit granularity based on what the author previously accepted or rejected), and prepares <strong>reverse-index line and phrase batch requests</strong> (<code>startIndex</code> descending) so multiple edits never shift downstream character offsets.</li>
+<li><strong>Stage 3 — Interactive Coaching in Google Docs:</strong> Rather than silently overwriting the manuscript or script, the engine delivers three complementary outputs directly inside Google Docs: <strong>💡 Hint-Only Mode</strong> (<code>insertComment</code> writing and debugging hints without spoiling the rewrite), <strong>🚀 Suggest &amp; Coach Mode</strong> (<code>WriteMode.SUGGEST</code> surgical prose and code diffs paired with <code>addCommentReply</code> explanations), and the <strong>🎓 Learning Summary Dialog</strong> synthesizing overall evaluation, recurring writing and coding habits, and actionable next steps.</li>
+</ol>
+<p>This architecture directly addresses five critical challenges across academic research, classroom education, and software engineer training:</p>
+<h3 id="1-combating-cognitive-debt-and-cognitive-surrender-in-academic--student-writing">1. Combating &ldquo;Cognitive Debt&rdquo; and &ldquo;Cognitive Surrender&rdquo; in Academic &amp; Student Writing</h3>
+<p>Recent cognitive science research has sounded the alarm on passive AI reliance:</p>
+<ul>
+<li><strong>MIT Media Lab Brain Study (June 2025):</strong> The study <em>&ldquo;Your Brain on ChatGPT&rdquo;</em> demonstrated that passively accepting AI-generated text induces <strong>&ldquo;cognitive debt,&rdquo;</strong> measurably reducing neural connectivity and mental engagement (<a href="https://www.media.mit.edu/projects/your-brain-on-chatgpt/overview/">Ref</a>).</li>
+<li><strong>CMU, Wharton &amp; MIT Studies (2026):</strong> Subsequent research highlighted the <strong>&ldquo;shortcut trap&rdquo;</strong>—where even 10 minutes of AI reliance reduces subsequent independent problem-solving performance by 20% (<a href="https://japan.cnet.com/article/35247336/">Ref</a>)—and <strong>&ldquo;cognitive surrender,&rdquo;</strong> where fluent AI outputs create an illusion of competence that stops students from thinking critically (<a href="https://www.asahi.com/articles/ASVB146BHVB1UHBI03JM.html">Ref</a>).</li>
+<li><strong>Nikkei XTECH Survey (October 2026):</strong> In this survey, <strong>42.1%</strong> of generative AI users cited <strong>&ldquo;decline in thinking ability due to AI dependency&rdquo;</strong> as their #1 concern (<a href="https://xtech.nikkei.com/atcl/nxt/mag/nc/18/020600010/100500235/">Ref</a>).</li>
+</ul>
+<p>In universities and schools, faculty often hesitate to permit AI tools because conventional rewriters turn students into passive copy-pasters. <strong>DocuMentor AI flips this dynamic</strong> by requiring authors to either formulate their own revisions from anchored coaching hints (<strong>💡 Hint-Only Mode</strong>) or critically evaluate each transparent diff paired with its grammatical/logical reason (<strong>🚀 Suggest &amp; Coach Mode</strong>).</p>
+<h3 id="2-true-cross-modal-consistency-verification-prose--tables--figures-for-research-papers">2. True Cross-Modal Consistency Verification (<code>Prose ⇄ Tables ⇄ Figures</code>) for Research Papers</h3>
+<p>Academic manuscripts—such as journal articles, conference papers, theses, and grant proposals—never consist of prose alone. One of the most common reasons peer reviewers flag scientific drafts is <strong>cross-modal inconsistency</strong>:</p>
+<ul>
+<li><strong>Mismatched Baselines &amp; Metrics:</strong> Numbers or percentages cited in the <em>Results</em> text do not match the values or baselines in <code>Table 1</code> or <code>Figure 1</code>.</li>
+<li><strong>Inconsistent Units &amp; Labels:</strong> Axis labels, units, or terminology in a bar chart or architecture diagram (<code>Execution Time (Minutes)</code>) differ from the column headers in a table (<code>Task Time</code>).</li>
+<li><strong>Uncited Visuals:</strong> Figures and tables are inserted into the manuscript without being explicitly cited or interpreted in the narrative.</li>
+</ul>
+<p>Because <strong>DocuMentor AI</strong> uploads the manuscript&rsquo;s structured Markdown and binary figure images in parallel to the <strong>Gemini File API</strong>, <code>gemini-4-argon</code> inspects the actual visual pixels of your plots alongside your tables and prose—proposing inline cell edits (<code>WriteMode.SUGGEST</code>) and attaching anchored review comments (<code>insertComment</code>) directly onto every figure and table.</p>
+<h3 id="3-distilling-co-author-advisor--peer-review-history-into-long-term-learning-include_resolved_history">3. Distilling Co-Author, Advisor &amp; Peer-Review History into Long-Term Learning (<code>INCLUDE_RESOLVED_HISTORY</code>)</h3>
+<p>In academic labs and graduate programs, a Google Doc often accumulates dozens of inline suggestions and comment threads from a principal investigator (PI), thesis advisor, or co-authors. Once a student clicks <strong>Accept</strong> on the advisor&rsquo;s edits or <strong>Resolve</strong> on comment threads, that valuable pedagogical feedback normally disappears into the document&rsquo;s history.</p>
+<p>With <strong>DocuMentor AI</strong>, calling <code>documents.get</code> with <code>commentsViewMode=COMMENTS_VIEW_MODE_INCLUDED</code> extracts both <strong>open review threads</strong> and <strong>resolved review history (<code>RESOLVED</code>, <code>ACCEPTED</code>, <code>REJECTED</code>)</strong>:</p>
+<ul>
+<li><strong>Step 1 History Ledger:</strong> Renders an expandable <strong><code>📜 View Resolved Review History</code></strong> ledger right in the sidebar showing every accepted/rejected edit and resolved comment thread.</li>
+<li><strong>Rejection-Aware Adaptive Proofreading:</strong> When <code>📜 Include Resolved Review History</code> is enabled during proofreading, Gemini respects the author&rsquo;s prior rejections (for instance, switching from full-sentence rewrites to surgical phrase-level edits if the author previously rejected broad rewrites).</li>
+<li><strong>Retrospective Learning Summary:</strong> By turning <strong>ON</strong> <strong>📜 Include Resolved Review History</strong> and clicking <strong>🎓 Generate Learning Summary from Suggestions &amp; Comments</strong>, graduate students and researchers can synthesize their advisor&rsquo;s or co-authors&rsquo; entire review pass—even after all threads are resolved—into a structured <strong>Writing Coach &amp; Learning Summary</strong>.</li>
+</ul>
+<h3 id="4-protecting-unpublished-research-data--scaling-across-classrooms">4. Protecting Unpublished Research Data &amp; Scaling Across Classrooms</h3>
+<p>For universities and schools deploying DocuMentor AI via <code>ScriptProperties</code>, linking the institution&rsquo;s Google Cloud Billing account (Paid Tier 1+) to the Gemini API project provides two essential guarantees:</p>
+<ol>
+<li><strong>Strict Academic &amp; Student Data Privacy:</strong> Under Google&rsquo;s Gemini API Terms of Service for paid/billed projects, submitted manuscripts, tables, and unpublished research figures are <strong>never used to train or improve Google models</strong>—preserving academic originality and student privacy. Additionally, DocuMentor AI automatically deletes all temporary files from the Gemini File API inside a <code>finally</code> block (<code>deleteGeminiFiles_</code>) immediately after each request.</li>
+<li><strong>High Concurrent Throughput &amp; Distributed GAS Quotas:</strong> Paid Tier rate limits allow an entire classroom of 30–40 students or a full research department to run multimodal proofreading simultaneously without hitting Free Tier RPM bottlenecks, while Google Apps Script <code>UrlFetchApp</code> quotas are counted per active student/researcher account (20,000–100,000 calls/day per user) rather than sharing a single user&rsquo;s quota.</li>
+</ol>
+<h3 id="5-beyond-prose-why-documentor-ai-is-ideal-for-multi-language-script-learning-code-review--engineer-training">5. Beyond Prose: Why DocuMentor AI Is Ideal for Multi-Language Script Learning, Code Review &amp; Engineer Training</h3>
+<p>While designing and testing DocuMentor AI, I realized that its core mechanism is not limited to natural-language essays or academic papers—it is equally powerful for <strong>coaching programming scripts across any language (Python, JavaScript, TypeScript, Go, Java, C++, Rust, SQL, Bash, Google Apps Script, and more)</strong>.</p>
+<p>Just as passive AI text rewriting leads to &ldquo;cognitive surrender&rdquo; in essay writing, software engineering education, university computer science courses, and corporate DX (citizen-developer) training face an identical crisis: <strong>&ldquo;vibe coding&rdquo;</strong>—where beginners and junior engineers blindly copy and paste AI-generated code without understanding <em>what</em> was wrong in their original script, <em>why</em> it failed at runtime, or <em>how</em> the underlying language or API actually works.</p>
+<p>When we examine both the pedagogical workflow and the internal implementation of <a href="https://github.com/tanaikech/DocuMentorAI/blob/main/src/code.js"><code>src/code.js</code></a>, three reasons make <strong>DocuMentor AI</strong> uniquely suited for <strong>multi-language script learning and educational code reviews inside Google Docs</strong>:</p>
+<ul>
+<li><strong>1. Transforming Passive Copy-Pasting into Active, Language-Agnostic Engineering Mentorship:</strong> Instead of handing over a rewritten file that replaces the learner&rsquo;s entire script at once, DocuMentor AI supports two active-learning code review modes for any programming language. In <strong>💡 Hint-Only Mode (<code>insertComment</code>)</strong>, it acts like a <strong>Socratic senior engineer mentor</strong>—highlighting the buggy, inefficient, or insecure line of code and explaining the root cause (e.g., an off-by-one error, SQL injection risk, memory leak, unclosed resource, or API misuse) so the learner can debug and refactor the line themselves first. In <strong>🚀 Suggest &amp; Coach Mode (<code>WriteMode.SUGGEST</code> + <code>addCommentReply</code>)</strong>, it acts like an <strong>educational GitHub Pull Request inline diff</strong>—crossing out the problematic line, proposing the idiomatic replacement in that target language inline, and attaching a reply with the <strong><code>💡 Reason for Revision</code></strong> and <strong><code>🎓 Learning Point</code></strong>, followed by a <strong><code>🎓 Writing Coach &amp; Learning Summary</code></strong> that diagnoses recurring coding habits across the entire script.</li>
+<li><strong>2. High Technical Affinity with DocuMentor AI&rsquo;s Line-Block &amp; Reverse-Index Engine (<code>src/code.js</code>):</strong> Why does Google Docs inline suggestion mode work so cleanly on source code regardless of the programming language? When any script is pasted into Google Docs with normal line breaks (<code>Enter</code>), Step 1 extracts each line of code as an independent paragraph block in <code>editableBlocks</code> (<code>[Block N (Body)]</code>). In Step 2, Gemini&rsquo;s strict schema rule (<code>each &quot;originalText&quot; MUST be an exact, character-for-character substring found within &quot;Target Editable Settled Text Blocks&quot; without newlines</code>) naturally guides the model to target <strong>self-contained, single-line bugs and anti-patterns</strong>. Then, in Step 3 (<code>step3_buildRequestBody()</code>), all matched code lines are sorted in <strong>reverse character-index order (<code>b.startIndex - a.startIndex</code>)</strong> and updated via <code>deleteContentRange</code> + <code>insertText</code> under <code>WriteControl.writeMode = &quot;SUGGEST&quot;</code>. As a result, indentation (even in whitespace-sensitive languages like Python!) and character offsets never shift, and clicking <strong><code>✅ Accept All Suggestions</code></strong> immediately produces a <strong>100% syntactically valid, runnable script</strong> that can be copied straight into an IDE or code editor!</li>
+<li><strong>3. Multimodal Specification-to-Code Verification (<code>Architecture Diagram + API Spec Table + Script</code>):</strong> Traditional code linters and IDE extensions only see raw text files. Because DocuMentor AI is powered by the <strong>Gemini File API&rsquo;s multimodal pipeline</strong>, an instructor, tech lead, or engineer can place a <strong>system architecture diagram (<code>Figure 1</code>)</strong>, an <strong>API specification or database schema table (<code>Table 1</code>)</strong>, and <strong>the implementation code (in Python, TypeScript, Go, GAS, etc.)</strong> inside a single Google Doc—allowing Gemini to simultaneously review the code for bugs <em>and</em> verify whether the implementation accurately matches the architecture diagram and specification table!</li>
+</ul>
+<hr>
+<h2 id="4-live-demonstration-v103-inside-the-sidebar-dashboard-prose-modes--interactive-code-review">4. Live Demonstration (<code>v1.0.3</code>): Inside the Sidebar Dashboard, Prose Modes &amp; Interactive Code Review</h2>
+<p>To see how <strong>DocuMentor AI <code>v1.0.3</code></strong> works in practice across both <strong>multimodal technical manuscripts</strong> (body text, <code>Table 1</code>, and <code>Figure 1</code>) and <strong>programming scripts</strong> (using a beginner Google Apps Script as our concrete code review example), let&rsquo;s first look at the <strong><code>v1.0.3</code> Sidebar Control Center</strong>, and then walk through three live execution cases.</p>
+<h3 id="inside-the-v103-sidebar-dashboard-sidebar_v103jpg">Inside the <code>v1.0.3</code> Sidebar Dashboard (<code>sidebar_v103.jpg</code>)</h3>
+<p><img src="https://tanaikech.github.io/image-storage/20261027a/sidebar_v103.jpg"
+     alt="DocuMentor AI v1.0.3 Sidebar Dashboard"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<p>As shown in <a href="https://tanaikech.github.io/image-storage/20261027a/sidebar_v103.jpg"><code>sidebar_v103.jpg</code></a> above, the entire workflow is controlled from a clean, four-part sidebar inside Google Docs:</p>
+<ul>
+<li><strong>1. Header &amp; Bilingual UI Switcher (<code>EN</code> / <code>JA</code>):</strong> Displays the version badge (<code>v1.0.3 • AI Proofreading Coach</code>), an info modal trigger (<code>ⓘ</code>), and a one-click language toggle (<code>EN</code> / <code>JA</code>) that switches both the sidebar labels and the language of Gemini&rsquo;s coaching explanations and learning summaries.</li>
+<li><strong>2. <code>⚙️ AI Engine &amp; API Settings</code>:</strong> Displays the API key status badge and model selector (<code>gemini-4-argon (High Precision)</code> vs. <code>gemini-3.8-flash (Fast &amp; Balanced)</code>). In Individual Mode (<code>UserProperties</code>), this card shows <code>🔒 API Key Configured (Saved)</code> with a <code>Reset</code> link as pictured above; in School/Organization Mode (<code>ScriptProperties</code>), it automatically locks to <code>🔒 API Key Configured (School / Organization Admin)</code> and hides the <code>Reset</code> link.</li>
+<li><strong>3. <code>✍️ Proofreading Scope &amp; Controls</code>:</strong> Houses the three independent pedagogical toggles—<code>🎯 Proofread Selection Only</code> (here <strong>OFF</strong> to inspect the entire active tab), <code>💡 Hint-Only Mode (Comment Without Rewrite)</code> (here turned <strong>ON</strong> with an amber border), and <code>📜 Include Resolved Review History</code> (here turned <strong>ON</strong> with an emerald border)—followed by custom instructions, quick preset chips (<code>#Concise &amp; Logical</code>, <code>#Business Tone</code>, <code>#Tables &amp; Charts</code>, <code>#Grammar &amp; Flow</code>), and action buttons (<code>💡 Run Proofreading (Hint-Only Comments)</code>, <code>🎓 Generate Learning Summary from Suggestions &amp; Comments</code>, <code>📝 Generate Initial Text from Prompt</code>, <code>✅ Accept All Suggestions</code>, <code>🧹 Clear All Suggestions</code>, and <code>🗑️ Clear All Comments</code>). Notice how toggling <strong>ON</strong> <code>💡 Hint-Only Mode</code> dynamically updates the primary button label from <code>🚀 Run Proofreading (Suggest &amp; Coach)</code> to <code>💡 Run Proofreading (Hint-Only Comments)</code>.</li>
+<li><strong>4. <code>📊 PROCESS DASHBOARD</code> (Steps 1–4):</strong> Tracks the real-time 4-stage pipeline (<code>1 Fetch Text, Tables &amp; Figures</code>, <code>2 Generate AI Proofreading &amp; Coaching</code>, <code>3 Build Suggestion Request Body</code>, and <code>4 Apply Suggestions &amp; Comments</code>), shown here in its initial <code>Waiting</code> state right before clicking run.</li>
+</ul>
+<h3 id="choosing-the-right-model-gemini-38-flash-vs-gemini-4-argon">Choosing the Right Model: <code>Gemini 3.8 Flash</code> vs. <code>Gemini 4 Argon</code></h3>
+<p>In the <strong><code>⚙️ AI Engine &amp; API Settings</code></strong> card of the sidebar, you can switch between <strong><code>gemini-3.8-flash (Fast &amp; Balanced)</code></strong> and <strong><code>gemini-4-argon (High Precision)</code></strong> at any time. Because DocuMentor AI supports both <strong>natural-language manuscript proofreading</strong> and <strong>multi-language code review</strong>, choosing the right model for your current stage of work maximizes both speed and analytical depth.</p>
+<p>The table below summarizes the recommended decision criteria across writing, research, and software engineering workflows:</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">Scenario / Use Case</th>
+          <th style="text-align: left">Domain</th>
+          <th style="text-align: left">Recommended Model</th>
+          <th style="text-align: left">Why &amp; Key Selection Criteria</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left"><strong>1. Typo, Spelling &amp; Grammar Check</strong></td>
+          <td style="text-align: left">✍️ Prose</td>
+          <td style="text-align: left"><strong>⚡ <code>Gemini 3.8 Flash</code></strong><br/><em>(Fast &amp; Balanced)</em></td>
+          <td style="text-align: left">Fixing typos, spelling mistakes, and clear grammatical errors relies primarily on pattern recognition—making Flash&rsquo;s high speed and low token cost the optimal choice.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>2. Routine Code Refactoring</strong></td>
+          <td style="text-align: left">💻 Code</td>
+          <td style="text-align: left"><strong>⚡ <code>Gemini 3.8 Flash</code></strong><br/><em>(Fast &amp; Balanced)</em></td>
+          <td style="text-align: left">Standardizing naming conventions, adding comments/docstrings, and rewriting simple functions without complex algorithmic changes complete almost instantaneously with Flash.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>3. Rapid Iterative Drafting &amp; Interactive Checks</strong></td>
+          <td style="text-align: left">✍️ Prose / 💻 Code</td>
+          <td style="text-align: left"><strong>⚡ <code>Gemini 3.8 Flash</code></strong><br/><em>(Fast &amp; Balanced)</em></td>
+          <td style="text-align: left">When actively drafting or iterating in the editor and wanting fast, rhythmic feedback or brainstorming without breaking your creative flow, Flash&rsquo;s ultra-low latency provides a stress-free experience.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>4. First-Pass Triage of Large Documents or Long Scripts</strong></td>
+          <td style="text-align: left">✍️ Prose / 💻 Code</td>
+          <td style="text-align: left"><strong>⚡ <code>Gemini 3.8 Flash</code></strong><br/><em>(Fast &amp; Balanced)</em></td>
+          <td style="text-align: left">Ideal for cost-effectively screening long manuscripts or large scripts to surface broad errors and recurring issues in a single initial pass.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>5. Logical Consistency in Academic Papers, Contracts &amp; Multimodal Figures</strong></td>
+          <td style="text-align: left">✍️ Prose &amp; 🖼️ Visuals</td>
+          <td style="text-align: left"><strong>🧠 <code>Gemini 4 Argon</code></strong><br/><em>(High Precision)</em></td>
+          <td style="text-align: left">Best when deep contextual reasoning is required to detect contradictions across claims, flawed logical progressions, subtle loopholes in legal/contractual phrasing, or cross-modal mismatches between body text, tables, and figures.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>6. Complex Algorithm &amp; Data Structure Review</strong></td>
+          <td style="text-align: left">💻 Code</td>
+          <td style="text-align: left"><strong>🧠 <code>Gemini 4 Argon</code></strong><br/><em>(High Precision)</em></td>
+          <td style="text-align: left">Shines in code reviews that require deep analytical thinking—such as optimizing time and space complexity, designing advanced data structures, and verifying subtle edge-case bugs.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>7. Security Auditing &amp; Vulnerability Detection</strong></td>
+          <td style="text-align: left">💻 Code</td>
+          <td style="text-align: left"><strong>🧠 <code>Gemini 4 Argon</code></strong><br/><em>(High Precision)</em></td>
+          <td style="text-align: left">Ideal for deeply tracing execution paths to uncover concurrency bugs (race conditions), injection vulnerabilities, credential exposure, or subtle security flaws hidden in source code.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>8. Nuanced Tone, Style &amp; Psychological Audience Adaptation</strong></td>
+          <td style="text-align: left">✍️ Prose</td>
+          <td style="text-align: left"><strong>🧠 <code>Gemini 4 Argon</code></strong><br/><em>(High Precision)</em></td>
+          <td style="text-align: left">Powerful for executing abstract, high-level editorial instructions beyond surface proofreading—such as rewriting text to achieve a specific psychological effect or persuasive tone tailored to a target audience.</td>
+      </tr>
+  </tbody>
+</table>
+<blockquote>
+<p><strong>💡 Practical Two-Pass Workflow Tip:</strong> For long academic papers or complex scripts, start with <strong><code>gemini-3.8-flash</code></strong> for a fast, low-cost <strong>First-Pass Triage</strong> (cleaning up typos, basic grammar, and naming conventions), and then switch to <strong><code>gemini-4-argon</code></strong> for your <strong>Deep Second Pass</strong> (verifying thesis/contract logic, cross-checking <code>Table 1</code> and <code>Figure 1</code>, or auditing algorithm complexity and security vulnerabilities).</p>
+</blockquote>
+<h3 id="case-a-running--hint-only-mode-active-recall-coaching-without-spoiling-the-answer">Case A: Running &ldquo;💡 Hint-Only Mode&rdquo; (Active-Recall Coaching Without Spoiling the Answer)</h3>
+<p>With the sidebar configured exactly as shown in <a href="https://tanaikech.github.io/image-storage/20261027a/sidebar_v103.jpg"><code>sidebar_v103.jpg</code></a> above (<code>gemini-4-argon (High Precision)</code>, <code>💡 Hint-Only Mode</code> <strong>ON</strong>, and <code>📜 Include Resolved Review History</code> <strong>ON</strong>), we click <strong><code>💡 Run Proofreading (Hint-Only Comments)</code></strong>:</p>
+<p><img src="https://tanaikech.github.io/image-storage/20261027a/hint_only_mode_result.jpg"
+     alt="Hint-Only Mode Execution Result in DocuMentor AI v1.0.3"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<p>Look closely at what happens across the three panes in <a href="https://tanaikech.github.io/image-storage/20261027a/hint_only_mode_result.jpg"><code>hint_only_mode_result.jpg</code></a>:</p>
+<ul>
+<li><strong>Zero Forced Rewrites on the Document Canvas (Left Pane):</strong> Not a single word of the author&rsquo;s manuscript is crossed out or overwritten with green suggestion text. Instead, phrases requiring attention—such as <code>&quot;is basically a coding platform that is provided by Google, and it is made based on the JavaScript language.&quot;</code>, <code>&quot;The most biggest advantage of using GAS is because&quot;</code>, <code>&quot;connect and integrate&quot;</code>, <code>&quot;boring daily routine works.&quot;</code>, <code>&quot;Target App&quot;</code> in <code>Table 1</code>, and <code>Figure 1</code>—are highlighted in yellow as anchored Google Docs comments (<code>insertComment</code>).</li>
+<li><strong>Socratic Coaching Comments in the Comment Stream (Center Pane):</strong> Looking at the expanded top comment card (<code>[DocuMentor AI | 💡 Hint Mode: Conciseness]</code>), DocuMentor AI identifies the exact <strong><code>🎯 Flagged Phrase</code></strong>, explains the <strong><code>💡 Issue to Check</code></strong> (<em>&ldquo;The conversational filler word &lsquo;basically&rsquo; and the passive clauses (&rsquo;that is provided by&rsquo;, &lsquo;and it is made based on&rsquo;) make this opening technical definition overly wordy&rdquo;</em>), and provides a <strong><code>🎓 Coaching Hint (Try Rewriting Yourself!)</code></strong> (<em>&ldquo;Try removing the filler adverb and tightening the two passive clauses into concise modifiers (for example, using a compound adjective for the language and a past participle phrase for the provider)&rdquo;</em>).</li>
+<li><strong>On-Demand Reference Rewrites &amp; Learning Summary (Right Sidebar):</strong> Students or researchers can attempt their own revision in the document first, and only click <strong><code>👁️ Show Reference Rewrite</code></strong> in the sidebar if they get stuck.</li>
+</ul>
+<p>Immediately after Hint-Only Mode finishes, DocuMentor AI pops up the <strong><code>🎓 Writing Coach &amp; Learning Summary</code></strong> modal dialog (which can be re-opened anytime via <strong><code>📖 Re-open Latest Learning Summary Dialog</code></strong>). Here is the exact summary output produced for this Hint-Only session:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>[🎓 Writing Coach &amp; Learning Summary (DocuMentor AI v1.0.3)]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>■ 📋 Overall Manuscript Evaluation
+</span></span><span style="display:flex;"><span>This manuscript clearly outlines the core strengths of Google Apps Script (GAS) and how it integrates with Google Workspace and the Gemini AI API. However, several grammatical errors, redundant modifiers, uncountable noun pluralizations, and overly conversational expressions remain in the body text. Additionally, the table and Figure 1 contain valuable quantitative comparisons (such as the 120-minute manual baseline and 96% time savings) that should be better aligned with the surrounding narrative. Because Hint-Only Mode is active, each flagged phrase includes a clear explanation of the underlying issue and a constructive coaching hint so you can practice revising the sentences yourself.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>■ 💡 What Was Flagged &amp; Hinted
+</span></span><span style="display:flex;"><span>Flagged grammatical errors (double superlatives, uncountable nouns like &#39;software&#39; and &#39;work&#39;, and &#39;the advantage is because&#39;), redundant word pairings (&#39;connect and integrate&#39;, &#39;many various&#39;), and awkward direct translations (&#39;there is a merit that&#39;, &#39;learning hurdle is low&#39;, &#39;very recommended&#39;). Also provided review comments on aligning Table 1 and Figure 1 with the main text.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>■ 🔍 Areas for Improvement &amp; Writing Habits
+</span></span><span style="display:flex;"><span>1. Stacking redundant modifiers or intensifiers (e.g., &#39;most biggest&#39;, &#39;many various&#39;, &#39;super simple&#39;, &#39;totally... at all&#39;). 2. Pluralizing uncountable nouns (&#39;softwares&#39;, &#39;routine works&#39;). 3. Using literal translations of non-English idioms (&#39;there is a merit that&#39;, &#39;learning hurdle is low&#39;) instead of natural English collocations.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>■ 🌱 Actionable Advice for Future Writing
+</span></span><span style="display:flex;"><span>1. Check noun countability: remember that &#39;software&#39; and &#39;work&#39; (meaning labor) are uncountable; use &#39;software&#39; and &#39;tasks&#39; instead. 2. Pair &#39;The advantage is...&#39; with a &#39;that&#39;-clause or noun phrase rather than &#39;because&#39;. 3. Use standard collocations like &#39;gentle learning curve&#39; and &#39;highly recommended&#39;, and explicitly cite your figures and tables in the body text.
+</span></span></code></pre></div><p>Notice how the Hint-Only Learning Summary does not merely list isolated typos—it diagnoses the writer&rsquo;s underlying <strong>structural habits</strong> (stacking redundant intensifiers, pluralizing uncountable nouns like <code>'softwares'</code> and <code>'works'</code>, and translating non-English idioms literally like <code>'there is a merit that'</code> or <code>'learning hurdle is low'</code>) and reminds the author to align the quantitative metrics in <code>Table 1</code> (120-minute manual baseline) and <code>Figure 1</code> (96% time savings) with the main narrative.</p>
+<hr>
+<h3 id="case-b-running--suggest--coach-mode-with-resolved-review-history-rejection-aware-surgical-edits">Case B: Running &ldquo;🚀 Suggest &amp; Coach Mode&rdquo; with Resolved Review History (Rejection-Aware Surgical Edits)</h3>
+<p>Next, let&rsquo;s see what happens when we turn <strong>OFF</strong> <strong><code>💡 Hint-Only Mode</code></strong>, keep <strong><code>📜 Include Resolved Review History</code></strong> turned <strong>ON</strong>, and click <strong><code>🚀 Run Proofreading (Suggest &amp; Coach)</code></strong>:</p>
+<p><img src="https://tanaikech.github.io/image-storage/20261027a/suggest_mode_result.jpg"
+     alt="Suggest &amp; Coach Mode Execution Result in DocuMentor AI v1.0.3"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<p>Examining <a href="https://tanaikech.github.io/image-storage/20261027a/suggest_mode_result.jpg"><code>suggest_mode_result.jpg</code></a> reveals three powerful capabilities working together:</p>
+<ul>
+<li><strong>Rejection-Aware Surgical Edits (<code>WriteMode.SUGGEST</code>) on the Canvas (Left Pane):</strong> In an earlier review pass on this document, full-sentence rewrites had been rejected by the author (stored in the document&rsquo;s resolved history). Because <strong><code>📜 Include Resolved Review History</code></strong> is active, DocuMentor AI detects that preference and automatically shifts from broad full-sentence rewrites to <strong>surgical, phrase-level inline suggestions</strong> that preserve the author&rsquo;s natural voice! Specifically, it proposes targeted replacements for <code>&quot;The most biggest advantage of using GAS is because&quot;</code> ➔ <code>&quot;The biggest advantage of using GAS is that&quot;</code>, <code>&quot;connect and integrate with many various&quot;</code> ➔ <code>&quot;integrate with various&quot;</code>, <code>&quot;boring daily routine works.&quot;</code> ➔ <code>&quot;repetitive daily tasks.&quot;</code>, <code>&quot;special softwares&quot;</code> ➔ <code>&quot;special software&quot;</code>, <code>&quot;There is a merit that you can&quot;</code> ➔ <code>&quot;A key benefit is that you can&quot;</code>, <code>&quot;learning hurdle is low,&quot;</code> ➔ <code>&quot;learning curve is gentle,&quot;</code>, and <code>&quot;is very recommended.&quot;</code> ➔ <code>&quot;is highly recommended.&quot;</code>, alongside anchored cross-modal review comments (<code>insertComment</code>) on <code>Table 1</code> (<code>&quot;Target App&quot;</code>) and <code>Figure 1</code>.</li>
+<li><strong>Native Suggestion Cards Paired with Educational Replies (Center Pane):</strong> In the Google Docs margin, every native <code>Replace: ... with ...</code> suggestion card is automatically enriched with an educational reply via <code>addCommentReply</code>. For example, on the first card (<code>Replace: “The most biggest advantage of using GAS is because” with “The biggest advantage of using GAS is that”</code>), the reply explains both the <strong><code>💡 Reason for Revision</code></strong> (<em>&ldquo;Corrects the double superlative (&lsquo;most biggest&rsquo; -&gt; &lsquo;biggest&rsquo;) and fixes the ungrammatical construction &lsquo;The advantage&hellip; is because&rsquo; by replacing &lsquo;because&rsquo; with &rsquo;that&rsquo;&rdquo;</em>) and the transferable <strong><code>🎓 Learning Point</code></strong> (<em>&ldquo;Never combine &lsquo;most&rsquo; with an &lsquo;-est&rsquo; superlative adjective, and always follow nouns like &lsquo;advantage&rsquo; or &lsquo;reason&rsquo; + &lsquo;is&rsquo; with a &rsquo;that&rsquo;-clause rather than &lsquo;because&rsquo;&rdquo;</em>).</li>
+<li><strong>Granular Accept / Reject Control (Right Sidebar &amp; Native Cards):</strong> The author can review and accept or reject each suggestion individually or in bulk from the sidebar while reading the exact rationale behind every edit.</li>
+</ul>
+<p>Here is the exact <strong><code>🎓 Writing Coach &amp; Learning Summary</code></strong> generated after running Suggest &amp; Coach Mode:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>[🎓 Writing Coach &amp; Learning Summary (DocuMentor AI v1.0.3)]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>■ 📋 Overall Manuscript Evaluation
+</span></span><span style="display:flex;"><span>Your manuscript provides a clear, well-structured introduction to Google Apps Script (GAS), effectively combining explanatory text, a summary table (Table 1), and a composite architecture and benchmark figure (Figure 1). Because previous full-sentence rewrites were rejected in favor of targeted, phrase-level improvements, this review focuses on surgical edits that preserve your natural voice while correcting specific grammatical errors (such as double superlatives, uncountable nouns, and redundant pairings) and improving alignment between the text, Table 1, and Figure 1.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>■ 🛠️ What Was Revised
+</span></span><span style="display:flex;"><span>Proposed targeted, phrase-level revisions to fix grammatical errors (&#39;most biggest&#39;, &#39;advantage... is because&#39;, &#39;softwares&#39;, &#39;routine works&#39;), eliminate tautologies (&#39;connect and integrate with many various&#39;), refine idiomatic collocations (&#39;gentle learning curve&#39;, &#39;highly recommended&#39;), and improve data consistency across Table 1 and Figure 1.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>■ 🔍 Areas for Improvement &amp; Writing Habits
+</span></span><span style="display:flex;"><span>Two recurring habits appear in the draft: (1) stacking redundant modifiers or double intensifiers (&#39;most biggest&#39;, &#39;connect and integrate&#39;, &#39;many various&#39;, &#39;totally... at all&#39;), and (2) pluralizing uncountable English nouns (&#39;softwares&#39;, &#39;works&#39;) or translating Japanese idioms literally (&#39;There is a merit that&#39;, &#39;learning hurdle is low&#39;, &#39;very recommended&#39;).
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>■ 🌱 Actionable Advice for Future Writing
+</span></span><span style="display:flex;"><span>1. Treat &#39;software&#39; and &#39;work&#39; (meaning labor/duties) as uncountable nouns; use &#39;software&#39; and &#39;tasks&#39; instead.
+</span></span><span style="display:flex;"><span>2. Pair &#39;The advantage is...&#39; with &#39;that&#39; rather than &#39;because&#39;, and never combine &#39;most&#39; with &#39;-est&#39; adjectives.
+</span></span><span style="display:flex;"><span>3. Ensure baseline numbers and service labels in your tables and figures (such as the 120-minute manual baseline and Gmail/GmailApp) match across all elements.
+</span></span></code></pre></div><p>Look at the second sentence of <code>■ 📋 Overall Manuscript Evaluation</code> above:</p>
+<blockquote>
+<p><em>&ldquo;Because previous full-sentence rewrites were rejected in favor of targeted, phrase-level improvements, this review focuses on surgical edits that preserve your natural voice while correcting specific grammatical errors&hellip;&rdquo;</em></p>
+</blockquote>
+<p>This demonstrates why combining <code>commentsViewMode=COMMENTS_VIEW_MODE_INCLUDED</code> with Gemini&rsquo;s multimodal reasoning is such a leap forward: <strong>DocuMentor AI learns from what the writer accepts and rejects within the document&rsquo;s history</strong>, adapting its coaching style to respect the writer&rsquo;s voice while still catching cross-modal discrepancies (such as matching the <code>120-minute</code> manual baseline and <code>Gmail</code>/<code>GmailApp</code> labels across the prose, <code>Table 1</code>, and <code>Figure 1</code>).</p>
+<hr>
+<h3 id="case-c-beyond-prose--interactive-multi-language-code-review--script-coaching-code_review_mode_resultjpg">Case C: Beyond Prose — Interactive Multi-Language Code Review &amp; Script Coaching (<code>code_review_mode_result.jpg</code>)</h3>
+<p>Finally, let&rsquo;s test the new use case I conceived for <strong>DocuMentor AI</strong>: <strong>coaching programming scripts and conducting line-by-line code reviews inside Google Docs</strong>. While this workflow supports <strong>any programming language</strong> (Python, JavaScript, TypeScript, Go, Java, C++, SQL, etc.), here we demonstrate it using a beginner <strong>Google Apps Script</strong> snippet (<code>sendDailyReport</code>) pasted into Google Docs. It represents a common automation task—reading rows from a Google Sheet, summarizing them with the Gemini API, and emailing the summary—written with typical beginner bugs, security risks, and API misuses:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">// Sample Beginner Google Apps Script: Summarize spreadsheet tasks with Gemini and send an email
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">sendDailyReport</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 1. Set the Gemini API key and get the target spreadsheet tab
+</span></span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">apiKey</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;AIzaSyD-1234567890abcdef_HARDCODED_KEY&#34;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">sheet</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">SpreadsheetApp</span>.<span style="color:#a6e22e">getActiveSpreadsheet</span>().<span style="color:#a6e22e">getActiveSheet</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 2. Read all task rows from the sheet (Rows 2 to 50, Columns A to C)
+</span></span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#e6db74">&#34;A2:C50&#34;</span>).<span style="color:#a6e22e">getValue</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 3. Stop execution if the retrieved task data is empty
+</span></span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">data</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;&#34;</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Logger</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;No task data found.&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 4. Call the Gemini API using UrlFetchApp to summarize today&#39;s tasks
+</span></span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=&#34;</span> <span style="color:#f92672">+</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">apiKey</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">payload</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">contents</span><span style="color:#f92672">:</span> [
+</span></span><span style="display:flex;"><span>      { <span style="color:#a6e22e">parts</span><span style="color:#f92672">:</span> [{ <span style="color:#a6e22e">text</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Summarize these tasks: &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">data</span>) }] },
+</span></span><span style="display:flex;"><span>    ],
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">response</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">UrlFetchApp</span>.<span style="color:#a6e22e">fetch</span>(<span style="color:#a6e22e">url</span>, { <span style="color:#a6e22e">method</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;post&#34;</span>, <span style="color:#a6e22e">payload</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">payload</span> });
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">response</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 5. Send the generated summary to the manager via email
+</span></span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">MailApp</span>.<span style="color:#a6e22e">sendEmail</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;manager@example.com&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;Daily Task Summary&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">result</span>.<span style="color:#a6e22e">candidates</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">content</span>.<span style="color:#a6e22e">parts</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">text</span>,
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">Logger</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Successfully sent the daily report!&#34;</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Next, we entered the following prompt into <strong>Additional Proofreading Instructions</strong> in the sidebar and clicked <strong><code>🚀 Run Proofreading (Suggest &amp; Coach)</code></strong>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>Review this Google Apps Script code for bugs, GAS API misuse, security risks, and modern V8 JavaScript best practices, proposing line-by-line code fixes.
+</span></span></code></pre></div><p>Here is the resulting Google Docs canvas and sidebar after execution (<a href="https://tanaikech.github.io/image-storage/20261027a/code_review_mode_result.jpg"><code>code_review_mode_result.jpg</code></a>):</p>
+<p><img src="https://tanaikech.github.io/image-storage/20261027a/code_review_mode_result.jpg"
+     alt="Google Apps Script Code Review Result in DocuMentor AI v1.0.3"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<p>Look at what <a href="https://tanaikech.github.io/image-storage/20261027a/code_review_mode_result.jpg"><code>code_review_mode_result.jpg</code></a> achieves across all three panes:</p>
+<ul>
+<li><strong>1. Security Fix (<code>PropertiesService</code> Instead of Hardcoded API Keys):</strong> On line 4, DocuMentor AI crosses out <code>var apiKey = &quot;AIzaSyD-1234567890abcdef_HARDCODED_KEY&quot;;</code> and suggests <code>const apiKey = PropertiesService.getScriptProperties().getProperty(&quot;GEMINI_API_KEY&quot;);</code>—teaching the developer never to hardcode credentials in source files.</li>
+<li><strong>2. GAS <code>Range</code> API Bug Fix (<code>getValues()</code> + Blank-Row Filtering Instead of <code>getValue()</code>):</strong> On line 8, beginners frequently call <code>.getValue()</code> (singular) on a multi-cell range like <code>&quot;A2:C50&quot;</code>, which silently ignores every cell except <code>A2</code>. DocuMentor AI replaces <code>var data = sheet.getRange(&quot;A2:C50&quot;).getValue();</code> with <code>const data = sheet.getRange(&quot;A2:C50&quot;).getValues().filter(row =&gt; row.some(cell =&gt; cell !== &quot;&quot;));</code> and updates <code>if (data == &quot;&quot;)</code> on line 11 to <code>if (data.length === 0)</code>. Look at the expanded comment reply in the center pane (<code>[DocuMentor AI | Bug Fix (GAS API Misuse)]</code>): it clearly explains <strong>what was wrong and why</strong> (<em>&quot;<code>getValue()</code> only returns the value of the top-left cell (<code>A2</code>), ignoring the rest of <code>A2:C50</code>. <code>getValues()</code> retrieves the entire 2D array of rows and columns, and filtering out completely blank rows prevents sending empty rows to the Gemini API&quot;</em>) and states the <strong><code>🎓 Learning Point</code></strong> (<em>&ldquo;Use <code>getValues()</code> instead of <code>getValue()</code> when reading a range that spans multiple cells, and filter out empty rows before processing&rdquo;</em>).</li>
+<li><strong>3. <code>UrlFetchApp.fetch</code> &amp; <code>HTTPResponse</code> Bug Fixes:</strong> On lines 19–20, calling <code>UrlFetchApp.fetch(url, { method: &quot;post&quot;, payload: payload })</code> with a raw object sends form-encoded data instead of JSON, and calling <code>JSON.parse(response)</code> directly on a GAS <code>HTTPResponse</code> object fails at runtime. DocuMentor AI suggests adding <code>contentType: &quot;application/json&quot;</code> with <code> payload: JSON.stringify(payload)</code> and parsing via <code>JSON.parse(response.getContentText())</code>.</li>
+<li><strong>4. Defensive Optional Chaining (<code>?.</code>) &amp; Modern V8 Syntax (<code>const</code>, Template Literals, <code>console.log</code>):</strong> On line 23, it replaces unprotected deep property access (<code>result.candidates[0].content.parts[0].text</code>) with <code>const summary = result.candidates?.[0]?.content?.parts?.[0]?.text || &quot;No summary generated.&quot;; MailApp.sendEmail(&quot;manager@example.com&quot;, &quot;Daily Task Summary&quot;, summary);</code> and upgrades legacy <code>var</code> and <code>Logger.log()</code> calls to V8 <code>const</code>, template literals, and <code>console.log()</code>. Crucially, if the learner clicks <strong><code>✅ Accept All Suggestions</code></strong>, the resulting document is a <strong>100% syntactically valid, runnable Google Apps Script</strong>!</li>
+</ul>
+<p>And here is the exact <strong><code>🎓 Writing Coach &amp; Learning Summary</code></strong> generated for this Google Apps Script review:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>[🎓 Writing Coach &amp; Learning Summary (DocuMentor AI v1.0.3)]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>■ 📋 Overall Manuscript Evaluation
+</span></span><span style="display:flex;"><span>This Google Apps Script snippet provides a clear high-level workflow for reading spreadsheet tasks, summarizing them with the Gemini API, and sending an email report. However, it contains several critical runtime bugs, a major security vulnerability (hardcoded API key), incorrect Google Apps Script API methods (such as using `getValue()` for a multi-cell range and improperly configuring `UrlFetchApp.fetch` for JSON), and outdated ES5 `var` declarations. Applying the line-by-line fixes below will make the script secure, functional, and compliant with modern V8 JavaScript standards.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>■ 🛠️ What Was Revised
+</span></span><span style="display:flex;"><span>Replaced the hardcoded API key with `PropertiesService`, fixed `getValue()` to `getValues()` for multi-row range reading, updated the empty-data check to inspect the 2D array properly, corrected the Gemini model name and `UrlFetchApp` JSON payload configuration, fixed `HTTPResponse` parsing with `getContentText()`, added optional chaining for safer response access, and modernized variable declarations from `var` to `const`.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>■ 🔍 Areas for Improvement &amp; Writing Habits
+</span></span><span style="display:flex;"><span>The script shows common beginner pitfalls in Google Apps Script: confusing single-cell and multi-cell `Range` methods (`getValue` vs. `getValues`), assuming `UrlFetchApp.fetch` automatically serializes JavaScript objects as JSON and returns a string directly, hardcoding sensitive credentials in source code, and using legacy `var` syntax instead of V8&#39;s `const`/`let`.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>■ 🌱 Actionable Advice for Future Writing
+</span></span><span style="display:flex;"><span>1. Always store API keys in Script Properties (`PropertiesService.getScriptProperties()`). 2. When working with multi-cell ranges, use `getValues()` and remember it returns a 2D array (`[][]`) even for empty cells. 3. When calling REST APIs with `UrlFetchApp`, always set `contentType: &#39;application/json&#39;`, stringify the payload (`JSON.stringify()`), and call `.getContentText()` on the response before parsing.
+</span></span></code></pre></div><p>Instead of blindly copying a rewritten block of code from a chatbot without knowing what changed, an aspiring engineer or computer science student gets an <strong>interactive line-by-line code review right inside Google Docs</strong>—learning <em>what</em> was broken, <em>why</em> it failed, and <em>how</em> to write production-grade Google Apps Script in the future.</p>
+<hr>
+<h2 id="5-comparison-individual-mode-vs-school-organization--academic-lab-mode">5. Comparison: Individual Mode vs. School, Organization &amp; Academic Lab Mode</h2>
+<p>Both modes run from the <strong>exact same three files</strong> in <a href="https://github.com/tanaikech/DocuMentorAI/tree/main/src"><code>src/</code></a>:</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">Aspect</th>
+          <th style="text-align: left">👤 Individual Mode (Personal Setup)</th>
+          <th style="text-align: left">🏫 School, Organization &amp; Academic Lab Mode</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left"><strong>Target Users</strong></td>
+          <td style="text-align: left">Individual writers, independent researchers, developers, bloggers.</td>
+          <td style="text-align: left">K–12 schools, university classes, academic research labs, corporate teams.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>Deployment Type</strong></td>
+          <td style="text-align: left">Container-bound script inside a Google Doc (<code>Extensions &gt; Apps Script</code>).</td>
+          <td style="text-align: left">Standalone script published as a <strong>Private (Domain-Internal)</strong> Google Workspace Marketplace Editor Add-on.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>Code Changes Required</strong></td>
+          <td style="text-align: left"><strong>None</strong> (copy &amp; paste <a href="https://github.com/tanaikech/DocuMentorAI/tree/main/src"><code>src/</code></a> as-is).</td>
+          <td style="text-align: left"><strong>None</strong> (copy &amp; paste the exact same <a href="https://github.com/tanaikech/DocuMentorAI/tree/main/src"><code>src/</code></a> files as-is).</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>Where the Gemini API Key Is Stored</strong></td>
+          <td style="text-align: left"><code>PropertiesService.getUserProperties()</code> (entered by the user in the sidebar UI).</td>
+          <td style="text-align: left"><code>PropertiesService.getScriptProperties()</code> (entered once by the IT Admin in <strong>Project Settings ⚙️ &gt; Script Properties</strong>).</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>Sidebar API Key UI</strong></td>
+          <td style="text-align: left">Shows input box on first run; once saved, shows <code>🔒 API Key Configured (Saved)</code> + <strong>Reset</strong> button.</td>
+          <td style="text-align: left">Automatically locked: shows <code>🔒 API Key Configured (School / Organization Admin)</code> with <strong>no input box and no Reset button</strong>.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>API Key Security</strong></td>
+          <td style="text-align: left">Private to the individual user&rsquo;s Google account.</td>
+          <td style="text-align: left"><strong>100% isolated:</strong> Students/end users cannot open <code>Apps Script</code>, cannot view <code>ScriptProperties</code>, and never need Google AI Studio.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>Document Availability</strong></td>
+          <td style="text-align: left">Available in the Google Doc where the script was pasted.</td>
+          <td style="text-align: left"><strong>Available in every Google Doc</strong> across the school/lab domain (installed automatically via Google Admin Console for OUs).</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>Step-by-Step Guide</strong></td>
+          <td style="text-align: left">👉 <strong><a href="https://github.com/tanaikech/DocuMentorAI/blob/main/INSTALL_INDIVIDUAL.md"><code>INSTALL_INDIVIDUAL.md</code></a></strong></td>
+          <td style="text-align: left">👉 <strong><a href="https://github.com/tanaikech/DocuMentorAI/blob/main/INSTALL_ORGANIZATION.md"><code>INSTALL_ORGANIZATION.md</code></a></strong></td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="6-quick-walkthrough-of-the-two-setup-workflows">6. Quick Walkthrough of the Two Setup Workflows</h2>
+<h3 id="workflow-a-individual-setup-3-minutes">Workflow A: Individual Setup (3 Minutes)</h3>
+<ol>
+<li><strong>Open Apps Script:</strong> Open your Google Document and click <strong>Extensions &gt; Apps Script</strong>.</li>
+<li><strong>Paste the Source Files:</strong> Enable <code>appsscript.json</code> in <strong>Project Settings (⚙️)</strong>, and copy <a href="https://github.com/tanaikech/DocuMentorAI/blob/main/src/appsscript.json"><code>src/appsscript.json</code></a>, <a href="https://github.com/tanaikech/DocuMentorAI/blob/main/src/code.js"><code>src/code.js</code></a> (into <code>Code.gs</code>), and <a href="https://github.com/tanaikech/DocuMentorAI/blob/main/src/index.html"><code>src/index.html</code></a> into the editor.</li>
+<li><strong>Save Your Personal Key:</strong> Reload the Google Doc, click <strong><code>✦ DocuMentor AI</code> &gt; <code>Open Dashboard</code></strong>, paste your Gemini API key into the sidebar, and click <strong>Save</strong>. For detailed instructions, see <strong><a href="https://github.com/tanaikech/DocuMentorAI/blob/main/INSTALL_INDIVIDUAL.md"><code>INSTALL_INDIVIDUAL.md</code></a></strong>.</li>
+</ol>
+<h3 id="workflow-b-zero-code-school-university--organization-rollout-10-minutes-for-it-admins">Workflow B: Zero-Code School, University &amp; Organization Rollout (10 Minutes for IT Admins)</h3>
+<ol>
+<li><strong>Create a Standalone Script &amp; Set <code>ScriptProperties</code>:</strong> Open <a href="https://script.google.com/">script.google.com</a>, create a new project, and paste <a href="https://github.com/tanaikech/DocuMentorAI/blob/main/src/appsscript.json"><code>src/appsscript.json</code></a>, <a href="https://github.com/tanaikech/DocuMentorAI/blob/main/src/code.js"><code>src/code.js</code></a>, and <a href="https://github.com/tanaikech/DocuMentorAI/blob/main/src/index.html"><code>src/index.html</code></a>. Then open <strong>Project Settings (⚙️) &gt; Script Properties</strong>, click <strong>Add script property</strong>, set Property = <code>GEMINI_API_KEY</code> and Value = your organization&rsquo;s Gemini API key, and click <strong>Save</strong>.</li>
+<li><strong>Publish as a Private (Internal) Marketplace Add-on:</strong> Link a standard GCP project number in Apps Script <strong>Project Settings (⚙️)</strong> and create an <strong>Add-on</strong> deployment (<strong>Deploy &gt; New deployment</strong>). In the GCP Console, enable <strong><code>Google Docs API</code></strong> and <strong><code>Google Workspace Marketplace SDK</code></strong>, set the <strong>OAuth Consent Screen</strong> to <strong><code>Internal</code></strong>, and configure the <strong>Google Workspace Marketplace SDK</strong> with <strong>Visibility: <code>Private</code></strong> (domain-only, requiring zero public review wait time).</li>
+<li><strong>Install for Student / Researcher Organizational Units:</strong> In the <a href="https://admin.google.com/">Google Workspace Admin Console (<code>admin.google.com</code>)</a>, go to <strong>Apps &gt; Google Workspace Marketplace apps &gt; Apps list &gt; Install app &gt; Internal apps</strong>, select <strong>DocuMentor AI</strong>, and perform an <strong>Admin install</strong> for your target Organizational Units (e.g., <code>/Students</code>, <code>/GraduateLab</code>, or domain-wide). Students and researchers can immediately open any Google Doc and launch <strong>Extensions &gt; DocuMentor AI &gt; Open Dashboard</strong> with the organization&rsquo;s API key pre-configured and locked. For the complete IT Administrator checklist and prerequisites, see <strong><a href="https://github.com/tanaikech/DocuMentorAI/blob/main/INSTALL_ORGANIZATION.md"><code>INSTALL_ORGANIZATION.md</code></a></strong>.</li>
+</ol>
+<hr>
+<h2 id="summary">Summary</h2>
+<p>By evolving <strong>DocuMentor AI (<code>v1.0.3</code>)</strong> to support both <strong>Individual Mode (<code>UserProperties</code>)</strong> and <strong>School, Organization &amp; Academic Mode (<code>ScriptProperties</code> + Private Google Workspace Marketplace Add-on)</strong> within a single codebase—and combining <strong>💡 Hint-Only Mode</strong>, <strong>🚀 Rejection-Aware Suggest &amp; Coach Mode</strong>, <strong>💻 Interactive Code Review &amp; Script Coaching</strong>, and <strong>🎓 Retrospective Learning Summaries</strong>—anyone from an independent writer, software engineer, or academic researcher to a school IT administrator can deploy a safe, multimodal, pedagogical writing and coding coach inside Google Docs without modifying a single line of code.</p>
+<p>All updated source code, sample multimodal manuscripts, and separated installation guides are available on GitHub:</p>
+<ul>
+<li><strong>GitHub Repository:</strong> <a href="https://github.com/tanaikech/DocuMentorAI">https://github.com/tanaikech/DocuMentorAI</a></li>
+<li><strong>Previous Article (Part 1):</strong> <a href="https://medium.com/google-cloud/building-a-multimodal-suggestion-based-ai-writing-coach-with-gemini-and-google-docs-ea07244fed99">Building a Multimodal, Suggestion-Based AI Writing Coach with Gemini and Google Docs</a></li>
+<li><strong>👤 Individual Setup Guide:</strong> <a href="https://github.com/tanaikech/DocuMentorAI/blob/main/INSTALL_INDIVIDUAL.md">INSTALL_INDIVIDUAL.md</a></li>
+<li><strong>🏫 School, University &amp; Organization Setup Guide:</strong> <a href="https://github.com/tanaikech/DocuMentorAI/blob/main/INSTALL_ORGANIZATION.md">INSTALL_ORGANIZATION.md</a></li>
+</ul>
+
+  
+  <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2026%2f10%2f27%2fbeyond-passive-ai-rewrites-and-vibe-coding-in-google-docs%2f" target="_blank" title="Share on Facebook"><i class="fab fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2026%2f10%2f27%2fbeyond-passive-ai-rewrites-and-vibe-coding-in-google-docs%2f" target="_blank" title="Tweet"><i class="fab fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f10%2f27%2fbeyond-passive-ai-rewrites-and-vibe-coding-in-google-docs%2f" target="_blank" title="Share on Google+"><i class="fab fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2026%2f10%2f27%2fbeyond-passive-ai-rewrites-and-vibe-coding-in-google-docs%2f" target="_blank" title="Post to Tumblr"><i class="fab fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f10%2f27%2fbeyond-passive-ai-rewrites-and-vibe-coding-in-google-docs%2f" target="_blank" title="Pin it"><i class="fab fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f10%2f27%2fbeyond-passive-ai-rewrites-and-vibe-coding-in-google-docs%2f" target="_blank" title="Submit to Reddit"><i class="fab fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
+
+
+  
+<nav class="prev-next-posts">
+  <div class="prev-post">
+    
+      <span class="nav-label">Previous Article</span>
+      <a href="https://tanaikech.github.io/2026/10/23/building-a-multimodal-suggestion-based-ai-writing-coach-with-gemini-and-google-docs/">Building a Multimodal, Suggestion-Based AI Writing Coach with Gemini and Google Docs</a>
+    
+  </div>
+  <div class="next-post">
+    
+  </div>
+</nav>
+
+<style>
+.prev-next-posts {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+  gap: 2rem;
+}
+.prev-post, .next-post {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.next-post {
+  text-align: right;
+}
+.nav-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+.prev-next-posts a {
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-decoration: none;
+}
+@media (max-width: 600px) {
+  .prev-next-posts { flex-direction: column; text-align: left; }
+  .next-post { text-align: left; }
+}
+</style>
+
+
+  
+  
+  
+  
+
+  
+
+</div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-social"><a href="https://twitter.com/tanaikech" target="_blank" rel="me" title="twitter">
+                  <i class="fab fa-x-twitter"></i>
+                </a><a href="https://github.com/tanaikech" target="_blank" rel="me" title="github">
+                  <i class="fab fa-github"></i>
+                </a><a href="https://linkedin.com/in/tanaike" target="_blank" rel="me" title="linkedin">
+                  <i class="fab fa-linkedin"></i>
+                </a><a href="https://www.youtube.com/@tanaike" target="_blank" rel="me" title="youtube">
+                  <i class="fab fa-youtube"></i>
+                </a><a href="https://medium.com/@tanaike" target="_blank" rel="me" title="medium">
+                  <i class="fab fa-medium"></i>
+                </a><a href="https://stackoverflow.com/users/7108653" target="_blank" rel="me" title="stackoverflow">
+                  <i class="fab fa-stack-overflow"></i>
+                </a><a href="https://zenn.dev/tanaike" target="_blank" rel="me" title="zenn">
+                  <i class="fas fa-edit"></i>
+                </a><a href="https://dev.to/tanaike" target="_blank" rel="me" title="devto">
+                  <i class="fab fa-dev"></i>
+                </a><a href="https://devpost.com/tanaike" target="_blank" rel="me" title="devpost">
+                  <i class="fas fa-terminal"></i>
+                </a><a href="https://orcid.org/0009-0004-2510-1163" target="_blank" rel="me" title="orcid">
+                  <i class="fab fa-orcid"></i>
+                </a>
+      </div>
+      
+      <p class="copyright">
+        &copy; 2026 tanaike - Google Apps Script, Gemini API, and Developer Tips. Built with <a href="https://gohugo.io" target="_blank">Hugo</a>.
+      </p>
+    </div>
+  </footer>
+
+  <script src="https://tanaikech.github.io/js/eclipse.js"></script>
+
+  
+  
+
+  
+  
+
+  
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
+<script>
+  
+  if (window.location.hostname != "localhost") {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-J3Z6T50WL5');
+  }
+</script>
+
+
+
+  
+
+  
+
+</body>
+</html>
+
