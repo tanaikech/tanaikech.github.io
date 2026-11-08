@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Hugo 0.157.0">
+
+  
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+  
+  <meta name="theme-color" content="#050505">
+
+  
+  <meta name="google-site-verification" content="googleccbde819fe280caa.html" />
+
+  
+  
+
+  <meta name="keywords" content="golang, Google Workspace, Gemini, document">
+
+  <meta name="description" content="Gists
+A Go CLI and MCP server that turns Gemini and any AI agent into a Socratic writing and code review coach
+
+
+Figure 1. Overview of the gdocumentor architecture and its four core pillars.
+In my previous two articles—Building a Multimodal, Suggestion-Based AI Writing Coach with Gemini and Google Docs (Ref) and Beyond Passive AI Rewrites and Vibe Coding in Google Docs (Ref)—I introduced the Google Apps Script add-on DocuMentor AI (Ref). Those earlier articles explain the foundational inspiration behind the project, how programmatic Google Docs API (v1) suggestions and comments (Ref) can replace passive AI ghostwriting with active learning, and how a single Google Docs container-bound or Marketplace script can serve both individuals and school/enterprise domains. For background on those foundational concepts and the Google Apps Script implementation, please refer to those two published articles (Ref, Ref).">
+
+  
+  <link rel="canonical" href="https://tanaikech.github.io/2026/11/08/stop-passive-ai-rewrites-agentic-coaching-in-google-docs-with-gdocumentor/">
+
+  
+  <title>Stop Passive AI Rewrites: Agentic Coaching in Google Docs with gdocumentor | tanaike - Google Apps Script, Gemini API, and Developer Tips</title>
+
+  
+  <meta property="og:title" content="Stop Passive AI Rewrites: Agentic Coaching in Google Docs with gdocumentor">
+  <meta property="og:description" content="Gists
+A Go CLI and MCP server that turns Gemini and any AI agent into a Socratic writing and code review coach
+
+
+Figure 1. Overview of the gdocumentor architecture and its four core pillars.
+In my previous two articles—Building a Multimodal, Suggestion-Based AI Writing Coach with Gemini and Google Docs (Ref) and Beyond Passive AI Rewrites and Vibe Coding in Google Docs (Ref)—I introduced the Google Apps Script add-on DocuMentor AI (Ref). Those earlier articles explain the foundational inspiration behind the project, how programmatic Google Docs API (v1) suggestions and comments (Ref) can replace passive AI ghostwriting with active learning, and how a single Google Docs container-bound or Marketplace script can serve both individuals and school/enterprise domains. For background on those foundational concepts and the Google Apps Script implementation, please refer to those two published articles (Ref, Ref).">
+  <meta property="og:url" content="https://tanaikech.github.io/2026/11/08/stop-passive-ai-rewrites-agentic-coaching-in-google-docs-with-gdocumentor/">
+  <meta property="og:site_name" content="tanaike - Google Apps Script, Gemini API, and Developer Tips">
+  <meta property="og:type" content="article"><meta property="og:image" content="https://tanaikech.github.io/img/og-main.png">
+
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@tanaikech">
+  <meta name="twitter:title" content="Stop Passive AI Rewrites: Agentic Coaching in Google Docs with gdocumentor">
+  <meta name="twitter:description" content="Gists
+A Go CLI and MCP server that turns Gemini and any AI agent into a Socratic writing and code review coach
+
+
+Figure 1. Overview of the gdocumentor architecture and its four core pillars.
+In my previous two articles—Building a Multimodal, Suggestion-Based AI Writing Coach with Gemini and Google Docs (Ref) and Beyond Passive AI Rewrites and Vibe Coding in Google Docs (Ref)—I introduced the Google Apps Script add-on DocuMentor AI (Ref). Those earlier articles explain the foundational inspiration behind the project, how programmatic Google Docs API (v1) suggestions and comments (Ref) can replace passive AI ghostwriting with active learning, and how a single Google Docs container-bound or Marketplace script can serve both individuals and school/enterprise domains. For background on those foundational concepts and the Google Apps Script implementation, please refer to those two published articles (Ref, Ref).">
+  <meta name="twitter:image" content="https://tanaikech.github.io/img/og-main.png">
+
+  
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [{
+        "@type": "BlogPosting",
+        "headline": "\"Stop Passive AI Rewrites: Agentic Coaching in Google Docs with gdocumentor\"",
+        "description": "\"\\u003cp\\u003e\\u003ca href=\\\"https://gist.github.com/tanaikech/45dd7398a47f8fa2c3bea6d23d2ce626\\\"\\u003eGists\\u003c/a\\u003e\\u003c/p\\u003e\\n\\u003ch3 id=\\\"a-go-cli-and-mcp-server-that-turns-gemini-and-any-ai-agent-into-a-socratic-writing-and-code-review-coach\\\"\\u003eA Go CLI and MCP server that turns Gemini and any AI agent into a Socratic writing and code review coach\\u003c/h3\\u003e\\n\\u003cp\\u003e\\u003cimg src=\\\"https://tanaikech.github.io/image-storage/20261108a/gdocumentor_infographic.jpg\\\"\\n     alt=\\\"Figure 1. Overview of the gdocumentor architecture and its four core pillars.\\\"\\n     \\n     loading=\\\"lazy\\\"\\n     decoding=\\\"async\\\"\\u003e\\n\\n\\u003cem\\u003eFigure 1. Overview of the \\u003ccode\\u003egdocumentor\\u003c/code\\u003e architecture and its four core pillars.\\u003c/em\\u003e\\u003c/p\\u003e\\n\\u003cp\\u003eIn my previous two articles—\\u003cem\\u003eBuilding a Multimodal, Suggestion-Based AI Writing Coach with Gemini and Google Docs\\u003c/em\\u003e (\\u003ca href=\\\"https://medium.com/google-cloud/building-a-multimodal-suggestion-based-ai-writing-coach-with-gemini-and-google-docs-ea07244fed99\\\"\\u003eRef\\u003c/a\\u003e) and \\u003cem\\u003eBeyond Passive AI Rewrites and Vibe Coding in Google Docs\\u003c/em\\u003e (\\u003ca href=\\\"https://medium.com/google-cloud/beyond-passive-ai-rewrites-and-vibe-coding-in-google-docs-d1ea10a36d4f\\\"\\u003eRef\\u003c/a\\u003e)—I introduced the Google Apps Script add-on \\u003cstrong\\u003eDocuMentor AI\\u003c/strong\\u003e (\\u003ca href=\\\"https://github.com/tanaikech/DocuMentorAI\\\"\\u003eRef\\u003c/a\\u003e). Those earlier articles explain the foundational inspiration behind the project, how programmatic Google Docs API (\\u003ccode\\u003ev1\\u003c/code\\u003e) suggestions and comments (\\u003ca href=\\\"https://developers.google.com/workspace/docs/api/how-tos/suggestions\\\"\\u003eRef\\u003c/a\\u003e) can replace passive AI ghostwriting with active learning, and how a single Google Docs container-bound or Marketplace script can serve both individuals and school/enterprise domains. For background on those foundational concepts and the Google Apps Script implementation, please refer to those two published articles (\\u003ca href=\\\"https://medium.com/google-cloud/building-a-multimodal-suggestion-based-ai-writing-coach-with-gemini-and-google-docs-ea07244fed99\\\"\\u003eRef\\u003c/a\\u003e, \\u003ca href=\\\"https://medium.com/google-cloud/beyond-passive-ai-rewrites-and-vibe-coding-in-google-docs-d1ea10a36d4f\\\"\\u003eRef\\u003c/a\\u003e).\\u003c/p\\u003e\"",
+        "url": "\"https://tanaikech.github.io/2026/11/08/stop-passive-ai-rewrites-agentic-coaching-in-google-docs-with-gdocumentor/\"",
+        "datePublished": "\"2026-11-08T11:08:59+09:00\"",
+        "dateModified": "\"2026-11-08T11:08:59+09:00\"",
+        "wordCount":  5445 ,
+        "author": {
+          "@id": "https:\/\/tanaikech.github.io\/#person"
+        },
+        "publisher": {
+          "@id": "https:\/\/tanaikech.github.io\/#person"
+        },
+        "image": {
+          "@type": "ImageObject",
+          "url": "\"https://tanaikech.github.io/img/og-main.png\"",
+          "width": 1200,
+          "height": 630
+        },
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "\"https://tanaikech.github.io/2026/11/08/stop-passive-ai-rewrites-agentic-coaching-in-google-docs-with-gdocumentor/\""
+        }
+      },{
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "\"https://tanaikech.github.io/\""
+          },{
+            "@type": "ListItem",
+            "position": 2,
+            "name": "\"Stop Passive AI Rewrites: Agentic Coaching in Google Docs with gdocumentor\"",
+            "item": "\"https://tanaikech.github.io/2026/11/08/stop-passive-ai-rewrites-agentic-coaching-in-google-docs-with-gdocumentor/\""
+          }]
+      },      {
+        "@type": "Person",
+        "@id": "https:\/\/tanaikech.github.io\/#person",
+        "name": "Kanshi Tanaike",
+        "alternateName": "tanaike",
+        "url": "\"https://tanaikech.github.io/\"",
+        "image": "\"https://tanaikech.github.io/img/og-main.png\"",
+        "jobTitle": "Google Developer Expert",
+        "honorificPrefix": "Ph.D.",
+        "description": "Japanese scientist, Physicist and Google Developer Expert for Google Workspace.",
+        "award": "First place in the Outstanding GDE Award 2025",
+        "sameAs": [
+          "https://twitter.com/tanaikech",
+          "https://github.com/tanaikech",
+          "https://stackoverflow.com/users/7108653/tanaike",
+          "https://developers.google.com/community/experts/directory?text=tanaike",
+          "https://zenn.dev/tanaike",
+          "https://medium.com/@tanaike",
+          "https://orcid.org/0009-0004-2510-1163"
+        ]
+      }
+    ]
+  }
+  </script>
+
+  
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/eclipse.css">
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <link rel="shortcut icon" href="https://tanaikech.github.io/img/favicon.ico" type="image/x-icon" />
+  
+  
+  
+
+  
+  
+  
+</head>
+
+
+<body>
+  <div id="progress-bar"></div>
+  
+  <header class="site-header">
+    <div class="header-container">
+      
+      <div class="header-top">
+        <div class="site-title">
+          <a href="https://tanaikech.github.io/">TANAIKE</a>
+          
+            <div class="site-subtitle">The Thinker</div>
+          
+        </div>
+
+        
+        <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+
+      
+      <div id="mobile-menu" class="mobile-menu-content">
+        <div class="nav-row">
+          <div class="nav-links">
+            
+              <a href="https://tanaikech.github.io/about/" title="">
+                <i class='fa fa-user fa-fw'></i> About
+              </a>
+            
+              <a href="https://tanaikech.github.io/post/" title="">
+                <i class='fa fa-list fa-fw'></i> Articles
+              </a>
+            
+              <a href="https://tanaikech.github.io/topics/" title="">
+                <i class='fa fa-folder fa-fw'></i> Topics
+              </a>
+            
+              <a href="https://tanaikech.github.io/tags/" title="">
+                <i class='fa fa-tags fa-fw'></i> Tags
+              </a>
+            
+              <a href="https://tanaikech.github.io/contact/" title="">
+                <i class='fa fa-phone fa-fw'></i> Contact
+              </a>
+            
+              <a href="https://tanaikech.github.io/link/" title="">
+                <i class='fa fa-thumbs-up fa-fw'></i> Links
+              </a>
+            
+              <a href="https://tanaikech.github.io/webapps/" title="">
+                <i class='fas fa-toolbox'></i> Web Applications
+              </a>
+            
+              <a href="https://tanaikech.github.io/donate/" title="">
+                <i class='fas fa-donate'></i> Donate
+              </a>
+            
+              <a href="https://tanaikech.github.io/" title="">
+                <i class='fa fa-home fa-fw'></i> Home
+              </a>
+            
+          </div>
+        </div>
+
+        <div class="social-links-row"><a href="https://twitter.com/tanaikech" target="_blank" rel="me">
+                <i class="fab fa-x-twitter"></i> X
+              </a><a href="https://medium.com/@tanaike" target="_blank" rel="me">
+                <i class="fab fa-medium"></i> Medium
+              </a><a href="https://www.youtube.com/@tanaike" target="_blank" rel="me">
+                <i class="fab fa-youtube"></i> YouTube
+              </a><a href="https://linkedin.com/in/tanaike" target="_blank" rel="me">
+                <i class="fab fa-linkedin"></i> LinkedIn
+              </a><a href="https://github.com/tanaikech" target="_blank" rel="me">
+                <i class="fab fa-github"></i> GitHub
+              </a><a href="https://gist.github.com/tanaikech" target="_blank" rel="me">
+                <i class="fas fa-code"></i> Gists
+              </a><a href="https://stackoverflow.com/users/7108653" target="_blank" rel="me">
+                <i class="fab fa-stack-overflow"></i> Stack Overflow
+              </a><a href="https://dev.to/tanaike" target="_blank" rel="me">
+                <i class="fab fa-dev"></i> DEV
+              </a><a href="https://zenn.dev/tanaike" target="_blank" rel="me">
+                <i class="fas fa-edit"></i> Zenn
+              </a><a href="https://devpost.com/tanaike" target="_blank" rel="me">
+                <i class="fas fa-terminal"></i> Devpost
+              </a><a href="https://orcid.org/0009-0004-2510-1163" target="_blank" rel="me">
+                <i class="fab fa-orcid"></i> ORCID
+              </a></div>
+      </div>
+
+    </div>
+  </header>
+
+  <main id="main">
+
+
+<div class="header">
+  <h1>Stop Passive AI Rewrites: Agentic Coaching in Google Docs with gdocumentor</h1>
+  <h2></h2>
+</div>
+<div class="content">
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>08 Nov 2026, 11:08</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gotips">GoTips</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/clitool">CLITool</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/document">document</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/golang">golang</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-workspace">Google Workspace</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/gemini">Gemini</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/document">document</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  <p><a href="https://gist.github.com/tanaikech/45dd7398a47f8fa2c3bea6d23d2ce626">Gists</a></p>
+<h3 id="a-go-cli-and-mcp-server-that-turns-gemini-and-any-ai-agent-into-a-socratic-writing-and-code-review-coach">A Go CLI and MCP server that turns Gemini and any AI agent into a Socratic writing and code review coach</h3>
+<p><img src="https://tanaikech.github.io/image-storage/20261108a/gdocumentor_infographic.jpg"
+     alt="Figure 1. Overview of the gdocumentor architecture and its four core pillars."
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 1. Overview of the <code>gdocumentor</code> architecture and its four core pillars.</em></p>
+<p>In my previous two articles—<em>Building a Multimodal, Suggestion-Based AI Writing Coach with Gemini and Google Docs</em> (<a href="https://medium.com/google-cloud/building-a-multimodal-suggestion-based-ai-writing-coach-with-gemini-and-google-docs-ea07244fed99">Ref</a>) and <em>Beyond Passive AI Rewrites and Vibe Coding in Google Docs</em> (<a href="https://medium.com/google-cloud/beyond-passive-ai-rewrites-and-vibe-coding-in-google-docs-d1ea10a36d4f">Ref</a>)—I introduced the Google Apps Script add-on <strong>DocuMentor AI</strong> (<a href="https://github.com/tanaikech/DocuMentorAI">Ref</a>). Those earlier articles explain the foundational inspiration behind the project, how programmatic Google Docs API (<code>v1</code>) suggestions and comments (<a href="https://developers.google.com/workspace/docs/api/how-tos/suggestions">Ref</a>) can replace passive AI ghostwriting with active learning, and how a single Google Docs container-bound or Marketplace script can serve both individuals and school/enterprise domains. For background on those foundational concepts and the Google Apps Script implementation, please refer to those two published articles (<a href="https://medium.com/google-cloud/building-a-multimodal-suggestion-based-ai-writing-coach-with-gemini-and-google-docs-ea07244fed99">Ref</a>, <a href="https://medium.com/google-cloud/beyond-passive-ai-rewrites-and-vibe-coding-in-google-docs-d1ea10a36d4f">Ref</a>).</p>
+<p>In this third installment, I introduce <strong><code>gdocumentor</code></strong> (<a href="https://github.com/tanaikech/gdocumentor">Ref</a>)—a high-performance <strong>Golang CLI tool</strong>, <strong>Global Model Context Protocol (MCP) Server (<code>gdocumentor mcp</code>)</strong>, and <strong>Google Antigravity Agent Skill / Plugin</strong> (with support for 7 major AI agent environments) that liberates DocuMentor AI from the confines of a single open browser tab and transforms it into a <strong>1-to-N scriptable, terminal-native, and autonomous AI-agent-driven coaching and document automation platform</strong>.</p>
+<h3 id="the-4-core-pillars-figure-1">The 4 Core Pillars (Figure 1)</h3>
+<ul>
+<li><strong>1. Multi-Source Input &amp; Scoped Workspace:</strong> Ingests local files (<code>.md</code>, <code>.pdf</code>, <code>.docx</code>, <code>.txt</code>, source code), <code>stdin</code>, Web/GitHub URLs (<code>#Lstart-Lend</code>), and Google Docs (<code>-d &lt;docId&gt;</code>), with scoped line/character ranges (<code>-t</code>, <code>--range</code>) and automatic cross-file dependency discovery (<code>--auto-deps</code>).</li>
+<li><strong>2. Parallel Pipeline, RAG Persona &amp; Dual AI Engine:</strong> Runs concurrent Go goroutine I/O (<code>sync.WaitGroup</code>) with custom personas (<code>--persona</code>) and RAG rulebooks (<code>-r</code>). <strong>Standalone CLI Mode</strong> calls the built-in Gemini API (<code>gemini-3.8-flash</code> / <code>gemini-4-argon</code>) via <code>GEMINI_API_KEY</code>, while <strong>MCP Server Mode (<code>gdocumentor mcp</code>)</strong> uses the <strong>client AI agent&rsquo;s own LLM (Host AI)</strong> (<strong>no <code>GEMINI_API_KEY</code> required</strong>).</li>
+<li><strong>3. Dual Coaching Modes, 0-Token Direct Editing &amp; Decision Record:</strong> Supports <strong>Google Docs OAuth2 Mode</strong> (bottom-up UTF-16 <code>WriteMode.SUGGEST</code> inline edits, Socratic <code>--hint</code> comments, and a <strong><code>🎓 DocuMentor AI Summary</code></strong> tab via <code>--summary-tab</code>), <strong>Zero-Auth Local Mode (<code>--no-auth</code>)</strong> for local Markdown reports (<code>-o</code>), <strong>0-Token Direct Editing (<code>edit</code>)</strong> for Markdown/table/image insertion and resizing, and <strong>Decision Record</strong> tracking (<code>Accepted</code>, <code>Edited</code>, <code>Rejected</code>, <code>Expired</code>).</li>
+<li><strong>4. Universal Interfaces &amp; Multi-Agent MCP:</strong> Provides an interactive CLI TUI, a pure JSON stream (<code>--json</code>), and 6 MCP tools (<code>proofread</code>, <code>summary</code>, <code>inspect</code>, <code>draft</code>, <code>edit</code>, <code>manage</code>).</li>
+</ul>
+<hr>
+<h2 id="1-defining-the-problem--why-move-beyond-a-browser-add-on">1. Defining the Problem &amp; Why Move Beyond a Browser Add-on</h2>
+<h3 id="why-passive-ai-rewrites-fail">Why Passive AI Rewrites Fail</h3>
+<ul>
+<li><strong>Cognitive Debt (MIT Media Lab, June 2025):</strong> Passively accepting AI text measurably reduces brain activity and neural connectivity (<a href="https://www.media.mit.edu/projects/your-brain-on-chatgpt/overview/">Ref</a>).</li>
+<li><strong>The &ldquo;Shortcut Trap&rdquo; (CMU, Wharton &amp; MIT, 2026):</strong> Just 10 minutes of passive AI reliance drops independent problem-solving performance by 20% (<a href="https://japan.cnet.com/article/35247336/">Ref</a>, <a href="https://www.asahi.com/articles/ASVB146BHVB1UHBI03JM.html">Ref</a>).</li>
+<li><strong>Declining Thinking Skills (Nikkei XTECH, Oct 2026):</strong> <strong>42.1%</strong> of AI users cite declining thinking ability as their #1 concern (<a href="https://xtech.nikkei.com/atcl/nxt/mag/nc/18/020600010/100500235/">Ref</a>).</li>
+</ul>
+<p>Instead of silently overwriting text, <code>gdocumentor</code> enforces active human judgment:</p>
+<ul>
+<li><strong><code>Suggest Mode</code>:</strong> Proposes inline diffs (<code>WriteMode.SUGGEST</code>) paired with <strong><code>💡 Reason</code></strong> and <strong><code>🎓 Learning Point</code></strong> replies.</li>
+<li><strong><code>Socratic Hint Mode (--hint)</code>:</strong> Withholds the rewritten answer and attaches only diagnostic hints so the human author writes the fix.</li>
+</ul>
+<h3 id="two-limits-of-a-browser-add-on">Two Limits of a Browser Add-on</h3>
+<ul>
+<li><strong>1. 1-to-1 Browser Constraint:</strong> A Google Apps Script sidebar only works on one open browser tab at a time (with a 6-minute execution limit).</li>
+<li><strong>2. Locked to Internal Gemini API:</strong> A browser add-on cannot delegate reasoning to external AI agents (Antigravity, Claude Desktop, Cursor, VS Code) that you already use.</li>
+</ul>
+<p><img src="https://tanaikech.github.io/image-storage/20261108a/cognitive_offloading_to_agentic_coaching_infographic.jpg"
+     alt="Figure 2. Paradigm shift from a 1-to-1 browser add-on to 1-to-N autonomous agentic coaching across classrooms, engineering teams, and research labs."
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 2. Paradigm shift from a 1-to-1 browser add-on to 1-to-N autonomous agentic coaching across classrooms, engineering teams, and research labs.</em></p>
+<h3 id="what-gdocumentor-unlocks-figure-2">What <code>gdocumentor</code> Unlocks (Figure 2)</h3>
+<ul>
+<li><strong>Classrooms (1 Instructor ➔ N Student Docs):</strong> Batch-deliver Socratic hints (<code>--hint</code>), course rubrics (<code>-r</code>), and Summary Tabs (<code>--summary-tab</code>) across dozens of essays from the terminal or an AI agent.</li>
+<li><strong>Engineering Teams (Local Repos &amp; GitHub):</strong> Review exact line ranges (<code>-t</code>, <code>#L1-L35</code>) with automatic import resolution (<code>--auto-deps</code>) and team coding standards (<code>-r</code>), bridging code reviews directly into Pageless Google Docs.</li>
+<li><strong>Research Labs &amp; Individual Writers:</strong> Cross-check prose, tables (<code>TABLE_1</code>), and figures (<code>VISUAL_1</code>), track author growth via the Decision Record, or run 100% locally via <code>--no-auth</code>.</li>
+</ul>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">Dimension</th>
+          <th style="text-align: left">GAS Add-on (<code>DocuMentor AI</code>)</th>
+          <th style="text-align: left">Go CLI &amp; MCP Server (<code>gdocumentor</code>)</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left"><strong>Execution</strong></td>
+          <td style="text-align: left">1-to-1 browser sidebar</td>
+          <td style="text-align: left">1-to-N terminal, CI/CD, and MCP AI agents</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>Inputs</strong></td>
+          <td style="text-align: left">Current open Google Doc only</td>
+          <td style="text-align: left"><code>.md</code>, <code>.docx</code>, <code>.pdf</code>, <code>.txt</code>, source code, <code>stdin</code>, Web/GitHub URLs, Google Docs (<code>-d</code>)</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>Code Context</strong></td>
+          <td style="text-align: left">Single document tab</td>
+          <td style="text-align: left">Cross-file dependency resolver (<code>--auto-deps</code>)</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>AI Engine</strong></td>
+          <td style="text-align: left">Internal <code>GEMINI_API_KEY</code></td>
+          <td style="text-align: left"><strong>CLI:</strong> <code>GEMINI_API_KEY</code> | <strong>MCP (<code>gdocumentor mcp</code>):</strong> Client Host AI (<strong>0 <code>GEMINI_API_KEY</code></strong>)</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>Direct Editing</strong></td>
+          <td style="text-align: left">N/A</td>
+          <td style="text-align: left">0-Token <code>edit</code> command/tool (Markdown, tables, image insert/resize)</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="2-architecture-4-stage-pipeline--dual-engine-mcp">2. Architecture: 4-Stage Pipeline &amp; Dual-Engine MCP</h2>
+<h3 id="a-the-4-stage-processing-pipeline">A. The 4-Stage Processing Pipeline</h3>
+<p><img src="https://tanaikech.github.io/image-storage/20261108a/workflow_pipeline_infographic.jpg"
+     alt="Figure 3. End-to-end workflow and 4-stage processing pipeline of gdocumentor."
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 3. End-to-end workflow and 4-stage processing pipeline of <code>gdocumentor</code>.</em></p>
+<ul>
+<li><strong>Stage 1 — Input, Scope &amp; Context:</strong> Loads targets, marks <code>--target</code> / <code>--range</code> blocks editable (retaining surrounding lines as read-only context), resolves <code>--auto-deps</code> and <code>-r</code> RAG rules, and converts Markdown + local images into <strong>Pageless Google Docs</strong>.</li>
+<li><strong>Stage 2 — Dual-Engine AI Inference:</strong> <strong>Standalone CLI</strong> packs text rules/context into XML blocks, uploads PDFs/visuals to the Gemini File API, and calls <code>gemini-3.8-flash</code> / <code>gemini-4-argon</code>; <strong>MCP Server</strong> delegates reasoning to the <strong>client AI agent&rsquo;s own LLM (<code>model: &quot;agent-ai&quot;</code>)</strong>.</li>
+<li><strong>Stage 3 — Surrogate-Pair-Safe UTF-16 Matching (<code>utf16idx</code>):</strong> Maps edits to exact UTF-16 <code>[StartIndex, EndIndex)</code> offsets, filters out read-only scopes, and sorts <strong>bottom-to-top (<code>StartIndex</code> descending)</strong> to prevent index drift.</li>
+<li><strong>Stage 4 — Two-Phase Application:</strong> <strong>Phase 1</strong> applies <code>WriteMode.SUGGEST</code> replacements + <code>addCommentReply</code> rationales (or <code>insertComment</code> in <code>--hint</code> mode); <strong>Phase 2</strong> re-fetches coordinates to anchor <code>VISUAL_N</code> / <code>TABLE_N</code> comments, builds the <strong><code>🎓 DocuMentor AI Summary</code></strong> tab, and updates the <strong>Decision Record</strong> (or writes a local Markdown report in <code>--no-auth</code> mode).</li>
+</ul>
+<h3 id="b-standalone-cli-vs-mcp-server">B. Standalone CLI vs. MCP Server</h3>
+<p><img src="https://tanaikech.github.io/image-storage/20261108a/agentic_mcp_ecosystem_infographic.jpg"
+     alt="Figure 4. Agentic ecosystem and dual-engine MCP architecture connecting AI orchestrators to Google Workspace and local filesystems."
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 4. Agentic ecosystem and dual-engine MCP architecture connecting AI orchestrators to Google Workspace and local filesystems.</em></p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">Feature</th>
+          <th style="text-align: left">💻 <strong>Standalone CLI (<code>gdocumentor</code>)</strong></th>
+          <th style="text-align: left">🤖 <strong>MCP Server (<code>gdocumentor mcp</code>)</strong></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left"><strong>Reasoning Brain</strong></td>
+          <td style="text-align: left">Built-in Gemini API (<code>gemini-3.8-flash</code> / <code>gemini-4-argon</code>)</td>
+          <td style="text-align: left">Client AI Agent&rsquo;s LLM (<code>model: &quot;agent-ai&quot;</code>)</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong><code>GEMINI_API_KEY</code></strong></td>
+          <td style="text-align: left"><strong>Required</strong></td>
+          <td style="text-align: left"><strong>Not Required</strong></td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>Execution Flow</strong></td>
+          <td style="text-align: left">1-command self-contained pipeline</td>
+          <td style="text-align: left">1-step (<code>aiResult</code>) or 2-step (<code>prepareOnly</code> ➔ <code>skipDocInsert: true</code>)</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>Best For</strong></td>
+          <td style="text-align: left">Terminal one-liners, shell loops, CI/CD gates</td>
+          <td style="text-align: left">Conversational coaching in <code>agy</code>, Claude Desktop, Cursor, VS Code</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="c-10-standout-capabilities-of-gdocumentor">C. 10 Standout Capabilities of <code>gdocumentor</code></h3>
+<ul>
+<li><strong>1. Zero-<code>GEMINI_API_KEY</code> Host-AI MCP + Standalone CLI Dual Engine:</strong> Delegates reasoning to your AI agent&rsquo;s own LLM (<code>gdocumentor mcp</code>) with no extra API key, or runs as a self-contained CLI via <code>GEMINI_API_KEY</code>.</li>
+<li><strong>2. Zero-Drift UTF-16 Coordinate Matching (<code>utf16idx</code>):</strong> Converts UTF-8 to surrogate-pair-safe UTF-16 offsets and applies <code>batchUpdate</code> edits <strong>bottom-to-top (<code>StartIndex</code> descending)</strong> so character indices never shift.</li>
+<li><strong>3. Socratic <code>--hint</code> Mode &amp; Rationale Replies:</strong> Replaces passive ghostwriting with <code>WriteMode.SUGGEST</code> diffs + <strong><code>💡 Reason</code></strong> / <strong><code>🎓 Learning Point</code></strong> replies, or withholds answers entirely (<code>--hint</code>) so authors revise text themselves.</li>
+<li><strong>4. Multimodal Prose × Table (<code>TABLE_1</code>) × Figure (<code>VISUAL_1</code>) Verification:</strong> Cross-checks narrative claims against embedded images and tables, anchoring comments directly onto mismatched figures or tables.</li>
+<li><strong>5. Fail-Closed Line/Char Scoping (<code>--target</code>) + Auto-Dependencies (<code>--auto-deps</code>):</strong> Restricts edits strictly to specified ranges (<code>#L1-L35</code>, <code>@0:2500</code>) while automatically attaching imported files as read-only context.</li>
+<li><strong>6. 4-State Decision Record &amp; Learning from Both AI (<code>🤖 AI</code>) and Human (<code>👤 Human</code>) Reviews (<code>summary</code>):</strong> Tracks <code>Accepted</code>, <code>Edited</code> (via bigram similarity), <code>Rejected</code>, and <code>Expired</code> outcomes, while <code>gdocumentor summary</code> analyzes existing suggestions and comments—<strong>including those written by human colleagues, instructors, or peer reviewers (<code>👤 Human</code>) as well as AI (<code>🤖 AI</code>)</strong>—to synthesize personalized writing/coding habits and actionable learning advice.</li>
+<li><strong>7. Zero-Auth Local Mode (<code>--no-auth</code>):</strong> Runs 100% locally without Google Cloud or OAuth2 tokens to output Markdown diff reports (<code>-o</code>).</li>
+<li><strong>8. 0-Token Direct Google Docs Editor (<code>gdocumentor edit</code>):</strong> Creates Pageless Docs, converts/inserts rich Markdown + tables + local images, and resizes <code>VISUAL_1</code> in place without consuming a single LLM token.</li>
+<li><strong>9. 7-Client Installer (<code>gdocumentor setup</code>) &amp; Windows 11 ↔ WSL2 Bridge (<code>--wsl-host</code>):</strong> Auto-configures Antigravity, Claude Desktop, Claude Code, Cursor, VS Code, Windsurf, and Gemini CLI—including a 1-command <code>wsl.exe</code> bridge with automatic <code>C:\...</code> ⇄ <code>/mnt/c/...</code> path translation.</li>
+<li><strong>10. 1-to-N Parallel Batch Scaling &amp; Multi-Language Coaching (<code>-l</code>):</strong> Processes multiple Google Docs concurrently and outputs coaching feedback in any target language (<code>-l en</code>, <code>ja</code>, <code>de</code>, <code>fr</code>, <code>es</code>, <code>zh</code>, <code>ko</code>, <code>auto</code>).</li>
+</ul>
+<h3 id="d-why-build-gdocumentor-in-go-golang">D. Why Build <code>gdocumentor</code> in Go (Golang)?</h3>
+<ul>
+<li><strong>Zero-Dependency Single Static Binary (<code>CGO_ENABLED=0</code>):</strong> No Python <code>venv</code> or Node.js <code>node_modules</code>—a single binary runs out of the box on macOS, Linux, and Windows (<code>amd64</code> / <code>arm64</code>).</li>
+<li><strong>Millisecond Cold Starts for MCP <code>stdio</code> &amp; WSL2 Bridges:</strong> Instant subprocess startup keeps multi-step MCP tool chains (<code>inspect</code> ➔ <code>edit</code> ➔ <code>proofread</code>) snappy even across <code>wsl.exe</code>.</li>
+<li><strong>Goroutine Concurrency (<code>sync.WaitGroup</code>) with No Time Limits:</strong> Loads files, converts Base64 images, uploads Gemini File API assets, and processes 1-to-N Google Docs in parallel without GAS&rsquo;s 6-minute ceiling.</li>
+<li><strong>Native <code>rune</code> &amp; <code>unicode/utf16</code> Precision:</strong> Fast, type-safe conversion between UTF-8 strings and Google Docs API UTF-16 code units.</li>
+<li><strong>Guaranteed <code>defer</code> Cleanup &amp; Shared Type Safety:</strong> Automatically cleans up temporary cloud/local files on exit (<code>defer</code>) and shares 100% identical structs across Standalone CLI and MCP Server modes.</li>
+</ul>
+<h3 id="e-why-self-provisioning-gdocumentor-setup--wsl2--windows-cross-os-bridging-are-unique">E. Why Self-Provisioning (<code>gdocumentor setup</code>) &amp; WSL2 ↔ Windows Cross-OS Bridging Are Unique</h3>
+<ul>
+<li><strong>Push-Based Self-Provisioning Binary (Zero <code>npx</code> / <code>uv</code> Dependencies):</strong> Unlike client-side pull commands (<code>claude mcp add</code>, <code>code --add-mcp</code>) or external Node/Python installers (<code>Smithery</code>, <code>FastMCP</code>), the compiled <code>gdocumentor</code> binary itself knows every client&rsquo;s OS config path and JSON schema (<code>mcpServers</code> vs. VS Code&rsquo;s <code>servers</code>) and non-destructively merges its own setup in one command.</li>
+<li><strong>Simultaneous MCP Server + Native Agent Skill/Rule Deployment:</strong> Existing MCP installers only register JSON server entries, leaving the Host AI unaware of workflow rules; <code>gdocumentor setup</code> simultaneously installs native coaching skills, rules, and subagents across all 7 clients (<code>SKILL.md</code>, <code>.cursor/rules/gdocumentor-workflow.mdc</code>, <code>.github/instructions/gdocumentor.instructions.md</code>, <code>.windsurf/rules/gdocumentor-workflow.md</code>, <code>rules/gdocumentor-workflow.md</code>, <code>agents/gdocumentor-coach.md</code>).</li>
+<li><strong>1-Command WSL2 ➔ Windows Host Cross-OS Bridge (<code>--wsl-host</code>):</strong> Previously, connecting Windows GUI clients (Claude Desktop, Cursor, VS Code, Windsurf) to a WSL2 MCP server required manually editing <code>%APPDATA%</code> JSON files or fragile <code>bash -c</code> scripts; running <code>gdocumentor setup --all --wsl-host</code> inside WSL2 auto-detects the Windows user profile under <code>/mnt/c/Users/&lt;WinUser&gt;</code>, updates Windows-side config files directly, and injects a shell-free <code>wsl.exe --exec</code> bridge.</li>
+<li><strong>Unified OAuth2 Credentials &amp; Lifecycle Management (<code>--status</code> / <code>--uninstall</code>):</strong> All Windows GUI clients and WSL2 CLI agents share a single Linux-side <code>gdocumentor</code> binary, Google Application Default Credentials (<code>~/.config/gcloud/application_default_credentials.json</code>), and Decision Records (<code>~/.config/gdocumentor/decision_records/</code>), with built-in cross-OS status diagnostics (<code>--status</code>) and clean non-destructive removal (<code>--uninstall</code>).</li>
+</ul>
+<hr>
+<h2 id="3-quick-setup-isolated-test-workspace-gdocumentor_test">3. Quick Setup: Isolated Test Workspace (<code>./gdocumentor_test</code>)</h2>
+<p>Pre-compiled static binaries (<code>CGO_ENABLED=0</code>) for macOS, Linux, and Windows (<code>amd64</code> / <code>arm64</code>) are available on <strong><a href="https://github.com/tanaikech/gdocumentor/releases">GitHub Releases</a></strong>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 1. Install binary (Linux amd64 example; or use go install github.com/tanaikech/gdocumentor@latest)</span>
+</span></span><span style="display:flex;"><span>curl -L https://github.com/tanaikech/gdocumentor/releases/latest/download/gdocumentor_linux_amd64 -o gdocumentor
+</span></span><span style="display:flex;"><span>chmod +x gdocumentor <span style="color:#f92672">&amp;&amp;</span> sudo mv gdocumentor /usr/local/bin/
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. Install as an Antigravity CLI Plugin (or run: gdocumentor setup --all)</span>
+</span></span><span style="display:flex;"><span>agy plugin install https://github.com/tanaikech/gdocumentor
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 3. Set Gemini API Key (Required for Part 1 CLI commands; NOT needed for Part 2 MCP prompts)</span>
+</span></span><span style="display:flex;"><span>export GEMINI_API_KEY<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;your-gemini-api-key&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 4. Create an isolated test workspace and copy sample files</span>
+</span></span><span style="display:flex;"><span>mkdir -p gdocumentor_test <span style="color:#f92672">&amp;&amp;</span> cd gdocumentor_test
+</span></span><span style="display:flex;"><span>git clone --depth <span style="color:#ae81ff">1</span> https://github.com/tanaikech/gdocumentor.git _repo
+</span></span><span style="display:flex;"><span>cp -r _repo/sample . <span style="color:#f92672">&amp;&amp;</span> cp <span style="color:#e6db74">&#34;</span><span style="color:#66d9ef">$(</span>command -v gdocumentor<span style="color:#66d9ef">)</span><span style="color:#e6db74">&#34;</span> ./gdocumentor <span style="color:#f92672">&amp;&amp;</span> rm -rf _repo
+</span></span></code></pre></div><ul>
+<li><strong>Individual OAuth2 setup (<code>gcloud auth application-default login</code>):</strong> <a href="https://github.com/tanaikech/gdocumentor/blob/main/INSTALL_INDIVIDUAL.md">INSTALL_INDIVIDUAL.md</a></li>
+<li><strong>Organization / school setup:</strong> <a href="https://github.com/tanaikech/gdocumentor/blob/main/INSTALL_ORGANIZATION.md">INSTALL_ORGANIZATION.md</a></li>
+</ul>
+<hr>
+<h2 id="4-part-1-6-foundational-cli-commands">4. Part 1: 6 Foundational CLI Commands</h2>
+<h3 id="command-1-zero-auth-local-mode---no-auth">Command 1: Zero-Auth Local Mode (<code>--no-auth</code>)</h3>
+<ul>
+<li><strong>🔑 Credentials:</strong> <code>GEMINI_API_KEY</code>: Required | Google OAuth2: <strong>Not Required</strong></li>
+<li><strong>🎯 What it does:</strong> Proofreads <code>./sample/sample_article.md</code> (including <code>TABLE_1</code> and local diagram <code>VISUAL_1</code>) 100% locally and saves <code>./my_first_review.md</code>.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>./gdocumentor --no-auth -i ./sample/sample_article.md -o ./my_first_review.md
+</span></span></code></pre></div><p><img src="https://tanaikech.github.io/image-storage/20261108a/result_command1.jpg"
+     alt="Figure 5. Terminal execution result of Command 1 in Zero-Auth local mode (&ndash;no-auth)."
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 5. Terminal execution result of Command 1 in Zero-Auth local mode (<code>--no-auth</code>).</em></p>
+<ul>
+<li><strong>Pipeline Execution (Figure 5):</strong> Confirms <code>AUTH BYPASSED (--no-auth)</code> and processes <code>TargetFiles=1, EditableBlocks=9, Visuals=1, Tables=1</code>.</li>
+<li><strong>Learning Summary &amp; Inline Suggestions:</strong> Catches fillers (<code>'basically'</code>), double superlatives (<code>'most biggest'</code>), and uncountable nouns (<code>'softwares'</code>), listing <strong>6 bottom-to-top UTF-16 inline suggestions</strong> (<code>#1</code>–<code>#6</code>) with <code>- Original</code>, <code>+ Suggested</code>, <code>💡 Reason</code>, and <code>🎓 Learning</code>.</li>
+<li><strong>Multimodal Cross-Check (<code>VISUAL_1</code> &amp; <code>TABLE_1</code>):</strong> Detects that <code>VISUAL_1</code> shows a <strong>120-minute manual baseline</strong> in its chart while <code>TABLE_1</code> omits that baseline row.</li>
+</ul>
+<hr>
+<h3 id="command-2-interactive-pageless-google-docs--summary-tab---summary-tab">Command 2: Interactive Pageless Google Docs + Summary Tab (<code>--summary-tab</code>)</h3>
+<ul>
+<li><strong>🔑 Credentials:</strong> <code>GEMINI_API_KEY</code>: Required | Google OAuth2: Required</li>
+<li><strong>🎯 What it does:</strong> Converts <code>./sample/sample_article.md</code> (with its table and local PNG) into a <strong>Pageless Google Document</strong>, applies <code>WriteMode.SUGGEST</code> inline edits + rationale replies, and creates a <strong><code>🎓 DocuMentor AI Summary</code></strong> tab.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>./gdocumentor -i ./sample/sample_article.md <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  -o ./interactive_coach_report.md <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --title <span style="color:#e6db74">&#34;My Interactive Writing Coach Demo&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --summary-tab
+</span></span></code></pre></div><p><img src="https://tanaikech.github.io/image-storage/20261108a/result_command2a.jpg"
+     alt="Figure 6. Terminal execution result of Command 2 creating a Pageless Google Document and a dedicated Summary Tab."
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 6. Terminal execution result of Command 2 creating a Pageless Google Document and a dedicated Summary Tab.</em></p>
+<p><img src="https://tanaikech.github.io/image-storage/20261108a/result_command2b.jpg"
+     alt="Figure 7. Pageless Google Document created by Command 2 with native inline Suggested Edits and educational rationale replies."
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 7. Pageless Google Document created by Command 2 with native inline Suggested Edits and educational rationale replies.</em></p>
+<ul>
+<li><strong>Terminal Output (Figure 6):</strong> Converts Markdown + image into a Pageless Doc, applies 8 coaching items, creates the Summary Tab, initializes the Decision Record (<code>Pending AI: 6</code>), and prints clickable URLs.</li>
+<li><strong>Google Docs Canvas (Figure 7):</strong> Awkward phrases are replaced via green <code>WriteMode.SUGGEST</code> edits, each paired with a threaded <strong><code>💡 Reason for Revision</code></strong> and <strong><code>🎓 Learning Point</code></strong> reply on the right.</li>
+</ul>
+<hr>
+<h3 id="command-3-socratic-hint-only-mode---hint--persona--rag-rubric">Command 3: Socratic Hint-Only Mode (<code>--hint</code>) + Persona + RAG Rubric</h3>
+<ul>
+<li><strong>🔑 Credentials:</strong> <code>GEMINI_API_KEY</code>: Required | Google OAuth2: Required</li>
+<li><strong>🎯 What it does:</strong> Adopts a supportive professor persona (<code>--persona</code>), enforces <code>./sample/rules/writing_guidelines.md</code> (<code>-r</code>), <strong>withholds all rewritten answers (<code>--hint</code>)</strong>, and attaches Socratic questions as anchored Google Docs comments.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>./gdocumentor -i ./sample/sample_article.md <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --hint <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --persona <span style="color:#e6db74">&#34;You are a supportive university writing professor. Encourage critical thinking and explain structural weaknesses clearly without giving away the rewritten sentence.&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  -r ./sample/rules/writing_guidelines.md <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --summary-tab <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  -o ./socratic_hints_report.md <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --title <span style="color:#e6db74">&#34;Student Essay - Socratic Hint Coaching&#34;</span>
+</span></span></code></pre></div><p><img src="https://tanaikech.github.io/image-storage/20261108a/result_command3a.jpg"
+     alt="Figure 8. Terminal execution result of Command 3 in Socratic Hint-Only Mode (&ndash;hint) with a custom professor persona and RAG writing guidelines."
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 8. Terminal execution result of Command 3 in Socratic Hint-Only Mode (<code>--hint</code>) with a custom professor persona and RAG writing guidelines.</em></p>
+<p><img src="https://tanaikech.github.io/image-storage/20261108a/result_command3b.jpg"
+     alt="Figure 9. Google Document created by Command 3 showing anchored Socratic coaching hints without forced text rewrites."
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 9. Google Document created by Command 3 showing anchored Socratic coaching hints without forced text rewrites.</em></p>
+<ul>
+<li><strong>Terminal Output (Figure 8):</strong> Shows <code>MODE hint</code> and <code>RAGRules=1</code>. Every card omits <code>+ Suggested</code> and instead cites the exact rule violated (<code>Guideline 1</code>–<code>Guideline 5</code>) with a Socratic prompt.</li>
+<li><strong>Google Docs Canvas (Figure 9):</strong> Not a single word of the student&rsquo;s Google Doc is overwritten. Yellow-highlighted comments show the <strong><code>🎯 Flagged Phrase</code></strong>, <strong><code>💡 Issue to Check</code></strong>, and <strong><code>🎓 Coaching Hint (Try Rewriting Yourself!)</code></strong>.</li>
+</ul>
+<hr>
+<h3 id="command-4-scoped-github-code-review-l1-l35--auto-dependencies---auto-deps">Command 4: Scoped GitHub Code Review (<code>#L1-L35</code>) + Auto-Dependencies (<code>--auto-deps</code>)</h3>
+<ul>
+<li><strong>🔑 Credentials:</strong> <code>GEMINI_API_KEY</code>: Required | Google OAuth2: Required</li>
+<li><strong>🎯 What it does:</strong> Reviews <strong>only lines 1–35</strong> of a remote GitHub file, shallow-clones the repo in the background to attach imported files as read-only context (<code>--auto-deps</code>), and posts line-by-line <code>WriteMode.SUGGEST</code> code diffs into Google Docs.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>./gdocumentor <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  -t <span style="color:#e6db74">&#34;https://github.com/tanaikech/DocuMentorAI/blob/main/src/code.js#L1-L35&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --auto-deps <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  -p <span style="color:#e6db74">&#34;Focus on readability, maintainability, and modern JavaScript / Google Apps Script best practices.&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  -o ./github_code_review.md <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --title <span style="color:#e6db74">&#34;GitHub Scoped Code Review (#L1-L35)&#34;</span>
+</span></span></code></pre></div><p><img src="https://tanaikech.github.io/image-storage/20261108a/result_command4a.jpg"
+     alt="Figure 10. Terminal execution result of Command 4 performing a scoped GitHub code review (#L1-L35) with automatic dependency resolution (&ndash;auto-deps)."
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 10. Terminal execution result of Command 4 performing a scoped GitHub code review (<code>#L1-L35</code>) with automatic dependency resolution (<code>--auto-deps</code>).</em></p>
+<p><img src="https://tanaikech.github.io/image-storage/20261108a/result_command4b.jpg"
+     alt="Figure 11. Google Document created by Command 4 with line-by-line inline code suggestions and V8 best-practice rationales."
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 11. Google Document created by Command 4 with line-by-line inline code suggestions and V8 best-practice rationales.</em></p>
+<ul>
+<li><strong>Terminal Output (Figure 10):</strong> Resolves <code>TargetFiles=1, ContextFiles=1, EditableBlocks=30</code> and proposes 2 scoped improvements: wrapping <code>ALLOWED_MODELS</code> in <code>Object.freeze(...)</code> (<code>src/code.js:31</code>) and documenting millisecond units on <code>DECISION_STALE_TTL_MS</code> (<code>src/code.js:27</code>).</li>
+<li><strong>Google Docs Canvas (Figure 11):</strong> Renders clean line-by-line code in Google Docs with green <code>WriteMode.SUGGEST</code> diffs strictly inside lines 1–35.</li>
+</ul>
+<hr>
+<h3 id="command-5-structural-inspection-decision-record--learning-from-ai--human-reviews-inspect-manage--summary">Command 5: Structural Inspection, Decision Record &amp; Learning from AI + Human Reviews (<code>inspect</code>, <code>manage</code>, &amp; <code>summary</code>)</h3>
+<ul>
+<li><strong>🔑 Credentials:</strong> <code>inspect</code> / <code>manage</code>: <strong>0 Gemini tokens</strong> (<code>GEMINI_API_KEY</code> Not Required) | <code>summary</code>: <code>GEMINI_API_KEY</code> Required in CLI mode (or <strong>0 <code>GEMINI_API_KEY</code></strong> via Host-AI MCP) | Google OAuth2: Required</li>
+<li><strong>🎯 What it does:</strong> Inspects exact UTF-16 coordinates (<code>inspect</code>), tracks how authors respond to suggestions (<code>manage</code>), and analyzes <strong>both AI-generated (<code>🤖 AI</code>) and human-authored (<code>👤 Human</code>) suggestions and comments</strong> on a Google Doc (<code>summary</code>) to give the author actionable learning advice.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 1. Inspect paragraph coordinates (@start:end), visual/table IDs, and pending AI/Human suggestions (0 LLM tokens)</span>
+</span></span><span style="display:flex;"><span>./gdocumentor inspect -d <span style="color:#e6db74">&#34;&lt;YOUR_GOOGLE_DOC_ID&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. Analyze existing suggestions &amp; comments (from BOTH AI and human reviewers, including resolved history) to get learning advice</span>
+</span></span><span style="display:flex;"><span>./gdocumentor summary -d <span style="color:#e6db74">&#34;&lt;YOUR_GOOGLE_DOC_ID&gt;&#34;</span> --include-resolved --summary-tab
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 3. Accept all pending suggestions and update the Coach Impact &amp; Decision Record (0 LLM tokens)</span>
+</span></span><span style="display:flex;"><span>./gdocumentor manage -d <span style="color:#e6db74">&#34;&lt;YOUR_GOOGLE_DOC_ID&gt;&#34;</span> --accept-all
+</span></span></code></pre></div><ul>
+<li><strong>Structural Inspection (<code>inspect</code>):</strong> Prints all tabs, paragraph UTF-16 <code>@start:end</code> coordinates, <code>VISUAL_N</code> / <code>TABLE_N</code> IDs, active suggestions (<code>🤖 AI</code> vs. <code>👤 Human</code>), and Decision Record counters with <strong>0 LLM tokens</strong>.</li>
+<li><strong>Learning Advice from AI &amp; Human Reviews (<code>summary</code>):</strong> Reads all open and resolved (<code>--include-resolved</code>) inline suggestions and comment threads on the Google Document—<strong>not only those created by generative AI (<code>🤖 AI</code>), but also edits and comments left by human colleagues, teachers, or editors (<code>👤 Human</code>)</strong>—and generates a <strong>Writing Coach &amp; Learning Summary</strong> (explaining <em>why</em> each human or AI edit matters, recurring weak points/habits, and concrete tips for future writing) without modifying the document text.</li>
+<li><strong>Decision Reconciliation (<code>manage --accept-all</code>):</strong> Accepts pending suggestions and reconciles <code>~/.config/gdocumentor/decision_records/&lt;docId&gt;.json</code> into <strong>✅ Accepted</strong>, <strong>✏️ Edited</strong> (author refined the text), <strong>❌ Rejected</strong>, or <strong>🗑️ Expired</strong> (&gt;7 days or deleted), computing the <strong>Draft Improvement Rate</strong> while separating AI (<code>🤖 AI</code>) from human (<code>👤 Human</code>) edits.</li>
+</ul>
+<hr>
+<h3 id="command-6-zero-token-direct-google-docs-markdown--image-editing-edit">Command 6: Zero-Token Direct Google Docs, Markdown &amp; Image Editing (<code>edit</code>)</h3>
+<ul>
+<li><strong>🔑 Credentials:</strong> <code>GEMINI_API_KEY</code>: <strong>Not Required (0 tokens)</strong> | Google OAuth2: Required</li>
+<li><strong>🎯 What it does:</strong> Creates a Google Doc, inserts initial text, converts and inserts rich Markdown (headings, formatting, checklist, 2×2 table, and <code>./sample/sample_figure.png</code>) before Paragraph 2, and resizes <code>VISUAL_1</code> to <code>320pt</code>.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 1. Create a new Google Document and insert initial paragraphs</span>
+</span></span><span style="display:flex;"><span>DOC_ID<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>./gdocumentor edit --create-doc --title <span style="color:#e6db74">&#34;Live Release Notes&#34;</span> --json | jq -r <span style="color:#e6db74">&#39;.documentId&#39;</span><span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>printf <span style="color:#e6db74">&#34;Paragraph 1: Introduction\nParagraph 2: Conclusion&#34;</span> | ./gdocumentor edit -d <span style="color:#e6db74">&#34;</span>$DOC_ID<span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. Convert and insert rich Markdown (with a native table &amp; local image) right before Paragraph 2</span>
+</span></span><span style="display:flex;"><span>./gdocumentor edit -d <span style="color:#e6db74">&#34;</span>$DOC_ID<span style="color:#e6db74">&#34;</span> --before-paragraph <span style="color:#ae81ff">2</span> --markdown <span style="color:#e6db74">&lt;&lt; &#39;EOF&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">## Key Highlights (Inserted from Markdown)
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">This section includes **bold**, *italic*, `inline_code_var`, and a [Google Docs API](https://developers.google.com/docs/api) link.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">- Automated Coaching Pipeline
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  - Supports Socratic `--hint` mode
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">- [x] Direct Markdown &amp; Image Insertion
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">| Feature | Status |
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">| :--- | :---: |
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">| Native Markdown Conversion | **Ready** |
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">| Image Insert / Replace / Delete | `Active` |
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">![Architecture Diagram](./sample/sample_figure.png)
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">EOF</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 3. Replace the first image (VISUAL_1) with a resized 320pt width version</span>
+</span></span><span style="display:flex;"><span>./gdocumentor edit -d <span style="color:#e6db74">&#34;</span>$DOC_ID<span style="color:#e6db74">&#34;</span> --replace-image VISUAL_1 --with-image ./sample/sample_figure.png --image-width <span style="color:#ae81ff">320</span>
+</span></span></code></pre></div><p><img src="https://tanaikech.github.io/image-storage/20261108a/result_command6a.jpg"
+     alt="Figure 12. Terminal execution result of Command 6 executing deterministic 0-token Google Docs creation, rich Markdown insertion, and image resizing via gdocumentor edit."
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 12. Terminal execution result of Command 6 executing deterministic 0-token Google Docs creation, rich Markdown insertion, and image resizing via <code>gdocumentor edit</code>.</em></p>
+<p><img src="https://tanaikech.github.io/image-storage/20261108a/result_command6b.jpg"
+     alt="Figure 13. Google Document created by Command 6 showing converted rich Markdown, a native 2x2 table, and a 320pt resized diagram placed between the introduction and conclusion."
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 13. Google Document created by Command 6 showing converted rich Markdown, a native 2×2 table, and a 320pt resized diagram placed between the introduction and conclusion.</em></p>
+<ul>
+<li><strong>Terminal Output (Figure 12):</strong> Executes <code>insert</code>, <code>insert-markdown</code>, and <code>replace-image</code> deterministically in seconds with <strong>0 Gemini tokens</strong>.</li>
+<li><strong>Google Docs Canvas (Figure 13):</strong> Renders native Heading 2, bold/italic/code/link styling, nested bullets + checkbox, a 2×2 table, and <code>VISUAL_1</code> resized to <code>320pt</code> right between Paragraph 1 and Paragraph 2.</li>
+</ul>
+<hr>
+<h2 id="5-part-2-6-autonomous-ai-agent-prompts-zero-gemini_api_key-via-host-ai-mcp">5. Part 2: 6 Autonomous AI Agent Prompts (Zero <code>GEMINI_API_KEY</code> via Host-AI MCP)</h2>
+<h3 id="how-multi-client-ai-agents-work-without-gemini_api_key">How Multi-Client AI Agents Work Without <code>GEMINI_API_KEY</code></h3>
+<p><img src="https://tanaikech.github.io/image-storage/20261108a/mcp_host_ai_workflow_infographic.jpg"
+     alt="Figure 14. 3-stage visual workflow of the gdocumentor MCP Server in Zero-GEMINI_API_KEY Host-AI Mode across multi-client AI agents, showing Stage 1 (Your AI Client / Host AI), Stage 2 (gdocumentor MCP Engine), and Stage 3 (Mode A: Without Google Docs vs. Mode B: With Google Docs)."
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 14. 3-stage visual workflow of the <code>gdocumentor</code> MCP Server in Zero-<code>GEMINI_API_KEY</code> Host-AI Mode across multi-client AI agents, showing Stage 1 (Your AI Client / Host AI), Stage 2 (<code>gdocumentor</code> MCP Engine), and Stage 3 (Mode A: Without Google Docs vs. Mode B: With Google Docs).</em></p>
+<ul>
+<li><strong>Stage 1 — Your AI Client (<code>Host AI</code> • <code>Zero GEMINI_API_KEY</code>):</strong> <strong>Antigravity (<code>agy</code>), Claude Desktop, Claude Code, VS Code (Copilot), Cursor, Windsurf, or Gemini CLI</strong> uses its own active LLM (<code>model: &quot;agent-ai&quot;</code>) to generate the coaching JSON (<code>aiResult</code>) in <strong><code>Suggest Mode</code></strong> or <strong><code>Socratic Hint Mode</code></strong>.</li>
+<li><strong>Stage 2 — <code>gdocumentor</code> MCP Engine (<code>MCP JSON-RPC stdio</code>):</strong> Loads workspace/RAG context, maps <code>originalText</code> to bottom-up UTF-16 coordinates (<code>utf16idx</code>), and exposes 6 MCP tools (<code>proofread</code>, <code>summary</code>, <code>inspect</code>, <code>draft</code>, <code>edit</code>, <code>manage</code>).</li>
+<li><strong>Stage 3 (🟢 Mode A — Without Google Docs / <code>noAuth: true</code>):</strong> Needs <strong>no <code>GEMINI_API_KEY</code> and no Google OAuth token</strong>, outputting local Markdown reports (<code>-o</code>) and direct chat tables.</li>
+<li><strong>Stage 3 (🔵 Mode B — With Google Docs / <code>OAuth2</code>):</strong> Creates/updates Pageless Google Docs with inline <code>WriteMode.SUGGEST</code> edits or Socratic hints (Tab 1), a <strong><code>🎓 DocuMentor AI Summary</code></strong> tab (Tab 2), and the <strong>Decision Record</strong>.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># View detailed setup help &amp; cross-platform (WSL2 &lt;-&gt; Windows 11) guide:</span>
+</span></span><span style="display:flex;"><span>gdocumentor setup --help
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Install &amp; configure ALL supported AI clients on Linux / macOS / WSL2:</span>
+</span></span><span style="display:flex;"><span>gdocumentor setup --all
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Inside WSL2, configure Windows 11 GUI apps (Claude Desktop, Cursor, VS Code, Windsurf) via wsl.exe bridge:</span>
+</span></span><span style="display:flex;"><span>gdocumentor setup --all --wsl-host
+</span></span></code></pre></div><hr>
+<h3 id="prompt-1-zero-auth-local-proofreading-in-">Prompt 1: Zero-Auth Local Proofreading in <code>./</code></h3>
+<ul>
+<li><strong>🔑 Credentials:</strong> <code>GEMINI_API_KEY</code>: <strong>Not Required</strong> | Google OAuth2: <strong>Not Required</strong> (<code>noAuth: true</code>)</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>Use gdocumentor without a Google OAuth access token (--no-auth) to proofread ./sample/sample_article.md (including its table and diagram) and save the coaching report to ./article_coaching.md in the current working directory. Then summarize the top 3 writing improvements and habits it found.
+</span></span></code></pre></div><p><img src="https://tanaikech.github.io/image-storage/20261108a/result_prompt1.jpg"
+     alt="Figure 15. Execution result of Prompt 1 in Antigravity CLI (agy) performing Zero-Auth local proofreading via Host-AI MCP and summarizing top writing habits."
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 15. Execution result of Prompt 1 in Antigravity CLI (<code>agy</code>) performing Zero-Auth local proofreading via Host-AI MCP and summarizing top writing habits.</em></p>
+<ul>
+<li><strong>Host-AI MCP Execution (Figure 15):</strong> <code>agy</code> runs <code>gdocumentor_proofread</code> (<code>noAuth: true</code>) using its own Host AI, applying <strong>10 coaching items (8 text + <code>TABLE_1</code> + <code>VISUAL_1</code>)</strong> into <code>./article_coaching.md</code>.</li>
+<li><strong>Top 3 Habits Identified:</strong> Summarizes (1) removing colloquial fillers (<code>&quot;basically&quot;</code>, <code>&quot;super simple&quot;</code>), (2) fixing uncountable nouns (<code>&quot;softwares&quot;</code> ➔ <code>&quot;software&quot;</code>) and double superlatives (<code>&quot;most biggest&quot;</code>), and (3) integrating <code>VISUAL_1</code> and <code>TABLE_1</code> into the narrative prose.</li>
+</ul>
+<hr>
+<h3 id="prompt-2-socratic-hint-only-mode--summary-tab-for-educators">Prompt 2: Socratic Hint-Only Mode + Summary Tab for Educators</h3>
+<ul>
+<li><strong>🔑 Credentials:</strong> <code>GEMINI_API_KEY</code>: <strong>Not Required</strong> | Google OAuth2: Required</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>I am a university writing instructor. Please use gdocumentor in Socratic Hint-Only mode (--hint) to review ./sample/sample_article.md into a new Google Document titled &#39;Student Draft - Socratic Coaching&#39;, generate the 🎓 DocuMentor AI Summary tab (--summary-tab), and also save a local copy of the hint report to ./student_socratic_hints.md in the current directory. Use a supportive professor persona so the student gets hints on how to improve their writing without being handed the rewritten answers. Give me the Google Docs link when finished.
+</span></span></code></pre></div><p><img src="https://tanaikech.github.io/image-storage/20261108a/result_prompt2a.jpg"
+     alt="Figure 16. Execution result of Prompt 2 in Antigravity CLI (agy) orchestrating Socratic Hint-Only coaching with a supportive professor persona."
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 16. Execution result of Prompt 2 in Antigravity CLI (<code>agy</code>) orchestrating Socratic Hint-Only coaching with a supportive professor persona.</em></p>
+<p><img src="https://tanaikech.github.io/image-storage/20261108a/result_prompt2b.jpg"
+     alt="Figure 17. Google Document created by Prompt 2 with anchored Socratic reflection hints from the professor persona."
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 17. Google Document created by Prompt 2 with anchored Socratic reflection hints from the professor persona.</em></p>
+<ul>
+<li><strong>Agent Output (Figure 16):</strong> Completes in <strong>1 MCP tool call</strong>, returning the Google Doc URL, Summary Tab URL, and a 10-row Socratic question table.</li>
+<li><strong>Google Docs Canvas (Figure 17):</strong> Anchors 10 yellow-highlighted Socratic hints in Google Docs without overwriting the student&rsquo;s text.</li>
+</ul>
+<hr>
+<h3 id="prompt-3-scoped-live-web-page-proofreading-02500">Prompt 3: Scoped Live Web Page Proofreading (<code>@0:2500</code>)</h3>
+<ul>
+<li><strong>🔑 Credentials:</strong> <code>GEMINI_API_KEY</code>: <strong>Not Required</strong> | Google OAuth2: Required</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>Use gdocumentor to proofread the web page https://go.dev/doc/effective_go (only character range @0:2500) into a new Google Document with inline Suggested Edits, and also save the local report to ./effective_go_review.md in the current working directory. Tell me the main stylistic takeaways.
+</span></span></code></pre></div><p><img src="https://tanaikech.github.io/image-storage/20261108a/result_prompt3a.jpg"
+     alt="Figure 18. Execution result of Prompt 3 in Antigravity CLI (agy) proofreading a live web page (Effective Go character range @0:2500)."
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 18. Execution result of Prompt 3 in Antigravity CLI (<code>agy</code>) proofreading a live web page (<code>Effective Go</code> character range <code>@0:2500</code>).</em></p>
+<p><img src="https://tanaikech.github.io/image-storage/20261108a/result_prompt3b.jpg"
+     alt="Figure 19. Google Document created by Prompt 3 showing inline typography and style suggestions on the imported Effective Go web text."
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 19. Google Document created by Prompt 3 showing inline typography and style suggestions on the imported <code>Effective Go</code> web text.</em></p>
+<ul>
+<li><strong>Agent Output (Figure 18):</strong> Fetches <code>https://go.dev/doc/effective_go@0:2500</code>, restricts edits to the first 2,500 UTF-16 units, applies 7 suggestions, and summarizes 4 stylistic takeaways.</li>
+<li><strong>Google Docs Canvas (Figure 19):</strong> Polishes prose tone and fixes detached punctuation spaces from HTML scraping via inline <code>WriteMode.SUGGEST</code> edits.</li>
+</ul>
+<hr>
+<h3 id="prompt-4-scoped-code-review-with-rag-coding-standards">Prompt 4: Scoped Code Review with RAG Coding Standards</h3>
+<ul>
+<li><strong>🔑 Credentials:</strong> <code>GEMINI_API_KEY</code>: <strong>Not Required</strong> | Google OAuth2: Required</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>Create a small JavaScript file named ./demo_script.js in the current working directory containing a 20-line function that fetches data from an API without error handling or const/let best practices. Then use gdocumentor to review lines 1 to 20 of ./demo_script.js applying ./sample/rules/coding_standards.md, create a Google Document with inline Suggested Edits, save a local report to ./code_review_report.md in the current directory, and summarize the issues found.
+</span></span></code></pre></div><p><img src="https://tanaikech.github.io/image-storage/20261108a/result_prompt4a.jpg"
+     alt="Figure 20. Execution result of Prompt 4 in Antigravity CLI (agy) generating ./demo_script.js and reviewing lines 1-20 against RAG coding standards."
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 20. Execution result of Prompt 4 in Antigravity CLI (<code>agy</code>) generating <code>./demo_script.js</code> and reviewing lines 1–20 against RAG coding standards.</em></p>
+<p><img src="https://tanaikech.github.io/image-storage/20261108a/result_prompt4b.jpg"
+     alt="Figure 21. Google Document created by Prompt 4 showing inline JavaScript code suggestions explicitly referencing sections of coding_standards.md."
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 21. Google Document created by Prompt 4 showing inline JavaScript code suggestions explicitly referencing sections of <code>coding_standards.md</code>.</em></p>
+<ul>
+<li><strong>Agent Output (Figure 20):</strong> Generates <code>./demo_script.js</code> (20 lines), audits it against <code>coding_standards.md</code>, applies 13 inline code suggestions, and outputs an 8-category violation table (<code>Section 1</code>–<code>Section 3</code>).</li>
+<li><strong>Google Docs Canvas (Figure 21):</strong> Upgrades <code>var</code> to <code>const</code>, adds <code>async/await</code> + <code>try...catch</code> + <code>response.ok</code>, replaces hardcoded secrets, and upgrades <code>http://</code> to <code>https://</code> with <code>encodeURIComponent</code>, citing <code>Coding Standards Section 2</code> in the Google Docs comment cards.</li>
+</ul>
+<hr>
+<h3 id="prompt-5-zero-token-direct-markdown--image-editing-via-mcp-edit--inspect">Prompt 5: Zero-Token Direct Markdown &amp; Image Editing via MCP (<code>edit</code> &amp; <code>inspect</code>)</h3>
+<ul>
+<li><strong>🔑 Credentials:</strong> <code>GEMINI_API_KEY</code>: <strong>Not Required (0 proofreading tokens)</strong> | Google OAuth2: Required</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>Using gdocumentor&#39;s edit and inspect tools (without calling Gemini proofreading), create a new Google Document titled &#39;Project Status Report&#39;, write an introductory paragraph and a conclusion paragraph, and then insert the contents of ./sample/sample_article.md as converted rich Markdown (including its table and ./sample/sample_figure.png) right between the introduction and the conclusion. Finally, resize the inserted image VISUAL_1 to a width of 300pt and give me the Google Document URL.
+</span></span></code></pre></div><p><img src="https://tanaikech.github.io/image-storage/20261108a/result_prompt5a.jpg"
+     alt="Figure 22. Execution result of Prompt 5 in Antigravity CLI (agy) orchestrating 0-token document creation, Markdown insertion, and in-place image resizing via MCP tools."
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 22. Execution result of Prompt 5 in Antigravity CLI (<code>agy</code>) orchestrating 0-token document creation, Markdown insertion, and in-place image resizing via MCP tools.</em></p>
+<p><img src="https://tanaikech.github.io/image-storage/20261108a/result_prompt5b.jpg"
+     alt="Figure 23. Google Document created by Prompt 5 showing the composite Project Status Report with converted Markdown, table, and 300pt figure between the introduction and conclusion."
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 23. Google Document created by Prompt 5 showing the composite Project Status Report with converted Markdown, table, and 300pt figure between the introduction and conclusion.</em></p>
+<ul>
+<li><strong>Agent Output (Figure 22):</strong> Chains <code>gdocumentor_edit</code> and <code>gdocumentor_inspect</code> with <strong>0 proofreading tokens</strong> to create the Doc, insert converted Markdown before Paragraph 2, and resize <code>VISUAL_1</code> to <code>300pt</code>.</li>
+<li><strong>Google Docs Canvas (Figure 23):</strong> Shows the composite Google Document with the converted article, 4-column table, and <code>300pt</code> diagram cleanly sandwiched between the introduction and conclusion.</li>
+</ul>
+<hr>
+<h3 id="prompt-6-parallel-multi-document-batch-processing-3-google-docs-concurrently">Prompt 6: Parallel Multi-Document Batch Processing (3 Google Docs Concurrently)</h3>
+<ul>
+<li><strong>🔑 Credentials:</strong> <code>GEMINI_API_KEY</code>: <strong>Not Required</strong> | Google OAuth2: Required</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>I want to test parallel batch processing using gdocumentor&#39;s MCP server. Please perform the following steps:
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>1. Use the gdocumentor_edit MCP tool to create 3 separate Google Documents on Google Drive with different titles and short sample texts containing intentional typos or stylistic flaws:
+</span></span><span style="display:flex;"><span>   - Document 1: Title &#39;Essay Draft - Climate Action&#39;, Content: A short 3-paragraph draft about renewable energy with repetitive sentences and informal phrasing.
+</span></span><span style="display:flex;"><span>   - Document 2: Title &#39;Tech Memo - Microservices Architecture&#39;, Content: A short technical proposal with vague performance claims and passive voice.
+</span></span><span style="display:flex;"><span>   - Document 3: Title &#39;Client Support - Inquiry Reply&#39;, Content: A customer support reply with overly blunt phrasing and missing greeting structure.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>2. Once the 3 Google Documents are created, process all 3 documents in parallel (concurrent sub-tasks or simultaneous tool calls) using the gdocumentor_proofread MCP tool:
+</span></span><span style="display:flex;"><span>   - Proofread Document 1 with mode: &#39;suggest&#39; and create a dedicated summary tab (summaryTab: true).
+</span></span><span style="display:flex;"><span>   - Proofread Document 2 in Socratic Hint-Only mode (mode: &#39;hint&#39;) with persona: &#39;Senior Software Architect&#39;.
+</span></span><span style="display:flex;"><span>   - Proofread Document 3 with mode: &#39;suggest&#39; focusing on polite business tone and client clarity.
+</span></span><span style="display:flex;"><span>   - For each document, also save a local Markdown report (./essay_review.md, ./tech_memo_review.md, ./client_reply_review.md) strictly in the current working directory (workDir: &#39;.&#39;).
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>3. When parallel execution completes, provide a Markdown comparison table displaying:
+</span></span><span style="display:flex;"><span>   - Document Title
+</span></span><span style="display:flex;"><span>   - Google Docs Link (URL)
+</span></span><span style="display:flex;"><span>   - Review Mode applied (Suggest vs. Socratic Hint)
+</span></span><span style="display:flex;"><span>   - Top 2 key improvement highlights for each document.
+</span></span></code></pre></div><p><img src="https://tanaikech.github.io/image-storage/20261108a/result_prompt6.jpg"
+     alt="Figure 24. Execution result of Prompt 6 in Antigravity CLI (agy) creating and coaching 3 distinct Google Documents concurrently in parallel via the MCP server."
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 24. Execution result of Prompt 6 in Antigravity CLI (<code>agy</code>) creating and coaching 3 distinct Google Documents concurrently in parallel via the MCP server.</em></p>
+<ul>
+<li><strong>Parallel MCP Creation &amp; Coaching (Figure 24):</strong> Creates 3 Google Docs via concurrent <code>gdocumentor_edit</code> calls, then coaches all 3 in parallel via <code>gdocumentor_proofread</code> (<code>suggest</code> + Summary Tab on Doc 1, Socratic <code>hint</code> on Doc 2, polite business <code>suggest</code> on Doc 3).</li>
+<li><strong>Executive Comparison Table:</strong> Outputs a 5-column comparison table with links and top 2 highlights for each document.</li>
+</ul>
+<hr>
+<h3 id="cross-platform-proof-windows-11-claude-desktop--wsl2-gdocumentor-mcp">Cross-Platform Proof: Windows 11 Claude Desktop ↔ WSL2 <code>gdocumentor</code> MCP</h3>
+<p>Configured via <code>gdocumentor setup --wsl-host --agent claude-desktop,claude-code</code>. <strong>No <code>GEMINI_API_KEY</code> is used</strong>—Windows 11 Claude Desktop (<code>Sonnet 5.5</code>) performs all reasoning and calls WSL2 <code>gdocumentor</code> over <code>wsl.exe</code>.</p>
+<h4 id="pattern-1-a-zero-auth-mode-in-claude-desktop-noauth-true">Pattern 1-A: Zero-Auth Mode in Claude Desktop (<code>noAuth: true</code>)</h4>
+<ul>
+<li><strong>🔑 Credentials:</strong> <code>GEMINI_API_KEY</code>: <strong>Not Required</strong> | Google OAuth2: <strong>Not Required</strong></li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>Please use the gdocumentor_proofread MCP tool without a Google OAuth access token (noAuth: true) to proofread the following short draft. Do not call any external Gemini API; use your own Host AI to generate the structured coaching feedback (`aiResult`). After running the tool, display the complete proofreading results directly here in the chat—including a table of Original Text vs. Suggested Revision, the Reason for each edit, the Learning Point, and the Writing Coach &amp; Learning Summary (Executive Feedback, Observed Habits, and Actionable Tips):
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>&#34;Google Apps Script is basically a coding platform that is provided by Google. You totally do not need to install any special softwares on your computer at all. The most biggest advantage of using GAS is because it can easily connect and integrate with many various Google services to automate routine works every single day.&#34;
+</span></span></code></pre></div><ul>
+<li><strong>🎥 Demo Video:</strong> <strong><a href="https://youtu.be/2rsLJIUOlJ4">Watch on YouTube (<code>https://youtu.be/2rsLJIUOlJ4</code>)</a></strong>
+<ul>
+<li><div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+      <iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" loading="eager" referrerpolicy="strict-origin-when-cross-origin" src="https://www.youtube.com/embed/2rsLJIUOlJ4?autoplay=0&amp;controls=1&amp;end=0&amp;loop=0&amp;mute=0&amp;start=0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" title="YouTube video"></iframe>
+    </div>
+</li>
+</ul>
+</li>
+<li><strong>Result:</strong> Claude Desktop&rsquo;s <code>Sonnet 5.5</code> generates 5 suggestions via <code>gdocumentor_proofread</code> (<code>noAuth: true</code>) and renders the <code>Original vs. Suggested</code> table, rationales, and Learning Summary directly in chat.</li>
+</ul>
+<h4 id="pattern-2-a-google-docs--summary-tab-in-claude-desktop-summarytab-true">Pattern 2-A: Google Docs + Summary Tab in Claude Desktop (<code>summaryTab: true</code>)</h4>
+<ul>
+<li><strong>🔑 Credentials:</strong> <code>GEMINI_API_KEY</code>: <strong>Not Required</strong> | Google OAuth2: Required</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>Please use the gdocumentor_proofread MCP tool (with Google Docs authentication enabled and summaryTab: true) to proofread the following draft into a new Google Document titled &#34;Claude Desktop WSL2 Test - Coaching Review&#34;. After applying the inline Suggested Edits to the Google Document, please show me directly here in the chat:
+</span></span><span style="display:flex;"><span>1. The clickable URL to the created Google Document and its Summary Tab
+</span></span><span style="display:flex;"><span>2. A Markdown table summarizing each inline suggestion applied (Original Text, Suggested Edit, Category, Reason, and Learning Point)
+</span></span><span style="display:flex;"><span>3. The Writing Coach &amp; Learning Summary (Executive Feedback, Observed Habits, and Actionable Tips)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Draft to proofread:
+</span></span><span style="display:flex;"><span>&#34;Google Apps Script is basically a coding platform that is provided by Google. You totally do not need to install any special softwares on your computer at all. The most biggest advantage of using GAS is because it can easily connect and integrate with many various Google services to automate routine works every single day.&#34;
+</span></span></code></pre></div><ul>
+<li><strong>🎥 Demo Video:</strong> <strong><a href="https://youtu.be/ZTGWwSU9EQg">Watch on YouTube (<code>https://youtu.be/ZTGWwSU9EQg</code>)</a></strong>
+<ul>
+<li><div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+      <iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" loading="eager" referrerpolicy="strict-origin-when-cross-origin" src="https://www.youtube.com/embed/ZTGWwSU9EQg?autoplay=0&amp;controls=1&amp;end=0&amp;loop=0&amp;mute=0&amp;start=0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" title="YouTube video"></iframe>
+    </div>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://tanaikech.github.io/image-storage/20261108a/result_claude_desktop_2A_b.jpg"
+     alt="Figure 25. Tab 1 of the Google Document created by Windows 11 Claude Desktop via the WSL2 gdocumentor MCP server (Pattern 2-A), showing 7 inline Suggested Edits and anchored coaching replies."
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 25. Tab 1 of the Google Document created by Windows 11 Claude Desktop via the WSL2 <code>gdocumentor</code> MCP server (Pattern 2-A), showing 7 inline Suggested Edits and anchored coaching replies.</em></p>
+<p><img src="https://tanaikech.github.io/image-storage/20261108a/result_claude_desktop_2A_c.png"
+     alt="Figure 26. The dedicated 🎓 DocuMentor AI Summary tab created in Google Docs by Windows 11 Claude Desktop via the WSL2 gdocumentor MCP server (Pattern 2-A, Model: agent-ai)."
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 26. The dedicated <code>🎓 DocuMentor AI Summary</code> tab created in Google Docs by Windows 11 Claude Desktop via the WSL2 <code>gdocumentor</code> MCP server (Pattern 2-A, <code>Model: agent-ai</code>).</em></p>
+<ul>
+<li><strong>Result (Demo Video, Figure 25 &amp; Figure 26):</strong> Claude Desktop (<code>Sonnet 5.5</code>) applies <strong>7 green <code>WriteMode.SUGGEST</code> inline edits</strong> with anchored rationales (Figure 25) and generates the <strong><code>🎓 DocuMentor AI Summary</code></strong> tab (<code>Model: agent-ai</code>, Figure 26) in ~32 seconds.</li>
+</ul>
+<hr>
+<h2 id="6-one-step-workspace-cleanup">6. One-Step Workspace Cleanup</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Optional: Delete test Google Docs created on Google Drive</span>
+</span></span><span style="display:flex;"><span>./gdocumentor edit -d <span style="color:#e6db74">&#34;&lt;YOUR_GOOGLE_DOC_ID&gt;&#34;</span> --delete-doc
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Remove the isolated local test workspace</span>
+</span></span><span style="display:flex;"><span>cd .. <span style="color:#f92672">&amp;&amp;</span> rm -rf gdocumentor_test
+</span></span></code></pre></div><hr>
+<h2 id="7-industry-context--6-advanced-workflows">7. Industry Context &amp; 6 Advanced Workflows</h2>
+<h3 id="macro-trends-in-ai-writing--coding">Macro Trends in AI Writing &amp; Coding</h3>
+<ul>
+<li><strong>1. Strategic Offloading vs. Harmful Substitution:</strong> Educational AI research (<a href="https://arxiv.org/pdf/2602.15638">Ref</a>) shows that Socratic scaffolding builds skill, whereas passive text replacement creates cognitive debt.</li>
+<li><strong>2. The &ldquo;Vibe Coding&rdquo; Maintainability Gap:</strong> GitClear (<a href="https://www.gitclear.com/the_ai_code_quality_maintainability_gap">Ref</a>) and empirical vibe-coding studies (<a href="https://arxiv.org/pdf/2512.11922">Ref</a>) show that isolated AI code generation increases code clones, churn, and PR review bottlenecks.</li>
+<li><strong>3. MCP as the Universal Connector:</strong> Anthropic&rsquo;s Model Context Protocol (<a href="https://www.anthropic.com/news/model-context-protocol">Ref</a>, <a href="https://modelcontextprotocol.io/specification/2025-06-18">Ref</a>) connects local codebases directly to living cloud documents.</li>
+</ul>
+<p><img src="https://tanaikech.github.io/image-storage/20261108a/advanced_applications_infographic.jpg"
+     alt="Figure 27. Six advanced applications and next-generation workflows unlocked by gdocumentor across software engineering, education, and research."
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 27. Six advanced applications and next-generation workflows unlocked by <code>gdocumentor</code> across software engineering, education, and research.</em></p>
+<h3 id="6-advanced-workflows-unlocked-by-gdocumentor-figure-27">6 Advanced Workflows Unlocked by <code>gdocumentor</code> (Figure 27)</h3>
+<ul>
+<li><strong>1. Anti-Vibe-Coding Pre-PR Gate (<code>git diff</code> + <code>--auto-deps</code> + <code>--no-auth</code>):</strong> Audit modified line ranges against <code>coding_standards.md</code> before opening a PR.</li>
+<li><strong>2. Spec-to-Code Drift Auditing (Google Docs ⇄ Git via MCP):</strong> Let an AI agent compare <code>TABLE_1</code> / <code>VISUAL_1</code> in a Google Doc spec against local code and anchor comments where they drift.</li>
+<li><strong>3. 0-Token CI/CD Living Documentation (<code>gdocumentor edit</code>):</strong> Pipe build tables and benchmark plots (<code>![Chart](./benchmark.png)</code>) into Google Docs from GitHub Actions with 0 LLM tokens.</li>
+<li><strong>4. Two-Stage Classroom &amp; Peer-Review Curriculum (<code>--hint</code> ➔ <code>summary</code>):</strong> Run <code>--hint</code> in Phase 1 so students revise their own drafts, then run <code>gdocumentor summary</code> in Phase 2 to synthesize learning advice from <strong>both AI suggestions (<code>🤖 AI</code>) and human instructor/peer review comments (<code>👤 Human</code>)</strong> alongside the <strong>Decision Record</strong> (<code>Accepted</code> / <code>Edited</code> / <code>Rejected</code>).</li>
+<li><strong>5. Cross-Modal Scientific Pre-Peer-Review (<code>gemini-4-argon</code>):</strong> Verify consistency across narrative text, data tables (<code>TABLE_1</code>), figures (<code>VISUAL_1</code>), and journal PDF guidelines (<code>-r</code>).</li>
+<li><strong>6. Living Codebooks for Onboarding:</strong> Turn legacy modules (<code>-t legacy/billing_engine.py:1-150 --auto-deps</code>) into annotated Pageless Google Docs where new hires can discuss architecture in comment threads.</li>
+</ul>
+<hr>
+<h2 id="8-summary--links">8. Summary &amp; Links</h2>
+<ul>
+<li><strong>1. Active Coaching Over Ghostwriting:</strong> Delivers <code>WriteMode.SUGGEST</code> diffs with rationales or Socratic <code>--hint</code> prompts so humans keep thinking.</li>
+<li><strong>2. 1-to-N Terminal &amp; Agent Scaling:</strong> Moves beyond 1-to-1 browser tabs to parallel batch coaching across classrooms, repos, and labs.</li>
+<li><strong>3. Zero-<code>GEMINI_API_KEY</code> Host-AI MCP:</strong> Lets Antigravity, Claude, Cursor, VS Code, Windsurf, and Gemini CLI reason using their own LLMs.</li>
+<li><strong>4. Zero-Drift UTF-16 &amp; Multimodal Engine:</strong> Matches exact UTF-16 offsets bottom-up and cross-checks prose, tables (<code>TABLE_1</code>), and figures (<code>VISUAL_1</code>).</li>
+<li><strong>5. 0-Token Editing &amp; Local Mode:</strong> Supports <code>--no-auth</code> local reports and 0-token Google Docs Markdown/table/image editing (<code>gdocumentor edit</code>).</li>
+</ul>
+<h3 id="resources">Resources</h3>
+<ul>
+<li><strong>GitHub Repository (<code>gdocumentor</code>):</strong> <a href="https://github.com/tanaikech/gdocumentor">https://github.com/tanaikech/gdocumentor</a></li>
+<li><strong>Pre-Compiled Binaries (<code>Releases</code>):</strong> <a href="https://github.com/tanaikech/gdocumentor/releases">https://github.com/tanaikech/gdocumentor/releases</a></li>
+<li><strong>Individual Setup (<code>INSTALL_INDIVIDUAL.md</code>):</strong> <a href="https://github.com/tanaikech/gdocumentor/blob/main/INSTALL_INDIVIDUAL.md">Link</a></li>
+<li><strong>Multi-Agent &amp; WSL2 Setup (<code>INSTALL_AI_AGENTS.md</code>):</strong> <a href="https://github.com/tanaikech/gdocumentor/blob/main/INSTALL_AI_AGENTS.md">Link</a></li>
+<li><strong>School / Organization Setup (<code>INSTALL_ORGANIZATION.md</code>):</strong> <a href="https://github.com/tanaikech/gdocumentor/blob/main/INSTALL_ORGANIZATION.md">Link</a></li>
+<li><strong>21 One-Command Test Cookbook (<code>TEST_COMMANDS.md</code>):</strong> <a href="https://github.com/tanaikech/gdocumentor/blob/main/TEST_COMMANDS.md">Link</a></li>
+<li><strong>End-to-End Testing Guide (<code>TESTING_GUIDE.md</code>):</strong> <a href="https://github.com/tanaikech/gdocumentor/blob/main/TESTING_GUIDE.md">Link</a></li>
+<li><strong>Agent Skill Spec (<code>SKILL.md</code>):</strong> <a href="https://github.com/tanaikech/gdocumentor/blob/main/skills/documentor-ai/SKILL.md">Link</a></li>
+</ul>
+
+  
+  <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2026%2f11%2f08%2fstop-passive-ai-rewrites-agentic-coaching-in-google-docs-with-gdocumentor%2f" target="_blank" title="Share on Facebook"><i class="fab fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2026%2f11%2f08%2fstop-passive-ai-rewrites-agentic-coaching-in-google-docs-with-gdocumentor%2f" target="_blank" title="Tweet"><i class="fab fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f11%2f08%2fstop-passive-ai-rewrites-agentic-coaching-in-google-docs-with-gdocumentor%2f" target="_blank" title="Share on Google+"><i class="fab fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2026%2f11%2f08%2fstop-passive-ai-rewrites-agentic-coaching-in-google-docs-with-gdocumentor%2f" target="_blank" title="Post to Tumblr"><i class="fab fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f11%2f08%2fstop-passive-ai-rewrites-agentic-coaching-in-google-docs-with-gdocumentor%2f" target="_blank" title="Pin it"><i class="fab fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f11%2f08%2fstop-passive-ai-rewrites-agentic-coaching-in-google-docs-with-gdocumentor%2f" target="_blank" title="Submit to Reddit"><i class="fab fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
+
+
+  
+<nav class="prev-next-posts">
+  <div class="prev-post">
+    
+      <span class="nav-label">Previous Article</span>
+      <a href="https://tanaikech.github.io/2026/10/27/beyond-passive-ai-rewrites-and-vibe-coding-in-google-docs/">Beyond Passive AI Rewrites and Vibe Coding in Google Docs</a>
+    
+  </div>
+  <div class="next-post">
+    
+  </div>
+</nav>
+
+<style>
+.prev-next-posts {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+  gap: 2rem;
+}
+.prev-post, .next-post {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.next-post {
+  text-align: right;
+}
+.nav-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+.prev-next-posts a {
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-decoration: none;
+}
+@media (max-width: 600px) {
+  .prev-next-posts { flex-direction: column; text-align: left; }
+  .next-post { text-align: left; }
+}
+</style>
+
+
+  
+  
+  
+  
+
+  
+
+</div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-social"><a href="https://twitter.com/tanaikech" target="_blank" rel="me" title="twitter">
+                  <i class="fab fa-x-twitter"></i>
+                </a><a href="https://github.com/tanaikech" target="_blank" rel="me" title="github">
+                  <i class="fab fa-github"></i>
+                </a><a href="https://linkedin.com/in/tanaike" target="_blank" rel="me" title="linkedin">
+                  <i class="fab fa-linkedin"></i>
+                </a><a href="https://www.youtube.com/@tanaike" target="_blank" rel="me" title="youtube">
+                  <i class="fab fa-youtube"></i>
+                </a><a href="https://medium.com/@tanaike" target="_blank" rel="me" title="medium">
+                  <i class="fab fa-medium"></i>
+                </a><a href="https://stackoverflow.com/users/7108653" target="_blank" rel="me" title="stackoverflow">
+                  <i class="fab fa-stack-overflow"></i>
+                </a><a href="https://zenn.dev/tanaike" target="_blank" rel="me" title="zenn">
+                  <i class="fas fa-edit"></i>
+                </a><a href="https://dev.to/tanaike" target="_blank" rel="me" title="devto">
+                  <i class="fab fa-dev"></i>
+                </a><a href="https://devpost.com/tanaike" target="_blank" rel="me" title="devpost">
+                  <i class="fas fa-terminal"></i>
+                </a><a href="https://orcid.org/0009-0004-2510-1163" target="_blank" rel="me" title="orcid">
+                  <i class="fab fa-orcid"></i>
+                </a>
+      </div>
+      
+      <p class="copyright">
+        &copy; 2026 tanaike - Google Apps Script, Gemini API, and Developer Tips. Built with <a href="https://gohugo.io" target="_blank">Hugo</a>.
+      </p>
+    </div>
+  </footer>
+
+  <script src="https://tanaikech.github.io/js/eclipse.js"></script>
+
+  
+  
+
+  
+  
+
+  
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
+<script>
+  
+  if (window.location.hostname != "localhost") {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-J3Z6T50WL5');
+  }
+</script>
+
+
+
+  
+
+  
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"
+      onload="renderMathInElement(document.body, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '\\[', right: '\\]', display: true},
+          {left: '\\begin{equation}', right: '\\end{equation}', display: true},
+          {left: '\\begin{align}', right: '\\end{align}', display: true},
+          {left: '\\begin{alignat}', right: '\\end{alignat}', display: true},
+          {left: '\\begin{gather}', right: '\\end{gather}', display: true},
+          {left: '\\begin{CD}', right: '\\end{CD}', display: true},
+          {left: '$', right: '$', display: false},
+          {left: '\\(', right: '\\)', display: false}
+        ],
+        throwOnError: false,
+        ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      });"></script>
+
+</body>
+</html>
+
