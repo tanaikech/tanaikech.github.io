@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Hugo 0.157.0">
+
+  
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+  
+  <meta name="theme-color" content="#050505">
+
+  
+  <meta name="google-site-verification" content="googleccbde819fe280caa.html" />
+
+  
+  
+
+  <meta name="keywords" content="Google Apps Script, Google Workspace, Gemini, spreadsheet, gmail">
+
+  <meta name="description" content="Gists
+
+
+Introduction
+Over the past three years, I published a three-part series on automating semantic Gmail labeling with Google Apps Script (GAS) and the Gemini API:
+
+Part 1 (Dec 19, 2023): Flexible Labeling for Gmail using Gemini Pro API with Google Apps Script introduced prompt-based free-text classification mapped through a label dictionary (labelObj).
+Part 2 (Jan 30, 2024): Flexible Labeling for Gmail using Gemini Pro API with Google Apps Script Part 2 replaced free-text prompts with Semantic Search (Gemini Corpora) and Function Calling.
+Part 3 (Sep 19, 2024): Flexible Labeling for Gmail using Gemini API with Google Apps Script Part 3 adopted strict JSON Schema structured outputs (responseMimeType: &quot;application/json&quot;) with Flash-tier batching.
+
+Each generation improved structural reliability, yet all three shared one underlying constraint: they relied on autoregressive text generation (generateContent) to emit classification tokens one by one. In November 2026, Google DeepMind introduced the Gemini Decisions API (POST https://generativelanguage.googleapis.com/v1beta/decisions, powered by gemini-decision-1). It evaluates structured questions in a single forward pass with zero output tokens and returns calibrated probabilities (0.01 to 0.99) alongside confidence scores.">
+
+  
+  <link rel="canonical" href="https://tanaikech.github.io/2026/11/25/zero-output-token-ai-in-google-apps-script-with-gemini-decisions-api/">
+
+  
+  <title>Zero-Output-Token AI in Google Apps Script with Gemini Decisions API | tanaike - Google Apps Script, Gemini API, and Developer Tips</title>
+
+  
+  <meta property="og:title" content="Zero-Output-Token AI in Google Apps Script with Gemini Decisions API">
+  <meta property="og:description" content="Gists
+
+
+Introduction
+Over the past three years, I published a three-part series on automating semantic Gmail labeling with Google Apps Script (GAS) and the Gemini API:
+
+Part 1 (Dec 19, 2023): Flexible Labeling for Gmail using Gemini Pro API with Google Apps Script introduced prompt-based free-text classification mapped through a label dictionary (labelObj).
+Part 2 (Jan 30, 2024): Flexible Labeling for Gmail using Gemini Pro API with Google Apps Script Part 2 replaced free-text prompts with Semantic Search (Gemini Corpora) and Function Calling.
+Part 3 (Sep 19, 2024): Flexible Labeling for Gmail using Gemini API with Google Apps Script Part 3 adopted strict JSON Schema structured outputs (responseMimeType: &quot;application/json&quot;) with Flash-tier batching.
+
+Each generation improved structural reliability, yet all three shared one underlying constraint: they relied on autoregressive text generation (generateContent) to emit classification tokens one by one. In November 2026, Google DeepMind introduced the Gemini Decisions API (POST https://generativelanguage.googleapis.com/v1beta/decisions, powered by gemini-decision-1). It evaluates structured questions in a single forward pass with zero output tokens and returns calibrated probabilities (0.01 to 0.99) alongside confidence scores.">
+  <meta property="og:url" content="https://tanaikech.github.io/2026/11/25/zero-output-token-ai-in-google-apps-script-with-gemini-decisions-api/">
+  <meta property="og:site_name" content="tanaike - Google Apps Script, Gemini API, and Developer Tips">
+  <meta property="og:type" content="article"><meta property="og:image" content="https://tanaikech.github.io/img/og-main.png">
+
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@tanaikech">
+  <meta name="twitter:title" content="Zero-Output-Token AI in Google Apps Script with Gemini Decisions API">
+  <meta name="twitter:description" content="Gists
+
+
+Introduction
+Over the past three years, I published a three-part series on automating semantic Gmail labeling with Google Apps Script (GAS) and the Gemini API:
+
+Part 1 (Dec 19, 2023): Flexible Labeling for Gmail using Gemini Pro API with Google Apps Script introduced prompt-based free-text classification mapped through a label dictionary (labelObj).
+Part 2 (Jan 30, 2024): Flexible Labeling for Gmail using Gemini Pro API with Google Apps Script Part 2 replaced free-text prompts with Semantic Search (Gemini Corpora) and Function Calling.
+Part 3 (Sep 19, 2024): Flexible Labeling for Gmail using Gemini API with Google Apps Script Part 3 adopted strict JSON Schema structured outputs (responseMimeType: &quot;application/json&quot;) with Flash-tier batching.
+
+Each generation improved structural reliability, yet all three shared one underlying constraint: they relied on autoregressive text generation (generateContent) to emit classification tokens one by one. In November 2026, Google DeepMind introduced the Gemini Decisions API (POST https://generativelanguage.googleapis.com/v1beta/decisions, powered by gemini-decision-1). It evaluates structured questions in a single forward pass with zero output tokens and returns calibrated probabilities (0.01 to 0.99) alongside confidence scores.">
+  <meta name="twitter:image" content="https://tanaikech.github.io/img/og-main.png">
+
+  
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [{
+        "@type": "BlogPosting",
+        "headline": "\"Zero-Output-Token AI in Google Apps Script with Gemini Decisions API\"",
+        "description": "\"\\u003cp\\u003e\\u003ca href=\\\"https://gist.github.com/tanaikech/270a6d4e1898431d7a4bc2c36074485f\\\"\\u003eGists\\u003c/a\\u003e\\u003c/p\\u003e\\n\\u003cp\\u003e\\u003cimg src=\\\"https://tanaikech.github.io/image-storage/20261125a/hero_banner.png\\\"\\n     alt=\\\"Zero-Output-Token AI in Google Apps Script with Gemini Decisions API\\\"\\n     \\n     loading=\\\"lazy\\\"\\n     decoding=\\\"async\\\"\\u003e\\n\\u003c/p\\u003e\\n\\u003ch2 id=\\\"introduction\\\"\\u003eIntroduction\\u003c/h2\\u003e\\n\\u003cp\\u003eOver the past three years, I published a three-part series on automating semantic Gmail labeling with Google Apps Script (GAS) and the Gemini API:\\u003c/p\\u003e\\n\\u003cul\\u003e\\n\\u003cli\\u003e\\u003cstrong\\u003ePart 1 (Dec 19, 2023)\\u003c/strong\\u003e: \\u003ca href=\\\"https://medium.com/google-cloud/flexible-labeling-for-gmail-using-gemini-pro-api-with-google-apps-script-5bf2ee7c9f52\\\"\\u003eFlexible Labeling for Gmail using Gemini Pro API with Google Apps Script\\u003c/a\\u003e introduced prompt-based free-text classification mapped through a label dictionary (\\u003ccode\\u003elabelObj\\u003c/code\\u003e).\\u003c/li\\u003e\\n\\u003cli\\u003e\\u003cstrong\\u003ePart 2 (Jan 30, 2024)\\u003c/strong\\u003e: \\u003ca href=\\\"https://medium.com/google-cloud/flexible-labeling-for-gmail-using-gemini-pro-api-with-google-apps-script-part-2-08015af6b2e6\\\"\\u003eFlexible Labeling for Gmail using Gemini Pro API with Google Apps Script Part 2\\u003c/a\\u003e replaced free-text prompts with Semantic Search (Gemini Corpora) and Function Calling.\\u003c/li\\u003e\\n\\u003cli\\u003e\\u003cstrong\\u003ePart 3 (Sep 19, 2024)\\u003c/strong\\u003e: \\u003ca href=\\\"https://medium.com/google-cloud/flexible-labeling-for-gmail-using-gemini-api-with-google-apps-script-part-3-414a62749e65\\\"\\u003eFlexible Labeling for Gmail using Gemini API with Google Apps Script Part 3\\u003c/a\\u003e adopted strict JSON Schema structured outputs (\\u003ccode\\u003eresponseMimeType: \\u0026quot;application/json\\u0026quot;\\u003c/code\\u003e) with Flash-tier batching.\\u003c/li\\u003e\\n\\u003c/ul\\u003e\\n\\u003cp\\u003eEach generation improved structural reliability, yet all three shared one underlying constraint: they relied on \\u003cstrong\\u003eautoregressive text generation\\u003c/strong\\u003e (\\u003ccode\\u003egenerateContent\\u003c/code\\u003e) to emit classification tokens one by one. In November 2026, Google DeepMind introduced the \\u003cstrong\\u003e\\u003ca href=\\\"https://aistudio.google.com/docs/decisions-api\\\"\\u003eGemini Decisions API\\u003c/a\\u003e\\u003c/strong\\u003e (\\u003ccode\\u003ePOST https://generativelanguage.googleapis.com/v1beta/decisions\\u003c/code\\u003e, powered by \\u003ccode\\u003egemini-decision-1\\u003c/code\\u003e). It evaluates structured questions in a \\u003cstrong\\u003esingle forward pass\\u003c/strong\\u003e with \\u003cstrong\\u003ezero output tokens\\u003c/strong\\u003e and returns calibrated probabilities (\\u003ccode\\u003e0.01\\u003c/code\\u003e to \\u003ccode\\u003e0.99\\u003c/code\\u003e) alongside confidence scores.\\u003c/p\\u003e\"",
+        "url": "\"https://tanaikech.github.io/2026/11/25/zero-output-token-ai-in-google-apps-script-with-gemini-decisions-api/\"",
+        "datePublished": "\"2026-11-25T11:53:53+09:00\"",
+        "dateModified": "\"2026-11-25T11:53:53+09:00\"",
+        "wordCount":  4981 ,
+        "author": {
+          "@id": "https:\/\/tanaikech.github.io\/#person"
+        },
+        "publisher": {
+          "@id": "https:\/\/tanaikech.github.io\/#person"
+        },
+        "image": {
+          "@type": "ImageObject",
+          "url": "\"https://tanaikech.github.io/img/og-main.png\"",
+          "width": 1200,
+          "height": 630
+        },
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "\"https://tanaikech.github.io/2026/11/25/zero-output-token-ai-in-google-apps-script-with-gemini-decisions-api/\""
+        }
+      },{
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "\"https://tanaikech.github.io/\""
+          },{
+            "@type": "ListItem",
+            "position": 2,
+            "name": "\"Zero-Output-Token AI in Google Apps Script with Gemini Decisions API\"",
+            "item": "\"https://tanaikech.github.io/2026/11/25/zero-output-token-ai-in-google-apps-script-with-gemini-decisions-api/\""
+          }]
+      },      {
+        "@type": "Person",
+        "@id": "https:\/\/tanaikech.github.io\/#person",
+        "name": "Kanshi Tanaike",
+        "alternateName": "tanaike",
+        "url": "\"https://tanaikech.github.io/\"",
+        "image": "\"https://tanaikech.github.io/img/og-main.png\"",
+        "jobTitle": "Google Developer Expert",
+        "honorificPrefix": "Ph.D.",
+        "description": "Japanese scientist, Physicist and Google Developer Expert for Google Workspace.",
+        "award": "First place in the Outstanding GDE Award 2025",
+        "sameAs": [
+          "https://twitter.com/tanaikech",
+          "https://github.com/tanaikech",
+          "https://stackoverflow.com/users/7108653/tanaike",
+          "https://developers.google.com/community/experts/directory?text=tanaike",
+          "https://zenn.dev/tanaike",
+          "https://medium.com/@tanaike",
+          "https://orcid.org/0009-0004-2510-1163"
+        ]
+      }
+    ]
+  }
+  </script>
+
+  
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/eclipse.css">
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <link rel="shortcut icon" href="https://tanaikech.github.io/img/favicon.ico" type="image/x-icon" />
+  
+  
+  
+
+  
+  
+  
+</head>
+
+
+<body>
+  <div id="progress-bar"></div>
+  
+  <header class="site-header">
+    <div class="header-container">
+      
+      <div class="header-top">
+        <div class="site-title">
+          <a href="https://tanaikech.github.io/">TANAIKE</a>
+          
+            <div class="site-subtitle">The Thinker</div>
+          
+        </div>
+
+        
+        <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+
+      
+      <div id="mobile-menu" class="mobile-menu-content">
+        <div class="nav-row">
+          <div class="nav-links">
+            
+              <a href="https://tanaikech.github.io/about/" title="">
+                <i class='fa fa-user fa-fw'></i> About
+              </a>
+            
+              <a href="https://tanaikech.github.io/post/" title="">
+                <i class='fa fa-list fa-fw'></i> Articles
+              </a>
+            
+              <a href="https://tanaikech.github.io/topics/" title="">
+                <i class='fa fa-folder fa-fw'></i> Topics
+              </a>
+            
+              <a href="https://tanaikech.github.io/tags/" title="">
+                <i class='fa fa-tags fa-fw'></i> Tags
+              </a>
+            
+              <a href="https://tanaikech.github.io/contact/" title="">
+                <i class='fa fa-phone fa-fw'></i> Contact
+              </a>
+            
+              <a href="https://tanaikech.github.io/link/" title="">
+                <i class='fa fa-thumbs-up fa-fw'></i> Links
+              </a>
+            
+              <a href="https://tanaikech.github.io/webapps/" title="">
+                <i class='fas fa-toolbox'></i> Web Applications
+              </a>
+            
+              <a href="https://tanaikech.github.io/donate/" title="">
+                <i class='fas fa-donate'></i> Donate
+              </a>
+            
+              <a href="https://tanaikech.github.io/" title="">
+                <i class='fa fa-home fa-fw'></i> Home
+              </a>
+            
+          </div>
+        </div>
+
+        <div class="social-links-row"><a href="https://twitter.com/tanaikech" target="_blank" rel="me">
+                <i class="fab fa-x-twitter"></i> X
+              </a><a href="https://medium.com/@tanaike" target="_blank" rel="me">
+                <i class="fab fa-medium"></i> Medium
+              </a><a href="https://www.youtube.com/@tanaike" target="_blank" rel="me">
+                <i class="fab fa-youtube"></i> YouTube
+              </a><a href="https://linkedin.com/in/tanaike" target="_blank" rel="me">
+                <i class="fab fa-linkedin"></i> LinkedIn
+              </a><a href="https://github.com/tanaikech" target="_blank" rel="me">
+                <i class="fab fa-github"></i> GitHub
+              </a><a href="https://gist.github.com/tanaikech" target="_blank" rel="me">
+                <i class="fas fa-code"></i> Gists
+              </a><a href="https://stackoverflow.com/users/7108653" target="_blank" rel="me">
+                <i class="fab fa-stack-overflow"></i> Stack Overflow
+              </a><a href="https://dev.to/tanaike" target="_blank" rel="me">
+                <i class="fab fa-dev"></i> DEV
+              </a><a href="https://zenn.dev/tanaike" target="_blank" rel="me">
+                <i class="fas fa-edit"></i> Zenn
+              </a><a href="https://devpost.com/tanaike" target="_blank" rel="me">
+                <i class="fas fa-terminal"></i> Devpost
+              </a><a href="https://orcid.org/0009-0004-2510-1163" target="_blank" rel="me">
+                <i class="fab fa-orcid"></i> ORCID
+              </a></div>
+      </div>
+
+    </div>
+  </header>
+
+  <main id="main">
+
+
+<div class="header">
+  <h1>Zero-Output-Token AI in Google Apps Script with Gemini Decisions API</h1>
+  <h2></h2>
+</div>
+<div class="content">
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>25 Nov 2026, 11:53</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/gastips">GasTips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-apps-script">Google Apps Script</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/google-workspace">Google Workspace</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/gemini">Gemini</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/spreadsheet">spreadsheet</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/gmail">gmail</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  <p><a href="https://gist.github.com/tanaikech/270a6d4e1898431d7a4bc2c36074485f">Gists</a></p>
+<p><img src="https://tanaikech.github.io/image-storage/20261125a/hero_banner.png"
+     alt="Zero-Output-Token AI in Google Apps Script with Gemini Decisions API"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<h2 id="introduction">Introduction</h2>
+<p>Over the past three years, I published a three-part series on automating semantic Gmail labeling with Google Apps Script (GAS) and the Gemini API:</p>
+<ul>
+<li><strong>Part 1 (Dec 19, 2023)</strong>: <a href="https://medium.com/google-cloud/flexible-labeling-for-gmail-using-gemini-pro-api-with-google-apps-script-5bf2ee7c9f52">Flexible Labeling for Gmail using Gemini Pro API with Google Apps Script</a> introduced prompt-based free-text classification mapped through a label dictionary (<code>labelObj</code>).</li>
+<li><strong>Part 2 (Jan 30, 2024)</strong>: <a href="https://medium.com/google-cloud/flexible-labeling-for-gmail-using-gemini-pro-api-with-google-apps-script-part-2-08015af6b2e6">Flexible Labeling for Gmail using Gemini Pro API with Google Apps Script Part 2</a> replaced free-text prompts with Semantic Search (Gemini Corpora) and Function Calling.</li>
+<li><strong>Part 3 (Sep 19, 2024)</strong>: <a href="https://medium.com/google-cloud/flexible-labeling-for-gmail-using-gemini-api-with-google-apps-script-part-3-414a62749e65">Flexible Labeling for Gmail using Gemini API with Google Apps Script Part 3</a> adopted strict JSON Schema structured outputs (<code>responseMimeType: &quot;application/json&quot;</code>) with Flash-tier batching.</li>
+</ul>
+<p>Each generation improved structural reliability, yet all three shared one underlying constraint: they relied on <strong>autoregressive text generation</strong> (<code>generateContent</code>) to emit classification tokens one by one. In November 2026, Google DeepMind introduced the <strong><a href="https://aistudio.google.com/docs/decisions-api">Gemini Decisions API</a></strong> (<code>POST https://generativelanguage.googleapis.com/v1beta/decisions</code>, powered by <code>gemini-decision-1</code>). It evaluates structured questions in a <strong>single forward pass</strong> with <strong>zero output tokens</strong> and returns calibrated probabilities (<code>0.01</code> to <code>0.99</code>) alongside confidence scores.</p>
+<p>In this article, I explain why the Decisions API fits Google Apps Script&rsquo;s execution model and walk through three self-contained V8 GAS applications. I start with <strong>Flexible Labeling for Gmail (Part 4)</strong> and a controlled 4-method benchmark, move to a <strong>Gmail Model Cascade Router</strong>, and close with a <strong>1,000-Item Parallel Compliance Audit in Google Sheets</strong>. Every latency, token, and accuracy measurement below comes from live Google Apps Script V8 runs.</p>
+<hr>
+<h2 id="1-why-gemini-decisions-api-fits-google-apps-script">1. Why Gemini Decisions API Fits Google Apps Script</h2>
+<p>As described on the official <a href="https://workspace.google.com/products/apps-script/">Google Apps Script</a> site:</p>
+<blockquote>
+<p>&ldquo;Apps Script is the only low-code platform that makes it quick and easy to build business solutions that integrate, automate, and extend Google Workspace. With Apps Script, business users can build custom solutions on top of Google Workspace — no professional development experience required. Apps Script is available to anyone with a Gmail account.&rdquo;</p>
+</blockquote>
+<p>Because Google Apps Script has native affinity with Google Workspace, it is an exceptional platform for exercising fine-grained control over Gmail, Google Sheets, Google Drive, Docs, and Forms—whether through time-driven triggers, event triggers like <code>onEdit</code> and <code>onFormSubmit</code>, or custom spreadsheet functions. At the same time, GAS enforces a strict <strong><a href="https://developers.google.com/apps-script/guides/services/quotas">6-minute (360-second) hard execution limit</a></strong>. When a script loops through hundreds of compliance rules or dozens of emails using autoregressive <code>generateContent</code> calls, token decoding latency and per-item network overhead accumulate quickly.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20261125a/figure1_architecture.png"
+     alt="Figure 1: Autoregressive LLM Loops vs. Gemini Decisions API in Google Apps Script"
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 1: Comparison between sequential autoregressive <code>generateContent</code> loops and single forward-pass parallel evaluation with <code>gemini-decision-1</code> in Google Apps Script.</em></p>
+<p>In practice, the Gemini Decisions API changes four design constraints inside GAS:</p>
+<ul>
+<li><strong>Mitigating GAS&rsquo;s 6-Minute Execution Limit</strong>: A single Decisions API request evaluates up to <strong>1,000 independent questions</strong> against one shared multimodal input in one forward pass. Google&rsquo;s <a href="https://aistudio.google.com/docs/decisions-api">official documentation</a> reports server-side latencies of ~150–250 ms for standard contexts, and I measure full end-to-end GAS <code>UrlFetchApp</code> latency directly in the benchmark below.</li>
+<li><strong>Zero Output Token Billing and Shared Input Reuse</strong>: Sending a Drive PDF or an email with attachments once as <code>input</code> incurs input token billing only once ($0.10 per 1M input tokens as of November 23, 2026), while evaluating up to 1,000 criteria generates strictly `0` output tokens ($0.00 output cost).</li>
+<li><strong>Calibrated Probabilities with Zero JSON Parse Failures</strong>: Instead of decoding text tokens into JSON and hoping the model expresses uncertainty accurately, <code>gemini-decision-1</code> returns structured probability maps and <code>confidence</code> scores across three typed question primitives: <code>noul</code> (Yes/No probability in <code>0.01</code>–<code>0.99</code>), <code>choice</code> (2–255 discrete classes), and <code>score</code> (ordered rubric expected score).</li>
+<li><strong>Native Multimodal Ingestion</strong>: GAS can pass Drive PDFs and Gmail attachments directly as typed <code>document</code> and <code>image</code> blocks without building OCR or pre-extraction pipelines.</li>
+</ul>
+<hr>
+<h2 id="2-three-practical-applications-across-orthogonal-axes">2. Three Practical Applications Across Orthogonal Axes</h2>
+<p>To show where zero-output-token decisions outperform autoregressive generation—and where reasoning models remain essential—I built three standalone GAS applications along three distinct axes:</p>
+<ul>
+<li><strong>Use Case 1 — Gmail Labeling Evolution &amp; 4-Method Benchmark (Part 1 → Part 4)</strong>: Multi-axis inbox classification (<code>choice</code>, <code>noul</code>, <code>score</code>, plus a <code>NeedsReview</code> safety gate) paired with a controlled 4-method benchmark comparing <strong><code>gemini-3.8-flash</code></strong> (Methods 1–3) against <strong><code>gemini-decision-1</code></strong> (Method 4).</li>
+<li><strong>Use Case 2 — Vertical Escalation (Model Cascade Router)</strong>: Confidence-gated routing in Gmail that handles routine inquiries cheaply with <code>gemini-decision-1</code> and escalates only complex or uncertain threads to <strong><code>gemini-4-hydrogen</code></strong> (<code>thinkingLevel: &quot;HIGH&quot;</code>) for deep reasoning and reply drafting.</li>
+<li><strong>Use Case 3 — Horizontal Scale (1 Input × 1,000 Criteria)</strong>: Shared-input parallel compliance auditing of a Drive PDF against up to 1,000 checklist criteria in Google Sheets.</li>
+</ul>
+<blockquote>
+<p><strong>Repository &amp; File Layout</strong>: All scripts are published in <a href="https://github.com/tanaikech/gemini-decisions-api-gas">https://github.com/tanaikech/gemini-decisions-api-gas</a>. The source filenames (<a href="https://github.com/tanaikech/gemini-decisions-api-gas/blob/main/src/usecase3_gmail_flexible_labeling.js"><code>src/usecase3_gmail_flexible_labeling.js</code></a>, <a href="https://github.com/tanaikech/gemini-decisions-api-gas/blob/main/src/usecase3_gmail_benchmark.js"><code>src/usecase3_gmail_benchmark.js</code></a>, <a href="https://github.com/tanaikech/gemini-decisions-api-gas/blob/main/src/usecase2_gmail_cascade_router.js"><code>src/usecase2_gmail_cascade_router.js</code></a>, and <a href="https://github.com/tanaikech/gemini-decisions-api-gas/blob/main/src/usecase1_compliance_audit.js"><code>src/usecase1_compliance_audit.js</code></a>) keep their original file numbering; this article orders them from Gmail labeling evolution to horizontal Sheets scale.</p>
+</blockquote>
+<p>All six <code>.js</code> files in <a href="https://github.com/tanaikech/gemini-decisions-api-gas/tree/main/src"><code>src/</code></a> (including the production operations runner <a href="https://github.com/tanaikech/gemini-decisions-api-gas/blob/main/src/production_runners.js"><code>src/production_runners.js</code></a>) are V8-compatible and designed to coexist inside a single GAS project without namespace collisions. Each application exposes both a <strong>single one-shot test function</strong> (with pre-flight checks, a 4.5-minute safety timeout, automatic Drive log export, and full cleanup) and a <strong>production-ready runner</strong> for day-to-day Workspace automation.</p>
+<hr>
+<h2 id="3-shared-core-client-srcdecisions_clientjs">3. Shared Core Client (<a href="https://github.com/tanaikech/gemini-decisions-api-gas/blob/main/src/decisions_client.js"><code>src/decisions_client.js</code></a>)</h2>
+<p>The shared client centralizes <code>UrlFetchApp.fetch</code> calls and passes <code>GEMINI_API_KEY</code> strictly via the <code>x-goog-api-key</code> header, never in query URLs. It also handles bounded exponential backoff on HTTP 429/5xx, normalizes response field names, and enforces a 35 MB raw-byte inline limit so Base64 expansion stays safely below <a href="https://developers.google.com/apps-script/guides/services/quotas"><code>UrlFetchApp</code>&rsquo;s 50 MB body cap</a>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">callGeminiDecisionsApi_</span>(<span style="color:#a6e22e">sharedInput</span>, <span style="color:#a6e22e">questions</span>, <span style="color:#a6e22e">modelOverride</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">payload</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">model</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">modelOverride</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">GEMINI_DECISIONS_CONFIG</span>.<span style="color:#a6e22e">MODEL_DECISION</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">input</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">sharedInput</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">questions</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">questions</span>,
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">res</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">postGeminiJsonWithRetry_</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">GEMINI_DECISIONS_CONFIG</span>.<span style="color:#a6e22e">DECISIONS_ENDPOINT</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">payload</span>,
+</span></span><span style="display:flex;"><span>  );
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">rawAnswers</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">answers</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">decisions</span> <span style="color:#f92672">||</span> {};
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">normalizedAnswers</span> <span style="color:#f92672">=</span> {};
+</span></span><span style="display:flex;"><span>  Object.<span style="color:#a6e22e">keys</span>(<span style="color:#a6e22e">questions</span>).<span style="color:#a6e22e">forEach</span>(<span style="color:#66d9ef">function</span> (<span style="color:#a6e22e">qId</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">normalizedAnswers</span>[<span style="color:#a6e22e">qId</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">normalizeDecisionAnswer_</span>(<span style="color:#a6e22e">rawAnswers</span>[<span style="color:#a6e22e">qId</span>]);
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">answers</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">normalizedAnswers</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">usage</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">inputTokens</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">usage</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">usage</span>.<span style="color:#a6e22e">totalInputTokens</span> <span style="color:#f92672">:</span> <span style="color:#66d9ef">null</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">outputTokens</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">0</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">thinkingTokens</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">0</span>,
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">apiLatencyMs</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">apiLatencyMs</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">retries</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">retries</span>,
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>The complete client—including multimodal input builders, MIME whitelisting, <code>generateContent</code> wrappers with explicit <code>thinkingLevel</code> control, and Gmail/Drive cleanup helpers—is available in <a href="https://github.com/tanaikech/gemini-decisions-api-gas/blob/main/src/decisions_client.js"><code>src/decisions_client.js</code></a>.</p>
+<hr>
+<h2 id="4-use-case-1-flexible-labeling-for-gmail-part-4--4-method-benchmark">4. Use Case 1: Flexible Labeling for Gmail (Part 4) &amp; 4-Method Benchmark</h2>
+<p>I start by picking up directly from my three prior Gmail labeling articles (<a href="https://medium.com/google-cloud/flexible-labeling-for-gmail-using-gemini-pro-api-with-google-apps-script-5bf2ee7c9f52">Part 1</a>, <a href="https://medium.com/google-cloud/flexible-labeling-for-gmail-using-gemini-pro-api-with-google-apps-script-part-2-08015af6b2e6">Part 2</a>, and <a href="https://medium.com/google-cloud/flexible-labeling-for-gmail-using-gemini-api-with-google-apps-script-part-3-414a62749e65">Part 3</a>), which focused on <strong>multi-axis inbox classification</strong> in Google Apps Script (<a href="https://github.com/tanaikech/gemini-decisions-api-gas/blob/main/src/usecase3_gmail_flexible_labeling.js"><code>src/usecase3_gmail_flexible_labeling.js</code></a> and <a href="https://github.com/tanaikech/gemini-decisions-api-gas/blob/main/src/usecase3_gmail_benchmark.js"><code>src/usecase3_gmail_benchmark.js</code></a>).</p>
+<p><img src="https://tanaikech.github.io/image-storage/20261125a/figure4_gmail_evolution_part1_to_4.png"
+     alt="Figure 2: Evolution of Flexible Labeling for Gmail in GAS (Part 1 to Part 4)"
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 2: Architectural progression across Part 1 (Prompt Free-Text), Part 2 (Semantic Search / Function Calling), Part 3 (JSON Schema), and Part 4 (Gemini Decisions API).</em></p>
+<p><strong>Figure 2</strong> and <strong>Table 1</strong> summarize the structural shift across the four generations. Parts 1 through 3 progressively constrained <em>how</em> autoregressive text tokens were formatted; Part 4 removes text token generation altogether while adding native calibrated confidence gating (<code>NeedsReview</code> when <code>confidence &lt; 0.85</code>).</p>
+<p><img src="https://tanaikech.github.io/image-storage/20261125a/table1_comparison.png"
+     alt="Table 1: Architectural Comparison Across Gmail Labeling Approaches in GAS"
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Table 1: Architectural comparison across Part 1 through Part 4 Gmail labeling implementations in Google Apps Script.</em></p>
+<p>In <a href="https://github.com/tanaikech/gemini-decisions-api-gas/blob/main/src/usecase3_gmail_flexible_labeling.js"><code>src/usecase3_gmail_flexible_labeling.js</code></a>, <code>uc3ClassifyEmailWithDecisions_()</code> evaluates primary category (<code>choice</code>), independent boolean flags (<code>is_action_required</code>, <code>is_urgent</code> via <code>noul</code>), and priority (<code>score</code>) in one pass. The production trigger entry point <code>labelGmailWithDecisions()</code> caches <code>GmailLabel</code> objects in a per-run <code>Map</code> to minimize Gmail API overhead.</p>
+<h3 id="controlled-4-method-benchmark-design-srcusecase3_gmail_benchmarkjs">Controlled 4-Method Benchmark Design (<a href="https://github.com/tanaikech/gemini-decisions-api-gas/blob/main/src/usecase3_gmail_benchmark.js"><code>src/usecase3_gmail_benchmark.js</code></a>)</h3>
+<p><strong>What this benchmark tests</strong>: Given the exact same 6 incoming Gmail emails (including a PDF invoice attachment and an intentionally ambiguous message), all four GAS labeling approaches—Part 1 Free-Text, Part 2 Function Calling, and Part 3 JSON Schema on <code>gemini-3.8-flash</code> vs. Part 4 Decisions API on <code>gemini-decision-1</code>—are asked to predict the <strong>exact same three outputs</strong> for every email: a primary category (<code>Academic</code>, <code>Finance</code>, <code>Advertisement</code>, <code>Support</code>, or <code>Other</code>), two boolean flags (<code>ActionRequired</code>, <code>Urgent</code>), and a <code>1</code>–<code>5</code> priority score. The goal is to measure whether switching from autoregressive text/JSON generation to Decisions API reduces latency and token cost <strong>without sacrificing accuracy</strong>, and whether calibrated confidence catches ambiguous emails before applying a wrong label.</p>
+<p>To keep the comparison fair inside GAS without deprecated models or execution-order bias, <code>testUseCase3GmailBenchmark()</code> applies six experimental controls illustrated in <strong>Figure 3</strong>:</p>
+<p><img src="https://tanaikech.github.io/image-storage/20261125a/figure5_uc3_benchmark_harness.png"
+     alt="Figure 3: Multi-Axis Gmail Labeling &amp; 4-Method Benchmark Harness"
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 3: One-shot Latin-square benchmark harness in <a href="https://github.com/tanaikech/gemini-decisions-api-gas/blob/main/src/usecase3_gmail_benchmark.js"><code>src/usecase3_gmail_benchmark.js</code></a> measuring isolated API latency, accuracy, Macro-F1, and token cost across all four methods.</em></p>
+<ul>
+<li><strong>Identical 3-Axis Schema and Multimodal Payload</strong>: All four methods evaluate the exact same 6 labeled test emails—Academic, Finance, Advertisement, Support, a Finance email with a PDF invoice attachment, and an intentionally ambiguous edge case—pre-loaded in memory before timing starts.</li>
+<li><strong>Why <code>gemini-3.8-flash</code> (<code>thinkingLevel: &quot;LOW&quot;</code>) for Methods 1–3</strong>: The original Parts 1–3 articles used older models (<code>gemini-pro</code> and <code>gemini-1.5-flash</code>) that have since been deprecated. Standardizing Methods 1–3 on <strong><code>gemini-3.8-flash</code></strong>—the current fast, cost-efficient Flash-tier model developers naturally choose for high-frequency GAS classification rather than a heavier reasoning model like <code>gemini-4-hydrogen</code>—keeps the benchmark reproducible and isolates architectural differences from model-generation differences. Because both <code>gemini-3.8-flash</code> and <code>gemini-4-hydrogen</code> reject <code>thinkingLevel: &quot;MINIMAL&quot;</code> and <code>thinkingBudget: 0</code> with HTTP 400 (defaulting to <code>MEDIUM</code>/<code>HIGH</code> thinking), Methods 1–3 explicitly set <code>thinkingLevel: &quot;LOW&quot;</code> and <code>temperature: 0.0</code>, logging thinking tokens alongside output tokens.</li>
+<li><strong>Warm-Up and Latin-Square Interleaving</strong>: One discarded warm-up call per endpoint eliminates cold-start DNS/TLS bias, and interleaved Latin-square rotation (<code>[M1,M2,M3,M4]</code>, <code>[M2,M3,M4,M1]</code>, &hellip;) across 2 repeats (48 timed trials total) removes execution-order drift.</li>
+<li><strong>Isolated API Timing</strong>: Timing wraps only <code>UrlFetchApp.fetch()</code>, keeping API latency cleanly separated from response parsing and post-benchmark live Gmail label application.</li>
+<li><strong>Direct Production Reuse</strong>: Method 4 invokes <code>uc3ClassifyEmailWithDecisions_()</code> directly from <a href="https://github.com/tanaikech/gemini-decisions-api-gas/blob/main/src/usecase3_gmail_flexible_labeling.js"><code>src/usecase3_gmail_flexible_labeling.js</code></a>.</li>
+<li><strong>Reproducible Logging &amp; Auto-Cleanup</strong>: The script logs run metadata (UTC timestamp, model IDs, <code>thinkingLevel</code>, pricing reference date) alongside a formatted Markdown summary table to Google Drive, then removes all temporary threads and nested labels in <code>finally</code>.</li>
+</ul>
+<p><img src="https://tanaikech.github.io/image-storage/20261125a/benchmark_results_chart.png"
+     alt="Figure 4: Live GAS 4-Method Gmail Labeling Benchmark Chart"
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 4: Empirical latency distribution (left), estimated cost per 1,000 emails with output/thinking token counts (top right), and <code>gemini-decision-1</code> calibrated confidence gate across all 6 emails (bottom right), measured across 48 live GAS V8 trials.</em></p>
+<p><strong>Figure 4</strong> reads across three complementary panels: the <strong>left panel</strong> plots median API latency bars overlaid with all 12 individual trial points and p95 diamond markers; the <strong>top-right panel</strong> compares estimated cost per 1,000 emails alongside average output and thinking token counts; and the <strong>bottom-right panel</strong> shows <code>gemini-decision-1</code>&rsquo;s calibrated confidence for each test email against the dashed <code>0.85</code> auto-label threshold.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20261125a/table2_benchmark_template.png"
+     alt="Table 2: Live GAS 4-Method Gmail Labeling Benchmark Results"
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Table 2: Live GAS V8 benchmark results measured via <code>testUseCase3GmailBenchmark()</code> (<code>N = 6</code>, <code>R = 2</code>, measured on November 23, 2026).</em></p>
+<h3 id="key-empirical-findings-from-live-gas-execution">Key Empirical Findings from Live GAS Execution</h3>
+<p>The live Latin-square benchmark across 48 API calls (measured on November 23, 2026; post-benchmark live Gmail label application total: <strong>3,750 ms</strong> across 6 threads) revealed four concrete takeaways:</p>
+<ul>
+<li><strong>6.29x to 10.33x Faster Paired Latency</strong>: At a median GAS <code>UrlFetchApp</code> latency of <strong>305 ms</strong> (IQR 168 ms, p95 <strong>566 ms</strong>), <code>gemini-decision-1</code> outperformed <code>gemini-3.8-flash</code> (<code>thinkingLevel: &quot;LOW&quot;</code>) by <strong>6.29x</strong> over JSON Schema (2,276 ms), <strong>6.30x</strong> over Free-Text (2,266 ms), and <strong>10.33x</strong> over Function Calling (3,259 ms). All four methods achieved identical <strong>100.0% Category Accuracy</strong>, <strong>1.00 Macro-F1</strong>, <strong>1.00 Multi-Label F1</strong>, and <strong>0/12 parse/HTTP failures</strong>.</li>
+<li><strong>92.2% to 95.0% Lower Cost per 1,000 Emails</strong>: Although Decisions API used slightly more average input tokens per call (595 vs. 380–502) due to typed question definitions, its <strong>$0.10 / 1M input rate** and strictly **0 output and 0 thinking tokens** drove estimated cost down to **$0.0595 / 1,000 emails</strong>. That is 12.9x cheaper than JSON Schema ($0.7664), 15.9x cheaper than Free-Text ($0.9466), and 20.2x cheaper than Function Calling ($1.2009).</li>
+<li><strong>Calibrated Safety Gate Prevented Silent Mislabeling</strong>: On the intentionally ambiguous email, all four methods predicted <code>Academic</code> instead of <code>Other</code>. Methods 1–3 had no uncertainty signal and silently applied the wrong label, whereas <code>gemini-decision-1</code> returned <code>confidence = 0.6064</code> (compared with <code>0.9462</code>–<code>0.9996</code> on the five clear emails, including the attached PDF invoice) and routed <strong>2/2</strong> trials safely to <code>NeedsReview</code>.</li>
+<li><strong>Deterministic Probability Reproducibility</strong>: Across both Latin-square repeats, <code>gemini-decision-1</code> returned bit-identical confidence scores on every email (<code>0.9936</code> for Academic, <code>0.9462</code> for Finance + PDF, <code>0.6064</code> for Ambiguous). By contrast, <code>gemini-3.8-flash</code> varied in thinking token length and latency across repeats even at <code>temperature = 0.0</code>.</li>
+</ul>
+<hr>
+<h2 id="5-use-case-2-gmail-trigger-driven-model-cascade-router">5. Use Case 2: Gmail Trigger-Driven Model Cascade Router</h2>
+<p>While Use Case 1 focuses on multi-axis inbox labeling, real support and operations pipelines must also decide <em>when</em> to invoke a heavyweight reasoning model to draft a substantive reply. Not every incoming email warrants frontier reasoning latency and cost, yet complex outages or legal disputes cannot be answered with static templates. Use Case 2 implements a two-stage model cascade in <a href="https://github.com/tanaikech/gemini-decisions-api-gas/blob/main/src/usecase2_gmail_cascade_router.js"><code>src/usecase2_gmail_cascade_router.js</code></a>.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20261125a/figure3_uc2_cascade_router.png"
+     alt="Figure 5: Gmail Trigger-Driven Model Cascade Router"
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 5: Vertical escalation workflow routing routine Gmail threads through <code>gemini-decision-1</code> (Fast Path) and cascading complex or low-confidence threads to <code>gemini-4-hydrogen</code>.</em></p>
+<p>Stage 1 evaluates each incoming Gmail thread—including whitelisted PDF or image attachments—with <code>gemini-decision-1</code> across three questions: <code>is_action_required</code> (<code>noul</code>), <code>intent_category</code> (<code>choice</code> across <code>routine_inquiry</code>, <code>billing</code>, <code>technical_escalation</code>, and <code>informational</code>), and <code>complexity_risk</code> (<code>score</code> on a 0–4 rubric). A simple threshold rule (<code>confidence &lt; 0.85</code> or <code>complexity &gt;= 3</code>) decides whether to escalate:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">shouldEscalate</span> <span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">confidence</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">UC2_CONFIDENCE_THRESHOLD</span> <span style="color:#f92672">||</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">complexityScore</span> <span style="color:#f92672">&gt;=</span> <span style="color:#a6e22e">UC2_COMPLEXITY_CASCADE_THRESHOLD</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">shouldEscalate</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">escRes</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">uc2CallReasoningEscalation_</span>(<span style="color:#a6e22e">emailText</span>, <span style="color:#a6e22e">attachments</span>, {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">category</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">category</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">confidence</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">confidence</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">complexityScore</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">complexityScore</span>,
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">thread</span>.<span style="color:#a6e22e">addLabel</span>(<span style="color:#a6e22e">escalatedLabel</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">createdDrafts</span>.<span style="color:#a6e22e">push</span>(<span style="color:#a6e22e">thread</span>.<span style="color:#a6e22e">createDraftReply</span>(<span style="color:#a6e22e">escRes</span>.<span style="color:#a6e22e">draftBody</span>));
+</span></span><span style="display:flex;"><span>} <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">thread</span>.<span style="color:#a6e22e">addLabel</span>(<span style="color:#a6e22e">fastLabel</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>When <code>shouldEscalate</code> is true, Stage 2 invokes <strong><code>gemini-4-hydrogen</code></strong> with <code>thinkingConfig: { thinkingLevel: &quot;HIGH&quot; }</code> to draft a detailed reply (with an optional fallback to <code>gemini-3.8-flash</code>).</p>
+<h3 id="live-gas-validation--cascade-results-testusecase2gmailcascaderouter">Live GAS Validation &amp; Cascade Results (<code>testUseCase2GmailCascadeRouter()</code>)</h3>
+<p><strong>What this validation tests</strong>: Unlike Use Case 1&rsquo;s head-to-head model comparison, Use Case 2 verifies whether a <strong>two-stage cascade router</strong> inside Gmail can reliably separate routine inquiries from ambiguous or high-risk threads—handling routine mail cheaply with <code>gemini-decision-1</code> alone while escalating only the hard cases to <code>gemini-4-hydrogen</code> for full reply drafting. Specifically, it measures <strong>(1) routing accuracy</strong> (does every email take the intended path?) and <strong>(2) latency savings</strong> (how much time is saved on routine mail by skipping Stage 2 reasoning?).</p>
+<p>To validate both branches without preparing sample emails manually, <code>testUseCase2GmailCascadeRouter()</code> generates a real PDF attachment (<code>incident_409.pdf</code>, reporting an EU-West HTTP 500 API outage with a $42,000 billing dispute and SLA penalty clause) and sends <strong>3 fixed test emails</strong> to your own Gmail Inbox:</p>
+<ul>
+<li><strong>Routine Inquiry (Fast Path)</strong>: Subject <code>&quot;Password reset link question&quot;</code>, a brief plain-text question asking where to reset an account password, with no attachments.</li>
+<li><strong>Ambiguous Follow-Up (Escalated)</strong>: Subject <code>&quot;Re: Following up on our discussion&quot;</code>, an intentionally underspecified message asking to confirm <em>&ldquo;the revised terms and technical workaround before Friday&rdquo;</em> with no prior context or attachments.</li>
+<li><strong>Complex Outage + PDF (Escalated)</strong>: Subject <code>&quot;URGENT: Production outage + $42k billing SLA dispute&quot;</code>, reporting a 3-hour production outage with the legal SLA and billing dispute report (<code>incident_409.pdf</code>) attached.</li>
+</ul>
+<p>After polling Inbox until all 3 emails arrive (excluded from API timing), <code>runGmailCascadeRouter()</code> runs Stage 1 triage on each thread and escalates qualifying threads to Stage 2 <code>gemini-4-hydrogen</code> (<code>thinkingLevel: &quot;HIGH&quot;</code>) to generate a Gmail reply draft. It then verifies all 3 routing outcomes, saves the log to Google Drive (<code>GeminiDecisionsTestLogs/</code>), and deletes all temporary drafts, threads, and nested labels in <code>finally</code>.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20261125a/uc2_results_chart.png"
+     alt="Figure 6: Live GAS Results: Gmail Model Cascade Router"
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 6: Empirical Stage 1 vs. Stage 2 API latency (left), 2D confidence-complexity decision plane with <code>conf = 0.85</code> and <code>score = 3.0</code> gates (top right), and live routing summary across all three GAS V8 test emails (bottom right).</em></p>
+<p>In the live GAS V8 run, all <strong>3/3 routing checks passed</strong>. The three panels in <strong>Figure 6</strong> highlight the measured trade-offs:</p>
+<ul>
+<li><strong>Fast Path vs. Escalated Latency (Left Panel)</strong>: Decomposes total API latency per email into <strong>Stage 1 <code>gemini-decision-1</code> triage</strong> (green) and <strong>Stage 2 <code>gemini-4-hydrogen</code> deep reasoning</strong> (purple). Routine Inquiry finished on the <strong>Fast Path</strong> in <strong>357 ms</strong> with <strong>0 reasoning calls</strong>, whereas Ambiguous Follow-Up took <strong>10,034 ms</strong> (<code>403 ms</code> + <code>9,631 ms</code>) and Complex Outage + PDF took <strong>10,422 ms</strong> (<code>601 ms</code> + <code>9,821 ms</code>)—roughly <strong>27x lower latency</strong> on routine traffic.</li>
+<li><strong>2D Confidence–Complexity Plane (Top-Right Panel)</strong>: Plots Stage 1 calibrated <code>confidence</code> (x-axis, gate at <code>0.85</code>) against <code>complexityScore</code> (y-axis, gate at <code>3.0</code>). Only the green lower-right quadrant (<code>conf &gt;= 0.85</code> and <code>score &lt; 3.0</code>) permits <code>FAST_PATH</code>. Routine Inquiry (<code>0.999</code>, <code>1.13</code>) lands squarely inside the green zone; Ambiguous Follow-Up (<code>0.554</code>, <code>2.59</code>) is caught by the <strong>confidence gate</strong> despite <code>score &lt; 3.0</code>; and Complex Outage + PDF (<code>0.635</code>, <code>3.70</code>) triggers <strong>both</strong> gates.</li>
+<li><strong>Live Routing Summary (Bottom-Right Panel)</strong>: Lists each email&rsquo;s predicted category (<code>routine_inquiry</code> vs. <code>technical_escalation</code>), confidence, complexity score, Stage 1 / Stage 2 latencies, final route (<code>FAST_PATH</code> vs. <code>ESCALATED</code>), and total end-to-end test runtime (<strong>29,067 ms</strong> including Gmail delivery polling, draft creation, and cleanup).</li>
+</ul>
+<h3 id="key-empirical-findings-from-live-gas-execution-1">Key Empirical Findings from Live GAS Execution</h3>
+<ul>
+<li><strong>~27x Faster Routine Triage Without Wasting Reasoning Tokens</strong>: Routine inquiries resolve on the Fast Path in <strong>357 ms</strong> with zero calls to <code>gemini-4-hydrogen</code>, reserving the ~9.6–9.8 s deep-reasoning budget exclusively for threads that genuinely require substantive reply synthesis.</li>
+<li><strong>Dual-Axis Gating Catches Ambiguity That Complexity Scores Alone Miss</strong>: Relying solely on a complexity rubric (<code>score &gt;= 3.0</code>) would have sent the underspecified follow-up (<code>score = 2.59</code>) down the Fast Path; pairing it with <code>gemini-decision-1</code>&rsquo;s calibrated <code>confidence &lt; 0.85</code> gate (<code>0.554</code>) ensured <strong>3/3</strong> accurate routing decisions.</li>
+<li><strong>Sub-Second Multimodal Screening Inside GAS</strong>: Even with an attached PDF outage and SLA dispute report (<code>incident_409.pdf</code>), Stage 1 triage completed in <strong>601 ms</strong> without OCR or text-extraction preprocessing, keeping scheduled Gmail cascade runs comfortably within GAS&rsquo;s 6-minute execution limit.</li>
+</ul>
+<hr>
+<h2 id="6-use-case-3-1000-item-parallel-compliance-audit-on-google-sheets">6. Use Case 3: 1,000-Item Parallel Compliance Audit on Google Sheets</h2>
+<p>Use Cases 1 and 2 operate on Gmail threads. Use Case 3 shifts to Google Sheets to demonstrate <strong>horizontal scale</strong> (<code>1 shared multimodal input × up to 1,000 criteria</code>) in <a href="https://github.com/tanaikech/gemini-decisions-api-gas/blob/main/src/usecase1_compliance_audit.js"><code>src/usecase1_compliance_audit.js</code></a>. When auditing a corporate security policy or vendor contract PDF against hundreds of checklist rules, calling a chat model once per row re-sends the entire document hundreds of times.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20261125a/figure2_uc1_compliance_audit.png"
+     alt="Figure 7: 1,000-Item Parallel Compliance Audit on Google Sheets"
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 7: Horizontal scale workflow in <a href="https://github.com/tanaikech/gemini-decisions-api-gas/blob/main/src/usecase1_compliance_audit.js"><code>src/usecase1_compliance_audit.js</code></a> evaluating up to 1,000 criteria against one shared Drive PDF input per batch.</em></p>
+<h3 id="how-google-sheets-google-drive-and-gemini-decisions-api-work-together">How Google Sheets, Google Drive, and Gemini Decisions API Work Together</h3>
+<p>In this workflow, <strong>Google Sheets acts as both the checklist input table and the color-coded audit report</strong>, while <strong>Google Drive stores the target PDF</strong> (such as a security policy or vendor contract). Row 1 holds four headers (<code>Audit Criterion</code>, <code>P(Compliant)</code>, <code>Confidence</code>, <code>Verdict</code>), you list one yes/no compliance question per row in <strong>Column A (<code>A2:A</code>)</strong>, and <code>runComplianceAudit(fileId, spreadsheetId, sheetName)</code> executes four concrete steps inside GAS:</p>
+<ul>
+<li><strong>1. Read Checklist Criteria from Google Sheets</strong>: <code>SpreadsheetApp.openById()</code> reads all non-empty rows from Column A (<code>A2:A</code>) in a single <code>getValues()</code> call while keeping track of exact row offsets.</li>
+<li><strong>2. Load the Target PDF Once from Google Drive</strong>: <code>DriveApp.getFileById(fileId)</code> retrieves the PDF blob, checks its MIME type and the 35 MB inline guard, and Base64-encodes the document <strong>once</strong> as a shared <code>input</code> block (<code>document</code>).</li>
+<li><strong>3. Evaluate All Rows in One Decisions API Call</strong>: GAS maps every row in Column A to a <code>noul</code> question (<code>q_0001</code>–<code>q_1000</code>, automatically chunking sheets with more than 1,000 rows) and sends the single shared PDF plus all questions together via <code>UrlFetchApp.fetch()</code> to <code>gemini-decision-1</code>.</li>
+<li><strong>4. Batch Write Verdicts &amp; Highlights Back to Columns B–D</strong>: GAS applies the <code>0.85</code> confidence gate (<code>PASS</code> in green, <code>FAIL</code> in red, <code>NEEDS_REVIEW</code> in yellow) and fills <code>P(Compliant)</code> (Column B), <code>Confidence</code> (Column C), and <code>Verdict</code> (Column D) in just two batched RPCs (<code>setValues</code> and <code>setBackgrounds</code>).</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">// 1. Map Column A criteria to noul questions (up to 1,000 per batch)
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">chunk</span>.<span style="color:#a6e22e">forEach</span>(<span style="color:#66d9ef">function</span> (<span style="color:#a6e22e">entry</span>, <span style="color:#a6e22e">idx</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">qKey</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;q_&#34;</span> <span style="color:#f92672">+</span> String(<span style="color:#a6e22e">sliceStart</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">idx</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>).<span style="color:#a6e22e">padStart</span>(<span style="color:#ae81ff">4</span>, <span style="color:#e6db74">&#34;0&#34;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">questions</span>[<span style="color:#a6e22e">qKey</span>] <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">type</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;noul&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">instructions</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;Does the document explicitly satisfy this compliance requirement? &#34;</span> <span style="color:#f92672">+</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;Criterion: &#34;</span> <span style="color:#f92672">+</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">entry</span>.<span style="color:#a6e22e">text</span>,
+</span></span><span style="display:flex;"><span>  };
+</span></span><span style="display:flex;"><span>});
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 2. Send 1 shared Drive PDF + all questions in one forward pass
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">response</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">callGeminiDecisionsApi_</span>(<span style="color:#a6e22e">sharedInput</span>, <span style="color:#a6e22e">questions</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 3. Batch-write Columns B–D (P(Compliant), Confidence, Verdict) &amp; row colors
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">outRange</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sheet</span>.<span style="color:#a6e22e">getRange</span>(<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">2</span>, <span style="color:#a6e22e">valuesMatrix</span>.<span style="color:#a6e22e">length</span>, <span style="color:#ae81ff">3</span>);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">outRange</span>.<span style="color:#a6e22e">setValues</span>(<span style="color:#a6e22e">valuesMatrix</span>);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">outRange</span>.<span style="color:#a6e22e">setBackgrounds</span>(<span style="color:#a6e22e">bgMatrix</span>);
+</span></span></code></pre></div><h3 id="how-to-run-this-in-your-own-google-sheet">How to Run This in Your Own Google Sheet</h3>
+<p>You can execute this audit in two practical ways using <a href="https://github.com/tanaikech/gemini-decisions-api-gas/blob/main/src/production_runners.js"><code>src/production_runners.js</code></a>:</p>
+<ul>
+<li><strong>Interactive Custom Menu in Google Sheets (Recommended)</strong>: Open any Google Spreadsheet, click <strong>Extensions &gt; Apps Script</strong>, paste the project files, and reload the Sheet. <code>onOpen()</code> adds a <strong>Gemini Decisions</strong> menu: click <strong>Initialize Audit Sheet Headers</strong> to format Row 1, enter your audit questions in Column A (Row 2+), then click <strong>Run Compliance Audit on Active Sheet&hellip;</strong> and paste a Google Drive PDF URL or File ID. Columns B–D populate automatically within seconds.</li>
+<li><strong>Standalone / Automated Batch Execution</strong>: Set <code>AUDIT_PDF_FILE_ID</code> and <code>AUDIT_SPREADSHEET_ID</code> (plus optional <code>AUDIT_SHEET_NAME</code>) in Script Properties and run <code>runProductionComplianceAudit()</code> from the GAS editor or a time-driven trigger—or call <code>runComplianceAudit(fileId, spreadsheetId, sheetName)</code> directly from another script.</li>
+</ul>
+<h3 id="live-gas-validation--audit-results-testusecase1complianceaudit">Live GAS Validation &amp; Audit Results (<code>testUseCase1ComplianceAudit()</code>)</h3>
+<p><strong>What this test does</strong>: Suppose you have <strong>one security policy PDF</strong> in Google Drive and a <strong>Google Sheet listing 25 checklist items</strong> (such as <em>&ldquo;Does the policy require AES-256 encryption?&rdquo;</em> or <em>&ldquo;Does it offer HIPAA BAA compliance?&rdquo;</em>). With a normal chat LLM, checking each row separately means uploading the same PDF 25 times. Here, <code>runComplianceAudit()</code> sends <strong>the PDF once together with all 25 questions in a single Decisions API request</strong>, then writes every <code>PASS</code>, <code>FAIL</code>, or <code>NEEDS_REVIEW</code> result back to the Sheet. This test checks three practical things: how many input tokens are saved by sending the PDF once instead of 25 times, how fast the API call and Sheet update complete, and whether clear items are judged accurately while ambiguous items are flagged <code>NEEDS_REVIEW</code> for human review.</p>
+<p>To verify this workflow without preparing external files beforehand, <code>testUseCase1ComplianceAudit()</code> generates a sample policy PDF and a checklist Sheet automatically:</p>
+<ul>
+<li><strong>Input Document (11-Clause Sample Policy PDF)</strong>: Created natively in GAS via <code>Utilities.newBlob(...).getAs('application/pdf')</code> as <em>&ldquo;Acme Cloud Services — Master Data Processing &amp; Security Policy (v2.4)&rdquo;</em>. It explicitly documents concrete controls such as TLS 1.3 in transit, AES-256 at rest, 48-hour PII breach notification, 90-day log purge, RBAC with hardware MFA, 30-day subprocessor notice, multi-region daily backups, annual third-party pentests, SOC 2 Type II reports, California governing law, and written opt-in for AI model training.</li>
+<li><strong>Audit Checklist (25 Ground-Truth Criteria on a Temporary Google Sheet)</strong>: Contains <strong>11 expected <code>PASS</code></strong> criteria satisfied by the policy (e.g., AES-256, TLS 1.3, 90-day log purge, hardware MFA, RBAC), <strong>11 expected <code>FAIL</code></strong> criteria absent or contradicted (e.g., ISO 27001, HIPAA BAA, strict EU data residency, CMEK, 99.999% uptime SLA, 4-hour RTO), and <strong>3 <code>BORDERLINE</code></strong> criteria with nuanced legal or SLA wording (EU GDPR SCC compatibility, financial-sector RTO targets, and penalty-free subprocessor exit).</li>
+</ul>
+<p><code>runComplianceAudit()</code> sends the PDF <strong>once</strong> with all 25 <code>noul</code> questions in a <strong>single <code>gemini-decision-1</code> forward pass</strong>. Each returned probability <code>P</code> passes through the <code>0.85</code> confidence gate: <code>P &gt;= 0.85</code> maps to <code>PASS</code>, <code>P &lt;= 0.15</code> to <code>FAIL</code>, and <code>0.15 &lt; P &lt; 0.85</code> to <code>NEEDS_REVIEW</code>. The script then writes all 25 probabilities, confidences, verdicts, and row highlights back to the Sheet in one batch, saves the log to Google Drive (<code>GeminiDecisionsTestLogs/</code>), and trashes both temporary files inside <code>finally</code>.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20261125a/uc1_results_chart.png"
+     alt="Figure 8: Live GAS Results: 25-Criterion Batch Compliance Audit (Google Sheets)"
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 8: Empirical per-criterion compliance probabilities for all 25 criteria (left), shared-input token savings vs. sequential calls (top right), and sub-second core audit latency breakdown (bottom right) measured in live GAS V8.</em></p>
+<p>Here is how to read the three graphs in <strong>Figure 8</strong> (out of the 22 clear PASS/FAIL ground-truth items, <strong>20/22 (90.9%)</strong> were auto-classified accurately, and the remaining 2 were safely routed to human review rather than misclassified):</p>
+<ul>
+<li><strong>Left Graph — What the Labels and Numbers Mean</strong>: The labels down the left side (such as <code>Hardware MFA (engineers)</code>, <code>AES-256 encryption at rest</code>, and <code>ISO 27001 certification</code>) are shortened names of the <strong>25 checklist items written in Column A of the Google Sheet</strong>, sorted from highest to lowest score. The number next to each bar (<code>0.9579</code> down to <code>0.0438</code>) is <strong><code>P(Compliant)</code></strong>—the calibrated Yes probability (<code>0.01</code>–<code>0.99</code>) <strong>returned directly by the Gemini Decisions API (<code>gemini-decision-1</code>)</strong> for each <code>noul</code> question in its JSON response (<code>answers.q_0001</code>–<code>q_0025</code>). GAS does not calculate these probabilities itself; it writes each returned value directly into <strong>Column B</strong> of the Sheet and applies a simple threshold rule: <strong>9 green bars</strong> (<code>P &gt;= 0.85</code>) become <code>PASS</code>, <strong>14 blue bars</strong> (<code>P &lt;= 0.15</code>) become <code>FAIL</code> (all 11 missing requirements plus the 3 unguaranteed borderline clauses), and the <strong>2 orange bars</strong> inside the <strong>yellow shaded band</strong> (<code>0.15 &lt; P &lt; 0.85</code>, i.e., <code>confidence &lt; 0.85</code>)—AI training opt-out (<code>0.8101</code>: written opt-in vs. default opt-out) and 72-hour breach notice (<code>0.3370</code>: 48-hour wording vs. 72-hour question)—are flagged <code>NEEDS_REVIEW</code> for human confirmation.</li>
+<li><strong>What the Left Graph Reveals</strong>: First, clear <code>PASS</code> items (<code>0.9256</code>–<code>0.9579</code>) and clear <code>FAIL</code> items (<code>0.0438</code>–<code>0.1448</code>) separate cleanly toward <code>1.0</code> and <code>0.0</code> in a single API call. Second, instead of overconfidently guessing on nuanced wording, calibration honestly places only the two ambiguous items into the middle orange zone for human review. Third, all three <code>borderline</code> clauses lacking explicit PDF guarantees (<code>0.0568</code>–<code>0.1448</code>) fail safely rather than slipping through as false <code>PASS</code> verdicts—the safest behavior for real compliance audits.</li>
+<li><strong>Top-Right Graph — Input Tokens Saved by Sending the PDF Once</strong>: The gray bar shows how many input tokens are needed if you send the same PDF 25 separate times (<code>61,000</code> tokens). The green bar shows Decisions API sending the PDF <strong>once</strong> alongside all 25 questions (<code>2,440</code> tokens, <code>0</code> output tokens, <strong>$0.000244</strong> total)—a <strong>96.0% reduction (25× fewer input tokens)</strong>.</li>
+<li><strong>Bottom-Right Graph — Execution Time Breakdown (Under 1 Second)</strong>: The green bar (<strong>687 ms</strong>) is the single Decisions API call evaluating all 25 questions, the blue bar (<strong>130 ms</strong>) is GAS writing all verdicts and colors back to Google Sheets, and the purple bar (<strong>817 ms</strong>) is the combined core audit time. (The <code>6,455 ms</code> note at the bottom includes creating and deleting the temporary test PDF and Sheet.)</li>
+</ul>
+<h3 id="key-empirical-findings-from-live-gas-execution-2">Key Empirical Findings from Live GAS Execution</h3>
+<ul>
+<li><strong>Sub-Second Core Audit Across 25 Criteria in One Pass</strong>: Evaluating all 25 criteria against a multi-clause Drive PDF and writing all verdicts plus row highlights back to Google Sheets completed in <strong>817 ms</strong> (<code>687 ms</code> API + <code>130 ms</code> batched Sheets write), making interactive menu-driven audits practical inside GAS.</li>
+<li><strong>96.0% Input Token Reduction via Shared-Document Evaluation</strong>: Sending the PDF once instead of repeating it per row cut input usage from <strong>61,000</strong> to <strong>2,440 tokens</strong> (<code>0</code> output tokens, <strong>$0.000244</strong> total), meaning scaling a checklist from 25 to 1,000 rows adds only the short question strings rather than multiplying document cost.</li>
+<li><strong>Zero False-Certainty Errors Through Calibrated Review Gating</strong>: On nuanced legal wording—48-hour vs. 72-hour breach notice (<code>P = 0.3370</code>) and written opt-in vs. default AI exclusion (<code>P = 0.8101</code>)—the <code>0.15 &lt; P &lt; 0.85</code> band safely routed both items to <code>NEEDS_REVIEW</code>, achieving <strong>20/22 (90.9%)</strong> clear ground-truth agreement with zero overconfident misclassifications.</li>
+</ul>
+<hr>
+<h2 id="7-setup-production-operation--future-extensions">7. Setup, Production Operation &amp; Future Extensions</h2>
+<p>Follow the step-by-step guide in <a href="https://github.com/tanaikech/gemini-decisions-api-gas/blob/main/README.md"><code>README.md</code></a> from <a href="https://github.com/tanaikech/gemini-decisions-api-gas">tanaikech/gemini-decisions-api-gas</a> to paste the six <a href="https://github.com/tanaikech/gemini-decisions-api-gas/tree/main/src"><code>src/*.js</code></a> files and <a href="https://github.com/tanaikech/gemini-decisions-api-gas/blob/main/src/appsscript.json"><code>src/appsscript.json</code></a> into a new Google Apps Script project, set <code>GEMINI_API_KEY</code> in Script Properties, and authorize OAuth scopes once. You can verify each workflow immediately using <code>testUseCase3GmailBenchmark()</code>, <code>testUseCase2GmailCascadeRouter()</code>, or <code>testUseCase1ComplianceAudit()</code>.</p>
+<h3 id="running-all-three-use-cases-in-production-srcproduction_runnersjs">Running All Three Use Cases in Production (<a href="https://github.com/tanaikech/gemini-decisions-api-gas/blob/main/src/production_runners.js"><code>src/production_runners.js</code></a>)</h3>
+<p>To move directly from testing to daily Workspace operation without writing glue code, <a href="https://github.com/tanaikech/gemini-decisions-api-gas/blob/main/src/production_runners.js"><code>src/production_runners.js</code></a> adds <code>LockService</code>-guarded trigger runners, idempotent trigger installers, and a Google Sheets custom menu controlled by <code>PRODUCTION_CONFIG</code>:</p>
+<ul>
+<li><strong>Use Case 1 — Automated Gmail Flexible Labeling</strong>: Optionally customize <code>LABELING_SEARCH_QUERY</code> or <code>LABELING_PREFIX</code> in <code>PRODUCTION_CONFIG</code>, then run <code>setupGmailLabelingTrigger()</code> once from the editor toolbar to schedule <code>runProductionGmailLabeling()</code> every 10 minutes (or run <code>runProductionGmailLabeling()</code> manually for a one-off inbox pass).</li>
+<li><strong>Use Case 2 — Automated Gmail Model Cascade Router</strong>: Optionally adjust <code>CASCADE_SEARCH_QUERY</code> or <code>CASCADE_CREATE_DRAFTS</code> in <code>PRODUCTION_CONFIG</code>, then run <code>setupCascadeRouterTrigger()</code> once to poll Gmail every 10 minutes via <code>runProductionCascadeRouter()</code>—handling routine mail on the Fast Path and drafting <code>gemini-4-hydrogen</code> replies only for escalated threads.</li>
+<li><strong>Use Case 3 — Interactive Google Sheets Audit (or Standalone Batch)</strong>: In a container-bound Spreadsheet project, reload the Sheet to open the <strong>Gemini Decisions</strong> custom menu (<code>onOpen()</code>), click <strong>Initialize Audit Sheet Headers</strong>, enter your criteria in Column A (Row 2+), and click <strong>Run Compliance Audit on Active Sheet&hellip;</strong> with any Google Drive PDF URL or File ID. For standalone or scheduled audits, set <code>AUDIT_PDF_FILE_ID</code> and <code>AUDIT_SPREADSHEET_ID</code> (plus optional <code>AUDIT_SHEET_NAME</code>) in Script Properties and run <code>runProductionComplianceAudit()</code>.</li>
+<li><strong>Stopping Scheduled Automation</strong>: Run <code>removeProductionTriggers()</code> anytime from the editor toolbar to remove all installed time-driven triggers cleanly.</li>
+</ul>
+<h3 id="future-extensions">Future Extensions</h3>
+<p>Beyond these three core applications, the same zero-output-token architecture extends naturally to broader Workspace agent systems:</p>
+<ul>
+<li><strong>Multi-Agent GAS Routing (e.g., <a href="https://github.com/tanaikech/adk-gas">GASADK</a>)</strong>: Use <code>gemini-decision-1</code> as a sub-second dispatcher selecting which GAS tool or sub-agent to invoke before spending reasoning tokens.</li>
+<li><strong>MCP / A2A Security Guardrails (e.g., <a href="https://github.com/tanaikech/MCPApp">MCPApp</a>, <a href="https://github.com/tanaikech/A2AApp">A2AApp</a>)</strong>: Evaluate incoming tool arguments and outgoing actions against dozens of <code>noul</code> safety policies in a single forward pass.</li>
+<li><strong>Google Forms Real-Time Attachment Validation</strong>: Inspect uploaded PDFs or images on <code>onFormSubmit</code> and flag low-confidence submissions for human verification immediately.</li>
+</ul>
+<hr>
+<h2 id="summary">Summary</h2>
+<p>The <strong>Gemini Decisions API (<code>gemini-decision-1</code>)</strong> removes the primary bottleneck of running AI inside Google Apps Script—sequential autoregressive token generation—by evaluating structured questions in a single sub-second forward pass with strictly <strong>zero output tokens</strong> and native calibrated probabilities:</p>
+<ul>
+<li><strong>Faster &amp; Cheaper Inbox Classification (Use Case 1)</strong>: In a controlled 48-trial live GAS benchmark against <code>gemini-3.8-flash</code> (<code>thinkingLevel: &quot;LOW&quot;</code>), <code>gemini-decision-1</code> achieved <strong>6.29x–10.33x faster latency</strong> (median <strong>305 ms</strong>), <strong>92.2%–95.0% lower cost</strong> (<strong>$0.0595 / 1,000 emails</strong>), identical <strong>100.0% accuracy / 1.00 Macro-F1</strong>, and caught <strong>2/2</strong> ambiguous emails via its <code>0.85</code> confidence gate.</li>
+<li><strong>Smart Reasoning Escalation (Use Case 2)</strong>: Pairing <code>gemini-decision-1</code> triage with <code>gemini-4-hydrogen</code> (<code>thinkingLevel: &quot;HIGH&quot;</code>) resolved routine Gmail inquiries in <strong>357 ms</strong> (~27x faster, zero reasoning calls) while accurately escalating ambiguous and complex PDF outage threads (<strong>3/3</strong> verified).</li>
+<li><strong>Horizontal Batch Auditing in Sheets (Use Case 3)</strong>: Sending one Drive PDF once alongside 25 checklist criteria cut input tokens by <strong>96.0%</strong> (<code>61,000 → 2,440</code>, <strong>$0.000244</strong>), completed API evaluation plus batched Sheets write in <strong>817 ms</strong>, and routed nuanced clauses safely to <code>NEEDS_REVIEW</code> with zero false-certainty errors.</li>
+<li><strong>Broad Google Workspace Potential</strong>: Because Decisions API runs at sub-second latency and low cost, Google Apps Script developers can build not only scheduled time-driven automations, but also responsive <code>onEdit</code> / <code>onFormSubmit</code> event triggers and real-time Google Sheets custom functions across Gmail, Sheets, Drive, Docs, and Forms.</li>
+</ul>
+<p>All source scripts, one-shot test harnesses, and turnkey production runners are ready to copy and deploy from <a href="https://github.com/tanaikech/gemini-decisions-api-gas">https://github.com/tanaikech/gemini-decisions-api-gas</a>.</p>
+<hr>
+<h2 id="references">References</h2>
+<ul>
+<li><strong>Part 1 (Dec 19, 2023)</strong>: Kanshi Tanaike, <a href="https://medium.com/google-cloud/flexible-labeling-for-gmail-using-gemini-pro-api-with-google-apps-script-5bf2ee7c9f52">Flexible Labeling for Gmail using Gemini Pro API with Google Apps Script</a>, Medium (Google Cloud).</li>
+<li><strong>Part 2 (Jan 30, 2024)</strong>: Kanshi Tanaike, <a href="https://medium.com/google-cloud/flexible-labeling-for-gmail-using-gemini-pro-api-with-google-apps-script-part-2-08015af6b2e6">Flexible Labeling for Gmail using Gemini Pro API with Google Apps Script Part 2</a>, Medium (Google Cloud).</li>
+<li><strong>Part 3 (Sep 19, 2024)</strong>: Kanshi Tanaike, <a href="https://medium.com/google-cloud/flexible-labeling-for-gmail-using-gemini-api-with-google-apps-script-part-3-414a62749e65">Flexible Labeling for Gmail using Gemini API with Google Apps Script Part 3</a>, Medium (Google Cloud).</li>
+<li><strong>Google Apps Script Official Product Page</strong>: Google Workspace, <a href="https://workspace.google.com/products/apps-script/">https://workspace.google.com/products/apps-script/</a>.</li>
+<li><strong>Quotas for Google Services (Google Apps Script)</strong>: Google Developers, <a href="https://developers.google.com/apps-script/guides/services/quotas">https://developers.google.com/apps-script/guides/services/quotas</a>.</li>
+<li><strong>Gemini Decisions API Official Documentation</strong>: Google AI Studio, <a href="https://aistudio.google.com/docs/decisions-api">https://aistudio.google.com/docs/decisions-api</a>.</li>
+<li><strong>Gemini API Pricing &amp; Documentation</strong>: Google AI for Developers, <a href="https://ai.google.dev/gemini-api/docs/pricing">https://ai.google.dev/gemini-api/docs/pricing</a> (verified November 23, 2026).</li>
+<li><strong>GitHub Repository &amp; Source Code</strong>: <a href="https://github.com/tanaikech/gemini-decisions-api-gas">https://github.com/tanaikech/gemini-decisions-api-gas</a> — complete copy-paste-ready GAS files in <a href="https://github.com/tanaikech/gemini-decisions-api-gas/tree/main/src"><code>src/</code></a> and setup instructions in <a href="https://github.com/tanaikech/gemini-decisions-api-gas/blob/main/README.md"><code>README.md</code></a>.</li>
+</ul>
+
+  
+  <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2026%2f11%2f25%2fzero-output-token-ai-in-google-apps-script-with-gemini-decisions-api%2f" target="_blank" title="Share on Facebook"><i class="fab fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2026%2f11%2f25%2fzero-output-token-ai-in-google-apps-script-with-gemini-decisions-api%2f" target="_blank" title="Tweet"><i class="fab fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f11%2f25%2fzero-output-token-ai-in-google-apps-script-with-gemini-decisions-api%2f" target="_blank" title="Share on Google+"><i class="fab fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2026%2f11%2f25%2fzero-output-token-ai-in-google-apps-script-with-gemini-decisions-api%2f" target="_blank" title="Post to Tumblr"><i class="fab fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f11%2f25%2fzero-output-token-ai-in-google-apps-script-with-gemini-decisions-api%2f" target="_blank" title="Pin it"><i class="fab fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f11%2f25%2fzero-output-token-ai-in-google-apps-script-with-gemini-decisions-api%2f" target="_blank" title="Submit to Reddit"><i class="fab fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
+
+
+  
+<nav class="prev-next-posts">
+  <div class="prev-post">
+    
+      <span class="nav-label">Previous Article</span>
+      <a href="https://tanaikech.github.io/2026/11/08/stop-passive-ai-rewrites-agentic-coaching-in-google-docs-with-gdocumentor/">Stop Passive AI Rewrites: Agentic Coaching in Google Docs with gdocumentor</a>
+    
+  </div>
+  <div class="next-post">
+    
+  </div>
+</nav>
+
+<style>
+.prev-next-posts {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+  gap: 2rem;
+}
+.prev-post, .next-post {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.next-post {
+  text-align: right;
+}
+.nav-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+.prev-next-posts a {
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-decoration: none;
+}
+@media (max-width: 600px) {
+  .prev-next-posts { flex-direction: column; text-align: left; }
+  .next-post { text-align: left; }
+}
+</style>
+
+
+  
+  
+  
+  
+
+  
+
+</div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-social"><a href="https://twitter.com/tanaikech" target="_blank" rel="me" title="twitter">
+                  <i class="fab fa-x-twitter"></i>
+                </a><a href="https://github.com/tanaikech" target="_blank" rel="me" title="github">
+                  <i class="fab fa-github"></i>
+                </a><a href="https://linkedin.com/in/tanaike" target="_blank" rel="me" title="linkedin">
+                  <i class="fab fa-linkedin"></i>
+                </a><a href="https://www.youtube.com/@tanaike" target="_blank" rel="me" title="youtube">
+                  <i class="fab fa-youtube"></i>
+                </a><a href="https://medium.com/@tanaike" target="_blank" rel="me" title="medium">
+                  <i class="fab fa-medium"></i>
+                </a><a href="https://stackoverflow.com/users/7108653" target="_blank" rel="me" title="stackoverflow">
+                  <i class="fab fa-stack-overflow"></i>
+                </a><a href="https://zenn.dev/tanaike" target="_blank" rel="me" title="zenn">
+                  <i class="fas fa-edit"></i>
+                </a><a href="https://dev.to/tanaike" target="_blank" rel="me" title="devto">
+                  <i class="fab fa-dev"></i>
+                </a><a href="https://devpost.com/tanaike" target="_blank" rel="me" title="devpost">
+                  <i class="fas fa-terminal"></i>
+                </a><a href="https://orcid.org/0009-0004-2510-1163" target="_blank" rel="me" title="orcid">
+                  <i class="fab fa-orcid"></i>
+                </a>
+      </div>
+      
+      <p class="copyright">
+        &copy; 2026 tanaike - Google Apps Script, Gemini API, and Developer Tips. Built with <a href="https://gohugo.io" target="_blank">Hugo</a>.
+      </p>
+    </div>
+  </footer>
+
+  <script src="https://tanaikech.github.io/js/eclipse.js"></script>
+
+  
+  
+
+  
+  
+
+  
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
+<script>
+  
+  if (window.location.hostname != "localhost") {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-J3Z6T50WL5');
+  }
+</script>
+
+
+
+  
+
+  
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"
+      onload="renderMathInElement(document.body, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '\\[', right: '\\]', display: true},
+          {left: '\\begin{equation}', right: '\\end{equation}', display: true},
+          {left: '\\begin{align}', right: '\\end{align}', display: true},
+          {left: '\\begin{alignat}', right: '\\end{alignat}', display: true},
+          {left: '\\begin{gather}', right: '\\end{gather}', display: true},
+          {left: '\\begin{CD}', right: '\\end{CD}', display: true},
+          {left: '$', right: '$', display: false},
+          {left: '\\(', right: '\\)', display: false}
+        ],
+        throwOnError: false,
+        ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      });"></script>
+
+</body>
+</html>
+
