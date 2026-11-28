@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Hugo 0.157.0">
+
+  
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+  
+  <meta name="theme-color" content="#050505">
+
+  
+  <meta name="google-site-verification" content="googleccbde819fe280caa.html" />
+
+  
+  
+
+  <meta name="keywords" content="Gemini, python, AI">
+
+  <meta name="description" content="Gists
+Check any PDF, draft, or image against 1,000 criteria at once—with zero output tokens
+
+
+Introduction
+In my previous article, &ldquo;Zero-Output-Token AI in Google Apps Script with Gemini Decisions API&rdquo; Ref (source repository Ref), I demonstrated how Google DeepMind&rsquo;s Gemini Decisions API (POST https://generativelanguage.googleapis.com/v1beta/decisions, powered by gemini-decision-1) Ref fits Google Workspace automation—covering Gmail inbox labeling, model cascade routing, and a Google Sheets PDF compliance audit. Among those examples, the PDF compliance audit drew an especially strong response, and I received inquiries about it from readers across many different fields.">
+
+  
+  <link rel="canonical" href="https://tanaikech.github.io/2026/11/28/auditing-documents-images-with-gemini-decisions-api/">
+
+  
+  <title>Auditing Documents &amp; Images with Gemini Decisions API | tanaike - Google Apps Script, Gemini API, and Developer Tips</title>
+
+  
+  <meta property="og:title" content="Auditing Documents &amp; Images with Gemini Decisions API">
+  <meta property="og:description" content="Gists
+Check any PDF, draft, or image against 1,000 criteria at once—with zero output tokens
+
+
+Introduction
+In my previous article, &ldquo;Zero-Output-Token AI in Google Apps Script with Gemini Decisions API&rdquo; Ref (source repository Ref), I demonstrated how Google DeepMind&rsquo;s Gemini Decisions API (POST https://generativelanguage.googleapis.com/v1beta/decisions, powered by gemini-decision-1) Ref fits Google Workspace automation—covering Gmail inbox labeling, model cascade routing, and a Google Sheets PDF compliance audit. Among those examples, the PDF compliance audit drew an especially strong response, and I received inquiries about it from readers across many different fields.">
+  <meta property="og:url" content="https://tanaikech.github.io/2026/11/28/auditing-documents-images-with-gemini-decisions-api/">
+  <meta property="og:site_name" content="tanaike - Google Apps Script, Gemini API, and Developer Tips">
+  <meta property="og:type" content="article"><meta property="og:image" content="https://tanaikech.github.io/img/og-main.png">
+
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@tanaikech">
+  <meta name="twitter:title" content="Auditing Documents &amp; Images with Gemini Decisions API">
+  <meta name="twitter:description" content="Gists
+Check any PDF, draft, or image against 1,000 criteria at once—with zero output tokens
+
+
+Introduction
+In my previous article, &ldquo;Zero-Output-Token AI in Google Apps Script with Gemini Decisions API&rdquo; Ref (source repository Ref), I demonstrated how Google DeepMind&rsquo;s Gemini Decisions API (POST https://generativelanguage.googleapis.com/v1beta/decisions, powered by gemini-decision-1) Ref fits Google Workspace automation—covering Gmail inbox labeling, model cascade routing, and a Google Sheets PDF compliance audit. Among those examples, the PDF compliance audit drew an especially strong response, and I received inquiries about it from readers across many different fields.">
+  <meta name="twitter:image" content="https://tanaikech.github.io/img/og-main.png">
+
+  
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [{
+        "@type": "BlogPosting",
+        "headline": "\"Auditing Documents \\u0026 Images with Gemini Decisions API\"",
+        "description": "\"\\u003cp\\u003e\\u003ca href=\\\"https://gist.github.com/tanaikech/fbf5b1aa345ea7a51f0f16d978d9197c\\\"\\u003eGists\\u003c/a\\u003e\\u003c/p\\u003e\\n\\u003cp\\u003eCheck any PDF, draft, or image against 1,000 criteria at once—with zero output tokens\\u003c/p\\u003e\\n\\u003cp\\u003e\\u003cimg src=\\\"https://tanaikech.github.io/image-storage/20261128a/hero_banner.png\\\"\\n     alt=\\\"Zero-Output Multimodal Auditing (ZOMA) with Gemini Decisions API and Python CLI\\\"\\n     \\n     loading=\\\"lazy\\\"\\n     decoding=\\\"async\\\"\\u003e\\n\\u003c/p\\u003e\\n\\u003ch2 id=\\\"introduction\\\"\\u003eIntroduction\\u003c/h2\\u003e\\n\\u003cp\\u003eIn my previous article, \\u003cem\\u003e\\u0026ldquo;Zero-Output-Token AI in Google Apps Script with Gemini Decisions API\\u0026rdquo;\\u003c/em\\u003e \\u003ca href=\\\"https://medium.com/google-cloud/zero-output-token-ai-in-google-apps-script-with-gemini-decisions-api-839c5a384fe1\\\"\\u003eRef\\u003c/a\\u003e (source repository \\u003ca href=\\\"https://github.com/tanaikech/gemini-decisions-api-gas\\\"\\u003eRef\\u003c/a\\u003e), I demonstrated how Google DeepMind\\u0026rsquo;s \\u003cstrong\\u003eGemini Decisions API\\u003c/strong\\u003e (\\u003ccode\\u003ePOST https://generativelanguage.googleapis.com/v1beta/decisions\\u003c/code\\u003e, powered by \\u003ccode\\u003egemini-decision-1\\u003c/code\\u003e) \\u003ca href=\\\"https://aistudio.google.com/docs/decisions-api\\\"\\u003eRef\\u003c/a\\u003e fits Google Workspace automation—covering Gmail inbox labeling, model cascade routing, and a Google Sheets PDF compliance audit. Among those examples, the \\u003cstrong\\u003ePDF compliance audit\\u003c/strong\\u003e drew an especially strong response, and I received inquiries about it from readers across many different fields.\\u003c/p\\u003e\"",
+        "url": "\"https://tanaikech.github.io/2026/11/28/auditing-documents-images-with-gemini-decisions-api/\"",
+        "datePublished": "\"2026-11-28T17:10:55+09:00\"",
+        "dateModified": "\"2026-11-28T17:10:55+09:00\"",
+        "wordCount":  6229 ,
+        "author": {
+          "@id": "https:\/\/tanaikech.github.io\/#person"
+        },
+        "publisher": {
+          "@id": "https:\/\/tanaikech.github.io\/#person"
+        },
+        "image": {
+          "@type": "ImageObject",
+          "url": "\"https://tanaikech.github.io/img/og-main.png\"",
+          "width": 1200,
+          "height": 630
+        },
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "\"https://tanaikech.github.io/2026/11/28/auditing-documents-images-with-gemini-decisions-api/\""
+        }
+      },{
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "\"https://tanaikech.github.io/\""
+          },{
+            "@type": "ListItem",
+            "position": 2,
+            "name": "\"Auditing Documents \\u0026 Images with Gemini Decisions API\"",
+            "item": "\"https://tanaikech.github.io/2026/11/28/auditing-documents-images-with-gemini-decisions-api/\""
+          }]
+      },      {
+        "@type": "Person",
+        "@id": "https:\/\/tanaikech.github.io\/#person",
+        "name": "Kanshi Tanaike",
+        "alternateName": "tanaike",
+        "url": "\"https://tanaikech.github.io/\"",
+        "image": "\"https://tanaikech.github.io/img/og-main.png\"",
+        "jobTitle": "Google Developer Expert",
+        "honorificPrefix": "Ph.D.",
+        "description": "Japanese scientist, Physicist and Google Developer Expert for Google Workspace.",
+        "award": "First place in the Outstanding GDE Award 2025",
+        "sameAs": [
+          "https://twitter.com/tanaikech",
+          "https://github.com/tanaikech",
+          "https://stackoverflow.com/users/7108653/tanaike",
+          "https://developers.google.com/community/experts/directory?text=tanaike",
+          "https://zenn.dev/tanaike",
+          "https://medium.com/@tanaike",
+          "https://orcid.org/0009-0004-2510-1163"
+        ]
+      }
+    ]
+  }
+  </script>
+
+  
+  <link rel="stylesheet" href="https://tanaikech.github.io/css/eclipse.css">
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <link rel="shortcut icon" href="https://tanaikech.github.io/img/favicon.ico" type="image/x-icon" />
+  
+  
+  
+
+  
+  
+  
+</head>
+
+
+<body>
+  <div id="progress-bar"></div>
+  
+  <header class="site-header">
+    <div class="header-container">
+      
+      <div class="header-top">
+        <div class="site-title">
+          <a href="https://tanaikech.github.io/">TANAIKE</a>
+          
+            <div class="site-subtitle">The Thinker</div>
+          
+        </div>
+
+        
+        <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+
+      
+      <div id="mobile-menu" class="mobile-menu-content">
+        <div class="nav-row">
+          <div class="nav-links">
+            
+              <a href="https://tanaikech.github.io/about/" title="">
+                <i class='fa fa-user fa-fw'></i> About
+              </a>
+            
+              <a href="https://tanaikech.github.io/post/" title="">
+                <i class='fa fa-list fa-fw'></i> Articles
+              </a>
+            
+              <a href="https://tanaikech.github.io/topics/" title="">
+                <i class='fa fa-folder fa-fw'></i> Topics
+              </a>
+            
+              <a href="https://tanaikech.github.io/tags/" title="">
+                <i class='fa fa-tags fa-fw'></i> Tags
+              </a>
+            
+              <a href="https://tanaikech.github.io/contact/" title="">
+                <i class='fa fa-phone fa-fw'></i> Contact
+              </a>
+            
+              <a href="https://tanaikech.github.io/link/" title="">
+                <i class='fa fa-thumbs-up fa-fw'></i> Links
+              </a>
+            
+              <a href="https://tanaikech.github.io/webapps/" title="">
+                <i class='fas fa-toolbox'></i> Web Applications
+              </a>
+            
+              <a href="https://tanaikech.github.io/donate/" title="">
+                <i class='fas fa-donate'></i> Donate
+              </a>
+            
+              <a href="https://tanaikech.github.io/" title="">
+                <i class='fa fa-home fa-fw'></i> Home
+              </a>
+            
+          </div>
+        </div>
+
+        <div class="social-links-row"><a href="https://twitter.com/tanaikech" target="_blank" rel="me">
+                <i class="fab fa-x-twitter"></i> X
+              </a><a href="https://medium.com/@tanaike" target="_blank" rel="me">
+                <i class="fab fa-medium"></i> Medium
+              </a><a href="https://www.youtube.com/@tanaike" target="_blank" rel="me">
+                <i class="fab fa-youtube"></i> YouTube
+              </a><a href="https://linkedin.com/in/tanaike" target="_blank" rel="me">
+                <i class="fab fa-linkedin"></i> LinkedIn
+              </a><a href="https://github.com/tanaikech" target="_blank" rel="me">
+                <i class="fab fa-github"></i> GitHub
+              </a><a href="https://gist.github.com/tanaikech" target="_blank" rel="me">
+                <i class="fas fa-code"></i> Gists
+              </a><a href="https://stackoverflow.com/users/7108653" target="_blank" rel="me">
+                <i class="fab fa-stack-overflow"></i> Stack Overflow
+              </a><a href="https://dev.to/tanaike" target="_blank" rel="me">
+                <i class="fab fa-dev"></i> DEV
+              </a><a href="https://zenn.dev/tanaike" target="_blank" rel="me">
+                <i class="fas fa-edit"></i> Zenn
+              </a><a href="https://devpost.com/tanaike" target="_blank" rel="me">
+                <i class="fas fa-terminal"></i> Devpost
+              </a><a href="https://orcid.org/0009-0004-2510-1163" target="_blank" rel="me">
+                <i class="fab fa-orcid"></i> ORCID
+              </a></div>
+      </div>
+
+    </div>
+  </header>
+
+  <main id="main">
+
+
+<div class="header">
+  <h1>Auditing Documents &amp; Images with Gemini Decisions API</h1>
+  <h2></h2>
+</div>
+<div class="content">
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>28 Nov 2026, 17:10</time>
+  </div>
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-folder fa-fw"></i>
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/report">report</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-topic" href="https://tanaikech.github.io/topics/pythontips">PythonTips</a>
+    
+  </div>
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/gemini">Gemini</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/python">python</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://tanaikech.github.io/tags/ai">AI</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  <p><a href="https://gist.github.com/tanaikech/fbf5b1aa345ea7a51f0f16d978d9197c">Gists</a></p>
+<p>Check any PDF, draft, or image against 1,000 criteria at once—with zero output tokens</p>
+<p><img src="https://tanaikech.github.io/image-storage/20261128a/hero_banner.png"
+     alt="Zero-Output Multimodal Auditing (ZOMA) with Gemini Decisions API and Python CLI"
+     
+     loading="lazy"
+     decoding="async">
+</p>
+<h2 id="introduction">Introduction</h2>
+<p>In my previous article, <em>&ldquo;Zero-Output-Token AI in Google Apps Script with Gemini Decisions API&rdquo;</em> <a href="https://medium.com/google-cloud/zero-output-token-ai-in-google-apps-script-with-gemini-decisions-api-839c5a384fe1">Ref</a> (source repository <a href="https://github.com/tanaikech/gemini-decisions-api-gas">Ref</a>), I demonstrated how Google DeepMind&rsquo;s <strong>Gemini Decisions API</strong> (<code>POST https://generativelanguage.googleapis.com/v1beta/decisions</code>, powered by <code>gemini-decision-1</code>) <a href="https://aistudio.google.com/docs/decisions-api">Ref</a> fits Google Workspace automation—covering Gmail inbox labeling, model cascade routing, and a Google Sheets PDF compliance audit. Among those examples, the <strong>PDF compliance audit</strong> drew an especially strong response, and I received inquiries about it from readers across many different fields.</p>
+<p>The origin of that idea was actually very personal: before turning it into a Google Sheets demo, I had been using the Decisions API in my own daily writing workflow to check my own research papers, technical articles, manuscripts, and drafts against a self-defined set of review criteria all at once, surfacing issues instantaneously. When developers first encounter a classification endpoint like the Decisions API, the natural mental model is <strong>&ldquo;Many-Inputs × Few-Labels&rdquo;</strong>—classifying a stream of emails or support tickets into three to five categories. Flipping that geometry to <strong>&ldquo;1-Input × up to 1,000-Criteria&rdquo;</strong>—sending <strong>one rich multimodal artifact</strong> (a PDF, research paper, article manuscript, or ad creative) once and evaluating it against up to 1,000 independent questions in a single forward pass—turned out to be a usage pattern that most users had never envisioned.</p>
+<p>Because of that response, I decided to write this dedicated follow-up article focused exclusively on this technique, which I refer to as <strong>Zero-Output Multimodal Auditing (ZOMA)</strong>. Because <code>gemini-decision-1</code> evaluates all questions against the shared input simultaneously without autoregressive text decoding <a href="https://aistudio.google.com/docs/decisions-api">Ref</a>, ZOMA produces strictly <strong>zero output tokens</strong> (<code>$0.00</code> output cost, with input tokens billed once at <code>$0.10</code> per 1M input tokens) <a href="https://ai.google.dev/gemini-api/docs/pricing">Ref</a> while returning calibrated probabilities (<code>0.01</code> to <code>0.99</code>), discrete choices, and ordinal rubric scores (<code>0</code>–<code>4</code>). Moving beyond Google Apps Script into a universal, dependency-light <strong>Python 3 CLI</strong> published at <code>gemini-decisions-api-python</code> <a href="https://github.com/tanaikech/gemini-decisions-api-python">Ref</a>, this article presents a reusable ZOMA auditing and weighted-scoring architecture and validates it across <strong>five live multimodal use cases</strong> (83 total criteria across Markdown, PDF, and PNG inputs). While I designed the core scenario and evaluation criteria for each of the five use cases myself, the sample input documents used to demonstrate and reproduce each run were generated with Gemini via <code>samples/generate_samples.py</code> <a href="https://github.com/tanaikech/gemini-decisions-api-python/blob/main/samples/generate_samples.py">Ref</a> so that anyone can reproduce every benchmark without proprietary files; every latency, token count, probability, score, and cost figure reported in this article comes directly from live API runs, and you can immediately swap in your own local files and custom checklists.</p>
+<hr>
+<h3 id="in-plain-english-what-is-zoma">In Plain English: What Is ZOMA?</h3>
+<p>Imagine handing a 20-page vendor contract, a research manuscript draft, an advertising banner, a student essay, or a grant proposal to a meticulous reviewer along with a structured checklist—and receiving every checkbox verdict, every 0–4 quality rating, and a clear flag on any ambiguous clause that needs human judgment back in under one second, for a fraction of a cent. That is <strong>Zero-Output Multimodal Auditing (ZOMA)</strong>. Instead of asking an AI chatbot to write long prose explanations one question at a time, ZOMA sends your document once, evaluates dozens or hundreds of independent checklist rules simultaneously, and lets deterministic Python code handle all final math and pass/fail decisions.</p>
+<h3 id="key-terms-in-plain-english">Key Terms in Plain English</h3>
+<ul>
+<li><strong>Single Forward Pass &amp; Zero Output Tokens</strong>: Standard AI chatbots generate answers one word (token) at a time, which adds latency and output billing. A single forward pass reads your document once and returns structured numeric answers directly, generating zero written text and zero output-token cost.</li>
+<li><strong>Calibrated Probability (<code>0.01</code>–<code>0.99</code>)</strong>: A reliability-tuned percentage expressed from <code>0.01</code> (1% likely &ldquo;Yes&rdquo;) to <code>0.99</code> (99% likely &ldquo;Yes&rdquo;). When the model is genuinely unsure (for example, <code>0.72</code>), the score sits in the middle instead of pretending to be 99% certain.</li>
+<li><strong>Question Types (<code>noul</code>, <code>choice</code>, <code>score</code>)</strong>: The three structured question formats supported by the Decisions API—<code>noul</code> for Yes/No checks, <code>choice</code> for picking one label from a fixed list, and <code>score</code> for rating quality on an ordered rubric such as <code>0</code> to <code>4</code>.</li>
+<li><strong>OCR-Free Multimodal Input</strong>: Sending PDFs and images (like PNG banners) directly to the AI model as-is, without running a separate Optical Character Recognition (OCR) or PDF-to-text converter first.</li>
+<li><strong>CLI, JSON/YAML &amp; Dry-Run</strong>: A Command-Line Interface (CLI) is a lightweight terminal program; JSON and YAML are plain-text formats used to write your checklist rules; and <code>--dry-run</code> checks your files and rules locally before making any paid API call.</li>
+<li><strong>Knock-Out Gate</strong>: A mandatory eligibility requirement (such as a maximum grant budget cap) where failing that single rule disqualifies a submission immediately, regardless of how high its overall quality score is.</li>
+</ul>
+<hr>
+<h2 id="1-why-gemini-decisions-api-excels-at-zoma--architecture">1. Why Gemini Decisions API Excels at ZOMA &amp; Architecture</h2>
+<p>Low latency and low cost are the most immediately visible advantages of <code>gemini-decision-1</code>, yet its deeper architectural strengths are what make <strong>Zero-Output Multimodal Auditing (ZOMA)</strong> production-grade across legal, editorial, visual, and academic domains <a href="https://aistudio.google.com/docs/decisions-api">Ref</a>:</p>
+<ul>
+<li><strong>Sub-Second Single Forward-Pass Latency</strong>: Because the model evaluates all questions in a single prefill forward pass (reading the document once without generating text word-by-word) without autoregressive token-by-token decoding, end-to-end latency remains flat and sub-second (<code>497.4–856.4 ms</code> live measured across 14–20 criteria) instead of scaling linearly with output length.</li>
+<li><strong>Ultra-Low Cost with Strictly Zero Output Tokens</strong>: Shared document input tokens are billed once at <code>$0.10</code> per 1M input tokens <a href="https://ai.google.dev/gemini-api/docs/pricing">Ref</a>, while output and thinking tokens remain strictly <code>0</code> (<code>$0.00</code> output cost), cutting input volume by over 92% compared to sequential per-criterion calls.</li>
+<li><strong>Mathematically Calibrated Probabilities &amp; Native Confidence Gating</strong>: Unlike generative LLMs whose self-reported verbal confidence is often poorly calibrated, <code>gemini-decision-1</code> returns statistically calibrated probabilities (<code>0.01</code>–<code>0.99</code>) and confidence scores, enabling reliable automated <code>NEEDS_REVIEW</code> escalation thresholds (such as <code>0.85</code>).</li>
+<li><strong>Zero JSON Parse Failures &amp; Closed-Set Schema Guarantees</strong>: Because no free-form text is decoded into JSON strings, malformed JSON, hallucinated enum values, and schema drift are structurally impossible across <code>noul</code>, <code>choice</code> (2–255 options), and <code>score</code> (2–255 ordered rubric tiers) primitives <a href="https://aistudio.google.com/docs/decisions-api">Ref</a>.</li>
+<li><strong>High-Density Parallel Batching (Up to 1,000 Independent Questions)</strong>: A single request evaluates up to 1,000 independent criteria against the exact same shared context without cross-question prompt contamination or attention degradation from massive compound instructions.</li>
+<li><strong>262,144-Token Unified Multimodal Context (OCR-Free)</strong>: A single shared <code>input</code> accepts up to 262,144 tokens (256K) across mixed modalities—text, JSON, PDFs, images, audio, and video <a href="https://aistudio.google.com/docs/decisions-api">Ref</a>—allowing native inspection of multi-page PDFs and high-resolution ad creatives without external OCR or PDF-to-text pipelines.</li>
+<li><strong>High Reproducibility for Programmatic Control Flow</strong>: Without autoregressive sampling drift or variable thinking-token traces, probability outputs remain highly repeatable across runs, making <code>gemini-decision-1</code> a dependable upstream signal provider for deterministic downstream software logic.</li>
+</ul>
+<h3 id="separation-of-concerns">Separation of Concerns</h3>
+<p>A common problem in LLM-based evaluation pipelines is asking a single generative model to read a document, judge 20 criteria, apply custom business weights, check hard eligibility rules, and sum the final score in one autoregressive JSON response. When AI judgment and arithmetic are mixed together, models exhibit silent summation drift, inconsistent threshold enforcement, and brittle JSON formatting errors.</p>
+<p>To prevent these problems by design, our Python CLI enforces a strict <strong>two-layer separation of concerns</strong>, illustrated in <strong>Figure 1</strong>.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20261128a/fig1_paradigm_shift_architecture.png"
+     alt="Figure 1: Paradigm Shift &amp; Decoupled Two-Layer Architecture"
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 1: Shifting from sequential autoregressive LLM loops to 1-Input × up to 1,000-Criteria evaluation with strict separation between <code>gemini-decision-1</code> inference (<code>client.py</code>) and deterministic Python aggregation (<code>evaluator.py</code>).</em></p>
+<p>As shown in <strong>Figure 1</strong>, the pipeline divides responsibility across three focused modules:</p>
+<ul>
+<li><strong>Stateless Multimodal Transport (<code>cli/client.py</code>)</strong> <a href="https://github.com/tanaikech/gemini-decisions-api-python/blob/main/cli/client.py">Ref</a>: Reads a local <code>.md</code>, <code>.txt</code>, <code>.pdf</code>, <code>.png</code>, <code>.jpg</code>, <code>.jpeg</code>, or <code>.webp</code> file once, Base64-encodes binary documents and images natively without OCR middleware (packaging PDFs and images directly for the API without separate text-extraction tools), authenticates strictly via the <code>x-goog-api-key</code> HTTP header, automatically chunks checklists exceeding 1,000 questions into compliant batches, applies bounded exponential backoff on HTTP 429/5xx, and normalizes proto-JSON response fields into typed Python dictionaries.</li>
+<li><strong>Zero-Output-Token Semantic Inference (<code>gemini-decision-1</code>)</strong>: Evaluates every criterion independently against the shared input in one forward pass, returning calibrated <code>noul</code> probabilities (<code>0.01</code>–<code>0.99</code>), <code>choice</code> probability distributions, or <code>score</code> expected values and ordinal bucket distributions—with <code>0</code> output tokens generated.</li>
+<li><strong>Deterministic Evaluation Engine (<code>cli/evaluator.py</code>)</strong> <a href="https://github.com/tanaikech/gemini-decisions-api-python/blob/main/cli/evaluator.py">Ref</a>: Operates completely offline with zero network I/O. It applies exact threshold rules, risk-flag inversions (<code>expected: &quot;no&quot;</code>), hard knock-out gates, weighted linear scaling, negative penalty deductions, and borderline/low-confidence escalation in pure Python—verified offline by the Stage-3 boundary stress test suite (an automated offline check that verifies the math handles edge cases like zero scores or borderline ties) <code>cli/test_evaluator_stress.py</code> <a href="https://github.com/tanaikech/gemini-decisions-api-python/blob/main/cli/test_evaluator_stress.py">Ref</a>.</li>
+</ul>
+<p>This decoupling guarantees that <strong>LLM arithmetic hallucination is structurally impossible</strong>: the AI model only produces calibrated per-criterion signals, while Python owns every threshold comparison, weighted sum, and pass/fail verdict. <strong>Table 1</strong> compares the two deterministic operating modes built into <code>evaluator.py</code> alongside a traditional autoregressive LLM loop.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20261128a/table1_comparison.png"
+     alt="Table 1: Architectural Comparison of Evaluation Modes"
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Table 1: Comparison of Naive Autoregressive LLM Loops vs. Gemini Decisions API Mode A (<code>audit</code>) and Mode B (<code>weighted_scoring</code>) across token scaling, output tokens, arithmetic determinism, and human-in-the-loop gating.</em></p>
+<p><strong>Table 1</strong> highlights why a single checklist schema can drive two distinct enterprise patterns:</p>
+<ul>
+<li><strong>Mode A (<code>audit</code>)</strong>: Designed for binary compliance, pre-flight linting, and risk scanning. Each <code>noul</code> criterion specifies <code>expected: &quot;yes&quot;</code> (required safeguard) or <code>expected: &quot;no&quot;</code> (prohibited risk flag). Any signal whose confidence falls below <code>confidence_threshold</code> (default <code>0.85</code>, i.e., <code>0.15 &lt; P &lt; 0.85</code>) is routed automatically to <code>NEEDS_REVIEW</code> rather than guessed. For <code>choice</code> criteria, explicit <code>fail_choices</code> or <code>review_choices</code> trigger <code>FAIL</code> or <code>NEEDS_REVIEW</code>; for <code>score</code> criteria, expected scores are gated against <code>pass_min</code> and <code>fail_max</code>.</li>
+<li><strong>Mode B (<code>weighted_scoring</code>)</strong>: Designed for rubric grading, grant screening, and procurement scoring. Criteria can be marked as <code>knockout: true</code> (hard eligibility gates where a <code>FAIL</code> immediately disqualifies the submission regardless of points, and low confidence forces <code>NEEDS_REVIEW</code>), positive-weight <code>noul</code> or <code>score</code> dimensions (where an ordinal <code>0</code>–<code>4</code> score contributes <code>(score / max_scale) * weight</code> points), or negative-weight <code>noul</code> penalty flags. If the final total falls within <code>±borderline_margin</code> of <code>cutoff_score</code>, or if too many items exhibit low confidence (<code>max_low_conf_for_auto</code>), the engine escalates the overall verdict to <code>NEEDS_REVIEW</code>.</li>
+</ul>
+<h3 id="mode-a--mode-b-end-to-end-workflows">Mode A &amp; Mode B End-to-End Workflows</h3>
+<p>Before diving into CLI commands and live numbers, <strong>Figure 2</strong> and <strong>Figure 3</strong> map the five end-to-end workflows we evaluated across both operating modes.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20261128a/fig2_mode_a_workflows.png"
+     alt="Figure 2: Mode A Multimodal Audit Workflows (UC1–UC3)"
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 2: End-to-end Mode A (<code>audit</code>) pipelines for UC1 (Markdown Manuscript Linter), UC2 (Multi-Page Vendor Contract PDF Risk Scanner), and UC3 (High-Resolution Ad Creative PNG QA), each executed in a single API batch.</em></p>
+<p><img src="https://tanaikech.github.io/image-storage/20261128a/fig3_mode_b_workflows.png"
+     alt="Figure 3: Mode B Weighted Rubric &amp; Knock-Out Screening Workflows (UC4–UC5)"
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 3: Mode B (<code>weighted_scoring</code>) execution pipelines for UC4 (Cybersecurity Essay Rubric Grading) and UC5 (R&amp;D Grant Proposal Knock-Out + Weighted Screening), where Python deterministically computes final totals and cutoff gates.</em></p>
+<hr>
+<h2 id="2-quickstart--reusable-python-cli-usage">2. Quickstart &amp; Reusable Python CLI Usage</h2>
+<p>All scripts, sample inputs, checklists, and saved live results are published in <code>tanaikech/gemini-decisions-api-python</code> <a href="https://github.com/tanaikech/gemini-decisions-api-python">Ref</a>. The CLI requires only Python 3, <code>requests</code>, and <code>PyYAML</code> (<code>requirements.txt</code> <a href="https://github.com/tanaikech/gemini-decisions-api-python/blob/main/requirements.txt">Ref</a>). Clone the repository, install dependencies, and export your Gemini API key once (the client sends the key solely in the <code>x-goog-api-key</code> header and never embeds it in URLs):</p>
+<p><strong>Not a programmer? Here is what the commands below actually do in 3 steps:</strong></p>
+<ul>
+<li><strong>Step 1 — One-Time Setup</strong>: Download the free tool folder, install its two lightweight Python helper libraries, and store your Gemini API key securely in your terminal session.</li>
+<li><strong>Step 2 — Define or Pick Your Checklist</strong>: Choose one of the ready-made checklist files (or edit your own plain-text JSON/YAML rules) describing what to check, score, or flag.</li>
+<li><strong>Step 3 — Audit Any Document</strong>: Point the tool at any local Markdown draft, PDF, or PNG image and get a structured pass/fail or weighted score report in under a second.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>git clone https://github.com/tanaikech/gemini-decisions-api-python.git
+</span></span><span style="display:flex;"><span>cd gemini-decisions-api-python
+</span></span><span style="display:flex;"><span>pip install -r requirements.txt
+</span></span><span style="display:flex;"><span>export GEMINI_API_KEY<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;your-api-key-here&#34;</span>
+</span></span></code></pre></div><p>Every audit or scoring workflow is defined declaratively in a single JSON or YAML checklist file. Below is a compact excerpt from a Mode B (<code>weighted_scoring</code>) checklist showing how a hard knock-out gate, a weighted binary criterion, and a weighted ordinal <code>score</code> rubric coexist in the same schema:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;UC5: R&amp;D Grant Proposal Knock-Out + Weighted Screening&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;mode&#34;</span>: <span style="color:#e6db74">&#34;weighted_scoring&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;confidence_threshold&#34;</span>: <span style="color:#ae81ff">0.85</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;cutoff_score&#34;</span>: <span style="color:#ae81ff">70.0</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;borderline_margin&#34;</span>: <span style="color:#ae81ff">3.0</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;max_low_conf_for_auto&#34;</span>: <span style="color:#ae81ff">2</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;criteria&#34;</span>: [
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;id&#34;</span>: <span style="color:#e6db74">&#34;ko_budget_cap&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;category&#34;</span>: <span style="color:#e6db74">&#34;Knock-Out Eligibility&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;label&#34;</span>: <span style="color:#e6db74">&#34;[KO] Budget &lt;= $250,000&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;noul&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;knockout&#34;</span>: <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;expected&#34;</span>: <span style="color:#e6db74">&#34;yes&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;instructions&#34;</span>: <span style="color:#e6db74">&#34;Is the total requested grant funding less than or equal to the $250,000 program cap?&#34;</span>
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;id&#34;</span>: <span style="color:#e6db74">&#34;has_itemized_budget&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;category&#34;</span>: <span style="color:#e6db74">&#34;Completeness&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;label&#34;</span>: <span style="color:#e6db74">&#34;Itemized Budget Breakdown (+5)&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;noul&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;expected&#34;</span>: <span style="color:#e6db74">&#34;yes&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;weight&#34;</span>: <span style="color:#ae81ff">5.0</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;instructions&#34;</span>: <span style="color:#e6db74">&#34;Does the proposal include an itemized budget breakdown whose line items clearly reconcile to the requested total?&#34;</span>
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;id&#34;</span>: <span style="color:#e6db74">&#34;technical_merit_score&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;category&#34;</span>: <span style="color:#e6db74">&#34;Merit Rubric&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;label&#34;</span>: <span style="color:#e6db74">&#34;Technical Merit &amp; Architecture (0-4, max 20)&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;score&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;weight&#34;</span>: <span style="color:#ae81ff">20.0</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;max_scale&#34;</span>: <span style="color:#ae81ff">4</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;instructions&#34;</span>: <span style="color:#e6db74">&#34;Rate the technical soundness, hardware/software feasibility, and engineering clarity of the proposed sensor network.&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;criteria&#34;</span>: [
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;0: Technically infeasible or undefined&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;1: High-level concept lacking engineering specifics&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;2: Plausible design with missing power, telemetry, or calibration details&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;3: Solid, practical engineering design with concrete BOM, power, and filtering specs&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;4: Exceptional, field-ready architecture with rigorous calibration and open hardware specs&#34;</span>
+</span></span><span style="display:flex;"><span>      ]
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  ]
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Before spending any API calls, you can run the offline zero-data stress test (<code>cli/test_evaluator_stress.py</code> <a href="https://github.com/tanaikech/gemini-decisions-api-python/blob/main/cli/test_evaluator_stress.py">Ref</a>) and validate any input file and checklist schema locally with <code>--dry-run</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>python3 cli/test_evaluator_stress.py
+</span></span><span style="display:flex;"><span>python3 cli/decisions_audit.py <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --input samples/uc1_manuscript_draft.md <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --checklist samples/uc1_checklist.json <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --dry-run
+</span></span></code></pre></div><p>Running all five live use cases uses the exact same CLI entry point (<code>cli/decisions_audit.py</code> <a href="https://github.com/tanaikech/gemini-decisions-api-python/blob/main/cli/decisions_audit.py">Ref</a>), switching only <code>--input</code>, <code>--checklist</code>, and optional flags (<code>--resolution high</code> for images, <code>--format table|markdown|json</code>, or <code>--confidence-threshold</code>):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># UC1: Manuscript / Technical Document Semantic Linter (Markdown, Mode A)</span>
+</span></span><span style="display:flex;"><span>python3 cli/decisions_audit.py <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --input samples/uc1_manuscript_draft.md <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --checklist samples/uc1_checklist.json <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --output results/uc1_result.json
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># UC2: Vendor SaaS Contract &amp; SLA Risk Scanner (Multi-page PDF, Mode A)</span>
+</span></span><span style="display:flex;"><span>python3 cli/decisions_audit.py <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --input samples/uc2_vendor_contract.pdf <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --checklist samples/uc2_checklist.json <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --output results/uc2_result.json
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># UC3: Ad Creative OCR-Free Multimodal QA (High-res PNG, Mode A)</span>
+</span></span><span style="display:flex;"><span>python3 cli/decisions_audit.py <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --input samples/uc3_ad_creative.png <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --checklist samples/uc3_checklist.json <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --resolution high <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --output results/uc3_result.json
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># UC4: Student / Training Essay Weighted Rubric Grading (PDF, Mode B)</span>
+</span></span><span style="display:flex;"><span>python3 cli/decisions_audit.py <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --input samples/uc4_student_essay.pdf <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --checklist samples/uc4_checklist.json <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --output results/uc4_result.json
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># UC5: R&amp;D Grant Proposal Knock-Out + Weighted Screening (PDF, Mode B)</span>
+</span></span><span style="display:flex;"><span>python3 cli/decisions_audit.py <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --input samples/uc5_grant_proposal.pdf <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --checklist samples/uc5_checklist.json <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --output results/uc5_result.json
+</span></span></code></pre></div><p>To adapt the CLI to your own documents, swap <code>--input</code> for any local Markdown, plain text, PDF, or image file, and edit a JSON/YAML checklist with your organization&rsquo;s rules. Adding <code>--format markdown</code> outputs a ready-to-paste report for GitHub pull requests, Notion pages, or CI/CD job summaries, while <code>--format json</code> emits clean machine-readable JSON so autonomous AI agents—such as <strong>Google Antigravity</strong>, <strong>Claude Code</strong>, <strong>Gemini CLI</strong>, or <strong>OpenAI Codex</strong>—can invoke <code>cli/decisions_audit.py</code> directly from their terminal tool (or wrap it as an agent skill) to self-audit drafts, reports, and visual assets in under a second.</p>
+<hr>
+<h2 id="3-mode-a-live-walkthrough--empirical-results">3. Mode A Live Walkthrough &amp; Empirical Results</h2>
+<p>Mode A (<code>audit</code>) targets high-precision defect detection across text, multi-page PDFs, and raw visual creatives. Following the three single-batch pipelines mapped in <strong>Figure 2</strong>, we examine each Mode A use case individually alongside its dedicated live test results infographic (<strong>Figure 4</strong>, <strong>Figure 5</strong>, and <strong>Figure 6</strong>).</p>
+<p><strong>How to read the live numbers in Sections 3 and 4:</strong></p>
+<ul>
+<li><strong>Required checks (<code>expected: &quot;yes&quot;</code>)</strong>: We want the document to contain this element, so a high probability (<code>p &gt;= 0.85</code>) means <strong><code>PASS</code></strong>, while a very low probability (<code>p &lt;= 0.15</code>) means <strong><code>FAIL</code></strong> (missing requirement).</li>
+<li><strong>Risk &amp; defect flags (<code>expected: &quot;no&quot;</code>)</strong>: We want this problem to be <em>absent</em>, so a low probability (<code>p &lt;= 0.15</code>) means <strong><code>PASS</code></strong> (safe), while a high probability (<code>p &gt;= 0.85</code>) means <strong><code>FAIL</code></strong> (risk or violation detected).</li>
+<li><strong>Human-review zone (<code>0.15 &lt; P &lt; 0.85</code>)</strong>: Whenever the model&rsquo;s confidence is below <code>0.85</code>, the tool refuses to guess and routes that criterion to <strong><code>NEEDS_REVIEW</code></strong> for a human reviewer.</li>
+<li><strong>Rubric scores (<code>0</code>–<code>4</code>, e.g., <code>3.17 / 4</code>)</strong>: Rather than forcing a blunt whole number, the model returns a probability distribution across levels <code>0</code> through <code>4</code> and computes the weighted average (expected score) for fine-grained grading.</li>
+</ul>
+<h3 id="use-case-1-manuscript--technical-document-semantic-linter-uc1_manuscript_draftmd">Use Case 1: Manuscript &amp; Technical Document Semantic Linter (<code>uc1_manuscript_draft.md</code>)</h3>
+<blockquote>
+<p><strong>What this test checks in plain English</strong>: Before submitting a technical paper or article draft, can ZOMA catch hidden confidentiality leaks, missing citations, and vague claims alongside structural quality checks in half a second?</p>
+</blockquote>
+<p>In Use Case 1, a 5,034-byte Markdown systems engineering preprint draft (<code>samples/uc1_manuscript_draft.md</code> <a href="https://github.com/tanaikech/gemini-decisions-api-python/blob/main/samples/uc1_manuscript_draft.md">Ref</a>, <em>&ldquo;Adaptive Cache-Coherence Prefetching for Multi-Region Edge Workers&rdquo;</em>) was audited against <strong>18 criteria</strong> (<code>16 noul</code> + <code>2 score</code>) defined in <code>samples/uc1_checklist.json</code> <a href="https://github.com/tanaikech/gemini-decisions-api-python/blob/main/samples/uc1_checklist.json">Ref</a> in a single batch (saved output: <code>results/uc1_result.json</code> <a href="https://github.com/tanaikech/gemini-decisions-api-python/blob/main/results/uc1_result.json">Ref</a>). The live call completed in <strong>497.37 ms</strong> (<code>0</code> retries) using <strong>2,562 input tokens</strong> and <strong>0 output tokens</strong> (estimated cost <strong>$0.000256</strong>), saving <strong>17 sequential API calls</strong>. The overall verdict was <strong><code>FAIL</code></strong> (<code>13 PASS</code>, <code>3 FAIL</code>, <code>2 NEEDS_REVIEW</code>), as detailed in <strong>Figure 4</strong>.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20261128a/fig4_uc1_results.png"
+     alt="Figure 4: UC1 Manuscript Semantic Linter — Live Test Results"
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 4: Live <code>gemini-decision-1</code> audit results for UC1 (<code>uc1_manuscript_draft.md</code>, 18 criteria, 497.4 ms, 2,562 input tokens, 0 output tokens, $0.000256), highlighting all three planted blockers caught, 13 passed checks, and 2 calibrated human-review escalations.</em></p>
+<p>As visualized in <strong>Figure 4</strong>, the live run separated structural strengths, planted blockers, and subjective gray zones cleanly in under half a second:</p>
+<ul>
+<li><strong>13 Required &amp; Security Checks Passed with High Confidence</strong>: Core publication sections passed decisively (<code>p = 0.934</code>–<code>0.982</code>), including <code>has_code_snippet</code> (<code>p = 0.982</code>), <code>has_limitations</code> (<code>p = 0.980</code>), <code>has_ethics_privacy</code> (<code>p = 0.978</code>), <code>has_quantitative_table</code> (<code>p = 0.977</code>), <code>has_abstract</code> (<code>p = 0.974</code>), <code>has_code_or_seed</code> (<code>p = 0.973</code>), <code>has_references</code> (<code>p = 0.966</code>), <code>has_reproducible_env</code> (<code>p = 0.964</code>), <code>has_baselines</code> (<code>p = 0.961</code>), and <code>consistent_numbers</code> (<code>p = 0.934</code>). The security risk flag <code>contains_hardcoded_secrets</code> (<code>expected: &quot;no&quot;</code>) also passed cleanly (<code>p = 0.023</code>, confidence <code>0.977</code>).</li>
+<li><strong>All 3 Planted Blockers Caught (<code>FAIL</code>)</strong>: The draft intentionally included an internal project codename and NDA customer identifier (<em>Project Nighthawk</em> / <em>NorthStar Financial Corp, NDA-2026-041</em>), an unresolved <code>[citation needed]</code> marker, and an unquantified <em>&ldquo;nearly zero tail latency overhead&rdquo;</em> claim. <code>gemini-decision-1</code> flagged all three risk criteria (<code>expected: &quot;no&quot;</code>) above the <code>0.85</code> threshold: <code>leak_confidential_nda</code> (<code>p = 0.990</code>), <code>unbounded_vague_claim</code> (<code>p = 0.909</code>), and <code>unresolved_citation_todo</code> (<code>p = 0.887</code>).</li>
+<li><strong>2 Calibrated <code>NEEDS_REVIEW</code> Escalations</strong>: Two nuanced qualitative criteria fell inside the <code>0.15 &lt; P &lt; 0.85</code> uncertainty band and were safely routed to a human editor instead of forced into a binary verdict: <code>has_problem_statement</code> (<code>p = 0.716</code>) and <code>uses_professional_tone</code> (<code>p = 0.798</code>).</li>
+<li><strong>Continuous Quality Rubric Scores</strong>: Both <code>0</code>–<code>4</code> ordinal scores cleared the <code>pass_min = 2.50</code> bar—<code>writing_clarity_score</code> achieved <strong>3.17 / 4</strong> (<code>P(3) = 0.469</code>, <code>P(4) = 0.369</code>) while <code>logical_rigor_score</code> scored <strong>2.58 / 4</strong> (<code>P(3) = 0.446</code>, <code>P(2) = 0.338</code>), accurately reflecting strong technical structure tempered by the unverified performance claim.</li>
+</ul>
+<p><strong>UC1 Summary (Input → Findings)</strong>: Feeding a 5 KB Markdown preprint draft and an 18-item pre-publication checklist into a single 497 ms pass immediately confirmed 13 required sections and security checks, caught all 3 planted blockers (an NDA client leak, an unresolved <code>[citation needed]</code>, and an unquantified performance claim), and routed 2 nuanced tone/problem-statement items to a human editor instead of guessing.</p>
+<h3 id="use-case-2-vendor-saas-contract--sla-risk-scanner-uc2_vendor_contractpdf">Use Case 2: Vendor SaaS Contract &amp; SLA Risk Scanner (<code>uc2_vendor_contract.pdf</code>)</h3>
+<blockquote>
+<p><strong>What this test checks in plain English</strong>: When procurement receives a multi-page software vendor contract PDF, can ZOMA verify security guarantees while flagging unfair liability caps, auto-renewal traps, and borderline clauses in under a second?</p>
+</blockquote>
+<p>In Use Case 2, a 53,951-byte multi-page vendor SaaS contract PDF (<code>samples/uc2_vendor_contract.pdf</code> <a href="https://github.com/tanaikech/gemini-decisions-api-python/blob/main/samples/uc2_vendor_contract.pdf">Ref</a>) was ingested natively as a <code>document</code> block—without any PDF-to-text extraction library—and evaluated against <strong>20 criteria</strong> (<code>17 noul</code> + <code>2 choice</code> + <code>1 score</code>) in <code>samples/uc2_checklist.json</code> <a href="https://github.com/tanaikech/gemini-decisions-api-python/blob/main/samples/uc2_checklist.json">Ref</a> (saved output: <code>results/uc2_result.json</code> <a href="https://github.com/tanaikech/gemini-decisions-api-python/blob/main/results/uc2_result.json">Ref</a>) in <strong>856.42 ms</strong> (<code>0</code> retries) using <strong>3,809 input tokens</strong> (<code>2,769</code> text + <code>1,040</code> image tokens) and <strong>0 output tokens</strong> (estimated cost <strong>$0.000381</strong>), saving <strong>19 sequential API calls</strong>. The overall verdict was <strong><code>FAIL</code></strong> (<code>9 PASS</code>, <code>10 FAIL</code>, <code>1 NEEDS_REVIEW</code>), shown in <strong>Figure 5</strong>.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20261128a/fig5_uc2_results.png"
+     alt="Figure 5: UC2 Vendor Contract &amp; SLA Risk Scanner — Live Test Results"
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 5: Live <code>gemini-decision-1</code> audit results for UC2 (<code>uc2_vendor_contract.pdf</code>, 20 criteria, 856.4 ms, 3,809 input tokens, 0 output tokens, $0.000381), contrasting 9 verified security safeguards against 10 commercial/legal FAIL verdicts and 1 borderline review clause.</em></p>
+<p><strong>Figure 5</strong> demonstrates why multi-axis legal screening benefits from combining <code>noul</code>, <code>choice</code>, and <code>score</code> questions in a single forward pass:</p>
+<ul>
+<li><strong>9 Security &amp; Governance Safeguards Verified (<code>PASS</code>)</strong>: Every baseline security control present in the contract passed with high certainty (<code>p = 0.959</code>–<code>0.977</code>): <code>no_ai_training_on_data</code> (<code>p = 0.977</code>), <code>soc2_or_iso27001</code> (<code>p = 0.972</code>), <code>cyber_insurance_5m</code> (<code>p = 0.969</code>), <code>termination_for_cause</code> (<code>p = 0.969</code>), <code>customer_owns_data</code> (<code>p = 0.968</code>), <code>subprocessor_notice</code> (<code>p = 0.968</code>), <code>breach_notice_72h</code> (<code>p = 0.961</code>), <code>governing_law_specified</code> (<code>p = 0.961</code>), and <code>encryption_at_rest_transit</code> (<code>p = 0.959</code>).</li>
+<li><strong>10 Commercial, SLA &amp; Legal Red Flags Caught (<code>FAIL</code>)</strong>: Three required protections were absent—<code>sla_meets_99_9</code> (<code>p = 0.022</code>), <code>termination_for_convenience</code> (<code>p = 0.027</code>), and <code>hipaa_baa_included</code> (<code>p = 0.041</code>). Simultaneously, all four prohibited risk clauses (<code>expected: &quot;no&quot;</code>) triggered decisively: <code>risk_renewal_price_hike</code> &gt;5% (<code>p = 0.978</code>), <code>risk_uncapped_customer_indemnity</code> (<code>p = 0.973</code>), <code>risk_auto_renewal_long_notice</code> &gt;60 days (<code>p = 0.967</code>), and <code>risk_low_vendor_liability_cap</code> &lt;12 months of fees (<code>p = 0.961</code>). Both <code>choice</code> questions selected fail classes with over 96% confidence—<code>liability_posture = heavily_vendor_favorable</code> (confidence <code>0.984</code>) and <code>negotiation_priority = block_and_redline</code> (confidence <code>0.962</code>)—and <code>commercial_favorability_score</code> landed at <strong>1.43 / 4</strong> (below <code>fail_max = 1.50</code>).</li>
+<li><strong>1 Borderline Clause Escalated (<code>NEEDS_REVIEW</code>)</strong>: <code>data_deletion_30d</code> returned <code>p = 0.835</code>, sitting just <code>0.015</code> below the <code>0.85</code> confidence gate. Rather than auto-approving a subtle post-termination deletion clause, <code>evaluator.py</code> flagged it for legal counsel review.</li>
+</ul>
+<p><strong>UC2 Summary (Input → Findings)</strong>: Feeding a multi-page vendor SaaS contract PDF and a 20-item legal/SLA checklist directly (with no PDF text extractor) verified 9 baseline security safeguards in 856 ms while flagging 10 commercial/legal red flags (low uptime SLA, missing HIPAA BAA, uncapped customer indemnity, long auto-renewal, <code>block_and_redline</code> priority) and safely escalating 1 borderline 30-day data-deletion clause for legal review.</p>
+<h3 id="use-case-3-ad-creative-ocr-free-multimodal-qa-uc3_ad_creativepng">Use Case 3: Ad Creative OCR-Free Multimodal QA (<code>uc3_ad_creative.png</code>)</h3>
+<blockquote>
+<p><strong>What this test checks in plain English</strong>: Looking directly at a finished advertising banner image with no OCR tool, can ZOMA confirm clean branding and layout while catching prohibited financial promises and unreadable fine-print disclaimers?</p>
+</blockquote>
+<p>In Use Case 3, a 101,539-byte FinTech advertising banner PNG (<code>samples/uc3_ad_creative.png</code> <a href="https://github.com/tanaikech/gemini-decisions-api-python/blob/main/samples/uc3_ad_creative.png">Ref</a>) was passed directly to <code>gemini-decision-1</code> with <code>--resolution high</code>—with zero OCR preprocessing—against <strong>16 criteria</strong> (<code>14 noul</code> + <code>2 score</code>) in <code>samples/uc3_checklist.json</code> <a href="https://github.com/tanaikech/gemini-decisions-api-python/blob/main/samples/uc3_checklist.json">Ref</a> (saved output: <code>results/uc3_result.json</code> <a href="https://github.com/tanaikech/gemini-decisions-api-python/blob/main/results/uc3_result.json">Ref</a>). The single API call completed in <strong>836.97 ms</strong> (<code>0</code> retries) using <strong>2,286 input tokens</strong> (<code>1,186</code> text + <code>1,100</code> image tokens) and <strong>0 output tokens</strong> (estimated cost <strong>$0.000229</strong>), saving <strong>15 sequential API calls</strong>. The overall verdict was <strong><code>FAIL</code></strong> (<code>11 PASS</code>, <code>5 FAIL</code>, <code>0 NEEDS_REVIEW</code>), as illustrated alongside the audited creative thumbnail in <strong>Figure 6</strong>.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20261128a/fig6_uc3_results.png"
+     alt="Figure 6: UC3 Ad Creative OCR-Free Multimodal QA — Live Test Results"
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 6: Live <code>gemini-decision-1</code> multimodal QA results for UC3 (<code>uc3_ad_creative.png</code> with embedded sample thumbnail, 16 criteria, 837.0 ms, 2,286 input tokens, 0 output tokens, $0.000229), separating strong visual design polish (3.15/4) from severe FinTech regulatory violations (0.29/4).</em></p>
+<p>As shown in <strong>Figure 6</strong>, native high-resolution image ingestion captured both layout quality and fine-print regulatory failures simultaneously:</p>
+<ul>
+<li><strong>11 Brand, Accessibility &amp; Design Checks Passed (<code>PASS</code>)</strong>: <code>mentions_security_soc2</code> (<code>p = 0.969</code>), <code>headline_legible_contrast</code> (<code>p = 0.955</code>), <code>clear_cta_button</code> (<code>p = 0.948</code>), <code>has_data_visual</code> (<code>p = 0.944</code>), <code>pricing_transparent</code> (<code>p = 0.942</code>), <code>brand_logo_visible</code> (<code>p = 0.937</code>), <code>dark_mode_brand_palette</code> (<code>p = 0.892</code>), and <code>clean_uncluttered_layout</code> (<code>p = 0.869</code>) all passed, while both visual defect risk flags (<code>expected: &quot;no&quot;</code>) stayed cleanly low: <code>no_stock_watermarks</code> (<code>p = 0.082</code>, confidence <code>0.918</code>) and <code>no_typos_visible</code> (<code>p = 0.085</code>, confidence <code>0.915</code>). <code>visual_hierarchy_score</code> earned <strong>3.15 / 4</strong>.</li>
+<li><strong>5 FinTech Regulatory &amp; Disclosure Violations Caught (<code>FAIL</code>)</strong>: Without any OCR step, <code>gemini-decision-1</code> caught the prohibited <em>&ldquo;Guaranteed ROI&rdquo;</em> headline (<code>claim_guaranteed_roi</code>: <code>p = 0.975</code>, <code>exp=no</code>), the unrealistic short-term return claim (<code>unrealistic_return_metric</code>: <code>p = 0.935</code>, <code>exp=no</code>), the unlabeled hypothetical chart (<code>chart_labeled_hypothetical</code>: <code>p = 0.047</code>, <code>exp=yes</code>), and the obscured low-contrast legal disclaimer footer (<code>disclaimer_legible_contrast</code>: <code>p = 0.033</code>, <code>exp=yes</code>). Consequently, <code>regulatory_readiness_score</code> fell to <strong>0.29 / 4</strong> (<code>P(0) = 0.763</code>), failing decisively below <code>fail_max = 1.50</code>.</li>
+<li><strong>Why 0 <code>NEEDS_REVIEW</code> Escalations Occurred</strong>: Every binary criterion resolved at or above <code>0.869</code> confidence (minimum <code>0.869</code> on <code>clean_uncluttered_layout</code>), leaving zero ambiguous signals—an ideal property for automated pre-flight ad-network moderation queues.</li>
+</ul>
+<p><strong>UC3 Summary (Input → Findings)</strong>: Passing a high-resolution FinTech ad banner PNG and a 16-item creative QA checklist with zero OCR confirmed strong visual polish (<code>3.15 / 4</code> hierarchy, 11 passed brand/design checks) in 837 ms while catching all 5 severe FinTech regulatory violations (<code>&quot;Guaranteed ROI&quot;</code> promise, unrealistic return claim, unlabeled hypothetical chart, illegible disclaimer, and <code>0.29 / 4</code> regulatory readiness) with zero ambiguous escalations.</p>
+<hr>
+<h2 id="4-mode-b-live-walkthrough--empirical-results">4. Mode B Live Walkthrough &amp; Empirical Results</h2>
+<p>Mode B (<code>weighted_scoring</code>) moves beyond pass/fail checklists into quantitative rubric grading and multi-stage eligibility screening. Following the deterministic aggregation and knock-out pipelines illustrated in <strong>Figure 3</strong>, we walk through each Mode B live evaluation with its dedicated scoring breakdown infographic (<strong>Figure 7</strong> and <strong>Figure 8</strong>).</p>
+<h3 id="use-case-4-cybersecurity-case-study-weighted-rubric-grading-uc4_student_essaypdf">Use Case 4: Cybersecurity Case Study Weighted Rubric Grading (<code>uc4_student_essay.pdf</code>)</h3>
+<blockquote>
+<p><strong>What this test checks in plain English</strong>: Given a student&rsquo;s PDF case study and a 100-point grading rubric, can ZOMA check required topics, rate four quality dimensions, check for penalties, and compute an exact, hallucination-free grade in Python?</p>
+</blockquote>
+<p>In Use Case 4, a 52,224-byte student cybersecurity case study PDF (<code>samples/uc4_student_essay.pdf</code> <a href="https://github.com/tanaikech/gemini-decisions-api-python/blob/main/samples/uc4_student_essay.pdf">Ref</a>) was graded against a <strong>100-point rubric</strong> (<code>samples/uc4_checklist.json</code> <a href="https://github.com/tanaikech/gemini-decisions-api-python/blob/main/samples/uc4_checklist.json">Ref</a>; saved output: <code>results/uc4_result.json</code> <a href="https://github.com/tanaikech/gemini-decisions-api-python/blob/main/results/uc4_result.json">Ref</a>) containing <strong>14 criteria</strong>: <code>6</code> mandatory element checks worth <code>+5.0</code> pts each (<code>30.0</code> pts), <code>4</code> ordinal <code>0</code>–<code>4</code> rubric dimensions totaling <code>70.0</code> pts, and <code>4</code> negative penalty flags (<code>-10.0</code> to <code>-15.0</code> pts), with a <code>75.0</code> cutoff and <code>±3.0</code> borderline margin. The single Decisions API call finished in <strong>702.58 ms</strong> (<code>0</code> retries) using <strong>3,261 input tokens</strong> (<code>2,221</code> text + <code>1,040</code> image tokens) and <strong>0 output tokens</strong> (estimated cost <strong>$0.000326</strong>), saving <strong>13 sequential API calls</strong>. The deterministic final score was <strong>86.17 / 100.0 (86.2%)</strong>, yielding <strong><code>PASS</code></strong>, as detailed in <strong>Figure 7</strong>.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20261128a/fig7_uc4_results.png"
+     alt="Figure 7: UC4 Cybersecurity Essay Weighted Rubric Grading — Live Test Results"
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 7: Live Mode B rubric grading breakdown for UC4 (<code>uc4_student_essay.pdf</code>, 14 criteria, 702.6 ms, 3,261 input tokens, 0 output tokens, $0.000326), showing 25.0/30.0 mandatory points, 61.17/70.0 rubric points, 0.0 penalties, and a final score of 86.17/100.0 vs. the 75.0 cutoff.</em></p>
+<p><strong>Figure 7</strong> breaks down every exact point calculated offline by <code>evaluator.py</code>:</p>
+<ul>
+<li><strong>Mandatory Elements (<code>25.00 / 30.00 pts</code>)</strong>: Five required elements passed with full <code>+5.0</code> credit—<code>addresses_hipaa</code> (<code>p = 0.965</code>), <code>references_nist_800_207</code> (<code>p = 0.953</code>), <code>has_exec_summary</code> (<code>p = 0.947</code>), <code>has_phased_roadmap</code> (<code>p = 0.931</code>), and <code>addresses_legacy_iomt</code> (<code>p = 0.854</code>). The student omitted a detailed 3-year TCO budget table (<code>has_3yr_tco_budget</code>: <code>p = 0.028</code>, confidence <code>0.972</code>), which <code>evaluator.py</code> deterministically marked <code>FAIL</code> (<code>0.0 / 5.0 pts</code>).</li>
+<li><strong>Weighted Ordinal Rubric Dimensions (<code>61.17 / 70.00 pts</code>)</strong>: Python converted each <code>0</code>–<code>4</code> expected score linearly via <code>(score / 4.0) * weight</code>: <code>threat_modeling_score</code> (<code>3.548 / 4</code> → <strong>13.31 / 15.0 pts</strong>), <code>architecture_rigor_score</code> (<code>3.487 / 4</code> → <strong>17.43 / 20.0 pts</strong>), <code>operational_feasibility_score</code> (<code>3.427 / 4</code> → <strong>17.13 / 20.0 pts</strong>), and <code>writing_coherence_score</code> (<code>3.547 / 4</code> → <strong>13.30 / 15.0 pts</strong>). Summing <code>25.00 + 13.3055 + 17.4333 + 17.1343 + 13.3004</code> yields <strong>86.1735 pts</strong> (<code>86.17 / 100.0</code>), clearing the <code>75.0</code> cutoff by <strong>+11.17 pts</strong>—well outside the <code>±3.0</code> borderline review band.</li>
+<li><strong>Zero False Penalties &amp; Zero Low-Confidence Escalations</strong>: All four negative penalty flags stayed tightly near zero—<code>penalty_missing_conclusion</code> (<code>p = 0.021</code>), <code>penalty_off_topic</code> (<code>p = 0.031</code>), <code>penalty_factual_blunder</code> (<code>p = 0.039</code>), and <code>penalty_placeholder_text</code> (<code>p = 0.042</code>)—deducting <code>0.0</code> pts. Because every <code>noul</code> item exceeded <code>0.85</code> confidence and every <code>score</code> item concentrated its top-2 adjacent probability mass (<code>P(3) + P(4) = 0.920</code>–<code>0.958</code>) above <code>0.85</code>, <code>low_confidence_items</code> was empty (<code>0 / 2</code> cap), enabling safe automated grading.</li>
+</ul>
+<p><strong>UC4 Summary (Input → Findings)</strong>: Grading a student&rsquo;s cybersecurity case-study PDF against a 14-item, 100-point rubric took 703 ms and revealed 5 of 6 mandatory elements present (<code>25.0 / 30.0</code>, catching the omitted 3-year TCO budget table), strong qualitative scores (<code>61.17 / 70.0</code>), and zero penalty deductions—deterministically yielding <strong><code>PASS</code> at <code>86.17 / 100.0</code></strong> (<code>+11.17</code> pts above the <code>75.0</code> cutoff).</p>
+<h3 id="use-case-5-rd-grant-proposal-knock-out--weighted-screening-uc5_grant_proposalpdf">Use Case 5: R&amp;D Grant Proposal Knock-Out + Weighted Screening (<code>uc5_grant_proposal.pdf</code>)</h3>
+<blockquote>
+<p><strong>What this test checks in plain English</strong>: When screening an R&amp;D grant application PDF, can ZOMA enforce strict pass/fail eligibility rules first and then score technical merit, impact, and budget realism against a 70-point cutoff?</p>
+</blockquote>
+<p>In Use Case 5, a 60,088-byte R&amp;D grant proposal PDF (<code>samples/uc5_grant_proposal.pdf</code> <a href="https://github.com/tanaikech/gemini-decisions-api-python/blob/main/samples/uc5_grant_proposal.pdf">Ref</a>) was screened against <strong>15 criteria</strong> (<code>samples/uc5_checklist.json</code> <a href="https://github.com/tanaikech/gemini-decisions-api-python/blob/main/samples/uc5_checklist.json">Ref</a>; saved output: <code>results/uc5_result.json</code> <a href="https://github.com/tanaikech/gemini-decisions-api-python/blob/main/results/uc5_result.json">Ref</a>): <strong>4 hard knock-out eligibility gates</strong> (<code>weight = 0.0</code>, mandatory pass), <strong>6 completeness/impact binary checks</strong> (<code>+5.0</code> pts each = <code>30.0</code> pts), <strong>4 ordinal merit rubric scores</strong> (<code>70.0</code> pts total), and <strong>1 conflict-of-interest / ethics penalty flag</strong> (<code>-15.0</code> pts), against a <code>70.0</code> cutoff and <code>±3.0</code> borderline margin. The single API call completed in <strong>769.60 ms</strong> (<code>0</code> retries) using <strong>3,339 input tokens</strong> (<code>2,299</code> text + <code>1,040</code> image tokens) and <strong>0 output tokens</strong> (estimated cost <strong>$0.000334</strong>), saving <strong>14 sequential API calls</strong>. The proposal cleared all 4 knock-out gates and scored <strong>91.40 / 100.0 (91.4%)</strong>, returning <strong><code>PASS</code></strong>, as presented in <strong>Figure 8</strong>.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20261128a/fig8_uc5_results.png"
+     alt="Figure 8: UC5 R&amp;D Grant Proposal Knock-Out &#43; Weighted Screening — Live Test Results"
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 8: Live Mode B screening results for UC5 (<code>uc5_grant_proposal.pdf</code>, 15 criteria, 769.6 ms, 3,339 input tokens, 0 output tokens, $0.000334), verifying 4/4 hard knock-out eligibility gates, 30.0/30.0 completeness points, 61.40/70.0 merit points, and 91.40/100.0 total score vs. the 70.0 cutoff.</em></p>
+<p><strong>Figure 8</strong> illustrates how hard eligibility logic and nuanced merit scoring coexist deterministically in one batch:</p>
+<ul>
+<li><strong>All 4 Hard Knock-Out Eligibility Gates Cleared (<code>4/4 PASS</code>)</strong>: <code>ko_open_source_commitment</code> (<code>p = 0.974</code>), <code>ko_budget_cap</code> &lt;= <code>$250,000</code> (<code>p = 0.965</code>), <code>ko_eligible_org</code> (<code>p = 0.964</code>), and <code>ko_timeline_12_24m</code> (<code>p = 0.948</code>) all passed well above the <code>0.85</code> threshold. In <code>evaluator.py</code>, if any single knock-out gate had returned <code>FAIL</code>, the overall verdict would have been forced to <code>FAIL</code> immediately regardless of the numeric score; if any knock-out had fallen below <code>0.85</code> confidence, it would have forced <code>NEEDS_REVIEW</code>.</li>
+<li><strong>Completeness &amp; Merit Point Calculation (<code>30.00 + 61.40 = 91.40 / 100.0 pts</code>)</strong>: All six <code>+5.0</code> completeness checks passed cleanly—<code>has_local_partners</code> (<code>p = 0.980</code>), <code>has_validation_plan</code> (<code>p = 0.975</code>), <code>has_quarterly_milestones</code> (<code>p = 0.967</code>), <code>has_qualified_team</code> (<code>p = 0.961</code>), <code>overhead_under_15pct</code> (<code>p = 0.960</code>), and <code>has_itemized_budget</code> (<code>p = 0.954</code>)—earning <code>30.00 / 30.00 pts</code>. The four weighted merit scores contributed <code>technical_merit_score</code> (<code>3.736 / 4</code> → <strong>18.68 / 20.0 pts</strong>), <code>public_impact_score</code> (<code>3.329 / 4</code> → <strong>16.65 / 20.0 pts</strong>), <code>budget_realism_score</code> (<code>3.459 / 4</code> → <strong>12.97 / 15.0 pts</strong>), and <code>sustainability_score</code> (<code>3.495 / 4</code> → <strong>13.10 / 15.0 pts</strong>), summing to <strong>91.4037 pts</strong> (<code>+21.40</code> pts above the <code>70.0</code> cutoff).</li>
+<li><strong>Zero Penalty &amp; Zero Low-Confidence Escalations</strong>: <code>penalty_coi_or_ethics</code> (<code>-15.0</code> pts) remained cleanly absent (<code>p = 0.037</code>, confidence <code>0.963</code>), and all 15 criteria cleared their confidence gates (<code>low_confidence_items = []</code>), allowing immediate automated advancement to finalist review.</li>
+</ul>
+<p><strong>UC5 Summary (Input → Findings)</strong>: Screening an R&amp;D grant proposal PDF against 4 hard eligibility knock-outs and 11 weighted merit criteria in 770 ms verified all 4/4 eligibility gates (<code>p = 0.948</code>–<code>0.974</code>), awarded full completeness points (<code>30.0 / 30.0</code>) plus strong merit scores (<code>61.40 / 70.0</code>) with zero ethics penalties, and deterministically approved the proposal (<code>PASS</code> at <code>91.40 / 100.0</code>, <code>+21.40</code> pts above cutoff).</p>
+<hr>
+<h2 id="5-cross-use-case-empirical-benchmarks--cost-analysis">5. Cross-Use-Case Empirical Benchmarks &amp; Cost Analysis</h2>
+<p>Aggregating telemetry across all five live CLI executions (<code>uc1_result.json</code> through <code>uc5_result.json</code>) reveals how consistently the 1-Input × N-Criteria architecture performs across Markdown, multi-page PDF, and high-resolution PNG payloads. <strong>Figure 9</strong> summarizes end-to-end API latency, shared-input token savings, and per-run cost across all five use cases.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20261128a/fig9_cross_usecase_benchmarks.png"
+     alt="Figure 9: Cross-Use-Case Live Benchmarks — Latency, Token Savings &amp; Cost"
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 9: Live benchmark summary across UC1–UC5 showing sub-second API latency (497.4–856.4 ms, avg 732.6 ms), 92.9%–95.0% input token reduction vs. naive sequential N× calls, and $0.001526 total cost across all 83 criteria with strictly 0 output tokens.</em></p>
+<p>Four empirical findings stand out from <strong>Figure 9</strong>:</p>
+<ul>
+<li><strong>Consistent Sub-Second Latency Across All Modalities</strong>: End-to-end HTTP round-trip latency ranged from <strong>497.37 ms</strong> (UC1, 18 criteria on Markdown) to <strong>856.42 ms</strong> (UC2, 20 criteria on a multi-page PDF), with an overall average of <strong>732.6 ms</strong> across all 5 runs (<code>UC3 = 836.97 ms</code>, <code>UC4 = 702.58 ms</code>, <code>UC5 = 769.60 ms</code>) and <strong>0 retries</strong>. Every run completed in a single API batch (<code>batches = 1</code>).</li>
+<li><strong>92.9% to 95.0% Input Token Reduction vs. Sequential Calls</strong>: Sending the shared document once instead of repeating it once per criterion saved <strong>78 sequential API calls</strong> across the 5 workflows (<code>83</code> total criteria evaluated in <code>5</code> calls). Compared with a naive sequential baseline (<code>N × total_input_tokens</code>, analogous to re-sending the entire document once for every single checklist question), shared-input evaluation cut input token volume by <strong>94.4%</strong> on UC1 (<code>2,562</code> vs. <code>46,116</code>), <strong>95.0%</strong> on UC2 (<code>3,809</code> vs. <code>76,180</code>), <strong>93.8%</strong> on UC3 (<code>2,286</code> vs. <code>36,576</code>), <strong>92.9%</strong> on UC4 (<code>3,261</code> vs. <code>45,654</code>), and <strong>93.3%</strong> on UC5 (<code>3,339</code> vs. <code>50,085</code>).</li>
+<li><strong>Strictly Zero Output Tokens Across All 83 Criteria</strong>: Across all five runs, <code>total_input_tokens</code> summed to <strong>15,257 tokens</strong>, while <code>output_tokens</code> remained strictly <strong>0</strong> (<code>$0.00</code> output cost).</li>
+<li><strong>Sub-Cent Total Cost (<code>$0.001526</code> for All 5 Audits Combined)</strong>: At <code>$0.10</code> per 1M input tokens <a href="https://ai.google.dev/gemini-api/docs/pricing">Ref</a>, individual audit costs ranged from <strong>$0.000229** (UC3) to **$0.000381</strong> (UC2). Evaluating all 83 multimodal criteria across five full documents cost <strong>$0.001526 total</strong>—roughly <strong>655 full multi-document audit suites per US dollar</strong>.</li>
+</ul>
+<hr>
+<h2 id="6-beyond-these-five-use-cases-future-horizons-for-zoma">6. Beyond These Five Use Cases: Future Horizons for ZOMA</h2>
+<p>The five live benchmarks in this article focused on Markdown, PDF, and PNG inputs, yet <code>gemini-decision-1</code> natively supports a <strong>262,144-token unified multimodal context</strong> spanning text, JSON, PDFs, images, <strong>audio, and video</strong> <a href="https://aistudio.google.com/docs/decisions-api">Ref</a>. Whenever an organization needs to inspect one rich artifact against dozens or hundreds of structured rules, the exact same ZOMA pattern applies without changing the architecture. <strong>Figure 10</strong> highlights six additional high-leverage applications across industries.</p>
+<p><img src="https://tanaikech.github.io/image-storage/20261128a/fig10_future_zoma_horizons.png"
+     alt="Figure 10: Beyond These 5 Use Cases — Future Horizons for ZOMA"
+     
+     loading="lazy"
+     decoding="async">
+
+<em>Figure 10: Six additional real-world applications of Zero-Output Multimodal Auditing (ZOMA) across audio, video, combined image+PDF packets, code diffs, long regulatory PDFs, and autonomous AI agent guardrails.</em></p>
+<p>As illustrated in <strong>Figure 10</strong>, ZOMA extends naturally well beyond document and ad checks:</p>
+<ul>
+<li><strong>Customer Support Call &amp; Sales Recording QA (<code>AUDIO</code>)</strong>: Submit one recorded support or sales call natively as audio against 50+ compliance, script-adherence, empathy, and mandatory legal-disclosure rules (<code>noul</code> + <code>score</code>) in a single pass—with no separate speech-to-text transcription pipeline required.</li>
+<li><strong>Video Ad, Tutorial &amp; Broadcast Compliance Screening (<code>VIDEO</code>)</strong>: Evaluate one short promotional clip or training video directly against brand safety, age-rating, logo visibility, caption accuracy, and regulatory claim policies before publication.</li>
+<li><strong>Insurance Claim &amp; Field Inspection Verification (<code>IMAGE + PDF</code>)</strong>: Combine damage photos and a contractor estimate PDF into one shared input and audit it against policy coverage knock-outs, fraud indicators, and automated payout tiers using Mode B (<code>weighted_scoring</code>).</li>
+<li><strong>CI/CD Pull Request &amp; Infrastructure Policy Gate (<code>CODE / DIFF</code>)</strong>: Screen one pull-request diff, Dockerfile, or Terraform plan against 100+ internal security, privacy, and architectural guidelines in under a second inside CI/CD pipelines or autonomous coding loops.</li>
+<li><strong>Clinical Trial, ISO &amp; ESG Regulatory Dossier Pre-Audit (<code>LONG PDF 256K</code>)</strong>: Pre-check lengthy statutory filings—such as medical study protocols, ISO quality manuals, or ESG sustainability disclosures—against hundreds of regulatory clauses before paying for formal external audits.</li>
+<li><strong>Real-Time AI Agent Safety &amp; Tool-Call Guardrails (<code>JSON / AGENT</code>)</strong>: Gate proposed actions, tool arguments, or generated deliverables from autonomous agents (such as <strong>Antigravity</strong> or <strong>Claude</strong>) against dozens of safety, PII, and policy boundaries in a single sub-second forward pass before execution.</li>
+</ul>
+<hr>
+<h2 id="7-limitations-best-practices--summary">7. Limitations, Best Practices &amp; Summary</h2>
+<p>While <strong>Zero-Output Multimodal Auditing (ZOMA)</strong> excels at high-throughput verification and structured scoring, treating it as a drop-in replacement for every generative workflow is a mistake. Five engineering principles keep production deployments reliable:</p>
+<ul>
+<li><strong>Pair Decisions API with a Reasoning Model When Explanations Are Required</strong>: Because <code>gemini-decision-1</code> emits zero output tokens, it tells you <em>which</em> clauses failed (<code>risk_uncapped_customer_indemnity: p = 0.973</code>) and <em>how confident</em> it is, not how to redline the contract prose. The optimal production pattern is a <strong>two-stage cascade</strong>: run <code>decisions_audit.py</code> on 100% of incoming documents at ~<code>$0.0003</code> each, and invoke a generative reasoning model only on the specific <code>FAIL</code> or <code>NEEDS_REVIEW</code> items that require written redlines or student feedback.</li>
+<li><strong>Embed ZOMA Directly Inside AI Agents (Antigravity, Claude, and Beyond)</strong>: Because the tool is a stateless Python CLI with <code>--format json</code> output, agentic platforms like <strong>Antigravity</strong> and <strong>Claude</strong> can call <code>cli/decisions_audit.py</code> as an external quality gate during autonomous workflows—checking their own generated manuscripts, specs, or images against dozens of organization rules in under a second for roughly <code>$0.0003</code>, then fixing only the flagged <code>FAIL</code> or <code>NEEDS_REVIEW</code> items before handing the final output to a human.</li>
+<li><strong>Write Atomic, Observable Checklist Criteria</strong>: Compound questions (<em>&ldquo;Does the contract include SOC 2, AES-256, and 72-hour breach notice?&rdquo;</em>) blur probabilities when only two of three clauses are present. Splitting them into atomic <code>noul</code> criteria costs only a few extra question tokens per item while keeping calibrated probabilities sharp.</li>
+<li><strong>Tune Confidence Thresholds &amp; Borderline Margins to Domain Risk</strong>: Defaulting to <code>confidence_threshold = 0.85</code> works well for general pre-flight checks, as demonstrated by UC1 and UC2 catching ambiguous items automatically. For regulated legal or medical gates, raising the threshold to <code>0.90</code>–<code>0.95</code> widens the <code>NEEDS_REVIEW</code> safety band so borderline cases always reach human reviewers.</li>
+<li><strong>Respect the 1,000-Question Batch Boundary</strong>: Each <code>POST /v1beta/decisions</code> request accepts up to 1,000 questions <a href="https://aistudio.google.com/docs/decisions-api">Ref</a>. Our <code>client.py</code> automatically chunks larger checklists into sequential 1,000-question batches while preserving the shared input, though keeping single-document checklists focused and non-redundant maximizes signal clarity.</li>
+</ul>
+<h3 id="summary">Summary</h3>
+<p>Instead of asking an AI chatbot to read a file and write long answers one question at a time, <strong>Zero-Output Multimodal Auditing (ZOMA)</strong> sends one document, PDF, or image once to Google&rsquo;s <strong>Gemini Decisions API (<code>gemini-decision-1</code>)</strong> <a href="https://aistudio.google.com/docs/decisions-api">Ref</a> and checks up to 1,000 rules in a single pass—with zero text generated and exact, trustworthy results:</p>
+<ul>
+<li><strong>Under a Second and Almost Free to Run</strong>: Across all five live tests (83 checks across Markdown, PDF, and PNG files), every audit finished in <strong>under 1 second</strong> (average <strong>732.6 ms</strong>), generated <strong>0 output tokens</strong>, cut input tokens by <strong>92.9%–95.0%</strong> compared to checking rules one by one, and cost <strong>$0.001526 in total</strong>—roughly 655 full five-document audits for a single US dollar.</li>
+<li><strong>Catches Real Problems Without Blindly Guessing (Mode A)</strong>: On technical drafts, vendor contracts, and ad images, ZOMA reliably caught confidentiality leaks, risky legal clauses, and prohibited ad promises—and whenever a rule fell in a gray area, it automatically flagged <strong><code>NEEDS_REVIEW</code></strong> so a human could make the final call.</li>
+<li><strong>Exact, Math-Error-Free Grading and Screening (Mode B)</strong>: On student case studies (<code>86.17 / 100</code>) and grant applications (<code>91.40 / 100</code>), the AI evaluates each rubric item while a simple Python script handles all additions, penalties, and mandatory eligibility rules—eliminating AI calculation mistakes completely.</li>
+<li><strong>Ready for Both Everyday Users and AI Agents</strong>: You can immediately run the same tool on your own local files and custom checklists without building OCR or complex code, and autonomous AI agents like <strong>Antigravity</strong> and <strong>Claude</strong> can call it directly as a fast, low-cost self-check before delivering finished work.</li>
+</ul>
+<p>All scripts, sample documents, checklists, and live test logs are ready to clone and run from <code>tanaikech/gemini-decisions-api-python</code> <a href="https://github.com/tanaikech/gemini-decisions-api-python">Ref</a>.</p>
+
+  
+  <h4><i class="fas fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ftanaikech.github.io%2f2026%2f11%2f28%2fauditing-documents-images-with-gemini-decisions-api%2f" target="_blank" title="Share on Facebook"><i class="fab fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=https%3a%2f%2ftanaikech.github.io%2f2026%2f11%2f28%2fauditing-documents-images-with-gemini-decisions-api%2f" target="_blank" title="Tweet"><i class="fab fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f11%2f28%2fauditing-documents-images-with-gemini-decisions-api%2f" target="_blank" title="Share on Google+"><i class="fab fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=https%3a%2f%2ftanaikech.github.io%2f2026%2f11%2f28%2fauditing-documents-images-with-gemini-decisions-api%2f" target="_blank" title="Post to Tumblr"><i class="fab fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f11%2f28%2fauditing-documents-images-with-gemini-decisions-api%2f" target="_blank" title="Pin it"><i class="fab fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=https%3a%2f%2ftanaikech.github.io%2f2026%2f11%2f28%2fauditing-documents-images-with-gemini-decisions-api%2f" target="_blank" title="Submit to Reddit"><i class="fab fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
+
+
+  
+<nav class="prev-next-posts">
+  <div class="prev-post">
+    
+      <span class="nav-label">Previous Article</span>
+      <a href="https://tanaikech.github.io/2026/11/27/harnessing-google-workspace-mcp-servers-with-google-apps-script/">Harnessing Google Workspace MCP Servers with Google Apps Script</a>
+    
+  </div>
+  <div class="next-post">
+    
+  </div>
+</nav>
+
+<style>
+.prev-next-posts {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+  gap: 2rem;
+}
+.prev-post, .next-post {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.next-post {
+  text-align: right;
+}
+.nav-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+.prev-next-posts a {
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-decoration: none;
+}
+@media (max-width: 600px) {
+  .prev-next-posts { flex-direction: column; text-align: left; }
+  .next-post { text-align: left; }
+}
+</style>
+
+
+  
+  
+  
+  
+
+  
+
+</div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-social"><a href="https://twitter.com/tanaikech" target="_blank" rel="me" title="twitter">
+                  <i class="fab fa-x-twitter"></i>
+                </a><a href="https://github.com/tanaikech" target="_blank" rel="me" title="github">
+                  <i class="fab fa-github"></i>
+                </a><a href="https://linkedin.com/in/tanaike" target="_blank" rel="me" title="linkedin">
+                  <i class="fab fa-linkedin"></i>
+                </a><a href="https://www.youtube.com/@tanaike" target="_blank" rel="me" title="youtube">
+                  <i class="fab fa-youtube"></i>
+                </a><a href="https://medium.com/@tanaike" target="_blank" rel="me" title="medium">
+                  <i class="fab fa-medium"></i>
+                </a><a href="https://stackoverflow.com/users/7108653" target="_blank" rel="me" title="stackoverflow">
+                  <i class="fab fa-stack-overflow"></i>
+                </a><a href="https://zenn.dev/tanaike" target="_blank" rel="me" title="zenn">
+                  <i class="fas fa-edit"></i>
+                </a><a href="https://dev.to/tanaike" target="_blank" rel="me" title="devto">
+                  <i class="fab fa-dev"></i>
+                </a><a href="https://devpost.com/tanaike" target="_blank" rel="me" title="devpost">
+                  <i class="fas fa-terminal"></i>
+                </a><a href="https://orcid.org/0009-0004-2510-1163" target="_blank" rel="me" title="orcid">
+                  <i class="fab fa-orcid"></i>
+                </a>
+      </div>
+      
+      <p class="copyright">
+        &copy; 2026 tanaike - Google Apps Script, Gemini API, and Developer Tips. Built with <a href="https://gohugo.io" target="_blank">Hugo</a>.
+      </p>
+    </div>
+  </footer>
+
+  <script src="https://tanaikech.github.io/js/eclipse.js"></script>
+
+  
+  
+
+  
+  
+
+  
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-J3Z6T50WL5"></script>
+<script>
+  
+  if (window.location.hostname != "localhost") {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-J3Z6T50WL5');
+  }
+</script>
+
+
+
+  
+
+  
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" crossorigin="anonymous"
+      onload="renderMathInElement(document.body, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '\\[', right: '\\]', display: true},
+          {left: '\\begin{equation}', right: '\\end{equation}', display: true},
+          {left: '\\begin{align}', right: '\\end{align}', display: true},
+          {left: '\\begin{alignat}', right: '\\end{alignat}', display: true},
+          {left: '\\begin{gather}', right: '\\end{gather}', display: true},
+          {left: '\\begin{CD}', right: '\\end{CD}', display: true},
+          {left: '$', right: '$', display: false},
+          {left: '\\(', right: '\\)', display: false}
+        ],
+        throwOnError: false,
+        ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      });"></script>
+
+</body>
+</html>
+
